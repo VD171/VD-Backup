@@ -1,0 +1,124 @@
+<!--
+  VD BACKUP - full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<p align="center">
+  <img src="module/webroot/assets/logo-wordmark.png" alt="VDBackup" width="320">
+</p>
+
+<p align="center">
+  <b>Sao lưu và khôi phục đầy đủ ứng dụng và dữ liệu với quyền root - điều khiển hoàn toàn qua WebUI.</b><br>
+  Mô-đun KernelSU / APatch / Magisk. Không có lời nhắc "cấp su", không cần bật tắt <code>sucompat</code>.
+</p>
+
+<p align="center">
+  <a href="https://github.com/VD171/VD-Backup/releases">Bản phát hành</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
+  <a href="docs/USER-GUIDE.md">Hướng dẫn người dùng</a> ·
+  <a href="docs/AI-AGENTS.md">Tác nhân AI</a> ·
+  <a href="CONTRIBUTING.md">Đóng góp</a> ·
+  <a href="https://xdaforums.com/t/VD-Backup.4807267/">Chủ đề XDA</a>
+</p>
+
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+
+---
+
+## Nó là gì
+
+VDBackup là một **mô-đun WebUI** root giúp sao lưu và khôi phục các ứng dụng cùng dữ liệu của chúng
+**mà không cần ứng dụng đồng hành cho các tính năng cốt lõi** - bởi vì mô-đun đã sẵn là root, nên
+không có gì để "cho phép". Nó hướng tới việc gói gọn mọi thứ mà các ứng dụng sao lưu phổ biến làm
+được vào một nơi, với một WebUI gọn gàng.
+
+Nó được định vị là **người kế nhiệm mở, root-native của Swift Backup, Neo-Backup và
+Android-DataBackup**: hợp nhất những gì chúng làm, dưới giấy phép AGPLv3, và thậm chí có thể nhập
+các bản sao lưu Neo-Backup và Android-DataBackup hiện có để bạn chuyển sang.
+
+## Tính năng
+
+- **Ứng dụng:** APK (base + splits), dữ liệu ứng dụng (`/data/data`), dữ liệu được thiết bị bảo vệ
+  (`/data/user_de`), dữ liệu bên ngoài (`Android/data`), OBB, phương tiện.
+- **Dữ liệu hệ thống/đặc biệt:** quyền, AppOps và (tùy chọn bật) SSAID, trong phạm vi root cho phép.
+- **Chế độ sao lưu:** **Full** (`tar.zst` khả chuyển), **Snapshot** (tăng dần +
+  có phiên bản, qua `restic`) và **Mirror** (đồng bộ 1:1, qua `rclone`/`rsync`).
+- **Bảo toàn trung thực:** ngữ cảnh SELinux, uid/gid, chế độ, xattr và capabilities.
+- **Nén:** none / lz4 / zstd / gzip (gzip = "chế độ tương thích", mở được ở mọi nơi).
+- **Mã hóa:** tùy chọn và khả chuyển (`age` + cụm mật khẩu, hoặc zip AES-256) - không bao giờ
+  gắn với phần cứng của thiết bị, nên một bản sao lưu có thể khôi phục trên thiết bị khác hoặc mở trên PC.
+- **Đích đến:** cục bộ, SFTP, SCP, SMB, WebDAV, FTP, S3 và hơn 70 loại khác (`rclone`), cùng với
+  kho `rsync` và `restic`. Tùy chọn Google Drive qua một ứng dụng đồng hành nhỏ bật theo lựa chọn.
+- **Tính toàn vẹn:** mọi archive đều được kiểm tra đối chiếu với manifest; dry-run và kiểm thử khôi
+  phục cho phép bạn kiểm tra một bản sao lưu mà không đụng chạm đến bất cứ thứ gì.
+- **Lập lịch + lưu giữ:** các tác vụ định kỳ với việc tỉa bớt theo kiểu keep-N.
+- **Nền:** sao lưu/khôi phục chạy tách rời và vẫn tiếp tục khi đóng WebUI, kèm thông báo khi bắt đầu
+  và khi hoàn thành.
+- **Di chuyển vào (nhập):** nhập các bản sao lưu Neo-Backup và Android-DataBackup hiện có, kể cả
+  các bản được mã hóa bằng mật khẩu.
+
+## Cài đặt
+
+1. Tải `VD-Backup-vX.Y.zip` mới nhất từ [Bản phát hành](https://github.com/VD171/VD-Backup/releases).
+2. Flash nó trong trình quản lý KernelSU / APatch / Magisk - dùng được ngay, không cần khởi động lại.
+3. Mở **WebUI** của mô-đun để cấu hình và chạy sao lưu. Vậy là xong.
+
+Mới làm quen? [Hướng dẫn người dùng](docs/USER-GUIDE.md) sẽ dẫn bạn từ cài đặt đến khôi phục.
+
+## Tính khả chuyển
+
+Các bản sao lưu của bạn **không bị khóa vào mô-đun này**. Mọi thứ đều dùng các định dạng tiêu chuẩn
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) mở được trên Windows, macOS và Linux bằng các công
+cụ thông dụng hoặc trình quản lý tệp. Mỗi bản sao lưu được mã hóa đều kèm một ghi chú **RECOVERY**
+chứa các lệnh chính xác để giải mã và giải nén trên PC.
+
+## Xây dựng (Build)
+
+Mô-đun gồm shell + WebUI cộng với các tệp nhị phân tĩnh theo từng ABI (`tar`, `zstd`, `lz4`,
+`rclone`, `rsync`, ssh, `restic`) được xây dựng cho `armeabi-v7a`, `arm64-v8a`, `x86`,
+`x86_64`. Xem [CONTRIBUTING.md](CONTRIBUTING.md) và các quy trình CI.
+
+## Tài liệu
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - tài liệu, duyệt trực tuyến.
+- **[Hướng dẫn người dùng](docs/USER-GUIDE.md)** - từ đầu đến cuối, từ cài đặt đến khôi phục.
+- **[Tác nhân AI](docs/AI-AGENTS.md)** - điều khiển mọi hành động không giao diện qua JSON API.
+- **[Kiến trúc](ARCHITECTURE.md)** và **[Cấu trúc tệp](docs/FILE-STRUCTURE.md)** - cách nó hoạt động.
+- **[Đóng góp](CONTRIBUTING.md)** và **[Bảo mật](SECURITY.md)**.
+
+## Thân thiện với AI
+
+VDBackup được xây dựng để chào đón các trợ lý và tác nhân AI, không chỉ con người. Engine nói JSON
+(mọi verb của `helper.sh` trả về một đối tượng JSON duy nhất), mã nguồn, tài liệu và cấu trúc tệp
+được bố trí để máy đọc, và các đóng góp có hỗ trợ của AI được xem xét và chấp nhận như mọi đóng góp
+khác. Một tác nhân có thể quản trị **mọi** hành động của mô-đun theo kiểu không giao diện qua cùng
+API mà WebUI dùng - xem toàn bộ bề mặt điều khiển tại **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**, và
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) để đóng góp.
+
+## Liên hệ
+
+* https://vd171.ru
+* https://vd.priv8.ru
+* **Telegram:** @VD_Priv8 https://t.me/VD_Priv8
+* **Channel:** @Priv8_VD https://t.me/Priv8_VD
+* **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
+* **E-mail:** vd.priv8@pm.me
+* **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
+* **GitHub:** @VD171 https://github.com/VD171
+
+## Xem thêm
+
+Các dự án anh em của cùng tác giả:
+
+- **[VDInfos](https://github.com/VD171/VD-Infos)** - một trình gỡ lỗi phương thức của thiết bị: đọc từng mục qua mọi phương thức có thể đọc nó và so sánh chúng cạnh nhau.
+- **[VDGoogle](https://github.com/VD171/VD-Google)** - các dịch vụ Google của bạn (RCS, Wallet, các chứng thực Play Integrity), đọc ngay trên thiết bị của bạn mà không cần internet.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)** - một trình giả lập thiết bị biến một fingerprint mới thành một hồ sơ mạch lạc, nhất quán.
+
+## Giấy phép
+
+[GNU AGPL-3.0-or-later](LICENSE). Copyleft mạng: nếu bạn chạy một phiên bản đã sửa đổi, kể cả dưới
+dạng một dịch vụ, bạn phải cung cấp mã nguồn của nó.
+
+---
+
+`android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `vdbackup`

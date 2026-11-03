@@ -1,0 +1,125 @@
+<!--
+  VD BACKUP - full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<p align="center">
+  <img src="module/webroot/assets/logo-wordmark.png" alt="VDBackup" width="320">
+</p>
+
+<p align="center">
+  <b>Volledige back-up en herstel van apps en gegevens als root - volledig aangestuurd vanuit een WebUI.</b><br>
+  KernelSU- / APatch- / Magisk-module. Geen "su verlenen"-prompt, geen omschakelen van <code>sucompat</code>.
+</p>
+
+<p align="center">
+  <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
+  <a href="docs/USER-GUIDE.md">Gebruikershandleiding</a> ·
+  <a href="docs/AI-AGENTS.md">AI-agenten</a> ·
+  <a href="CONTRIBUTING.md">Bijdragen</a> ·
+  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA-thread</a>
+</p>
+
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+
+---
+
+## Wat het is
+
+VDBackup is een root-**WebUI-module** die je apps en hun gegevens back-upt en herstelt
+**zonder begeleidende app voor de kernfuncties** - omdat de module al root is, valt er
+niets te "toestaan". Het doel is om alles te dekken wat de populaire back-upapps doen, op
+één plek, met een overzichtelijke WebUI.
+
+Het is bedoeld als de open, root-native **opvolger van Swift Backup, Neo-Backup en
+Android-DataBackup**: de vereniging van wat zij doen, onder AGPLv3, en het kan zelfs
+bestaande back-ups van Neo-Backup en Android-DataBackup importeren zodat je kunt overstappen.
+
+## Functies
+
+- **Apps:** APK (basis + splits), app-gegevens (`/data/data`), apparaatbeveiligde gegevens
+  (`/data/user_de`), externe gegevens (`Android/data`), OBB, media.
+- **Systeem-/speciale gegevens:** machtigingen, AppOps en (optioneel) SSAID, waar root dit toelaat.
+- **Back-upmodi:** **Full** (draagbare `tar.zst`), **Snapshot** (incrementeel +
+  geversioneerd, via `restic`) en **Mirror** (1:1-synchronisatie, via `rclone`/`rsync`).
+- **Getrouw behoud:** SELinux-contexten, uid/gid, modi, xattr en capabilities.
+- **Compressie:** geen / lz4 / zstd / gzip (gzip = "compatibiliteitsmodus", opent overal).
+- **Versleuteling:** optioneel en draagbaar (`age` + wachtwoordzin of AES-256-zip) - nooit
+  gebonden aan de apparaathardware, zodat een back-up op een ander apparaat wordt hersteld of op een pc wordt geopend.
+- **Bestemmingen:** lokaal, SFTP, SCP, SMB, WebDAV, FTP, S3 en 70+ meer (`rclone`),
+  plus `rsync`- en `restic`-repository's. Optioneel Google Drive via een piepkleine optionele begeleider.
+- **Integriteit:** elk archief wordt geverifieerd tegen het manifest; droogloop (dry-run)
+  en hersteltest laten je een back-up controleren zonder iets aan te raken.
+- **Planning + bewaring:** terugkerende taken met keep-N-opschoning.
+- **Achtergrond:** back-up/herstel draaien losgekoppeld en overleven het sluiten van de
+  WebUI, met meldingen bij start/voltooiing.
+- **Migreren:** importeert bestaande back-ups van Neo-Backup en Android-DataBackup,
+  inclusief met wachtwoord versleutelde.
+
+## Installatie
+
+1. Download de nieuwste `VD-Backup-vX.Y.zip` van [Releases](https://github.com/VD171/VD-Backup/releases).
+2. Flash het in de KernelSU- / APatch- / Magisk-manager - meteen bruikbaar, geen herstart nodig.
+3. Open de **WebUI** van de module om back-ups te configureren en uit te voeren. Dat is alles.
+
+Nieuw hier? De [Gebruikershandleiding](docs/USER-GUIDE.md) leidt je van installatie tot herstel.
+
+## Overdraagbaarheid
+
+Je back-ups zitten **niet vast aan deze module**. Alles gebruikt standaardformaten
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) die op Windows, macOS en Linux openen met
+gangbare hulpmiddelen of bestandsbeheerders. Elke versleutelde back-up wordt geleverd met
+een **RECOVERY**-notitie met de exacte opdrachten om op een pc te ontsleutelen en uit te pakken.
+
+## Bouwen
+
+De module is shell + WebUI plus statische binaries per ABI (`tar`, `zstd`, `lz4`,
+`rclone`, `rsync`, ssh, `restic`) gebouwd voor `armeabi-v7a`, `arm64-v8a`, `x86`,
+`x86_64`. Zie [CONTRIBUTING.md](CONTRIBUTING.md) en de CI-workflows.
+
+## Documentatie
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - de documentatie, online te doorbladeren.
+- **[Gebruikershandleiding](docs/USER-GUIDE.md)** - van begin tot eind, van installatie tot herstel.
+- **[AI-agenten](docs/AI-AGENTS.md)** - stuur elke actie headless aan via de JSON-API.
+- **[Architectuur](ARCHITECTURE.md)** en **[Bestandsstructuur](docs/FILE-STRUCTURE.md)** - hoe het werkt.
+- **[Bijdragen](CONTRIBUTING.md)** en **[Beveiliging](SECURITY.md)**.
+
+## AI-vriendelijk
+
+VDBackup is gebouwd om AI-assistenten en -agenten welkom te heten, niet alleen mensen.
+De engine spreekt JSON (elk `helper.sh`-werkwoord geeft één JSON-object terug), de code,
+documentatie en bestandsstructuur zijn ingericht voor machinaal lezen, en bijdragen met
+AI-hulp worden net als alle andere beoordeeld en geaccepteerd. Een agent kan **elke**
+actie van de module headless beheren via dezelfde API die de WebUI gebruikt - zie
+**[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** voor het volledige besturingsoppervlak, en
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) om bij te dragen.
+
+## Contacten
+
+* https://vd171.ru
+* https://vd.priv8.ru
+* **Telegram:** @VD_Priv8 https://t.me/VD_Priv8
+* **Channel:** @Priv8_VD https://t.me/Priv8_VD
+* **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
+* **E-mail:** vd.priv8@pm.me
+* **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
+* **GitHub:** @VD171 https://github.com/VD171
+
+## Zie ook
+
+Zusterprojecten van dezelfde auteur:
+
+- **[VDInfos](https://github.com/VD171/VD-Infos)** - een debugger voor apparaatmethoden: leest elk item via elke methode die het kan lezen en vergelijkt ze naast elkaar.
+- **[VDGoogle](https://github.com/VD171/VD-Google)** - je Google-diensten (RCS, Wallet, Play Integrity-attestaties), op je apparaat gelezen zonder internet.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)** - een apparaatspoofer die een verse fingerprint omzet in een coherent, consistent profiel.
+
+## Licentie
+
+[GNU AGPL-3.0-or-later](LICENSE). Netwerk-copyleft: als je een gewijzigde versie draait,
+ook als dienst, moet je de broncode ervan aanbieden.
+
+---
+
+`android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `vdbackup`

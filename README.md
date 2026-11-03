@@ -1,0 +1,125 @@
+<!--
+  VD BACKUP - full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<p align="center">
+  <img src="module/webroot/assets/logo-wordmark.png" alt="VDBackup" width="320">
+</p>
+
+<p align="center">
+  <b>Full app &amp; data backup and restore as root - driven entirely from a WebUI.</b><br>
+  KernelSU / APatch / Magisk module. No "grant su" prompt, no toggling <code>sucompat</code>.
+</p>
+
+<p align="center">
+  <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
+  <a href="docs/USER-GUIDE.md">User guide</a> ·
+  <a href="docs/AI-AGENTS.md">AI agents</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a> ·
+  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
+</p>
+
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+
+---
+
+## What it is
+
+VDBackup is a root **WebUI module** that backs up and restores your apps and their
+data **without a companion app for the core features** - because the module is
+already root, there is nothing to "allow". It aims to cover everything the popular
+backup apps do, in one place, with a clean WebUI.
+
+It is meant as the open, root-native **successor to Swift Backup, Neo-Backup and
+Android-DataBackup**: the union of what they do, under AGPLv3, and it can even
+import existing Neo-Backup and Android-DataBackup backups so you can move over.
+
+## Features
+
+- **Apps:** APK (base + splits), app data (`/data/data`), device-protected data
+  (`/data/user_de`), external data (`Android/data`), OBB, media.
+- **System/special data:** permissions, AppOps, and (opt-in) SSAID, where root allows.
+- **Backup modes:** **Full** (portable `tar.zst`), **Snapshot** (incremental +
+  versioned, via `restic`) and **Mirror** (1:1 sync, via `rclone`/`rsync`).
+- **Faithful preservation:** SELinux contexts, uid/gid, modes, xattr and capabilities.
+- **Compression:** none / lz4 / zstd / gzip (gzip = "compatibility mode", opens anywhere).
+- **Encryption:** optional and portable (`age` + passphrase, or AES-256 zip) - never
+  tied to device hardware, so a backup restores on another device or opens on a PC.
+- **Destinations:** local, SFTP, SCP, SMB, WebDAV, FTP, S3 and 70+ more (`rclone`),
+  plus `rsync` and `restic` repos. Optional Google Drive via a tiny opt-in companion.
+- **Integrity:** every archive is verified against the manifest; dry-run and
+  restore-test let you check a backup without touching anything.
+- **Scheduling + retention:** recurring jobs with keep-N pruning.
+- **Background:** backup/restore run detached and survive closing the WebUI, with
+  start/finish notifications.
+- **Migrate in:** imports existing Neo-Backup and Android-DataBackup backups,
+  including password-encrypted ones.
+
+## Install
+
+1. Download the latest `VD-Backup-vX.Y.zip` from [Releases](https://github.com/VD171/VD-Backup/releases).
+2. Flash it in the KernelSU / APatch / Magisk manager - usable immediately, no reboot needed.
+3. Open the module's **WebUI** to configure and run backups. That's it.
+
+New here? The [User guide](docs/USER-GUIDE.md) walks you from install to restore.
+
+## Portability
+
+Your backups are **not locked into this module**. Everything uses standard formats
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) that open on Windows, macOS and
+Linux with common tools or file managers. Every encrypted backup ships with a
+**RECOVERY** note containing the exact commands to decrypt and extract on a PC.
+
+## Build
+
+The module is shell + WebUI plus per-ABI static binaries (`tar`, `zstd`, `lz4`,
+`rclone`, `rsync`, ssh, `restic`) built for `armeabi-v7a`, `arm64-v8a`, `x86`,
+`x86_64`. See [CONTRIBUTING.md](CONTRIBUTING.md) and the CI workflows.
+
+## Documentation
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - the docs, browsable online.
+- **[User guide](docs/USER-GUIDE.md)** - end to end, from install to restore.
+- **[AI agents](docs/AI-AGENTS.md)** - drive every action headlessly over the JSON API.
+- **[Architecture](ARCHITECTURE.md)** and **[File structure](docs/FILE-STRUCTURE.md)** - how it works.
+- **[Contributing](CONTRIBUTING.md)** and **[Security](SECURITY.md)**.
+
+## AI-friendly
+
+VDBackup is built to be welcoming to AI assistants and agents, not just people.
+The engine speaks JSON (every `helper.sh` verb returns a single JSON object), the
+code, docs and file structure are laid out for machine reading, and AI-assisted
+contributions are reviewed and accepted like any other. An agent can administer
+**every** action of the module headlessly through the same API the WebUI uses -
+see **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** for the full control surface, and
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) to contribute.
+
+## Contacts
+
+* https://vd171.ru
+* https://vd.priv8.ru
+* **Telegram:** @VD_Priv8 https://t.me/VD_Priv8
+* **Channel:** @Priv8_VD https://t.me/Priv8_VD
+* **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
+* **E-mail:** vd.priv8@pm.me
+* **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
+* **GitHub:** @VD171 https://github.com/VD171
+
+## See also
+
+Sibling projects by the same author:
+
+- **[VDInfos](https://github.com/VD171/VD-Infos)** - a device method debugger: reads each item through every method that can read it and compares them side by side.
+- **[VDGoogle](https://github.com/VD171/VD-Google)** - your Google services (RCS, Wallet, Play Integrity attestations), read on your device with no internet.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)** - a device spoofer that turns a fresh fingerprint into a coherent, consistent profile.
+
+## License
+
+[GNU AGPL-3.0-or-later](LICENSE). Network copyleft: if you run a modified version,
+even as a service, you must offer its source.
+
+---
+
+`android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `vdbackup`
