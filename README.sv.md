@@ -51,7 +51,16 @@ importera befintliga säkerhetskopior från Neo-Backup och Android-DataBackup s�
   plus `rsync`- och `restic`-förråd. Valfritt Google Drive via en pytteliten valfri följeslagare.
 - **Integritet:** varje arkiv verifieras mot manifestet; torrkörning (dry-run) och
   återställningstest låter dig kontrollera en säkerhetskopia utan att röra något.
-- **Schemaläggning + kvarhållning:** återkommande jobb med keep-N-gallring.
+- **Selektiv återställning:** återställ valfri delmängd av en säkerhetskopias objekt; radera
+  säkerhetskopior och för en aktivitets-/revisionslogg över varje destruktiv åtgärd.
+- **Särskilda säkerhetskopior:** meddelanden (SMS/MMS), kontakter och samtalslogg, Wi-Fi och
+  Bluetooth, med en valfri portabel JSON-export som du kan öppna på en PC.
+- **Schemaläggning + automatisering:** återkommande jobb med keep-N-gallring, plus valfri
+  auto-säkerhetskopiering vid installation/uppdatering och en lista över uteslutna appar.
+- **Installationskälla:** återställda appar anger som standard Play Store som sin
+  installationskälla (växlingsbart); ett avancerat tillval förfalskar även det initierande paketet och källan.
+- **Montering som systemapp:** montera en installerad app som en systemapp utan att röra den
+  riktiga `/system`-partitionen (systemlöst overlay-undermodul, NoMount-medvetet).
 - **Bakgrund:** säkerhetskopiering/återställning körs frikopplat och överlever att WebUI
   stängs, med aviseringar vid start/slut.
 - **Migrera in:** importerar befintliga säkerhetskopior från Neo-Backup och
@@ -62,6 +71,15 @@ importera befintliga säkerhetskopior från Neo-Backup och Android-DataBackup s�
 1. Ladda ner den senaste `VD-Backup-vX.Y.zip` från [Utgåvor](https://github.com/VD171/VD-Backup/releases).
 2. Flasha den i KernelSU- / APatch- / Magisk-hanteraren - användbar direkt, ingen omstart behövs.
 3. Öppna modulens **WebUI** för att konfigurera och köra säkerhetskopior. Det är allt.
+
+**Utgåvor.** Sex zip-filer per release. `universal-full` - alla arkitekturer och alla
+binärer (inkl. `rclone` för molnleverantörer, `restic` för ögonblicksbilder), alla enheter,
+störst. `universal-lite` - alla arkitekturer utan de två största binärerna (`rclone`,
+`restic`), minst, och klarar fortfarande lokala, SSH/SFTP och `rsync`. `<abi>-full`
+(`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - en enda arkitektur med alla binärer, mindre
+än `universal-full`. Vet du din arkitektur -> välj `<abi>-full`; vill du ha minst eller
+slippa molnjättarna -> `universal-lite`; allt på alla enheter -> `universal-full`. Se
+[Utgåvor](https://github.com/VD171/VD-Backup/releases).
 
 Ny här? [Användarguiden](docs/USER-GUIDE.md) tar dig från installation till återställning.
 
@@ -84,7 +102,10 @@ Modulen är shell + WebUI plus statiska binärer per ABI (`tar`, `zstd`, `lz4`,
 - **[Användarguide](docs/USER-GUIDE.md)** - från början till slut, från installation till återställning.
 - **[AI-agenter](docs/AI-AGENTS.md)** - styr varje åtgärd huvudlöst via JSON-API:et.
 - **[Arkitektur](ARCHITECTURE.md)** och **[Filstruktur](docs/FILE-STRUCTURE.md)** - hur det fungerar.
+- **[Medföljande binärer](docs/BINARIES.md)** - ursprung och SHA-256 för varje förkompilerad binär, för en fullständig granskning.
+- **[Återställning](module/RECOVERY.md)** - öppna och dekryptera en säkerhetskopia på en dator, utan modulen.
 - **[Bidra](CONTRIBUTING.md)** och **[Säkerhet](SECURITY.md)**.
+- **[Ändringslogg](CHANGELOG.md)** och **[Uppförandekod](CODE_OF_CONDUCT.md)**.
 
 ## AI-vänligt
 

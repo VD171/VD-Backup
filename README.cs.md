@@ -51,7 +51,16 @@ importovat existující zálohy Neo-Backup a Android-DataBackup, abyste mohli p�
   plus repozitáře `rsync` a `restic`. Volitelně Google Drive přes drobného volitelného společníka.
 - **Integrita:** každý archiv je ověřen proti manifestu; zkušební běh (dry-run) a test
   obnovy umožňují zkontrolovat zálohu, aniž byste cokoli změnili.
-- **Plánování + uchovávání:** opakující se úlohy s prořezáváním keep-N.
+- **Selektivní obnova:** obnovte libovolnou podmnožinu položek zálohy; mažte zálohy a veďte
+  protokol aktivity/auditu každé destruktivní akce.
+- **Speciální zálohy:** zprávy (SMS/MMS), kontakty a seznam hovorů, Wi-Fi a Bluetooth,
+  s volitelným přenosným exportem do JSON, který otevřete na PC.
+- **Plánování + automatizace:** opakující se úlohy s prořezáváním keep-N, plus volitelná
+  automatická záloha při instalaci/aktualizaci a seznam vyloučených aplikací.
+- **Zdroj instalace:** obnovené aplikace ve výchozím nastavení hlásí jako zdroj instalace
+  Play Store (přepínatelné); pokročilá volitelná možnost také zfalšuje iniciující balíček a zdroj.
+- **Připojení jako systémová aplikace:** připojte nainstalovanou aplikaci jako systémovou, aniž
+  byste se dotkli skutečného oddílu `/system` (bezsystémový overlay podmodul, s ohledem na NoMount).
 - **Na pozadí:** zálohování/obnova běží odpojeně a přežijí zavření WebUI, s oznámeními
   o začátku/dokončení.
 - **Migrace:** importuje existující zálohy Neo-Backup a Android-DataBackup, včetně těch
@@ -62,6 +71,8 @@ importovat existující zálohy Neo-Backup a Android-DataBackup, abyste mohli p�
 1. Stáhněte nejnovější `VD-Backup-vX.Y.zip` z [Vydání](https://github.com/VD171/VD-Backup/releases).
 2. Nainstalujte jej ve správci KernelSU / APatch / Magisk - použitelný okamžitě, restart není potřeba.
 3. Otevřete **WebUI** modulu, abyste nakonfigurovali a spouštěli zálohy. A je to.
+
+**Edice.** Každé vydání se dodává jako šest zipů. `universal-full` - každá architektura a každá binárka (včetně `rclone` pro cloudové poskytovatele a `restic` pro snímky), jakékoli zařízení, největší. `universal-lite` - každá architektura bez dvou největších binárek (`rclone`, `restic`), nejmenší, stále zvládá lokální zálohy, SSH/SFTP a `rsync`. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - jediná architektura se všemi binárkami, menší než `universal-full`. Znáte svou architekturu -> zvolte `<abi>-full`; chcete nejmenší nebo bez cloudových obrů -> `universal-lite`; všechno na jakémkoli zařízení -> `universal-full`. Viz [Vydání](https://github.com/VD171/VD-Backup/releases).
 
 Jste tu noví? [Uživatelská příručka](docs/USER-GUIDE.md) vás provede od instalace až po obnovu.
 
@@ -84,7 +95,10 @@ Modul tvoří shell + WebUI plus statické binárky pro každou ABI (`tar`, `zst
 - **[Uživatelská příručka](docs/USER-GUIDE.md)** - od začátku do konce, od instalace po obnovu.
 - **[AI agenti](docs/AI-AGENTS.md)** - řiďte každou akci bezhlavě přes JSON API.
 - **[Architektura](ARCHITECTURE.md)** a **[Struktura souborů](docs/FILE-STRUCTURE.md)** - jak to funguje.
+- **[Přibalené binárky](docs/BINARIES.md)** - původ a SHA-256 každé předkompilované binárky, pro úplný audit.
+- **[Obnovení](module/RECOVERY.md)** - otevřete a dešifrujte zálohu na počítači, bez modulu.
 - **[Přispívání](CONTRIBUTING.md)** a **[Bezpečnost](SECURITY.md)**.
+- **[Seznam změn](CHANGELOG.md)** a **[Kodex chování](CODE_OF_CONDUCT.md)**.
 
 ## Přívětivý k AI
 

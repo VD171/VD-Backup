@@ -1,0 +1,85 @@
+# ======================================================================
+#  VDBackup .gitignore - deliberately strict. It keeps secrets, data
+#  pulled from devices, and build artifacts OUT of the repo so a mistake
+#  or an accident cannot leak them. When in doubt, a file stays out.
+#  (Patterns are specific on purpose: broad name substrings are avoided
+#  so a contributor's legitimate source file is never silently ignored.)
+# ======================================================================
+
+# --- Internal, never published ----------------------------------------
+/CLAUDE.md
+/.docs/
+/.claude/
+
+# --- Secrets: keys, credentials, tokens (NEVER commit) -----------------
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+keystore.properties
+*.gpg
+*.asc
+*.agekey
+age.key
+id_rsa
+id_ed25519
+id_ecdsa
+*.ppk
+.env
+.env.*
+*.env
+credentials.json
+*.credentials
+client_secret*.json
+oauth_client_secret*
+*.token
+token.txt
+
+# --- Data pulled from devices / user data (NEVER commit) ---------------
+*.apk
+*.apks
+*.ab
+*.abx
+settings_ssaid*
+*.vda
+*.tar
+*.tar.*
+*.zst
+*.gz
+*.lz4
+*.pcap
+*.pcapng
+*.dump
+*.db
+*.sqlite
+*.sqlite3
+/backups/
+/ssaid_backups/
+/staging/
+
+# --- Build artifacts ---------------------------------------------------
+*.zip
+/build/
+/dist/
+**/build/
+.gradle/
+local.properties
+/dex/out/
+/module/vdbhelper.dex
+# companion APK is built from companion/ by CI and bundled on demand
+/module/companion.apk
+# bundled per-ABI binaries are build artifacts (CI/build_bin.sh rebuilds them)
+/module/bin/*/*
+!/module/bin/*/.gitkeep
+
+# --- OS / editor cruft -------------------------------------------------
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.idea/
+*.iml
+.vscode/

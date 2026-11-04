@@ -1,0 +1,130 @@
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · Italiano · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+
+---
+
+# Changelog
+
+Tutte le modifiche rilevanti di VDBackup sono documentate qui. Solo in inglese.
+
+## v1.01
+
+Prima versione pubblica. Un modulo WebUI per KernelSU/APatch/Magisk che esegue il backup e il ripristino di
+app e dei loro dati interamente come root, senza richiesta di concessione.
+
+Motore e formati:
+
+- Motore di backup/ripristino eseguito come processo root distaccato (`setsid`): sopravvive alla chiusura
+  della WebUI o del gestore di root, e l'interfaccia si riaggancia al progresso in tempo reale tramite `opid`.
+- Tre modalità di backup: Full (tar.zst, locale o remoto), Snapshot (repository restic, cifrato
+  e deduplicato) e Mirror (sincronizzazione 1:1 rclone/rsync). Gli APK sono sempre compressi,
+  anche in un mirror.
+- Elementi per app: APK (base + splits), `data`, `data_de`, `obb`, esterno e media.
+  Il contesto SELinux, uid/gid, i modi e xattr/caps vengono preservati; il ripristino usa una
+  sessione `pm install` e rimappa proprietario/contesto all'uid attivo.
+- Consapevole del multi-utente (multi-user) in ogni fase. I backup sono archiviati sotto `/sdcard/VDBackup`
+  (per utente), fuori da `/data/adb`, così da non essere leggibili prima del primo sblocco; ogni
+  destinazione è isolata sotto `<path>/vdbackup`.
+- Compressione: nessuna, lz4, zstd (livelli) o gzip ("modalità di compatibilità"). Un manifest JSON
+  registra il dispositivo, il pacchetto (inclusa l'etichetta dell'app), gli elementi e i permessi.
+- Cifratura portatile con `age` (keygen), oltre a una guida di RIPRISTINO su PC inclusa in ogni backup
+  cifrato, così da poter essere decifrato ed estratto ovunque, senza il modulo.
+
+Destinazioni e cloud:
+
+- Destinazioni: aggiungi/elenca/prova/elimina (locale, remoto rclone, repository restic e un companion
+  opzionale di Google Drive); le credenziali sono archiviate offuscate, mai in chiaro.
+- Creare remote rclone dall'interfaccia/API (`remote-add`/`remote-list`/`remote-del`), così che qualsiasi
+  backend cloud (SFTP, SMB, WebDAV, FTP, S3, Google Drive e altro) sia raggiungibile senza
+  modificare `rclone.conf` a mano.
+- Google Drive in due modi: via rclone (senza account Google Cloud) o tramite l'app companion headless
+  opzionale (`ru.vd171.vdbackup`), che riporta un avviso obbligatorio di occultamento con HMA-OSS.
+- Politica di rete: scegliere se i trasferimenti cloud possono usare qualsiasi connessione, solo Wi-Fi o
+  solo dati mobili; applicata ai job manuali e pianificati. Le destinazioni locali sono esenti.
+
+Importazione (migrazione):
+
+- Importare da Neo-Backup, inclusi i backup cifrati con password (AES-256-GCM decifrato dall'
+  helper dex; la WebUI richiede la password).
+- Importare da Android-DataBackup (installare gli APK, estrarre gli archivi user/user_de/data, rimappare).
+- Entrambi convalidati contro backup reali su più dispositivi.
+
+Integrità e sicurezza:
+
+- Ripristino fedele di tipo cancella-e-estrai; verifica sha256 per archivio (attiva per default su Full, e
+  un controllo di integrità del repository per Snapshot), dry-run e restore-test. Gli archivi vengono riletti
+  per verificarne la completezza; un archivio corrotto o un nome di pacchetto non valido non possono mai
+  innescare un ripristino distruttivo, e i fallimenti di trasferimento remoto vengono segnalati, mai silenziosi.
+- Ripristino selettivo: ripristina qualsiasi sottoinsieme degli elementi contenuti in un backup (APK, data, dati
+  protetti, OBB, esterno, media), tutti selezionati per default.
+- Elimina i backup dall'interfaccia/API (`delete-backup`) e ritenzione keep-last-N per i backup manuali
+  (`prune`); ogni eliminazione, ripristino, potatura ed esecuzione pianificata viene scritta in un log di audit
+  JSON locale consultabile nell'app.
+- Permessi di runtime e AppOps catturati nel manifest e riapplicati al ripristino. Vengono catturati anche
+  l'origine di installazione (installerPackageName) e lo stato abilitato/disabilitato, e riapplicati al ripristino.
+- Spoofing dell'origine di installazione: per default un'app ripristinata riporta il Play Store come origine di
+  installazione (impostata al momento dell'installazione tramite la sessione di installazione, poiché altrimenti
+  un'app ripristinata sembra caricata lateralmente); commutabile globalmente e per singolo ripristino, e quando è
+  disattivato viene mantenuta l'origine catturata. Una modalità "deep" avanzata opt-in forgia inoltre il pacchetto
+  e l'origine iniziatori modificando il database dei pacchetti di sistema (prima un backup byte-esatto, si applica
+  dopo un riavvio) così che l'app sembri completamente installata dallo store.
+- SSAID (ANDROID_ID del dispositivo): strettamente opt-in e segnalato in modo evidente; consapevole di ABX; il
+  file attivo viene sempre salvato byte per byte prima di qualsiasi sovrascrittura, per il rollback; si applica dopo un
+  riavvio.
+- Il ripristino e l'importazione richiedono un riconoscimento esplicito "questo sovrascrive i dati attuali dell'app"
+  prima di procedere.
+
+Pianificazione e automazione:
+
+- Backup pianificati con ritenzione keep-N, gestiti da una scheda Schedule (per app, giornaliero/
+  orario/settimanale con un orario opzionale, modalità e destinazione).
+- Backup automatico all'installazione o all'aggiornamento: un osservatore opt-in cavalca il battito dello
+  scheduler, esegue il backup delle app nuove o aggiornate in background, e si limita a inizializzare alla prima
+  esecuzione così che abilitarlo non esegua mai il backup di tutto in una volta. Rispetta l'impostazione delle
+  app escluse (blocklist).
+
+Backup speciali (a livello di sistema):
+
+- Esegue il backup di messaggi (SMS/MMS), contatti e registro chiamate, Wi-Fi e Bluetooth come dati di
+  sistema grezzi e archiviati fedelmente (stessa conservazione SELinux/xattr e stessa cifratura age opzionale dei
+  backup di app). Il ripristino è fedele sullo stesso dispositivo/stessa ROM, richiede un riavvio, ed è protetto
+  da un riconoscimento prominente di sovrascrittura-e-riavvio.
+- Esportazione portatile opzionale accanto all'archivio grezzo: messaggi, registro chiamate e contatti vengono
+  scritti anche come JSON apribile (letto con il sqlite3 impacchettato direttamente dai database dei provider,
+  così che i corpi dei messaggi con virgole o a capo sopravvivano intatti), fornendo una copia multi-dispositivo
+  che non necessita del modulo. La copia portatile è cifrata anch'essa quando il backup è cifrato, così da non
+  far mai trapelare ciò che l'archivio protegge.
+
+Integrazione di sistema:
+
+- Monta un'app installata come app di sistema senza toccare la partizione /system reale: VDBackup prepara
+  l'APK (o gli APK) dell'app in un proprio sottomodulo overlay, che il gestore root monta. Con NoMount su KernelSU
+  viene iniettato a caldo (senza riavvio); altrimenti si applica al boot successivo, così da non dipendere mai
+  dall'avere NoMount installato. Scegli il posizionamento regolare o privilegiato.
+
+WebUI:
+
+- L'elenco delle app mostra il vero nome localizzato dell'app (risolto dall'APK, così da sopravvivere a una
+  disinstallazione) accanto al pacchetto, con icone caricate su richiesta e in cache, rese come riquadri
+  arrotondati e consapevoli delle icone adattive.
+- Tocca un'app per aprirne la cronologia dei backup e ripristinare qualsiasi backup precedente; la scheda Backups
+  mostra nome e pacchetto su righe separate e apre un foglio di dettagli per ogni backup (versione,
+  origine di installazione, stato, data, dimensione, elementi, conteggio dei permessi, dispositivo).
+- Filtra l'elenco delle app per utente/sistema/tutte e ordina per nome o pacchetto; seleziona più app e
+  eseguine il backup in un unico batch; escludi app dai backup automatici e pianificati.
+- Scegli cosa includere e attiva verify o dry-run per singolo backup; scegli un ripristino di solo test che
+  estrae in staging senza toccare l'app in uso.
+- Tema chiaro/scuro, un selettore del colore d'accento, selettore della lingua, una scheda Info (con i
+  progetti fratelli e il manifesto di audit dei binari impacchettati), un selettore di cartelle per la
+  destinazione locale, progresso dell'operazione localizzato con feedback istantaneo e dialoghi moderni
+  nell'app (nessun pop-up di alert/confirm del sistema).
+- La navigazione con il tasto Indietro torna alla scheda precedente e chiude prima i dialoghi; i dialoghi sono
+  fluttuanti e l'app sopravvive alla riapertura riagganciandosi alle operazioni in tempo reale.
+
+AI-friendly e i18n:
+
+- Una superficie di controllo JSON documentata affinché gli agenti amministrino ogni azione in modo headless
+  (`docs/AI-AGENTS.md`); la WebUI è solo uno dei client di quell'API.
+- Il README e tutta la documentazione del progetto sono tradotti nelle 21 lingue standard
+  (`docs/<lang>/`), con i docs rispecchiati sul wiki.
+- L'elenco ricco delle app e la decifratura di Neo passano attraverso un helper dex pilotato come root
+  (`IPackageManager` tramite ServiceManager), così che funzionino dove ActivityThread si blocca.
