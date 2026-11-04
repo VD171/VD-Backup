@@ -1,3 +1,7 @@
+> **Languages:** English · [العربية](ar/USER-GUIDE.md) · [Čeština](cs/USER-GUIDE.md) · [Deutsch](de/USER-GUIDE.md) · [Español](es/USER-GUIDE.md) · [فارسی](fa/USER-GUIDE.md) · [Français](fr/USER-GUIDE.md) · [हिन्दी](hi/USER-GUIDE.md) · [Bahasa Indonesia](in/USER-GUIDE.md) · [Italiano](it/USER-GUIDE.md) · [日本語](ja/USER-GUIDE.md) · [한국어](ko/USER-GUIDE.md) · [Nederlands](nl/USER-GUIDE.md) · [Polski](pl/USER-GUIDE.md) · [Português](pt/USER-GUIDE.md) · [Русский](ru/USER-GUIDE.md) · [Svenska](sv/USER-GUIDE.md) · [ไทย](th/USER-GUIDE.md) · [Türkçe](tr/USER-GUIDE.md) · [Tiếng Việt](vi/USER-GUIDE.md) · [中文](zh/USER-GUIDE.md)
+
+---
+
 # VDBackup user guide
 
 A complete, friendly walkthrough of VDBackup, from installing the module to making
@@ -18,6 +22,7 @@ place, with nothing to "allow".
   - [5.3 Compression](#53-compression)
   - [5.4 Encryption](#54-encryption)
   - [5.5 Verify and dry-run](#55-verify-and-dry-run)
+  - [5.6 Special backups (messages, call log, Wi-Fi, Bluetooth)](#56-special-backups-messages-call-log-wi-fi-bluetooth)
 - [6. Restoring a backup](#6-restoring-a-backup)
 - [7. Destinations: local and remote](#7-destinations-local-and-remote)
 - [8. Scheduling and retention](#8-scheduling-and-retention)
@@ -70,39 +75,81 @@ and they degrade gracefully when they are not available on your device.
    when restoring SSAID; see [section 10](#10-ssaid-device-android_id).)
 4. Open the module's **WebUI** from the manager. That is the entire interface.
 
+**Which edition to download.** Each release ships as several flashable zip editions, so
+you download only what you need. Pick one:
+
+- **`VD-Backup-<ver>-universal-full.zip`** - every CPU architecture and every binary,
+  including `rclone` (cloud providers: Google Drive, S3 and 70+ other rclone backends) and
+  `restic` (deduplicated snapshots). Works on any device. Largest download.
+- **`VD-Backup-<ver>-universal-lite.zip`** - every architecture, but **without** the two
+  largest binaries (`rclone` and `restic`). Smallest download; still does local, SSH/SFTP
+  and rsync backups, with portable `age` encryption.
+- **`VD-Backup-<ver>-<abi>-full.zip`** (one of `arm64-v8a`, `armeabi-v7a`, `x86`,
+  `x86_64`) - a single architecture with every binary (same features as `universal-full`
+  but only your device's architecture, so smaller than `universal-full`).
+
+Pick the matching **`<abi>-full`** if you know your device's architecture and want
+everything (most phones are **`arm64-v8a`**). Pick **`universal-lite`** if you want the
+smallest download or do not need cloud providers (`rclone`) or snapshots (`restic`). Pick
+**`universal-full`** if you want everything and are not sure of the architecture. On
+install the module keeps only your device's architecture regardless of the edition you
+flash.
+
 On first run the module seeds a default configuration (only if none exists yet), so
 your settings are preserved across module updates.
 
-**Where state lives.** All of VDBackup's working data - your configuration, scheduled
-jobs, saved destinations, encrypted credentials, logs and audit trail, staging area,
-and your local backups - lives under:
+**Where state lives.** VDBackup's working data - your configuration, scheduled jobs,
+saved destinations, encrypted credentials, logs and audit trail, and staging area -
+lives under:
 
 ```
 /data/adb/vdbackup/
 ```
 
-Keep this in mind for two reasons: local backups take up space there, and that is
-where you look for logs if something goes wrong.
+**Where backups live.** The backups themselves are written to user-visible, credential
+-encrypted storage (so they are only readable after you unlock the device, and they
+survive uninstalling the module), one folder per Android user:
+
+```
+/sdcard/VDBackup/            (= /data/media/<user>/VDBackup)
+```
+
+Keep this in mind for two reasons: backups take up space under `/sdcard/VDBackup`, and
+`/data/adb/vdbackup/logs/` is where you look if something goes wrong.
 
 ## 4. The WebUI tour
 
 The WebUI is organized into a few tabs:
 
-- **Apps** - the list of installed apps (user and system). Pick an app to back it up,
-  and choose the items, mode, compression and encryption for the job.
-- **Backups** - the backups you already have. This is where you restore, run a
-  restore-test, delete a backup, or import backups from Neo-Backup or
+- **Apps** - the list of installed apps (user and system), each shown with its real
+  name, its package name, and its icon (icons load lazily and are cached, so the list
+  stays responsive). The button on a row backs the app up; tapping the row opens that
+  app's backup history, where you can restore any previous backup.
+- **Backups** - the backups you already have, each showing the app name on one line and
+  the package on the next. Tap a backup to see its full details (version, date, size,
+  included items, permission counts, and the device it came from). This is also where
+  you restore, run a restore-test, delete a backup, or import backups from Neo-Backup or
   Android-DataBackup.
 - **Destinations** - manage where backups go: local storage plus any remote
   destinations you add (see [section 7](#7-destinations-local-and-remote)). You can
   test a destination here before relying on it.
-- **Settings** - defaults for new jobs (default compression, verify on/off, default
-  encryption), the encryption key, scheduling, and language.
+- **Settings** - a light/dark theme toggle, an accent-colour picker (presets, a custom
+  colour, or reset), a language selector, defaults for new jobs (default compression,
+  verify on/off, default encryption), the network policy for cloud transfers (see
+  [section 7](#7-destinations-local-and-remote)), auto-backup and the excluded-apps list,
+  the install-source option, the encryption key, and scheduling.
+- **About** - version, links, the sibling projects (See also) and the bundled-binary
+  audit manifest.
+
+Confirmations and messages use in-app dialogs (not the old system pop-ups), and a
+restore or import asks you to acknowledge that it overwrites the current app data before
+it proceeds.
 
 Backups and restores run **detached** as a background root process. You can close the
 WebUI, or even close the root manager, and the operation keeps going. When you come
-back, the WebUI reattaches and shows live progress, and you also get an Android
-notification when a job starts and finishes.
+back, the WebUI reattaches and shows live progress with a localized phase label. On
+ROMs that surface shell notifications you also get an Android notification when a job
+starts and finishes; either way the in-app progress card is the reliable indicator.
 
 ## 5. Making a backup
 
@@ -196,6 +243,17 @@ Two safety options help you trust a backup before you rely on it:
   anything**. Use it to estimate space or to check your item selection before running
   the real thing.
 
+### 5.6 Special backups (messages, call log, Wi-Fi, Bluetooth)
+
+Below the app lists on the **Backups** tab, **Special backups** cover system-wide data
+that is not tied to a single app: **messages (SMS/MMS)**, **contacts and call log**,
+**Wi-Fi networks** and **Bluetooth**. Pick the categories and back them up; they are
+archived raw, with the same SELinux/xattr preservation and optional encryption as app
+backups. Optionally a **portable copy** is written too (messages, call log and contacts
+as openable JSON), so you have a cross-device copy you can read on a PC without the
+module. Restoring a special backup overwrites live system data and needs a reboot, so it
+is gated behind a prominent acknowledgment and is reliable on the same device and ROM.
+
 ## 6. Restoring a backup
 
 Open the **Backups** tab, pick the backup you want, and start the restore. Because
@@ -219,11 +277,30 @@ Useful restore options:
   screen.
 - For **Snapshot** and **Mirror** backups, the restore pulls from the versioned
   repository or the mirrored copy respectively.
+- **Install source** - by default a restored app reports the **Play Store** as its
+  install source (instead of looking sideloaded), which is what most apps and app checks
+  expect. You can turn this off globally in Settings or per restore, and when off the
+  original install source is kept. An advanced, opt-in **"forge the initiating source"**
+  toggle goes further and also makes the app's initiating package and package source look
+  Play-installed; it edits the system package database (backed up first) and takes effect
+  after a reboot.
+
+**Deleting a backup.** Open a backup's details (or an app's history) and use **Delete**;
+you are asked to confirm, and the deletion is written to the activity log. You can also
+cap how many backups to keep per app (retention) so old ones are pruned automatically.
+
+**Mount an installed app as a system app.** From an app's backup history, **Mount as
+system** stages the app's APK into a VDBackup overlay sub-module so the root manager
+serves it from `/system/app` (or `/system/priv-app`) - the real `/system` partition is
+never touched. With **NoMount** on KernelSU it applies live; otherwise it applies after a
+reboot. This never depends on NoMount being installed.
 
 ## 7. Destinations: local and remote
 
 By default, backups are written to **local** storage under the module's state
-directory. You can also add remote destinations in the **Destinations** tab.
+directory. You can also add remote destinations in the **Destinations** tab. For a local
+destination, **Browse** opens a folder picker so you can pick a sub-folder under shared
+storage (`/sdcard`) instead of typing the path.
 
 Remote transport is handled by the bundled tools:
 
@@ -245,6 +322,13 @@ Two rules keep remote use safe:
   in clear text.
 - **Validate before you use.** Use the destination test in the Destinations tab to
   confirm a destination works before you point a real backup at it.
+
+**Network policy (Wi-Fi vs mobile data).** In Settings, "Cloud transfers over" lets you
+restrict which connection cloud transfers may use: **Wi-Fi and mobile data** (the
+default), **Wi-Fi only**, or **Mobile data only**. When you restrict it, every cloud
+transfer - manual or scheduled, upload or restore - checks the active connection first
+and refuses to run on the wrong one, so a Wi-Fi-only policy never spends mobile data.
+Local backups are never affected.
 
 **Google Drive.** You have two ways to reach Google Drive:
 
@@ -275,6 +359,18 @@ Scheduled jobs are triggered by a boot-time heartbeat in the module: when a job 
 due it runs, records its last-run time so it does not fire twice, and applies
 retention to prune old backups. Because everything runs as root in the background,
 scheduled backups do not need the WebUI to be open.
+
+**Auto-backup on install/update.** In Settings you can turn on **automatic backup**: the
+same background heartbeat notices apps that were newly installed or updated and backs them
+up for you (with keep-N retention). The first run only records what is installed, so
+enabling it never backs up your whole device at once.
+
+**Excluded apps (blocklist).** Also in Settings, you can exclude apps you never want
+backed up automatically or on a schedule; excluded apps are skipped by both.
+
+**Activity log.** The Schedule tab has a **View activity log** button that shows the local
+audit trail - backups, restores, deletions, scheduled and automatic runs, and prunes -
+newest first.
 
 ## 9. Migrating in: importing Neo-Backup and Android-DataBackup
 
@@ -332,7 +428,7 @@ To open one on a PC, in short:
 
 Every encrypted backup ships with a **RECOVERY** note containing the exact
 copy-paste commands for Windows, macOS and Linux. See
-[`../module/RECOVERY.md`](../module/RECOVERY.md) for the full, step-by-step kit.
+[`../module/etc/RECOVERY.md`](../module/etc/RECOVERY.md) for the full, step-by-step kit.
 
 Note that SELinux contexts, uid/gid and modes are stored inside the tar and are only
 reapplied properly when you restore on Android - on a PC you still get all your files,

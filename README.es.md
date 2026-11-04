@@ -51,7 +51,16 @@ importar copias de seguridad existentes de Neo-Backup y Android-DataBackup para 
   además de repositorios `rsync` y `restic`. Google Drive opcional mediante un pequeño complemento opt-in.
 - **Integridad:** cada archivo se verifica contra el manifiesto; dry-run y
   restore-test te dejan comprobar una copia sin tocar nada.
-- **Programación + retención:** trabajos recurrentes con poda keep-N.
+- **Restauración selectiva:** restaura cualquier subconjunto de los elementos de una copia; elimina copias y
+  mantén un registro de actividad/auditoría de cada acción destructiva.
+- **Copias especiales:** mensajes (SMS/MMS), contactos y registro de llamadas, Wi-Fi y Bluetooth,
+  con una exportación JSON portátil opcional que puedes abrir en un PC.
+- **Programación + automatización:** trabajos recurrentes con poda keep-N, además de copia
+  automática opt-in al instalar/actualizar y una lista de apps excluidas.
+- **Origen de instalación:** las apps restauradas indican Play Store como su origen de instalación de
+  forma predeterminada (conmutable); una opción avanzada opt-in también falsifica el paquete iniciador y el origen.
+- **Montaje como app de sistema:** monta una app instalada como app de sistema sin tocar la
+  partición `/system` real (submódulo de superposición sin montaje, compatible con NoMount).
 - **En segundo plano:** backup/restore se ejecutan desacoplados y sobreviven al cierre de la WebUI, con
   notificaciones de inicio/fin.
 - **Migrar hacia aquí:** importa copias de seguridad existentes de Neo-Backup y Android-DataBackup,
@@ -62,6 +71,8 @@ importar copias de seguridad existentes de Neo-Backup y Android-DataBackup para 
 1. Descarga el `VD-Backup-vX.Y.zip` más reciente desde [Versiones](https://github.com/VD171/VD-Backup/releases).
 2. Instálalo en el gestor KernelSU / APatch / Magisk - utilizable al instante, sin necesidad de reiniciar.
 3. Abre la **WebUI** del módulo para configurar y ejecutar las copias. Eso es todo.
+
+**Ediciones.** Cada release viene como seis zips. `universal-full` - todas las arquitecturas y todos los binarios (incl. `rclone` para proveedores de nube y `restic` para instantáneas), cualquier dispositivo, el más grande. `universal-lite` - todas las arquitecturas sin los dos binarios más grandes (`rclone`, `restic`), el más pequeño, y sigue haciendo copias locales, SSH/SFTP y `rsync`. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - una sola arquitectura con todos los binarios, más pequeño que `universal-full`. ¿Conoces tu arquitectura? -> elige `<abi>-full`; ¿quieres el más pequeño o sin los gigantes de la nube? -> `universal-lite`; todo en cualquier dispositivo -> `universal-full`. Ve [Versiones](https://github.com/VD171/VD-Backup/releases).
 
 ¿Recién llegas? La [Guía de usuario](docs/USER-GUIDE.md) te lleva desde la instalación hasta la restauración.
 
@@ -84,7 +95,10 @@ El módulo es shell + WebUI más binarios estáticos por ABI (`tar`, `zstd`, `lz
 - **[Guía de usuario](docs/USER-GUIDE.md)** - de principio a fin, desde la instalación hasta la restauración.
 - **[Agentes de IA](docs/AI-AGENTS.md)** - gestiona cada acción sin interfaz mediante la API JSON.
 - **[Arquitectura](ARCHITECTURE.md)** y **[Estructura de archivos](docs/FILE-STRUCTURE.md)** - cómo funciona.
+- **[Binarios incluidos](docs/BINARIES.md)** - procedencia y SHA-256 de cada binario precompilado, para una auditoría completa.
+- **[Recuperación](module/etc/RECOVERY.md)** - abre y descifra una copia de seguridad en un PC, sin el módulo.
 - **[Cómo contribuir](CONTRIBUTING.md)** y **[Seguridad](SECURITY.md)**.
+- **[Registro de cambios](CHANGELOG.md)** y **[Código de Conducta](CODE_OF_CONDUCT.md)**.
 
 ## Amigable con la IA
 

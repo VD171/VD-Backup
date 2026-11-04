@@ -1,3 +1,7 @@
+> **Languages:** English · [العربية](docs/ar/ARCHITECTURE.md) · [Čeština](docs/cs/ARCHITECTURE.md) · [Deutsch](docs/de/ARCHITECTURE.md) · [Español](docs/es/ARCHITECTURE.md) · [فارسی](docs/fa/ARCHITECTURE.md) · [Français](docs/fr/ARCHITECTURE.md) · [हिन्दी](docs/hi/ARCHITECTURE.md) · [Bahasa Indonesia](docs/in/ARCHITECTURE.md) · [Italiano](docs/it/ARCHITECTURE.md) · [日本語](docs/ja/ARCHITECTURE.md) · [한국어](docs/ko/ARCHITECTURE.md) · [Nederlands](docs/nl/ARCHITECTURE.md) · [Polski](docs/pl/ARCHITECTURE.md) · [Português](docs/pt/ARCHITECTURE.md) · [Русский](docs/ru/ARCHITECTURE.md) · [Svenska](docs/sv/ARCHITECTURE.md) · [ไทย](docs/th/ARCHITECTURE.md) · [Türkçe](docs/tr/ARCHITECTURE.md) · [Tiếng Việt](docs/vi/ARCHITECTURE.md) · [中文](docs/zh/ARCHITECTURE.md)
+
+---
+
 # Architecture
 
 VDBackup is a root WebUI module. It has three layers: the **WebUI** (what you see),
@@ -11,21 +15,21 @@ permission prompt and no companion app for the core features.
    │    index.html · scripts.js · i18n.js · styles.css         │
    │    lang/en.js + 21 languages · config.json (CSP, no net)  │
    └───────────────┬──────────────────────────────────────────┘
-                   │  ksu.exec("sh helper.sh <verb> <b64json>")
+                   │  ksu.exec("sh scripts/helper.sh <verb> <b64json>")
                    ▼
    ┌──────────────────────────────────────────────────────────┐
-   │  helper.sh  (dispatcher, returns JSON)                    │
+   │  scripts/helper.sh  (dispatcher, returns JSON)            │
    │    list-apps · config · dests · backup/restore/import ... │
-   │    long ops -> setsid nohup worker.sh  (detached)         │
-   └───────────────┬───────────────────────────┬──────────────┘
-                   │                           │ progress-<opid>.json (poll)
-                   ▼                           ▼
-   ┌───────────────────────────┐   ┌──────────────────────────┐
-   │  worker.sh (root, detached)│   │  framework helper (opt.) │
-   │   force-stop · tar|zstd|age│   │  app_process + dex       │
-   │   pm install · chown/chcon │   │  perms/appops/ssaid/...  │
-   │   transfer · notify        │   │  (dex primary, shell fb) │
-   └───────────────┬───────────┘   └──────────────────────────┘
+   │    long ops -> setsid nohup scripts/worker.sh  (detached) │
+   └───────────────┬───────────────────────────────┬──────────┘
+                   │                               │ progress-<opid>.json (poll)
+                   ▼                               ▼
+   ┌────────────────────────────────────┐   ┌──────────────────────────┐
+   │  scripts/worker.sh (root, detached)│   │  framework helper (opt.) │
+   │   force-stop · tar|zstd|age        │   │  app_process + dex       │
+   │   pm install · chown/chcon         │   │  perms/appops/ssaid/...  │
+   │   transfer · notify                │   │  (dex primary, shell fb) │
+   └───────────────┬────────────────────┘   └──────────────────────────┘
                    ▼
    ┌──────────────────────────────────────────────────────────┐
    │  bin/<abi>/  tar · zstd · lz4 · rclone · rsync · ssh · restic │
@@ -47,7 +51,36 @@ permission prompt and no companion app for the core features.
   `app_process` (no installed app) handles these, with a shell fallback.
 - **Portability.** Only standard formats; backups open on a PC without this module.
 - **State** lives in `/data/adb/vdbackup/` (config, jobs, destinations, encrypted
-  credentials, logs, staging, local backups).
+  credentials, logs, staging). **Backups** are written to user-visible, credential-
+  encrypted storage at `/sdcard/VDBackup/` (`/data/media/<user>/VDBackup`, per user),
+  not in `/data/adb` (which is device-encrypted and readable before first unlock).
+
+## Compatibility guarantee
+
+A backup must stay restorable forever. This is a hard rule, not a best effort.
+
+**Scope.** The guarantee covers backups written by **v1.01 onward** (the first officially
+published release) and only by officially published, released versions. v1.00 was a
+test-only build and is explicitly out of scope; pre-release and development builds are not
+covered. From the first public release forward, the promise below is absolute:
+
+- **Standard formats only.** Every archive is a plain `tar` compressed with `zstd`,
+  `gzip` or `lz4`, optionally wrapped with `age`. There is no proprietary container, so
+  a backup can be opened on any PC with ordinary tools even without this module (see
+  `etc/RECOVERY.md`). A format we cannot drop.
+- **Append-only metadata.** `manifest.json` carries `format_version`. The schema only
+  ever grows: fields may be *added*, never removed, renamed or repurposed. Restore reads
+  every field defensively (missing optional fields fall back to a default) and installs
+  APKs and extracts archives by their file name and extension, not by assuming a fixed
+  manifest shape.
+- **Forward compatible restore.** Restore never rejects a backup for being old, and an
+  older VDBackup silently skips item types it does not know rather than failing. A newer
+  VDBackup therefore restores any older backup, and the standard-format archives remain
+  restorable by hand regardless.
+
+In short: anything VDBackup has ever written, every future VDBackup (and a plain PC)
+can still restore. Changing the format in a way that breaks a prior backup is not
+allowed; new capabilities are added behind `format_version` and new, additive fields.
 
 For the full technical design (archive format, metadata schema, pipelines, crypto,
 destinations, importers) the maintainers keep detailed design notes; this file is the

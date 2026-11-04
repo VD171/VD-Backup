@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root - KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA-Thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Telegram       : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="VDBackup">
+  <defs>
+    <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.38" stop-color="#eef1f5"/>
+      <stop offset="0.52" stop-color="#aeb6c2"/>
+      <stop offset="0.66" stop-color="#d7dce3"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <linearGradient id="green" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#17c74a"/>
+      <stop offset="1" stop-color="#36e86a"/>
+    </linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff4040"/>
+      <stop offset="1" stop-color="#cf1c1c"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="2" width="252" height="252" rx="56" fill="#0d0f12" stroke="#23262d" stroke-width="2"/>
+
+  <!-- green arrow left, red arrow right (short shafts tuck behind VD) -->
+  <path d="M24 128 L74 96 L74 116 L150 116 L150 140 L74 140 L74 160 Z" fill="url(#green)"/>
+  <path d="M232 128 L182 96 L182 116 L106 116 L106 140 L182 140 L182 160 Z" fill="url(#red)"/>
+
+  <!-- VD monogram -->
+  <g transform="translate(128 132) skewX(-10)">
+    <text x="2" y="4" text-anchor="middle" dominant-baseline="central"
+          font-family="'Arial Black','Arial',sans-serif" font-weight="900" font-style="italic"
+          font-size="128" letter-spacing="-6" fill="#0c0e11">VD</text>
+    <text x="0" y="0" text-anchor="middle" dominant-baseline="central"
+          font-family="'Arial Black','Arial',sans-serif" font-weight="900" font-style="italic"
+          font-size="128" letter-spacing="-6"
+          fill="url(#silver)" stroke="#16191f" stroke-width="3.5" paint-order="stroke">VD</text>
+  </g>
+</svg>

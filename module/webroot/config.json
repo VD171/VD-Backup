@@ -1,0 +1,7 @@
+{
+  "title": "VDBackup",
+  "icon": "assets/logo-icon.svg",
+  "backHandler": true,
+  "windowResize": true,
+  "contentSecurityPolicy": "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'"
+}

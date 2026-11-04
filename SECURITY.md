@@ -1,12 +1,13 @@
+> **Languages:** English · [العربية](docs/ar/SECURITY.md) · [Čeština](docs/cs/SECURITY.md) · [Deutsch](docs/de/SECURITY.md) · [Español](docs/es/SECURITY.md) · [فارسی](docs/fa/SECURITY.md) · [Français](docs/fr/SECURITY.md) · [हिन्दी](docs/hi/SECURITY.md) · [Bahasa Indonesia](docs/in/SECURITY.md) · [Italiano](docs/it/SECURITY.md) · [日本語](docs/ja/SECURITY.md) · [한국어](docs/ko/SECURITY.md) · [Nederlands](docs/nl/SECURITY.md) · [Polski](docs/pl/SECURITY.md) · [Português](docs/pt/SECURITY.md) · [Русский](docs/ru/SECURITY.md) · [Svenska](docs/sv/SECURITY.md) · [ไทย](docs/th/SECURITY.md) · [Türkçe](docs/tr/SECURITY.md) · [Tiếng Việt](docs/vi/SECURITY.md) · [中文](docs/zh/SECURITY.md)
+
+---
+
 # Security Policy
 
 VDBackup runs as root and handles your data and (optionally) your credentials and
 encryption passphrases. We take security seriously.
 
 ## Reporting a vulnerability
-
-Please report security issues **privately** - do not open a public issue for them.
-Reach out through any of these:
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
@@ -30,3 +31,6 @@ soon as we can and credit you if you wish.
   choose a strong one.
 - The optional Google Drive companion app should always be hidden with HMA-OSS so it
   does not reveal root or an unlocked bootloader.
+- Every prebuilt binary and library is traceable to a pinned public upstream with a
+  recorded SHA-256, and the manifest ships on-device, so the bundled payload can be
+  audited and reproduced. See [docs/BINARIES.md](docs/BINARIES.md).

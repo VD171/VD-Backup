@@ -51,7 +51,16 @@ mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada agar Anda bi
   ditambah repo `rsync` dan `restic`. Google Drive opsional melalui pendamping kecil yang opt-in.
 - **Integritas:** setiap arsip diverifikasi terhadap manifes; dry-run dan restore-test memungkinkan
   Anda memeriksa sebuah cadangan tanpa menyentuh apa pun.
-- **Penjadwalan + retensi:** tugas berulang dengan pemangkasan keep-N.
+- **Pemulihan selektif:** pulihkan subset mana pun dari item sebuah cadangan; hapus cadangan dan simpan
+  log aktivitas/audit dari setiap tindakan destruktif.
+- **Cadangan khusus:** pesan (SMS/MMS), kontak dan log panggilan, Wi-Fi dan Bluetooth,
+  dengan ekspor JSON portabel opsional yang dapat Anda buka di PC.
+- **Penjadwalan + otomasi:** tugas berulang dengan pemangkasan keep-N, ditambah pencadangan otomatis
+  opt-in saat pemasangan/pembaruan dan daftar aplikasi yang dikecualikan.
+- **Sumber pemasangan:** aplikasi yang dipulihkan melaporkan Play Store sebagai sumber pemasangannya
+  secara default (dapat dialihkan); opt-in tingkat lanjut juga memalsukan paket penginisiasi dan sumbernya.
+- **Pemasangan aplikasi-sistem:** pasang aplikasi terpasang sebagai aplikasi sistem tanpa menyentuh
+  partisi `/system` yang asli (sub-modul overlay systemless, sadar-NoMount).
 - **Latar belakang:** pencadangan/pemulihan berjalan terpisah dan tetap hidup setelah WebUI ditutup,
   dengan notifikasi mulai/selesai.
 - **Impor masuk:** mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada,
@@ -62,6 +71,8 @@ mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada agar Anda bi
 1. Unduh `VD-Backup-vX.Y.zip` terbaru dari [Rilis](https://github.com/VD171/VD-Backup/releases).
 2. Flash di manajer KernelSU / APatch / Magisk - langsung bisa dipakai, tanpa perlu reboot.
 3. Buka **WebUI** modul untuk mengonfigurasi dan menjalankan pencadangan. Selesai.
+
+**Edisi.** Setiap rilis hadir sebagai enam zip. `universal-full` - setiap arsitektur dan setiap biner (termasuk `rclone` untuk penyedia cloud dan `restic` untuk snapshot), perangkat apa pun, terbesar. `universal-lite` - setiap arsitektur tanpa dua biner terbesar (`rclone`, `restic`), terkecil, dan tetap bisa backup lokal, SSH/SFTP dan `rsync`. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - satu arsitektur dengan setiap biner, lebih kecil dari `universal-full`. Tahu arsitekturmu -> pilih `<abi>-full`; mau yang terkecil atau tanpa biner cloud raksasa -> `universal-lite`; semuanya di perangkat apa pun -> `universal-full`. Lihat [Rilis](https://github.com/VD171/VD-Backup/releases).
 
 Baru di sini? [Panduan pengguna](docs/USER-GUIDE.md) memandu Anda dari pemasangan hingga pemulihan.
 
@@ -84,7 +95,10 @@ Modul ini adalah shell + WebUI ditambah biner statis per-ABI (`tar`, `zstd`, `lz
 - **[Panduan pengguna](docs/USER-GUIDE.md)** - menyeluruh, dari pemasangan hingga pemulihan.
 - **[Agen AI](docs/AI-AGENTS.md)** - kendalikan setiap tindakan tanpa antarmuka melalui JSON API.
 - **[Arsitektur](ARCHITECTURE.md)** dan **[Struktur berkas](docs/FILE-STRUCTURE.md)** - cara kerjanya.
+- **[Biner bawaan](docs/BINARIES.md)** - asal-usul dan SHA-256 setiap biner prakompilasi, untuk audit penuh.
+- **[Pemulihan](module/etc/RECOVERY.md)** - buka dan dekripsi cadangan di PC, tanpa modul.
 - **[Berkontribusi](CONTRIBUTING.md)** dan **[Keamanan](SECURITY.md)**.
+- **[Changelog](CHANGELOG.md)** dan **[Pedoman Perilaku](CODE_OF_CONDUCT.md)**.
 
 ## Ramah AI
 

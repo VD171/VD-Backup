@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<!--
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root - KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA-Thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Telegram       : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
+-->
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VDBackup</title>
+  <link rel="icon" href="assets/logo-icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <img class="logo" src="assets/logo-icon.svg" alt="VDBackup">
+    <div class="brand">
+      <h1>VDBackup</h1>
+      <span class="ver" id="ver"></span>
+    </div>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="theme-btn" aria-label="Theme" data-i18n-title="settings_theme">&#9789;</button>
+  </header>
+
+  <main>
+    <section id="apps" class="panel active">
+      <div class="field" id="user-field" hidden>
+        <label for="user-sel" data-i18n="ui_user_label">User</label>
+        <select id="user-sel"></select>
+      </div>
+      <div class="toolbar">
+        <input id="search" type="search" data-i18n-ph="search_apps" placeholder="Search apps">
+        <button id="refresh" data-i18n="refresh">Refresh</button>
+      </div>
+      <div class="toolbar">
+        <select id="app-filter">
+          <option value="user" data-i18n="opt_apps_user">User apps</option>
+          <option value="system" data-i18n="opt_apps_system">System apps</option>
+          <option value="all" data-i18n="opt_apps_all">All apps</option>
+        </select>
+        <select id="app-sort">
+          <option value="name" data-i18n="opt_sort_name">Name</option>
+          <option value="package" data-i18n="opt_sort_pkg">Package</option>
+        </select>
+        <button id="app-select" class="btn" data-i18n="ui_select">Select</button>
+      </div>
+      <div id="app-batchbar" class="toolbar batchbar" hidden>
+        <span id="app-selcount" class="grow muted"></span>
+        <button id="app-selall" class="btn" data-i18n="ui_select_all">All</button>
+        <button id="app-selnone" class="btn" data-i18n="ui_select_none">None</button>
+        <button id="app-backupsel" class="btn go" data-i18n="ui_backup_selected">Back up</button>
+      </div>
+      <ul id="applist" class="list"></ul>
+    </section>
+
+    <section id="backups" class="panel">
+      <ul id="backuplist" class="list"></ul>
+      <p id="backups-empty" class="muted" data-i18n="backups_empty">No backups yet.</p>
+      <h2 data-i18n="ui_import_title">Import from another app</h2>
+      <div class="field">
+        <select id="import-from">
+          <option value="neo">Neo Backup</option>
+          <option value="databackup">DataBackup</option>
+        </select>
+        <button id="import-scan" class="btn" data-i18n="ui_import_scan">Scan</button>
+      </div>
+      <ul id="importlist" class="list"></ul>
+      <p id="import-empty" class="muted" data-i18n="msg_import_empty" hidden>No importable backups found.</p>
+
+      <h2 data-i18n="special_title">Special backups</h2>
+      <div class="muted" data-i18n="special_hint">Back up system-wide data: messages, contacts and call log, Wi-Fi and Bluetooth. Restore is same-device and needs a reboot.</div>
+      <div class="card">
+        <div class="checks" id="special-cats"></div>
+        <div class="checks">
+          <label><input type="checkbox" id="special-portable" checked><span data-i18n="special_portable">Also export a portable copy (SMS, call log, contacts as JSON)</span></label>
+        </div>
+        <button id="special-backup" class="btn go block" data-i18n="backup">Back up</button>
+      </div>
+      <ul id="special-list" class="list"></ul>
+      <p id="special-empty" class="muted" data-i18n="special_empty" hidden>No special backups yet.</p>
+    </section>
+
+    <section id="dests" class="panel">
+      <ul id="destlist" class="list"></ul>
+      <h2 data-i18n="dest_add">Add destination</h2>
+      <div class="field">
+        <input id="d-id" type="text" data-i18n-ph="ph_dest_id" placeholder="id (e.g. mynas)">
+        <select id="d-type">
+          <option value="local">local</option>
+          <option value="rclone">rclone (SFTP/SMB/WebDAV/Drive/S3/...)</option>
+          <option value="restic">restic (snapshot repo)</option>
+          <option value="gdrive" data-i18n="ui_dest_gdrive">Google Drive (companion)</option>
+        </select>
+        <select id="d-remote"></select>
+        <input id="d-path" type="text" data-i18n-ph="ph_dest_path" placeholder="path / sub-folder">
+        <button id="d-browse" class="btn" data-i18n="ui_browse">Browse</button>
+        <input id="d-repo" type="text" data-i18n-ph="ph_dest_repo" placeholder="restic repo">
+        <input id="d-pass" type="password" data-i18n-ph="ph_dest_pass" placeholder="restic password">
+        <button id="d-save" class="btn go block" data-i18n="save">Save</button>
+      </div>
+      <p class="muted" data-i18n="dests_hint">rclone covers SFTP, SMB, WebDAV, FTP, Google Drive, S3 and more.</p>
+
+      <h2 data-i18n="remote_add">Add cloud remote</h2>
+      <div class="field" id="remote-box">
+        <ul id="remotelist" class="list"></ul>
+        <input id="r-name" type="text" data-i18n-ph="ph_remote_name" placeholder="remote name (e.g. mydrive)">
+        <select id="r-backend">
+          <option value="sftp">SFTP</option>
+          <option value="smb">SMB</option>
+          <option value="webdav">WebDAV</option>
+          <option value="ftp">FTP</option>
+          <option value="s3">S3</option>
+          <option value="drive" data-i18n="opt_remote_drive">Google Drive (rclone)</option>
+        </select>
+        <input id="r-host" type="text" data-i18n-ph="ph_remote_host" placeholder="host">
+        <input id="r-port" type="text" data-i18n-ph="ph_remote_port" placeholder="port">
+        <input id="r-url" type="text" data-i18n-ph="ph_remote_url" placeholder="URL">
+        <input id="r-vendor" type="text" data-i18n-ph="ph_remote_vendor" placeholder="vendor (nextcloud/owncloud/other)">
+        <input id="r-user" type="text" data-i18n-ph="ph_remote_user" placeholder="user">
+        <input id="r-pass" type="password" data-i18n-ph="ph_remote_pass" placeholder="password">
+        <input id="r-akey" type="text" data-i18n-ph="ph_remote_akey" placeholder="access key id">
+        <input id="r-skey" type="password" data-i18n-ph="ph_remote_skey" placeholder="secret access key">
+        <input id="r-endpoint" type="text" data-i18n-ph="ph_remote_endpoint" placeholder="endpoint (S3)">
+        <input id="r-region" type="text" data-i18n-ph="ph_remote_region" placeholder="region (S3)">
+        <textarea id="r-token" data-i18n-ph="ph_remote_token" placeholder="rclone drive token"></textarea>
+        <p id="r-drive-hint" class="muted" data-i18n="remote_drive_hint">No Google Cloud account needed. On any computer run: rclone authorize "drive" - then paste the token it prints here.</p>
+        <button id="r-save" class="btn go block" data-i18n="remote_create">Create remote</button>
+      </div>
+      <div id="companion-hma" class="notice" hidden>
+        <div class="notice-toggle">
+          <span data-i18n="companion_hma_title">Hide the companion app</span>
+          <span class="tag" data-i18n="companion_hma_badge">Recommended</span>
+        </div>
+        <div class="notice-msg" data-i18n="companion_hma_body">The Google Drive companion app is installed. Always hide it with HMA-OSS so it does not reveal root or an unlocked bootloader.</div>
+        <div class="notice-msg" data-i18n="companion_hma_howto">Open HMA-OSS, edit your hide template and add this app to its list. HMA-OSS does the hiding; this just points you there.</div>
+        <div class="pkg" id="companion-hma-pkg"></div>
+        <div class="modal-actions">
+          <button class="btn small" id="companion-hma-dismiss" data-i18n="companion_hma_dismiss">Got it</button>
+          <button class="btn go small" id="companion-hma-add" data-i18n="companion_hma_add">Add to HMA-OSS list</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="settings" class="panel">
+      <div class="card">
+        <div class="field">
+          <label data-i18n="settings_theme">Theme</label>
+          <select id="set-theme">
+            <option value="auto" data-i18n="opt_theme_auto">System</option>
+            <option value="dark" data-i18n="opt_theme_dark">Dark</option>
+            <option value="light" data-i18n="opt_theme_light">Light</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-i18n="settings_language">Language</label>
+          <select id="set-lang"></select>
+        </div>
+        <div class="field">
+          <label data-i18n="settings_accent">Accent color</label>
+          <div class="swatches" id="accent-swatches"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="field">
+          <label data-i18n="settings_mode">Default backup mode</label>
+          <select id="set-mode">
+            <option value="full" data-i18n="opt_mode_full">Full (tar.zst)</option>
+            <option value="snapshot" data-i18n="opt_mode_snapshot">Snapshot (restic)</option>
+            <option value="mirror" data-i18n="opt_mode_mirror">Mirror (sync)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-i18n="settings_dest">Default destination</label>
+          <select id="set-dest"></select>
+        </div>
+        <div class="field">
+          <label data-i18n="settings_network">Cloud transfers over</label>
+          <select id="set-netpolicy">
+            <option value="any" data-i18n="opt_net_any">Wi-Fi and mobile data</option>
+            <option value="wifi" data-i18n="opt_net_wifi">Wi-Fi only</option>
+            <option value="mobile" data-i18n="opt_net_mobile">Mobile data only</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-i18n="settings_compression">Compression</label>
+          <select id="set-comp">
+            <option value="none" data-i18n="opt_comp_none">none</option>
+            <option value="lz4" data-i18n="opt_comp_lz4">lz4</option>
+            <option value="zstd:3" data-i18n="opt_comp_zstd_fast">zstd (fast)</option>
+            <option value="zstd:10" data-i18n="opt_comp_zstd_default">zstd (default)</option>
+            <option value="zstd:19" data-i18n="opt_comp_zstd_max">zstd (max)</option>
+            <option value="gzip" data-i18n="opt_comp_gzip">gzip (compatible)</option>
+          </select>
+        </div>
+        <div class="field check">
+          <input type="checkbox" id="set-enc-data"><span data-i18n="settings_encrypt_data">Encrypt data</span>
+        </div>
+        <div class="field check">
+          <input type="checkbox" id="set-enc-apk"><span data-i18n="settings_encrypt_apk">Encrypt APKs</span>
+        </div>
+        <div class="muted" data-i18n="settings_encrypt_hint">Encryption uses a passphrase you enter when you back up (age scrypt). Any age tool decrypts it on a PC with that passphrase. There is no recovery if you lose it.</div>
+      </div>
+
+      <div class="card">
+        <div class="field check">
+          <input type="checkbox" id="set-auto"><span data-i18n="settings_auto_backup">Back up apps automatically on install and update</span>
+        </div>
+        <div class="muted" data-i18n="settings_auto_hint">When on, newly installed or updated apps are backed up in the background. The first run only records what is installed, so turning this on never backs up everything at once.</div>
+        <div class="field">
+          <label for="set-auto-keep" data-i18n="job_keep">Keep last N</label>
+          <input id="set-auto-keep" type="number" min="1" value="5">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="settings_blocklist">Excluded apps</h2>
+        <div class="muted" data-i18n="settings_blocklist_hint">Apps on this list are skipped by automatic and scheduled backups.</div>
+        <ul id="blocklist" class="list"></ul>
+        <div class="field">
+          <select id="block-app"></select>
+          <button id="block-add" class="btn" data-i18n="ui_block_add">Exclude</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="field check">
+          <input type="checkbox" id="set-spoof"><span data-i18n="settings_spoof">Set install source to Play Store on restore</span>
+        </div>
+        <div class="muted" data-i18n="settings_spoof_hint">Restored apps report the Play Store as their install source instead of looking sideloaded. On by default; you can turn it off here or per restore, and when off the original install source is kept.</div>
+      </div>
+
+      <div class="notice warn">
+        <label class="notice-toggle">
+          <input type="checkbox" id="set-ssaid">
+          <span data-i18n="ui_ssaid_label">Include the device ID (SSAID)</span>
+          <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
+        </label>
+        <div class="notice-msg" data-i18n="msg_ssaid_warning">This backs up and, on restore, rewrites the device ID (SSAID / ANDROID_ID). It is optional and off by default. A restored value only takes effect after a reboot, and the previous value is always saved first so it can be rolled back.</div>
+      </div>
+
+      <button id="set-save" class="btn go block" data-i18n="save">Save</button>
+      <div id="set-status" class="muted"></div>
+    </section>
+
+    <section id="schedule" class="panel">
+      <ul id="joblist" class="list"></ul>
+      <p id="jobs-empty" class="muted" data-i18n="jobs_empty" hidden>No scheduled jobs yet.</p>
+      <h2 data-i18n="job_add">Add scheduled backup</h2>
+      <div class="card">
+        <div class="field">
+          <label for="job-app" data-i18n="job_app">App</label>
+          <select id="job-app"></select>
+        </div>
+        <div class="field">
+          <label for="job-cron" data-i18n="job_when">When</label>
+          <select id="job-cron">
+            <option value="daily" data-i18n="opt_cron_daily">Daily</option>
+            <option value="hourly" data-i18n="opt_cron_hourly">Hourly</option>
+            <option value="weekly" data-i18n="opt_cron_weekly">Weekly</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="job-at" data-i18n="job_at">At (HH:MM, optional)</label>
+          <input id="job-at" type="time">
+        </div>
+        <div class="field">
+          <label for="job-mode" data-i18n="settings_mode">Default backup mode</label>
+          <select id="job-mode">
+            <option value="full" data-i18n="opt_mode_full">Full (tar.zst)</option>
+            <option value="snapshot" data-i18n="opt_mode_snapshot">Snapshot (restic)</option>
+            <option value="mirror" data-i18n="opt_mode_mirror">Mirror (sync)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="job-dest" data-i18n="settings_dest">Default destination</label>
+          <select id="job-dest"></select>
+        </div>
+        <div class="field">
+          <label for="job-keep" data-i18n="job_keep">Keep last N</label>
+          <input id="job-keep" type="number" min="1" value="5">
+        </div>
+        <button id="job-save" class="btn go block" data-i18n="save">Save</button>
+        <div id="job-status" class="muted"></div>
+      </div>
+      <button id="log-open" class="btn block" data-i18n="ui_log_open">View activity log</button>
+    </section>
+
+    <section id="about" class="panel about">
+      <div class="about-hero">
+        <img src="assets/logo-icon.svg" alt="VDBackup">
+        <div>
+          <div class="n">VDBackup</div>
+          <div class="v" id="about-ver"></div>
+        </div>
+      </div>
+      <p data-i18n="about_what">Full app and data backup and restore as root, driven entirely from a WebUI. The open, root-native successor to Swift Backup, Neo-Backup and Android-DataBackup.</p>
+      <h2 data-i18n="about_links">Project</h2>
+      <div class="links">
+        <a href="https://github.com/VD171/VD-Backup"><span class="k">GitHub</span><span class="val">github.com/VD171/VD-Backup</span></a>
+        <a href="https://github.com/VD171/VD-Backup/wiki"><span class="k" data-i18n="about_wiki">Wiki &amp; docs</span><span class="val">github.com/VD171/VD-Backup/wiki</span></a>
+        <a href="https://xdaforums.com/t/VD-Backup.4807267/"><span class="k">XDA</span><span class="val">xdaforums.com/t/VD-Backup.4807267</span></a>
+        <a href="https://github.com/VD171/VD-Backup/blob/main/docs/BINARIES.md"><span class="k" data-i18n="about_binaries">Bundled binaries (audit)</span><span class="val">docs/BINARIES.md</span></a>
+        <a href="https://t.me/VD_Priv8"><span class="k">Telegram</span><span class="val">@VD_Priv8</span></a>
+        <a href="https://t.me/Priv8_VD"><span class="k" data-i18n="about_channel">Channel</span><span class="val">@Priv8_VD</span></a>
+        <a href="https://discord.com/users/1296831918989639721"><span class="k">Discord</span><span class="val">@VD.Priv8</span></a>
+        <a href="mailto:vd.priv8@pm.me"><span class="k" data-i18n="about_email">E-mail</span><span class="val">vd.priv8@pm.me</span></a>
+      </div>
+      <h2 data-i18n="about_see_also">See also</h2>
+      <div class="links stack">
+        <a href="https://github.com/VD171/VD-Infos"><span class="k">VDInfos</span><span class="val" data-i18n="about_sib_vdinfos">a device method debugger: reads each item through every method that can read it and compares them side by side.</span></a>
+        <a href="https://github.com/VD171/VD-Google"><span class="k">VDGoogle</span><span class="val" data-i18n="about_sib_vdgoogle">your Google services (RCS, Wallet, Play Integrity attestations), read on your device with no internet.</span></a>
+        <a href="https://github.com/VD171/COPG-VD"><span class="k">COPG-VD</span><span class="val" data-i18n="about_sib_copg">a device spoofer that turns a fresh fingerprint into a coherent, consistent profile.</span></a>
+      </div>
+      <button id="prov-open" class="btn block" data-i18n="about_prov_btn">View bundled-binary manifest</button>
+      <div class="foot" data-i18n="about_foot">GNU AGPL-3.0-or-later - Copyright (C) 2026 VD171</div>
+    </section>
+  </main>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="apps" data-i18n-title="tab_apps">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span data-i18n="tab_apps">Apps</span>
+    </button>
+    <button class="tab" data-tab="backups" data-i18n-title="tab_backups">
+      <svg viewBox="0 0 24 24"><path d="M3 7l0 11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/><path d="M2 7l2.5-3.5A2 2 0 0 1 6 2.6h12a2 2 0 0 1 1.5.9L22 7z"/><path d="M9.5 12h5"/></svg>
+      <span data-i18n="tab_backups">Backups</span>
+    </button>
+    <button class="tab" data-tab="dests" data-i18n-title="tab_dests">
+      <svg viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.5-1.5A3.75 3.75 0 0 1 18 18z"/></svg>
+      <span data-i18n="tab_dests">Destinations</span>
+    </button>
+    <button class="tab" data-tab="settings" data-i18n-title="tab_settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l1.7-1.3-1.8-3.1-2 .8a7.6 7.6 0 0 0-2.6-1.5L14.3 2H9.7l-.4 2.1a7.6 7.6 0 0 0-2.6 1.5l-2-.8L2.9 7.9l1.7 1.3a7.6 7.6 0 0 0 0 3l-1.7 1.3 1.8 3.1 2-.8a7.6 7.6 0 0 0 2.6 1.5l.4 2.1h4.6l.4-2.1a7.6 7.6 0 0 0 2.6-1.5l2 .8 1.8-3.1z"/></svg>
+      <span data-i18n="tab_settings">Settings</span>
+    </button>
+    <button class="tab" data-tab="schedule" data-i18n-title="tab_schedule">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M5 3 2.5 5.5"/><path d="M19 3l2.5 2.5"/></svg>
+      <span data-i18n="tab_schedule">Schedule</span>
+    </button>
+    <button class="tab" data-tab="about" data-i18n-title="tab_about">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v5"/><circle cx="12" cy="7.6" r="0.1" stroke-width="2.4"/></svg>
+      <span data-i18n="tab_about">About</span>
+    </button>
+  </nav>
+
+  <div id="ops" class="ops" hidden></div>
+
+  <div id="pw-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="pw-title" data-i18n="ui_import_password">Backup password</div>
+      <div class="modal-msg" id="pw-msg"></div>
+      <div class="checks" id="pw-items" hidden></div>
+      <input id="pw-input" type="password" autocomplete="off" autocapitalize="off"
+             spellcheck="false" data-i18n-ph="ui_import_password" placeholder="Backup password">
+      <div class="modal-err" id="pw-err"></div>
+      <div class="notice warn">
+        <label class="notice-toggle">
+          <input type="checkbox" id="pw-ssaid">
+          <span data-i18n="ui_ssaid_label">Include the device ID (SSAID)</span>
+          <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
+        </label>
+        <div class="notice-msg" data-i18n="msg_ssaid_warning">This backs up and, on restore, rewrites the device ID (SSAID / ANDROID_ID). It is optional and off by default. A restored value only takes effect after a reboot, and the previous value is always saved first so it can be rolled back.</div>
+      </div>
+      <div class="checks" id="pw-test-row" hidden>
+        <label><input type="checkbox" id="pw-test"><span data-i18n="ui_restore_test">Test only (extract, do not touch the live app)</span></label>
+      </div>
+      <div class="checks" id="pw-spoof-row" hidden>
+        <label><input type="checkbox" id="pw-spoof"><span data-i18n="ui_spoof_installer">Set install source to Play Store</span></label>
+      </div>
+      <div class="checks" id="pw-deep-row" hidden>
+        <label><input type="checkbox" id="pw-deep"><span data-i18n="ui_deep_spoof">Also forge the initiating source (edits packages.xml, needs a reboot)</span></label>
+        <div class="muted" data-i18n="ui_deep_spoof_note">Advanced. Makes the app look fully Play-installed (initiating package and source), not just the installer. The system package database is backed up first; the change applies after a reboot.</div>
+      </div>
+      <div class="notice warn" id="pw-overwrite-row" hidden>
+        <label class="notice-toggle">
+          <input type="checkbox" id="pw-overwrite">
+          <span data-i18n="ui_overwrite_label">I understand this overwrites the current app data</span>
+        </label>
+        <div class="notice-msg" data-i18n="msg_overwrite_warning">Restoring replaces this app's current data with the backup. The app is stopped first. This cannot be undone unless you have a separate backup of the current state.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="pw-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="pw-ok" data-i18n="ui_import_do">Import</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- generic confirm / alert dialog (replaces native confirm/alert) -->
+  <div id="msg-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="msg-title"></div>
+      <div class="modal-msg" id="msg-body"></div>
+      <div class="modal-actions">
+        <button class="btn" id="msg-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="msg-ok" data-i18n="ui_ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- backup details (tap a backup entry) -->
+  <div id="info-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="info-title"></div>
+      <div id="info-body" class="info-body"></div>
+      <div class="modal-actions">
+        <button class="btn" id="info-close" data-i18n="ui_close">Close</button>
+        <button class="btn danger" id="info-delete" data-i18n="delete">Delete</button>
+        <button class="btn go" id="info-restore" data-i18n="restore">Restore</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- per-app backup history (tap an app to see its backups and restore) -->
+  <div id="appbk-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="appbk-title"></div>
+      <ul id="appbk-list" class="list"></ul>
+      <div id="appbk-empty" class="muted" data-i18n="appbk_empty" hidden>No backups yet.</div>
+      <div class="modal-actions">
+        <button class="btn" id="appbk-close" data-i18n="ui_close">Close</button>
+        <button class="btn" id="appbk-sysmount" data-i18n="ui_sysmount">Mount as system</button>
+        <button class="btn go" id="appbk-backup" data-i18n="backup">Back up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- choose what to include in this backup -->
+  <div id="backup-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="backup-title"></div>
+      <div class="modal-msg" data-i18n="backup_what">What to include in this backup</div>
+      <div class="checks">
+        <label><input type="checkbox" id="bi-apk" checked><span data-i18n="item_apk">APK (app)</span></label>
+        <label><input type="checkbox" id="bi-data" checked><span data-i18n="item_data">App data</span></label>
+        <label><input type="checkbox" id="bi-data_de" checked><span data-i18n="item_data_de">Protected data</span></label>
+        <label><input type="checkbox" id="bi-obb" checked><span data-i18n="item_obb">OBB</span></label>
+        <label><input type="checkbox" id="bi-external" checked><span data-i18n="item_external">External data</span></label>
+        <label><input type="checkbox" id="bi-media" checked><span data-i18n="item_media">Media</span></label>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" id="bi-verify" checked><span data-i18n="ui_verify">Verify after backup</span></label>
+        <label><input type="checkbox" id="bi-dryrun"><span data-i18n="ui_dryrun">Dry run (estimate only)</span></label>
+      </div>
+      <input id="backup-pass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"
+             hidden data-i18n-ph="backup_passphrase" placeholder="Encryption passphrase">
+      <div class="modal-actions">
+        <button class="btn" id="backup-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="backup-ok" data-i18n="backup">Back up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- mount an installed app as a system app (systemless, via a VDBackup sub-module) -->
+  <div id="sysmount-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="ui_sysmount_title">Mount as system app</div>
+      <div class="modal-msg" id="sysmount-sub"></div>
+      <div class="checks">
+        <label><input type="radio" name="sysmount-loc" id="sysmount-app" checked><span data-i18n="ui_sysmount_app">Regular system app (/system/app)</span></label>
+        <label><input type="radio" name="sysmount-loc" id="sysmount-priv"><span data-i18n="ui_sysmount_priv">Privileged system app (/system/priv-app)</span></label>
+      </div>
+      <div class="muted" data-i18n="ui_sysmount_note">This never changes the real /system partition. It adds the app through a VDBackup sub-module that the root manager mounts. Privileged apps may also need a privapp-permissions allowlist.</div>
+      <div id="sysmount-hint" class="muted"></div>
+      <div class="modal-actions">
+        <button class="btn" id="sysmount-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="sysmount-ok" data-i18n="ui_sysmount">Mount as system</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- folder browser (local destination path) -->
+  <div id="dir-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="ui_dir_title">Choose a folder</div>
+      <div class="modal-msg" id="dir-path"></div>
+      <ul id="dir-list" class="list"></ul>
+      <div class="modal-actions">
+        <button class="btn" id="dir-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="dir-use" data-i18n="ui_dir_use">Use this folder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- bundled-binary provenance manifest (supply-chain audit) -->
+  <div id="prov-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="about_prov_btn">View bundled-binary manifest</div>
+      <div class="modal-msg" data-i18n="about_prov_hint">Source and SHA-256 of every binary and library bundled for this device's ABI.</div>
+      <pre id="prov-body" class="codebox"></pre>
+      <div class="modal-actions">
+        <button class="btn go" id="prov-close" data-i18n="ui_close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- activity log (audit trail: deletes, restores, scheduled runs, prunes) -->
+  <div id="log-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="ui_log_title">Activity log</div>
+      <ul id="log-list" class="list"></ul>
+      <div id="log-empty" class="muted" data-i18n="ui_log_empty" hidden>No activity yet.</div>
+      <div class="modal-actions">
+        <button class="btn go" id="log-close" data-i18n="ui_close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- special restore (system-wide): heavy friction, reboot required -->
+  <div id="special-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="special_restore_title">Restore special backup</div>
+      <div class="modal-msg" id="special-modal-sub"></div>
+      <div class="checks" id="special-modal-cats"></div>
+      <input id="special-pass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"
+             hidden data-i18n-ph="ui_import_password" placeholder="Backup password">
+      <div class="notice warn">
+        <label class="notice-toggle">
+          <input type="checkbox" id="special-ack">
+          <span data-i18n="special_ack_label">I understand this overwrites live system data and needs a reboot</span>
+        </label>
+        <div class="notice-msg" data-i18n="special_ack_warning">This replaces the current messages, contacts, Wi-Fi or Bluetooth state with the backup. It only applies after a reboot and can only be relied on when restoring to the same device and ROM.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="special-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn danger" id="special-delete" data-i18n="delete">Delete</button>
+        <button class="btn go" id="special-ok" data-i18n="restore">Restore</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="lang/en.js"></script>
+  <script src="i18n.js"></script>
+  <script src="scripts.js"></script>
+</body>
+</html>

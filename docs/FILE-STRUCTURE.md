@@ -1,3 +1,7 @@
+> **Languages:** English · [العربية](ar/FILE-STRUCTURE.md) · [Čeština](cs/FILE-STRUCTURE.md) · [Deutsch](de/FILE-STRUCTURE.md) · [Español](es/FILE-STRUCTURE.md) · [فارسی](fa/FILE-STRUCTURE.md) · [Français](fr/FILE-STRUCTURE.md) · [हिन्दी](hi/FILE-STRUCTURE.md) · [Bahasa Indonesia](in/FILE-STRUCTURE.md) · [Italiano](it/FILE-STRUCTURE.md) · [日本語](ja/FILE-STRUCTURE.md) · [한국어](ko/FILE-STRUCTURE.md) · [Nederlands](nl/FILE-STRUCTURE.md) · [Polski](pl/FILE-STRUCTURE.md) · [Português](pt/FILE-STRUCTURE.md) · [Русский](ru/FILE-STRUCTURE.md) · [Svenska](sv/FILE-STRUCTURE.md) · [ไทย](th/FILE-STRUCTURE.md) · [Türkçe](tr/FILE-STRUCTURE.md) · [Tiếng Việt](vi/FILE-STRUCTURE.md) · [中文](zh/FILE-STRUCTURE.md)
+
+---
+
 # File structure
 
 A commented map of the repository, so you know where to start.
@@ -11,8 +15,9 @@ VD-Backup/
 │   ├── uninstall.sh                # keeps user data, removes only transient state
 │   ├── sepolicy.rule               # SELinux rules (none needed yet)
 │   ├── update.json                 # in-app updater manifest
-│   ├── helper.sh                   # WebUI command dispatcher (verb -> JSON)
-│   ├── worker.sh                   # detached backup/restore engine (survives UI close)
+│   ├── scripts/                    # shell backend (dispatcher + detached engine)
+│   │   ├── helper.sh               # WebUI command dispatcher (verb -> JSON)
+│   │   └── worker.sh               # detached backup/restore engine (survives UI close)
 │   ├── META-INF/.../update-binary  # standard installer stub (Magisk/KernelSU/APatch)
 │   ├── bin/<abi>/                  # per-ABI static binaries (tar, zstd, rclone, ...)
 │   │   ├── arm64-v8a/  armeabi-v7a/  x86/  x86_64/
@@ -43,7 +48,7 @@ VD-Backup/
 ## Where to start
 
 - **WebUI/UX or translations:** `module/webroot/` (and `lang/`).
-- **Backup/restore logic:** `module/helper.sh` and `module/worker.sh`.
+- **Backup/restore logic:** `module/scripts/helper.sh` and `module/scripts/worker.sh`.
 - **Packaging/CI:** `.github/`.
 
 ---

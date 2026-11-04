@@ -1,0 +1,154 @@
+# ======================================================================
+#  VD BACKUP  ::  root backup & restore, no grant prompt
+#  Full app/data backup & restore as root - KernelSU/APatch/Magisk WebUI.
+#
+#  Copyright (C) 2026  VD171
+#  SPDX-License-Identifier: AGPL-3.0-or-later
+#
+#  Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+#  modified version, even as a service, and you MUST offer its source.
+#
+#  Site           : https://vd171.ru
+#  Site           : https://vd.priv8.ru
+#  Source         : https://github.com/VD171/VD-Backup
+#  GitHub         : @VD171 https://github.com/VD171
+#  XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+#  XDA-Thread     : https://xdaforums.com/t/VD-Backup.4807267/
+#  Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+#  Telegram       : @Priv8_VD https://t.me/Priv8_VD
+#  Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+#  E-mail         : vd.priv8@pm.me
+# ======================================================================
+#
+#  Keep the bundled, pre-compiled upstream tools (Termux + ABX) fresh between
+#  feature releases. Weekly, re-fetch the latest from upstream; if any version
+#  changed, do a .patch bump (v1.01 -> v1.01.1 -> v1.01.2 ...) and publish a
+#  "binary refresh" release with the new zip. Provenance (source + sha256) is in
+#  each bin/<abi>/PROVENANCE.json; the upstream version set is tracked in
+#  .github/bin-versions.lock so a run with no upstream change does nothing.
+
+name: Binary refresh
+
+on:
+  schedule:
+    - cron: '17 4 * * 1'   # every Monday 04:17 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bin-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build per-ABI binaries (latest upstream)
+        run: bash .github/scripts/build_bin.sh
+
+      - name: Compare upstream versions to the lock
+        id: chk
+        run: |
+          set -e
+          grep -hoE '"package": "[^"]+", "version": "[^"]+"' module/bin/*/PROVENANCE.json \
+            | sed -E 's/.*"package": "([^"]+)", "version": "([^"]+)".*/\1=\2/' | sort -u > /tmp/bin.lock
+          if [ ! -s .github/bin-versions.lock ]; then
+            echo "state=baseline" >> "$GITHUB_OUTPUT"
+          elif diff -q .github/bin-versions.lock /tmp/bin.lock >/dev/null 2>&1; then
+            echo "state=unchanged" >> "$GITHUB_OUTPUT"
+          else
+            echo "state=changed" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Up to date
+        if: steps.chk.outputs.state == 'unchanged'
+        run: echo "bundled tools already at the latest upstream versions; nothing to do"
+
+      - name: Seed the lock (first run, no release)
+        if: steps.chk.outputs.state == 'baseline'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cp /tmp/bin.lock .github/bin-versions.lock
+          git add .github/bin-versions.lock
+          git commit -m "chore: seed binary-version lock"
+          git push
+
+      # ---- a real upstream change: build everything, patch-bump, release ----
+      - name: Set up JDK 17
+        if: steps.chk.outputs.state == 'changed'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        if: steps.chk.outputs.state == 'changed'
+        uses: android-actions/setup-android@v3
+        with:
+          packages: ''          # the obsolete 'tools' default fails; we install exactly what we need below
+
+      - name: Install SDK platform + build-tools
+        if: steps.chk.outputs.state == 'changed'
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Build helper dex
+        if: steps.chk.outputs.state == 'changed'
+        run: bash dex/build.sh
+
+      - name: Build Google Drive companion (if signing secret present)
+        if: steps.chk.outputs.state == 'changed' && env.KS != ''
+        env:
+          KS: ${{ secrets.VDB_COMPANION_KEYSTORE_B64 }}
+          VDB_COMPANION_STORE_PASS: ${{ secrets.VDB_COMPANION_STORE_PASS }}
+          VDB_COMPANION_KEY_ALIAS: ${{ secrets.VDB_COMPANION_KEY_ALIAS }}
+          VDB_COMPANION_KEY_PASS: ${{ secrets.VDB_COMPANION_KEY_PASS }}
+          VDB_OAUTH_CLIENT_ID: ${{ secrets.VDB_OAUTH_CLIENT_ID }}
+        run: |
+          echo "$KS" | base64 -d > companion/release.keystore
+          export VDB_COMPANION_KEYSTORE="$PWD/companion/release.keystore"
+          ( cd companion && ./gradlew --no-daemon :app:assembleRelease )
+          cp "$(ls companion/app/build/outputs/apk/release/*.apk | head -1)" module/companion.apk
+          rm -f companion/release.keystore
+
+      - name: Patch-bump version
+        if: steps.chk.outputs.state == 'changed'
+        run: bash .github/scripts/version.sh patch
+
+      - name: Read version
+        if: steps.chk.outputs.state == 'changed'
+        id: v
+        run: echo "name=$(sed -n 's/^version=//p' module/module.prop)" >> "$GITHUB_OUTPUT"
+
+      - name: Stage README + LICENSE + refresh the lock
+        if: steps.chk.outputs.state == 'changed'
+        run: |
+          cp README.md LICENSE module/
+          cp /tmp/bin.lock .github/bin-versions.lock
+
+      - name: Assemble release zip
+        if: steps.chk.outputs.state == 'changed'
+        run: cd module && zip -r9 "../VD-Backup-${{ steps.v.outputs.name }}.zip" . -x 'bin/*/.gitkeep'
+
+      - name: Commit bump + lock
+        if: steps.chk.outputs.state == 'changed'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add module/module.prop module/update.json .github/bin-versions.lock
+          git commit -m "chore: binary refresh ${{ steps.v.outputs.name }}"
+          git push
+
+      - name: Create GitHub release
+        if: steps.chk.outputs.state == 'changed'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.v.outputs.name }}" \
+            "VD-Backup-${{ steps.v.outputs.name }}.zip" \
+            --title "VDBackup ${{ steps.v.outputs.name }} (binary refresh)" \
+            --notes "Automated refresh of the bundled, pre-compiled upstream tools (Termux + ABX) to their latest versions. Source and SHA-256 of every binary are in bin/<abi>/PROVENANCE.json; see docs/BINARIES.md."

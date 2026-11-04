@@ -48,7 +48,11 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 - **目标位置:** 本地、SFTP、SCP、SMB、WebDAV、FTP、S3 以及 70 多种 (`rclone`)，外加 `rsync`
   和 `restic` 仓库。还可通过一个小型的选择加入配套应用选用 Google Drive。
 - **完整性:** 每个归档都会对照清单进行校验；试运行和还原测试让你无需改动任何东西即可检查备份。
-- **调度 + 保留:** 以 keep-N 修剪的周期性任务。
+- **选择性还原:** 还原备份项目的任意子集；删除备份，并为每一次破坏性操作保留活动/审计日志。
+- **特殊备份:** 短信 (SMS/MMS)、联系人和通话记录、Wi-Fi 和蓝牙，还可选地导出一份可在 PC 上打开的可移植 JSON。
+- **调度 + 自动化:** 以 keep-N 修剪的周期性任务，外加选择加入的安装/更新时自动备份和一份排除应用列表。
+- **安装来源:** 还原的应用默认把 Play Store 报告为其安装来源 (可切换)；一个高级的选择加入项还会伪造发起方软件包和来源。
+- **系统应用挂载:** 无需触碰真实的 `/system` 分区即可把已安装的应用挂载为系统应用 (无系统修改的叠加子模块，支持 NoMount)。
 - **后台:** 备份/还原以分离方式运行，关闭 WebUI 后仍会继续，并在开始和完成时发送通知。
 - **迁移导入:** 导入现有的 Neo-Backup 和 Android-DataBackup 备份，包括用密码加密的备份。
 
@@ -57,6 +61,8 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 1. 从 [发布](https://github.com/VD171/VD-Backup/releases) 下载最新的 `VD-Backup-vX.Y.zip`。
 2. 在 KernelSU / APatch / Magisk 管理器中刷入 - 立即可用，无需重启。
 3. 打开模块的 **WebUI** 进行配置并运行备份。就这么简单。
+
+**版本。** 每个发行版包含六个 zip。`universal-full` - 所有架构和全部二进制文件（含用于云服务商的 `rclone`、用于快照的 `restic`），任何设备可用，体积最大。`universal-lite` - 所有架构，但去掉两个最大的二进制文件（`rclone`、`restic`），体积最小，仍可进行本地、SSH/SFTP 和 `rsync` 备份。`<abi>-full`（`arm64-v8a`、`armeabi-v7a`、`x86`、`x86_64`） - 单一架构含全部二进制文件，比 `universal-full` 小。知道自己的架构 -> 选 `<abi>-full`；想要最小或不需要云端大文件 -> `universal-lite`；在任何设备上拥有全部功能 -> `universal-full`。参见 [发布](https://github.com/VD171/VD-Backup/releases)。
 
 初次使用？[用户指南](docs/USER-GUIDE.md) 将带你从安装一路走到还原。
 
@@ -78,7 +84,10 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 - **[用户指南](docs/USER-GUIDE.md)** - 从安装到还原，端到端。
 - **[AI 代理](docs/AI-AGENTS.md)** - 通过 JSON API 以无头方式执行每一个操作。
 - **[架构](ARCHITECTURE.md)** 和 **[文件结构](docs/FILE-STRUCTURE.md)** - 工作原理。
+- **[随附的二进制文件](docs/BINARIES.md)** - 每个预编译二进制文件的来源与 SHA-256，便于完整审计。
+- **[恢复](module/etc/RECOVERY.md)** - 无需模块即可在 PC 上打开并解密备份。
 - **[参与贡献](CONTRIBUTING.md)** 和 **[安全](SECURITY.md)**。
+- **[更新日志](CHANGELOG.md)** 和 **[行为准则](CODE_OF_CONDUCT.md)**。
 
 ## 对 AI 友好
 

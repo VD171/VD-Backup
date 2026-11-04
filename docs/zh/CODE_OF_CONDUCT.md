@@ -1,0 +1,18 @@
+> **Languages:** [English](../../CODE_OF_CONDUCT.md) · [العربية](../ar/CODE_OF_CONDUCT.md) · [Čeština](../cs/CODE_OF_CONDUCT.md) · [Deutsch](../de/CODE_OF_CONDUCT.md) · [Español](../es/CODE_OF_CONDUCT.md) · [فارسی](../fa/CODE_OF_CONDUCT.md) · [Français](../fr/CODE_OF_CONDUCT.md) · [हिन्दी](../hi/CODE_OF_CONDUCT.md) · [Bahasa Indonesia](../in/CODE_OF_CONDUCT.md) · [Italiano](../it/CODE_OF_CONDUCT.md) · [日本語](../ja/CODE_OF_CONDUCT.md) · [한국어](../ko/CODE_OF_CONDUCT.md) · [Nederlands](../nl/CODE_OF_CONDUCT.md) · [Polski](../pl/CODE_OF_CONDUCT.md) · [Português](../pt/CODE_OF_CONDUCT.md) · [Русский](../ru/CODE_OF_CONDUCT.md) · [Svenska](../sv/CODE_OF_CONDUCT.md) · [ไทย](../th/CODE_OF_CONDUCT.md) · [Türkçe](../tr/CODE_OF_CONDUCT.md) · [Tiếng Việt](../vi/CODE_OF_CONDUCT.md) · 中文
+
+---
+
+# 行为准则
+
+我们希望 VDBackup 成为一个友好的项目。请保持尊重，善意假定，
+并让讨论保持技术性和建设性。
+
+- 友善待人。不得骚扰、人身攻击或歧视。
+- 批评想法和代码，而不是人。
+- 帮助新人；每个人都曾是新手。
+
+不可接受的行为可以私下向维护者报告（联系方式见
+[SECURITY.md](SECURITY.md)）。维护者可以删除违反本准则的评论、提交、
+issue 和贡献，并可以封禁屡次违规者。
+
+这是对 Contributor Covenant 精神的一个浓缩的、适合本项目的改编。

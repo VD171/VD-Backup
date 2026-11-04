@@ -51,7 +51,16 @@ các bản sao lưu Neo-Backup và Android-DataBackup hiện có để bạn chu
   kho `rsync` và `restic`. Tùy chọn Google Drive qua một ứng dụng đồng hành nhỏ bật theo lựa chọn.
 - **Tính toàn vẹn:** mọi archive đều được kiểm tra đối chiếu với manifest; dry-run và kiểm thử khôi
   phục cho phép bạn kiểm tra một bản sao lưu mà không đụng chạm đến bất cứ thứ gì.
-- **Lập lịch + lưu giữ:** các tác vụ định kỳ với việc tỉa bớt theo kiểu keep-N.
+- **Khôi phục chọn lọc:** khôi phục bất kỳ tập con nào các mục của một bản sao lưu; xóa các bản
+  sao lưu và giữ một nhật ký hoạt động/kiểm toán cho mọi hành động phá hủy.
+- **Sao lưu đặc biệt:** tin nhắn (SMS/MMS), danh bạ và nhật ký cuộc gọi, Wi-Fi và Bluetooth,
+  với một bản xuất JSON khả chuyển tùy chọn mà bạn có thể mở trên PC.
+- **Lập lịch + tự động hóa:** các tác vụ định kỳ với việc tỉa bớt theo kiểu keep-N, cùng với
+  tự động sao lưu opt-in khi cài đặt/cập nhật và một danh sách ứng dụng loại trừ.
+- **Nguồn cài đặt:** các ứng dụng đã khôi phục báo cáo Play Store là nguồn cài đặt của chúng
+  theo mặc định (có thể bật/tắt); một tùy chọn opt-in nâng cao còn giả mạo cả gói khởi tạo và nguồn.
+- **Gắn ứng dụng hệ thống:** gắn một ứng dụng đã cài làm ứng dụng hệ thống mà không chạm vào
+  phân vùng `/system` thật (mô-đun con overlay không-hệ-thống, nhận biết NoMount).
 - **Nền:** sao lưu/khôi phục chạy tách rời và vẫn tiếp tục khi đóng WebUI, kèm thông báo khi bắt đầu
   và khi hoàn thành.
 - **Di chuyển vào (nhập):** nhập các bản sao lưu Neo-Backup và Android-DataBackup hiện có, kể cả
@@ -62,6 +71,8 @@ các bản sao lưu Neo-Backup và Android-DataBackup hiện có để bạn chu
 1. Tải `VD-Backup-vX.Y.zip` mới nhất từ [Bản phát hành](https://github.com/VD171/VD-Backup/releases).
 2. Flash nó trong trình quản lý KernelSU / APatch / Magisk - dùng được ngay, không cần khởi động lại.
 3. Mở **WebUI** của mô-đun để cấu hình và chạy sao lưu. Vậy là xong.
+
+**Các phiên bản.** Mỗi bản phát hành gồm sáu zip. `universal-full` - mọi kiến trúc và mọi tệp nhị phân (gồm `rclone` cho nhà cung cấp đám mây và `restic` cho ảnh chụp nhanh), mọi thiết bị, lớn nhất. `universal-lite` - mọi kiến trúc nhưng bỏ hai tệp nhị phân lớn nhất (`rclone`, `restic`), nhỏ nhất, vẫn sao lưu được cục bộ, SSH/SFTP và `rsync`. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - một kiến trúc duy nhất với mọi tệp nhị phân, nhỏ hơn `universal-full`. Biết kiến trúc của bạn -> chọn `<abi>-full`; muốn nhỏ nhất hoặc không cần các tệp nhị phân đám mây cồng kềnh -> `universal-lite`; mọi thứ trên mọi thiết bị -> `universal-full`. Xem [Bản phát hành](https://github.com/VD171/VD-Backup/releases).
 
 Mới làm quen? [Hướng dẫn người dùng](docs/USER-GUIDE.md) sẽ dẫn bạn từ cài đặt đến khôi phục.
 
@@ -84,7 +95,10 @@ Mô-đun gồm shell + WebUI cộng với các tệp nhị phân tĩnh theo từ
 - **[Hướng dẫn người dùng](docs/USER-GUIDE.md)** - từ đầu đến cuối, từ cài đặt đến khôi phục.
 - **[Tác nhân AI](docs/AI-AGENTS.md)** - điều khiển mọi hành động không giao diện qua JSON API.
 - **[Kiến trúc](ARCHITECTURE.md)** và **[Cấu trúc tệp](docs/FILE-STRUCTURE.md)** - cách nó hoạt động.
+- **[Tệp nhị phân đi kèm](docs/BINARIES.md)** - nguồn gốc và SHA-256 của mọi tệp nhị phân biên dịch sẵn, để kiểm tra đầy đủ.
+- **[Khôi phục](module/etc/RECOVERY.md)** - mở và giải mã bản sao lưu trên PC, không cần mô-đun.
 - **[Đóng góp](CONTRIBUTING.md)** và **[Bảo mật](SECURITY.md)**.
+- **[Nhật ký thay đổi](CHANGELOG.md)** và **[Quy tắc ứng xử](CODE_OF_CONDUCT.md)**.
 
 ## Thân thiện với AI
 
