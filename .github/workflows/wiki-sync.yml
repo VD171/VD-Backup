@@ -29,7 +29,7 @@ name: Wiki sync
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths: ['docs/**', '.github/workflows/wiki-sync.yml']
   workflow_dispatch: {}
 
