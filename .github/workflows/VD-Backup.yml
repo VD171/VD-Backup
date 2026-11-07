@@ -126,7 +126,7 @@ jobs:
           first=1
           for abi in arm64-v8a armeabi-v7a x86 x86_64; do
             [ -d "module/bin/$abi" ] || continue
-            out="VD-Backup-${VER}-cloud-$abi.tar.zst"
+            out="assets-${VER}-$abi.tar.zst"
             ( cd "module/bin/$abi" && tar -c rclone restic $([ -d lib ] && echo lib) | zstd -19 -T0 -q -o "$GITHUB_WORKSPACE/$out" -f )
             sha=$(sha256sum "$out" | cut -d' ' -f1)
             size=$(stat -c%s "$out")
@@ -206,7 +206,7 @@ jobs:
             printf 'full = every binary, including rclone (cloud providers) and restic (snapshots).\n'
             printf 'lite = without the two largest binaries (rclone, restic); it fetches them on demand (verified by SHA-256) the first time you use a cloud or snapshot feature. Local, SSH/SFTP and rsync work without any download.\n'
             printf 'universal = every architecture; per-ABI = pick your device (arm64-v8a, armeabi-v7a, x86, x86_64).\n'
-            printf '\nThe `cloud-<abi>.tar.zst` assets are the on-demand rclone+restic bundles the lite edition downloads; you do not flash them.\n'
+            printf '\nThe `assets-<abi>.tar.zst` files are the on-demand rclone+restic addons the lite edition downloads on first cloud use; they are not flashable builds, do not flash them.\n'
           } > release-notes.md
           # Idempotent: drop any existing release/tag for this version first.
           gh release delete "$VER" -y --cleanup-tag || true
@@ -217,6 +217,6 @@ jobs:
             "VD-Backup-${VER}-armeabi-v7a-full.zip" \
             "VD-Backup-${VER}-x86-full.zip" \
             "VD-Backup-${VER}-x86_64-full.zip" \
-            VD-Backup-${VER}-cloud-*.tar.zst \
+            assets-${VER}-*.tar.zst \
             --title "VDBackup ${VER}" \
             --notes-file release-notes.md
