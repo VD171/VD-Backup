@@ -6,7 +6,7 @@
 
 Tutte le modifiche rilevanti di VDBackup sono documentate qui. Solo in inglese.
 
-## v1.03
+## v1.03.1
 
 Nuovo ambito di backup :
 

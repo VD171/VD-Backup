@@ -6,7 +6,7 @@
 
 Alle nennenswerten Änderungen an VDBackup werden hier dokumentiert. Nur auf Englisch.
 
-## v1.03
+## v1.03.1
 
 Neuer Backup-Umfang:
 

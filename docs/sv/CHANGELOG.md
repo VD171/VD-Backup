@@ -6,7 +6,7 @@
 
 Alla noterbara ändringar i VDBackup dokumenteras här. Endast engelska.
 
-## v1.03
+## v1.03.1
 
 Ny säkerhetskopieomfattning:
 

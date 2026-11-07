@@ -6,7 +6,7 @@
 
 Toutes les modifications notables de VDBackup sont documentées ici. En anglais uniquement.
 
-## v1.03
+## v1.03.1
 
 Nouvelle portée de sauvegarde :
 

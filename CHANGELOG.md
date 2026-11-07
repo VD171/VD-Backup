@@ -6,7 +6,7 @@
 
 All notable changes to VDBackup are documented here. English only.
 
-## v1.03
+## v1.03.1
 
 New backup scope:
 

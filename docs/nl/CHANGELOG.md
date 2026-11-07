@@ -6,7 +6,7 @@
 
 Alle noemenswaardige wijzigingen aan VDBackup worden hier gedocumenteerd. Alleen in het Engels.
 
-## v1.03
+## v1.03.1
 
 Nieuwe backup-reikwijdte:
 

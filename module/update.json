@@ -1,9 +1,9 @@
 {
-  "version": "v1.03",
-  "versionCode": 10300,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.03/VD-Backup-v1.03-universal-full.zip",
+  "version": "v1.03.1",
+  "versionCode": 10301,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.03.1/VD-Backup-v1.03.1-universal-full.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "Cloud destinations with on-device browser sign-in (Drive, Dropbox, OneDrive, Box, pCloud and more), right-to-left for Arabic and Persian, an adjustable interface scale, standalone folder and file backup, new special categories (calendar, wallpaper, private DNS, system settings), gated scheduled jobs, and localized screenshots in all 21 languages. See the changelog for details.",
-  "size": 241493824,
-  "sha256": "5059244598b55d865e6f1042848a8e75eff2ca6ea65b12b62d8610cf42ebff9c"
+  "notes": "",
+  "size": 0,
+  "sha256": ""
 }

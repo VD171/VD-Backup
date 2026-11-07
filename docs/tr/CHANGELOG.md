@@ -6,7 +6,7 @@
 
 VDBackup'taki tüm kayda değer değişiklikler burada belgelenir. Yalnızca İngilizce.
 
-## v1.03
+## v1.03.1
 
 Yeni yedek kapsamı:
 

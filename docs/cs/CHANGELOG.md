@@ -6,7 +6,7 @@
 
 Všechny podstatné změny ve VDBackup jsou zdokumentovány zde. Pouze anglicky.
 
-## v1.03
+## v1.03.1
 
 Nový rozsah zálohování:
 

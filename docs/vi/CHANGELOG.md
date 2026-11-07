@@ -6,7 +6,7 @@
 
 Mọi thay đổi đáng chú ý của VDBackup được ghi lại ở đây. Chỉ bằng tiếng Anh.
 
-## v1.03
+## v1.03.1
 
 Phạm vi sao lưu mới:
 

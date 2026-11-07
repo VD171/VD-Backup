@@ -6,7 +6,7 @@
 
 Semua perubahan penting pada VDBackup didokumentasikan di sini. Hanya dalam bahasa Inggris.
 
-## v1.03
+## v1.03.1
 
 Cakupan backup baru:
 

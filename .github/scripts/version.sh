@@ -79,7 +79,7 @@ cat > "$UJSON" <<EOF
   "version": "${NAME}",
   "versionCode": ${CODE},
   "zipUrl": "https://github.com/${REPO}/releases/download/${NAME}/VD-Backup-${NAME}-universal-full.zip",
-  "changelog": "https://raw.githubusercontent.com/${REPO}/master/CHANGELOG.md",
+  "changelog": "https://raw.githubusercontent.com/${REPO}/main/CHANGELOG.md",
   "notes": "",
   "size": 0,
   "sha256": ""
