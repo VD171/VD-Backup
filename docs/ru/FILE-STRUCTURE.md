@@ -21,6 +21,7 @@ VD-Backup/
 │   ├── META-INF/.../update-binary  # standard installer stub (Magisk/KernelSU/APatch)
 │   ├── bin/<abi>/                  # per-ABI static binaries (tar, zstd, rclone, ...)
 │   │   ├── arm64-v8a/  armeabi-v7a/  x86/  x86_64/
+│   ├── etc/                        # notify.sh, authorize-landing.html (OAuth), RECOVERY.md
 │   └── webroot/                    # the WebUI
 │       ├── index.html              # layout (tabs: Apps, Backups, Destinations, Settings)
 │       ├── scripts.js              # app logic + root bridge (execCommand/helper)
@@ -35,6 +36,7 @@ VD-Backup/
 ├── CODE_OF_CONDUCT.md  SECURITY.md
 ├── LICENSE                         # GNU AGPL-3.0-or-later
 ├── docs/                           # public docs (this file)
+├── tools/screenshots/              # dev harness: renders the WebUI -> docs/screenshots (not shipped)
 └── .github/
     ├── workflows/ci.yml            # build/sanity on every push & PR
     ├── workflows/VD-Backup.yml     # manual release (workflow_dispatch)

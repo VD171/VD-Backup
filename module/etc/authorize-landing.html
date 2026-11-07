@@ -23,7 +23,11 @@
 
   rclone authorize --template: the OAuth landing page the device browser shows
   after sign-in. Styled like the VDBackup WebUI so the sign-in feels in-app.
-  Go template: {{ .Error }} is set only on failure.
+  Go template: .OK is rclone's success flag (bool). Do NOT branch on .Error:
+  rclone's AuthResult implements the error interface, so printing .Error calls a
+  method that always returns a non-empty string (even on success) - branching
+  on it would always show failure. (Go templates evaluate actions even inside
+  HTML comments, so this note avoids the double-brace form.)
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -61,14 +65,13 @@
 </style>
 </head>
 <body>
-  {{ if .Error }}
+  {{ if not .OK }}
   <div class="card err">
     <div class="mark">
       <svg viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
     </div>
     <h1>Sign-in failed</h1>
     <p>The authorization did not complete. You can close this tab, return to VDBackup and try again.</p>
-    <p class="hint"><code>{{ .Error }}</code></p>
     <div class="brand">VDBackup</div>
   </div>
   {{ else }}
