@@ -59,6 +59,10 @@ destinationer (`rclone`/`restic`/ssh) kommunicerar med nätverket.
 | `list-ops` | `{}` | `{ok,ops:[...]}` (återanslut efter återanslutning) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | applista / base64-ikoner i batch |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` enhetens Android-användare (fleranvändare). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` underkataloger för en sökväg (mappväljare). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` fristående mapp-/filsäkerhetskopior. |
+| `provenance` | `{}` | granskningsmanifest för medföljande binärer (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` en säkerhetskopias fullständiga detaljer (version, installationskälla, tillstånd, datum, läge, storlek, objekt, behörighetsantal, enhet) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG från manifestet (fungerar när appen är avinstallerad) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref måste ligga under backup-katalogen) |

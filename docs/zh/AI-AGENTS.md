@@ -57,6 +57,10 @@ SSH-to-root 配置）来执行该命令。模块附带捆绑的二进制文件�
 | `list-ops` | `{}` | `{ok,ops:[...]}`（重新连接后再挂接） |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | 应用列表 / 批量 base64 图标 |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` 设备的 Android 用户（多用户）. |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` 某路径的子目录（文件夹选择器）. |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` 独立的文件夹/文件备份. |
+| `provenance` | `{}` | 随附二进制文件的审计清单 (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` 某个备份的完整详情（版本、安装来源、状态、日期、模式、大小、项目、权限计数、设备） |
 | `backup-icon` | `{ref}` | `{ok,icon}` 来自清单的 base64 PNG（应用已卸载时仍可用） |
 | `delete-backup` | `{ref}` | `{ok,deleted}`（ref 必须位于 backups 目录之下） |

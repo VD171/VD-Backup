@@ -59,6 +59,10 @@ Backup/Restore benötigt; nur Cloud-Ziele (`rclone`/`restic`/ssh) sprechen mit d
 | `list-ops` | `{}` | `{ok,ops:[...]}` (nach dem Wiederverbinden erneut anhängen) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | App-Liste / base64-Icons im Batch |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` Android-Benutzer des Geräts (Mehrbenutzer). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` Unterverzeichnisse eines Pfads (Ordnerauswahl). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` eigenständige Ordner-/Datei-Backups. |
+| `provenance` | `{}` | Audit-Manifest der mitgelieferten Binärdateien (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` alle Details eines Backups (Version, Installationsquelle, Status, Datum, Modus, Größe, Elemente, Berechtigungszählungen, Gerät) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64-PNG aus dem Manifest (funktioniert, wenn die App deinstalliert ist) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref muss unter dem backups-Verzeichnis liegen) |

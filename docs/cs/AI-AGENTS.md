@@ -59,6 +59,10 @@ cíle (`rclone`/`restic`/ssh) komunikují se sítí.
 | `list-ops` | `{}` | `{ok,ops:[...]}` (znovupřipojení po opětovném připojení) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | seznam aplikací / dávkové base64 ikony |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` uživatelé Androidu v zařízení (více uživatelů). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` podadresáře cesty (výběr složky). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` samostatné zálohy složky/souboru. |
+| `provenance` | `{}` | auditní manifest přibalených binárek (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` úplné detaily jedné zálohy (verze, zdroj instalace, stav, datum, režim, velikost, položky, počty oprávnění, zařízení) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG z manifestu (funguje, když je aplikace odinstalována) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref musí být pod adresářem záloh) |

@@ -58,6 +58,10 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `list-ops` | `{}` | `{ok,ops:[...]}` (เชื่อมต่อใหม่หลังรีคอนเนกต์) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | รายการแอป / ไอคอน base64 แบบกลุ่ม |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` ผู้ใช้ Android ของอุปกรณ์ (หลายผู้ใช้). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` ไดเรกทอรีย่อยของพาธ (ตัวเลือกโฟลเดอร์). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` การสำรองโฟลเดอร์/ไฟล์แบบเดี่ยว. |
+| `provenance` | `{}` | รายการตรวจสอบไบนารีที่มากับแอป (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` รายละเอียดครบของ backup หนึ่งชุด (เวอร์ชัน, แหล่งติดตั้ง, สถานะ, วันที่, mode, ขนาด, items, จำนวนสิทธิ์, อุปกรณ์) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG จาก manifest (ใช้ได้แม้แอปถูกถอนการติดตั้ง) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref ต้องอยู่ใต้ไดเรกทอรี backups) |

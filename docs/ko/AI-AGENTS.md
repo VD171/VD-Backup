@@ -59,6 +59,10 @@ SSH-to-root 설정)을 통해 그 명령을 실행하세요. 모듈은 바이너
 | `list-ops` | `{}` | `{ok,ops:[...]}` (재연결 후 다시 붙기) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | 앱 목록 / 일괄 base64 아이콘 |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` 기기의 Android 사용자(멀티 유저). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` 경로의 하위 디렉터리(폴더 선택기). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` 독립 폴더/파일 백업. |
+| `provenance` | `{}` | 번들 바이너리 감사 매니페스트 (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` 한 백업의 전체 세부 정보 (버전, 설치 출처, 상태, 날짜, 모드, 크기, 항목, 권한 개수, 기기) |
 | `backup-icon` | `{ref}` | `{ok,icon}` 매니페스트에서 가져온 base64 PNG (앱이 제거된 경우에도 동작) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref는 backups 디렉터리 아래여야 함) |

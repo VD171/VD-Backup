@@ -59,6 +59,10 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `list-ops` | `{}` | `{ok,ops:[...]}` (إعادة الارتباط بعد إعادة الاتصال) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | قائمة التطبيقات / أيقونات base64 بالدفعة |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` مستخدمو أندرويد في الجهاز (متعدد المستخدمين). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` المجلدات الفرعية لمسار (منتقي المجلدات). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` نسخ احتياطية مستقلة لمجلد/ملف. |
+| `provenance` | `{}` | بيان تدقيق الثنائيات المضمَّنة (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` تفاصيل نسخة احتياطية واحدة كاملة (الإصدار، مصدر التثبيت، الحالة، التاريخ، الوضع، الحجم، العناصر، أعداد الأذونات، الجهاز) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG من البيان (يعمل عندما يكون التطبيق غير مثبّت) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (يجب أن يكون ref ضمن دليل النسخ الاحتياطية) |

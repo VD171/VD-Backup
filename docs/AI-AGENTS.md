@@ -59,6 +59,10 @@ destinations (`rclone`/`restic`/ssh) talk to the network.
 | `list-ops` | `{}` | `{ok,ops:[...]}` (reattach after reconnecting) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | app list / batch base64 icons |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` the device's Android users (multi-user). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` sub-directories of a path (the folder picker). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` standalone folder/file backups. |
+| `provenance` | `{}` | the bundled-binary audit manifest (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` one backup's full details (version, install source, state, date, mode, size, items, permission counts, device) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG from the manifest (works when the app is uninstalled) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref must be under the backups dir) |

@@ -59,6 +59,10 @@ các đích đám mây (`rclone`/`restic`/ssh) mới nói chuyện với mạng.
 | `list-ops` | `{}` | `{ok,ops:[...]}` (gắn lại sau khi kết nối lại) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | danh sách ứng dụng / lô biểu tượng base64 |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` người dùng Android của thiết bị (đa người dùng). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` thư mục con của một đường dẫn (bộ chọn thư mục). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` sao lưu thư mục/tệp độc lập. |
+| `provenance` | `{}` | tệp kê khai kiểm toán các nhị phân đi kèm (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` toàn bộ chi tiết của một bản sao lưu (phiên bản, nguồn cài đặt, trạng thái, ngày, chế độ, kích thước, mục, số lượng quyền, thiết bị) |
 | `backup-icon` | `{ref}` | `{ok,icon}` PNG base64 từ manifest (hoạt động cả khi ứng dụng đã bị gỡ cài đặt) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref phải nằm dưới thư mục backups) |

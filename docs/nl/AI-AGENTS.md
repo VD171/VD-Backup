@@ -59,6 +59,10 @@ backup/restore; alleen cloudbestemmingen (`rclone`/`restic`/ssh) praten met het 
 | `list-ops` | `{}` | `{ok,ops:[...]}` (opnieuw aanhaken na herverbinden) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | app-lijst / batch base64-pictogrammen |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` Android-gebruikers van het apparaat (multi-user). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` submappen van een pad (mapkiezer). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` losse map-/bestandsback-ups. |
+| `provenance` | `{}` | audit-manifest van de meegeleverde binaries (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` alle details van één backup (versie, installatiebron, staat, datum, modus, grootte, items, machtigingstellingen, apparaat) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64-PNG uit het manifest (werkt wanneer de app is verwijderd) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref moet onder de backups-map liggen) |

@@ -59,6 +59,10 @@ cloud (`rclone`/`restic`/ssh) yang berkomunikasi dengan jaringan.
 | `list-ops` | `{}` | `{ok,ops:[...]}` (reattach setelah tersambung kembali) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | daftar aplikasi / ikon base64 batch |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` pengguna Android perangkat (multi-pengguna). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` subdirektori dari sebuah path (pemilih folder). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` cadangan folder/berkas mandiri. |
+| `provenance` | `{}` | manifes audit biner bawaan (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` detail lengkap satu backup (versi, sumber pemasangan, keadaan, tanggal, mode, ukuran, item, jumlah izin, perangkat) |
 | `backup-icon` | `{ref}` | `{ok,icon}` PNG base64 dari manifest (berfungsi saat aplikasi sudah dicopot) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref harus berada di bawah direktori backups) |

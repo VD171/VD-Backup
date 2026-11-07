@@ -59,6 +59,10 @@ dosyalarla gelir, bu yüzden kurulduktan sonra yerel yedekleme/geri yükleme iç
 | `list-ops` | `{}` | `{ok,ops:[...]}` (yeniden bağlandıktan sonra yeniden eklenir) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | uygulama listesi / toplu base64 simgeler |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` cihazın Android kullanıcıları (çoklu kullanıcı). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` bir yolun alt dizinleri (klasör seçici). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` bağımsız klasör/dosya yedekleri. |
+| `provenance` | `{}` | paket ikili dosyaların denetim bildirimi (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` bir yedeğin tüm ayrıntıları (sürüm, kurulum kaynağı, durum, tarih, mod, boyut, öğeler, izin sayıları, cihaz) |
 | `backup-icon` | `{ref}` | `{ok,icon}` manifestten base64 PNG (uygulama kaldırıldığında da çalışır) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref, backups dizininin altında olmalıdır) |

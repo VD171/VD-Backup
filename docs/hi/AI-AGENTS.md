@@ -59,6 +59,10 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `list-ops` | `{}` | `{ok,ops:[...]}` (पुनः कनेक्ट होने के बाद reattach) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | ऐप सूची / बैच base64 आइकन |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` डिवाइस के Android उपयोगकर्ता (मल्टी-यूज़र). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` किसी पथ की उप-निर्देशिकाएँ (फ़ोल्डर पिकर). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` स्वतंत्र फ़ोल्डर/फ़ाइल बैकअप. |
+| `provenance` | `{}` | बंडल बाइनरी का ऑडिट मैनिफ़ेस्ट (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` एक backup का पूरा विवरण (संस्करण, इंस्टॉल स्रोत, स्थिति, तिथि, mode, आकार, items, अनुमति गणना, डिवाइस) |
 | `backup-icon` | `{ref}` | `{ok,icon}` manifest से base64 PNG (ऐप अनइंस्टॉल होने पर भी काम करता है) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref का backups निर्देशिका के अंतर्गत होना आवश्यक) |

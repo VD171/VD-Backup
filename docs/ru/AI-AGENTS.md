@@ -59,6 +59,10 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `list-ops` | `{}` | `{ok,ops:[...]}` (повторное подключение после восстановления связи) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | список приложений / пакетные base64-иконки |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,items}]}` |
+| `list-users` | `{}` | `{ok,users:[{id,name}]}` пользователи Android на устройстве (мультипользователь). |
+| `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` подкаталоги пути (выбор папки). |
+| `path-list` | `{user?}` | `{ok,backups:[...]}` отдельные резервные копии папки/файла. |
+| `provenance` | `{}` | манифест аудита встроенных бинарников (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` полные сведения об одной резервной копии (версия, источник установки, состояние, дата, режим, размер, элементы, счётчики разрешений, устройство) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG из манифеста (работает, когда приложение удалено) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref должен находиться под каталогом резервных копий) |
