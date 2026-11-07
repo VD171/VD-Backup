@@ -1944,6 +1944,17 @@ function setupSegments() { SEGMENTED.forEach(function (s) { segmentize($(s)); })
 function syncSegments() { SEGMENTED.forEach(function (s) { var e = $(s); if (e && e._segSync) e._segSync(); }); }
 
 // --- update check (button-triggered; never auto-runs on load) ------------
+// Fills and shows the dismissible update banner from an update-check result that
+// reports an available update. Shared by the manual check and the auto-check.
+function showUpdateBanner(r, scroll) {
+  var banner = $("#update-banner");
+  $("#update-banner-title").textContent = I18N.t("ui_update_available", { version: r.latest_version || "" });
+  var msg = I18N.t("ui_update_via_manager");
+  if (r.notes) msg = r.notes + "\n\n" + msg;
+  $("#update-banner-msg").textContent = msg;
+  if (banner) { banner.classList.add("show"); if (scroll && banner.scrollIntoView) banner.scrollIntoView({ block: "center" }); }
+}
+
 // Wires to the helper "update-check" verb. On an available update it shows the
 // dismissible banner and points the user at their root manager (which performs the
 // actual update via the module's updateJson); it never opens external URLs itself.
@@ -1954,18 +1965,23 @@ function checkForUpdates() {
   helper("update-check").then(function (r) {
     restore();
     if (!r || r.ok === false) { modalAlert(errMsg(r)); return; }
-    var banner = $("#update-banner");
-    if (r.update_available) {
-      $("#update-banner-title").textContent = I18N.t("ui_update_available", { version: r.latest_version || "" });
-      var msg = I18N.t("ui_update_via_manager");
-      if (r.notes) msg = r.notes + "\n\n" + msg;
-      $("#update-banner-msg").textContent = msg;
-      if (banner) { banner.classList.add("show"); if (banner.scrollIntoView) banner.scrollIntoView({ block: "center" }); }
-    } else {
-      if (banner) banner.classList.remove("show");
-      modalAlert(I18N.t("ui_update_latest"));
-    }
+    if (r.update_available) { showUpdateBanner(r, true); }
+    else { var b = $("#update-banner"); if (b) b.classList.remove("show"); modalAlert(I18N.t("ui_update_latest")); }
   }).catch(function () { restore(); modalAlert(I18N.t("msg_err_update_check")); });
+}
+
+// Silent, throttled auto-check on open: at most once an hour (localStorage ts).
+// Shows the banner only when a newer version exists; never alerts, never nags,
+// and fails silently (offline shows nothing). The manual button is unaffected.
+var UPDATE_CHECK_THROTTLE_MS = 3600000;
+function autoCheckUpdates() {
+  var now = Date.now(), last = 0;
+  try { last = parseInt(localStorage.getItem("vdb_update_last_check"), 10) || 0; } catch (e) {}
+  if (now - last < UPDATE_CHECK_THROTTLE_MS) return;
+  try { localStorage.setItem("vdb_update_last_check", String(now)); } catch (e) {}
+  helper("update-check").then(function (r) {
+    if (r && r.ok !== false && r.update_available) showUpdateBanner(r, false);
+  }).catch(function () {});
 }
 
 // --- boot ---------------------------------------------------------------
@@ -2030,7 +2046,7 @@ function boot() {
   setupBackNav();
 
   helper("config-get").then(function (c) { CFG = c || {}; activeUser = (CFG.user != null) ? (CFG.user | 0) : 0; return I18N.init(CFG.language || "auto"); })
-    .then(function () { I18N.apply(); loadDests(); loadSettings(); loadUsers(); loadOverview(); reattachOps(); recoverPendingAuth(); });
+    .then(function () { I18N.apply(); loadDests(); loadSettings(); loadUsers(); loadOverview(); reattachOps(); recoverPendingAuth(); autoCheckUpdates(); });
 
   helper("ping").then(function (r) {
     if (r && r.version) { $("#ver").textContent = r.version; if ($("#about-ver")) $("#about-ver").textContent = r.version + " - " + (r.abi || ""); }
