@@ -71,12 +71,18 @@ ZIP="VD-Backup-${NAME}.zip"
 sed -i "s/^version=.*/version=${NAME}/"       "$PROP"
 sed -i "s/^versionCode=.*/versionCode=${CODE}/" "$PROP"
 
+# update manifest. size/sha256/notes are filled by the release workflow once the
+# universal-full zip exists (version.sh runs before the build); the in-app
+# update-check verb reads these so the WebUI can show what a new version brings.
 cat > "$UJSON" <<EOF
 {
   "version": "${NAME}",
   "versionCode": ${CODE},
   "zipUrl": "https://github.com/${REPO}/releases/download/${NAME}/VD-Backup-${NAME}-universal-full.zip",
-  "changelog": "https://raw.githubusercontent.com/${REPO}/master/CHANGELOG.md"
+  "changelog": "https://raw.githubusercontent.com/${REPO}/master/CHANGELOG.md",
+  "notes": "",
+  "size": 0,
+  "sha256": ""
 }
 EOF
 

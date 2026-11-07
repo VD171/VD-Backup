@@ -31,3 +31,11 @@ snart vi kan och ger dig erkännande om du vill.
   välj en stark. 
 - Den valfria Google Drive-följeslagar-appen bör alltid döljas med HMA-OSS så att den
   inte avslöjar root eller en upplåst bootloader.
+- Återställning körs som root, så varje arkiv kontrolleras innan något skrivs: en
+  säkerhetskopia vars innehåll pekar utanför sitt mål (en absolut sökväg eller en `..`-komponent)
+  avvisas, och ingen fil packas upp förrän hela arkivet har godkänts.
+- Varje förkompilerad binär och bibliotek kan spåras till en fastnålad offentlig uppström med en
+  registrerad SHA-256, och manifestet levereras på enheten, så att den medföljande nyttolasten kan
+  granskas och reproduceras. Se [BINARIES.md](BINARIES.md).
+
+*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna - se [CONTRIBUTING.md](CONTRIBUTING.md).*

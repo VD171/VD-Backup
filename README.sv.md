@@ -17,6 +17,7 @@
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
   <a href="docs/USER-GUIDE.md">Användarguide</a> ·
   <a href="docs/AI-AGENTS.md">AI-agenter</a> ·
+  <a href="CHANGELOG.md">Ändringslogg</a> ·
   <a href="CONTRIBUTING.md">Bidra</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA-tråd</a>
 </p>
@@ -51,12 +52,14 @@ importera befintliga säkerhetskopior från Neo-Backup och Android-DataBackup s�
   plus `rsync`- och `restic`-förråd. Valfritt Google Drive via en pytteliten valfri följeslagare.
 - **Integritet:** varje arkiv verifieras mot manifestet; torrkörning (dry-run) och
   återställningstest låter dig kontrollera en säkerhetskopia utan att röra något.
-- **Selektiv återställning:** återställ valfri delmängd av en säkerhetskopias objekt; radera
-  säkerhetskopior och för en aktivitets-/revisionslogg över varje destruktiv åtgärd.
+- **Selektiv återställning och batchåterställning:** återställ valfri delmängd av en säkerhetskopias
+  objekt, eller markera flera säkerhetskopior och återställ dem alla på en gång; radera säkerhetskopior
+  och för en aktivitets-/revisionslogg över varje destruktiv åtgärd.
 - **Särskilda säkerhetskopior:** meddelanden (SMS/MMS), kontakter och samtalslogg, Wi-Fi och
   Bluetooth, med en valfri portabel JSON-export som du kan öppna på en PC.
-- **Schemaläggning + automatisering:** återkommande jobb med keep-N-gallring, plus valfri
-  auto-säkerhetskopiering vid installation/uppdatering och en lista över uteslutna appar.
+- **Schemaläggning + automatisering:** återkommande jobb för **säkerhetskopiering eller återställning**
+  mot en app, en uppsättning, eller alla appar, med keep-N-gallring, plus valfri auto-säkerhetskopiering
+  vid installation/uppdatering och en lista över uteslutna appar.
 - **Installationskälla:** återställda appar anger som standard Play Store som sin
   installationskälla (växlingsbart); ett avancerat tillval förfalskar även det initierande paketet och källan.
 - **Montering som systemapp:** montera en installerad app som en systemapp utan att röra den
@@ -66,6 +69,14 @@ importera befintliga säkerhetskopior från Neo-Backup och Android-DataBackup s�
 - **Migrera in:** importerar befintliga säkerhetskopior från Neo-Backup och
   Android-DataBackup, inklusive lösenordskrypterade.
 
+## Skärmbilder
+
+| Start | Appar | Schema |
+|:---:|:---:|:---:|
+| ![Start](docs/screenshots/sv/home-dark.png) | ![Appar](docs/screenshots/sv/apps-dark.png) | ![Schema](docs/screenshots/sv/schedule-dark.png) |
+| **Mål** | **Inställningar** | **Aktivitetslogg** |
+| ![Mål](docs/screenshots/sv/destinations-dark.png) | ![Inställningar](docs/screenshots/sv/settings-dark.png) | ![Aktivitetslogg](docs/screenshots/sv/activitylog-dark.png) |
+
 ## Installation
 
 1. Ladda ner den senaste `VD-Backup-vX.Y.zip` från [Utgåvor](https://github.com/VD171/VD-Backup/releases).
@@ -73,12 +84,17 @@ importera befintliga säkerhetskopior från Neo-Backup och Android-DataBackup s�
 3. Öppna modulens **WebUI** för att konfigurera och köra säkerhetskopior. Det är allt.
 
 **Utgåvor.** Sex zip-filer per release. `universal-full` - alla arkitekturer och alla
-binärer (inkl. `rclone` för molnleverantörer, `restic` för ögonblicksbilder), alla enheter,
-störst. `universal-lite` - alla arkitekturer utan de två största binärerna (`rclone`,
-`restic`), minst, och klarar fortfarande lokala, SSH/SFTP och `rsync`. `<abi>-full`
-(`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - en enda arkitektur med alla binärer, mindre
-än `universal-full`. Vet du din arkitektur -> välj `<abi>-full`; vill du ha minst eller
-slippa molnjättarna -> `universal-lite`; allt på alla enheter -> `universal-full`. Se
+binärer inbäddade (inkl. `rclone` för molnleverantörer, `restic` för ögonblicksbilder),
+helt offline, inget laddas någonsin ner, alla enheter, störst. `universal-lite` - alla
+arkitekturer utan de två största binärerna (`rclone`, `restic`), minst; klarar fortfarande
+lokala, SSH/SFTP och `rsync` utan nedladdning, och första gången du använder en
+molndestination (`rclone`) eller ögonblicksbildsläge (`restic`) erbjuder den sig att ladda
+ner det lilla arkitekturspecifika tillägget en gång (verifierat med SHA-256) och cachar det,
+så att även de funktionerna fungerar. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`,
+`x86_64`) - en enda arkitektur med alla binärer inbäddade, mindre än `universal-full`. Vet
+du din arkitektur -> välj `<abi>-full`; vill du ha minst och har inget emot en
+engångsnedladdning för moln eller ögonblicksbilder -> `universal-lite`; vill du ha allt
+inbäddat utan några nedladdningar (offline / återställning) -> en full-utgåva. Se
 [Utgåvor](https://github.com/VD171/VD-Backup/releases).
 
 Ny här? [Användarguiden](docs/USER-GUIDE.md) tar dig från installation till återställning.
@@ -101,7 +117,7 @@ Modulen är shell + WebUI plus statiska binärer per ABI (`tar`, `zstd`, `lz4`,
 - **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - dokumentationen, att bläddra i online.
 - **[Användarguide](docs/USER-GUIDE.md)** - från början till slut, från installation till återställning.
 - **[AI-agenter](docs/AI-AGENTS.md)** - styr varje åtgärd huvudlöst via JSON-API:et.
-- **[Arkitektur](ARCHITECTURE.md)** och **[Filstruktur](docs/FILE-STRUCTURE.md)** - hur det fungerar.
+- **[Arkitektur](docs/ARCHITECTURE.md)** och **[Filstruktur](docs/FILE-STRUCTURE.md)** - hur det fungerar.
 - **[Medföljande binärer](docs/BINARIES.md)** - ursprung och SHA-256 för varje förkompilerad binär, för en fullständig granskning.
 - **[Återställning](module/etc/RECOVERY.md)** - öppna och dekryptera en säkerhetskopia på en dator, utan modulen.
 - **[Bidra](CONTRIBUTING.md)** och **[Säkerhet](SECURITY.md)**.

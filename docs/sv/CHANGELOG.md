@@ -6,6 +6,66 @@
 
 Alla noterbara ändringar i VDBackup dokumenteras här. Endast engelska.
 
+## v1.03
+
+Ny säkerhetskopieomfattning:
+
+- Nya kategorier för specialsäkerhetskopia: kalender (kalenderprovidern plus en portabel
+  `calendar.json`-export), bakgrundsbild (start- och låsskärmsbakgrund), privat DNS (läge och
+  specificerare) och systeminställningar (den fullständiga dumpen av system-, global- och
+  secure-inställningarna). Systeminställningar är opt-in och skriver över de enhetsövergripande
+  inställningarna vid återställning, så de är inhägnade som SSAID, med uttryckligt samtycke och
+  en fullständig revisionspost.
+- Fristående mapp- och filsäkerhetskopia: säkerhetskopiera valfri absolut sökväg (delad
+  lagring eller appdata) som ett komprimerat, manifestförseglat arkiv, och återställ det till
+  samma sökväg. Återställning kräver en uttrycklig bekräftelse.
+
+Säkrare återställning:
+
+- Varje arkiv kontrolleras innan något skrivs: en säkerhetskopia vars innehåll pekar utanför
+  sitt mål (en absolut sökväg eller en `..`-komponent) nekas, så att en återställning som körs
+  som root inte kan luras att skriva utanför destinationen.
+
+Förlopp och schemaläggning:
+
+- Live-förlopp visar nu överföringshastighet, ETA och en objekträknare under säkerhetskopior,
+  plus ett checksummeverifierat steg för molnuppladdningar och en förkontroll av "inte
+  tillräckligt med utrymme".
+- Schemalagda jobb kan villkoras: körs bara på Wi-Fi, bara under laddning, bara över en
+  batterinivå, eller bara på valda veckodagar; ett schemalagt jobb hoppas också över medan
+  enheten är kritiskt varm. Ett överhoppat jobb försöks igen vid nästa tick.
+
+Molndestinationer:
+
+- Anslut vilken rclone-backend som helst från gränssnittet: rullgardinsmenyn för molnfjärr
+  erbjuder de populära leverantörerna (Google Drive, Dropbox, OneDrive, Box, pCloud, Mega,
+  Backblaze B2, S3, SFTP, WebDAV, FTP, SMB) plus ett "Custom (advanced)"-alternativ där du
+  skriver in vilken annan rclone-backend som helst och dess `key=value`-parametrar, så att
+  alla rclones backends går att nå.
+- Inloggning på enheten (ingen PC): leverantörer som kräver inloggning via webbläsare
+  (Google Drive, Dropbox, OneDrive, Box, pCloud) har en "Authorize in browser"-knapp som
+  öppnar telefonens egen webbläsare till leverantörens samtyckessida; efter att du godkänt
+  återvänder du till appen och fjärren sparas automatiskt, med token fångad på enheten. Att
+  klistra in en token för hand finns kvar som reserv.
+
+Gränssnitt:
+
+- En justerbar gränssnittsskala (ett dragbart skjutreglage) skalar om hela gränssnittet, så att
+  det passar skärmar med olika pixeltäthet; 100 % är standard och är oförändrat.
+- Gränssnittet renderas nu från höger till vänster för arabiska och persiska.
+- En startöversikt med säkerhetskopieantal och en lagringsstapel, statusmärken, kopiera
+  hashar och sökvägar till urklipp, växlingsbrytare i Android-stil, och en "Check for updates"-åtgärd.
+- Aktivitetsloggen är en helskärm som öppnas direkt, med en "Export logs"-åtgärd som sparar en
+  loggfil som du kan bifoga en rapport.
+
+Fixar:
+
+- Återställning och import misslyckas inte längre på enheter vars medföljande `tar` inte
+  accepterar flaggan `--no-absolute-names`; arkivets säkerhetskontroll är oberoende av den
+  flaggan.
+- "Check for updates" fungerar även där ingen HTTP-klient medföljer, genom att falla tillbaka på
+  den medföljande rclone; och aktivitetsloggen tar inte längre lång tid att öppna.
+
 ## v1.01
 
 Första offentliga versionen. En WebUI-modul för KernelSU/APatch/Magisk som säkerhetskopierar och
@@ -131,3 +191,5 @@ AI-vänligt och i18n:
   dokumentationen speglad till wikin.
 - Rik applistning och Neo-dekryptering körs genom en dex-hjälpare driven som root (`IPackageManager` via
   ServiceManager), så att de fungerar där ActivityThread hänger sig.
+
+*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna - se [CONTRIBUTING.md](CONTRIBUTING.md).*

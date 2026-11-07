@@ -75,3 +75,5 @@ backup เดิมของ Neo-Backup และ Android-DataBackup เพื�
 
 มองหา label `good first issue` และ `help wanted` การแปล, เอกสาร, preset destination
 `rclone` ใหม่ และการขัดเกลา WebUI ล้วนเป็นจุดเริ่มต้นที่ยอดเยี่ยม
+
+*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง - ดู [CONTRIBUTING.md](CONTRIBUTING.md)*

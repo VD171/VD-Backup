@@ -17,6 +17,7 @@
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
   <a href="docs/USER-GUIDE.md">Benutzerhandbuch</a> ·
   <a href="docs/AI-AGENTS.md">KI-Agenten</a> ·
+  <a href="CHANGELOG.md">Änderungsprotokoll</a> ·
   <a href="CONTRIBUTING.md">Mitwirken</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA-Thread</a>
 </p>
@@ -51,11 +52,13 @@ vorhandene Backups von Neo-Backup und Android-DataBackup importieren, damit du u
   dazu `rsync`- und `restic`-Repos. Google Drive optional über einen winzigen opt-in-Begleiter.
 - **Integrität:** jedes Archiv wird gegen das Manifest geprüft; Dry-Run und
   Restore-Test lassen dich ein Backup kontrollieren, ohne etwas anzufassen.
-- **Selektive Wiederherstellung:** stelle eine beliebige Teilmenge der Elemente eines Backups
-  wieder her; lösche Backups und führe ein Aktivitäts-/Audit-Protokoll jeder destruktiven Aktion.
+- **Selektive & stapelweise Wiederherstellung:** stelle eine beliebige Teilmenge der Elemente
+  eines Backups wieder her oder wähle mehrere Backups aus und stelle sie alle auf einmal wieder
+  her; lösche Backups und führe ein Aktivitäts-/Audit-Protokoll jeder destruktiven Aktion.
 - **Spezial-Backups:** Nachrichten (SMS/MMS), Kontakte und Anrufliste, WLAN und Bluetooth,
   mit einem optionalen portablen JSON-Export, den du auf einem PC öffnen kannst.
-- **Zeitplanung + Automatisierung:** wiederkehrende Jobs mit keep-N-Bereinigung, dazu
+- **Zeitplanung + Automatisierung:** wiederkehrende **Backup- oder Wiederherstellungs**-Jobs,
+  die auf eine App, einen Satz oder alle Apps zielen, mit keep-N-Bereinigung, dazu
   opt-in-Auto-Backup bei Installation/Update und eine Liste ausgeschlossener Apps.
 - **Installationsquelle:** wiederhergestellte Apps melden standardmäßig den Play Store als ihre
   Installationsquelle (umschaltbar); ein erweitertes Opt-in fälscht zusätzlich das initiierende
@@ -67,13 +70,21 @@ vorhandene Backups von Neo-Backup und Android-DataBackup importieren, damit du u
 - **Hierher migrieren:** importiert vorhandene Backups von Neo-Backup und Android-DataBackup,
   einschließlich passwortverschlüsselter.
 
+## Screenshots
+
+| Start | Apps | Zeitplan |
+|:---:|:---:|:---:|
+| ![Start](docs/screenshots/de/home-dark.png) | ![Apps](docs/screenshots/de/apps-dark.png) | ![Zeitplan](docs/screenshots/de/schedule-dark.png) |
+| **Ziele** | **Einstellungen** | **Aktivitätsprotokoll** |
+| ![Ziele](docs/screenshots/de/destinations-dark.png) | ![Einstellungen](docs/screenshots/de/settings-dark.png) | ![Aktivitätsprotokoll](docs/screenshots/de/activitylog-dark.png) |
+
 ## Installation
 
 1. Lade das neueste `VD-Backup-vX.Y.zip` von [Versionen](https://github.com/VD171/VD-Backup/releases) herunter.
 2. Flashe es im KernelSU- / APatch- / Magisk-Manager - sofort nutzbar, kein Neustart nötig.
 3. Öffne die **WebUI** des Moduls, um Backups zu konfigurieren und auszuführen. Das war's.
 
-**Editionen.** Jedes Release wird als sechs Zips ausgeliefert. `universal-full` - jede Architektur und jede Binärdatei (inkl. `rclone` für Cloud-Anbieter, `restic` für Snapshots), jedes Gerät, am größten. `universal-lite` - jede Architektur ohne die zwei größten Binärdateien (`rclone`, `restic`), am kleinsten, kann weiterhin lokale, SSH/SFTP- und `rsync`-Backups. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - eine einzelne Architektur mit jeder Binärdatei, kleiner als `universal-full`. Kennst du deine Architektur -> nimm `<abi>-full`; willst du das kleinste oder keine Cloud-Riesen -> `universal-lite`; alles auf jedem Gerät -> `universal-full`. Siehe [Versionen](https://github.com/VD171/VD-Backup/releases).
+**Editionen.** Jedes Release wird als sechs Zips ausgeliefert. `universal-full` - jede Architektur und jede Binärdatei eingebettet (inkl. `rclone` für Cloud-Anbieter, `restic` für Snapshots), vollständig offline, nie wird etwas heruntergeladen, jedes Gerät, am größten. `universal-lite` - jede Architektur ohne die zwei größten Binärdateien (`rclone`, `restic`), am kleinsten; macht weiterhin lokale, SSH/SFTP- und `rsync`-Backups ohne jeden Download, und beim ersten Mal, wenn du ein Cloud-Ziel (`rclone`) oder den Snapshot-Modus (`restic`) nutzt, bietet es an, dieses kleine, architekturspezifische Add-on einmalig herunterzuladen (per SHA-256 verifiziert) und zwischenzuspeichern, sodass auch diese Funktionen laufen. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - eine einzelne Architektur mit jeder Binärdatei eingebettet, kleiner als `universal-full`. Kennst du deine Architektur -> nimm `<abi>-full`; willst du das kleinste und hast nichts gegen einen einmaligen Download für Cloud oder Snapshots -> `universal-lite`; willst du alles eingebettet ohne jeden Download (offline / Wiederherstellung) -> eine full-Edition. Siehe [Versionen](https://github.com/VD171/VD-Backup/releases).
 
 Neu hier? Das [Benutzerhandbuch](docs/USER-GUIDE.md) begleitet dich von der Installation bis zur Wiederherstellung.
 
@@ -95,7 +106,7 @@ Das Modul besteht aus Shell + WebUI plus statischen Binaries pro ABI (`tar`, `zs
 - **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - die Dokumentation, online durchsuchbar.
 - **[Benutzerhandbuch](docs/USER-GUIDE.md)** - von Anfang bis Ende, von der Installation bis zur Wiederherstellung.
 - **[KI-Agenten](docs/AI-AGENTS.md)** - steuere jede Aktion kopflos über die JSON-API.
-- **[Architektur](ARCHITECTURE.md)** und **[Dateistruktur](docs/FILE-STRUCTURE.md)** - wie es funktioniert.
+- **[Architektur](docs/ARCHITECTURE.md)** und **[Dateistruktur](docs/FILE-STRUCTURE.md)** - wie es funktioniert.
 - **[Mitgelieferte Binaries](docs/BINARIES.md)** - Herkunft und SHA-256 jeder vorkompilierten Binärdatei, für eine vollständige Prüfung.
 - **[Wiederherstellung](module/etc/RECOVERY.md)** - ein Backup auf einem PC öffnen und entschlüsseln, ohne das Modul.
 - **[Mitwirken](CONTRIBUTING.md)** und **[Sicherheit](SECURITY.md)**.

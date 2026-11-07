@@ -11,7 +11,7 @@ you where things live and the few conventions we follow.
 
 VDBackup is a **KernelSU/APatch/Magisk WebUI module**: shell scripts + a vanilla-JS
 WebUI + per-ABI static binaries. No app is required for the core features. See
-[ARCHITECTURE.md](ARCHITECTURE.md) and [docs/FILE-STRUCTURE.md](docs/FILE-STRUCTURE.md).
+[ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/FILE-STRUCTURE.md](docs/FILE-STRUCTURE.md).
 
 It is the open, root-native **successor to Swift Backup, Neo-Backup and
 Android-DataBackup** - the union of their features under AGPLv3, with import of
@@ -75,3 +75,5 @@ AI assistants and agents are first-class contributors here, not an afterthought.
 
 Look for the `good first issue` and `help wanted` labels. Translations, docs, new
 `rclone` destination presets and WebUI polish are all great starting points.
+
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome - see [CONTRIBUTING.md](CONTRIBUTING.md).*

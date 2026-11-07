@@ -17,6 +17,7 @@
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
   <a href="docs/USER-GUIDE.md">Panduan pengguna</a> ·
   <a href="docs/AI-AGENTS.md">Agen AI</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
   <a href="CONTRIBUTING.md">Berkontribusi</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">Utas XDA</a>
 </p>
@@ -51,12 +52,14 @@ mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada agar Anda bi
   ditambah repo `rsync` dan `restic`. Google Drive opsional melalui pendamping kecil yang opt-in.
 - **Integritas:** setiap arsip diverifikasi terhadap manifes; dry-run dan restore-test memungkinkan
   Anda memeriksa sebuah cadangan tanpa menyentuh apa pun.
-- **Pemulihan selektif:** pulihkan subset mana pun dari item sebuah cadangan; hapus cadangan dan simpan
-  log aktivitas/audit dari setiap tindakan destruktif.
+- **Pemulihan selektif & massal:** pulihkan subset mana pun dari item sebuah cadangan, atau pilih beberapa
+  cadangan sekaligus dan pulihkan semuanya dalam satu kali; hapus cadangan dan simpan log aktivitas/audit dari
+  setiap tindakan destruktif.
 - **Cadangan khusus:** pesan (SMS/MMS), kontak dan log panggilan, Wi-Fi dan Bluetooth,
   dengan ekspor JSON portabel opsional yang dapat Anda buka di PC.
-- **Penjadwalan + otomasi:** tugas berulang dengan pemangkasan keep-N, ditambah pencadangan otomatis
-  opt-in saat pemasangan/pembaruan dan daftar aplikasi yang dikecualikan.
+- **Penjadwalan + otomasi:** tugas **backup atau restore** berulang yang menargetkan satu aplikasi, sekumpulan,
+  atau semua aplikasi, dengan pemangkasan keep-N, ditambah pencadangan otomatis opt-in saat pemasangan/pembaruan
+  dan daftar aplikasi yang dikecualikan.
 - **Sumber pemasangan:** aplikasi yang dipulihkan melaporkan Play Store sebagai sumber pemasangannya
   secara default (dapat dialihkan); opt-in tingkat lanjut juga memalsukan paket penginisiasi dan sumbernya.
 - **Pemasangan aplikasi-sistem:** pasang aplikasi terpasang sebagai aplikasi sistem tanpa menyentuh
@@ -66,13 +69,21 @@ mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada agar Anda bi
 - **Impor masuk:** mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada,
   termasuk yang terenkripsi dengan kata sandi.
 
+## Tangkapan layar
+
+| Beranda | Aplikasi | Jadwal |
+|:---:|:---:|:---:|
+| ![Beranda](docs/screenshots/in/home-dark.png) | ![Aplikasi](docs/screenshots/in/apps-dark.png) | ![Jadwal](docs/screenshots/in/schedule-dark.png) |
+| **Tujuan** | **Pengaturan** | **Log aktivitas** |
+| ![Tujuan](docs/screenshots/in/destinations-dark.png) | ![Pengaturan](docs/screenshots/in/settings-dark.png) | ![Log aktivitas](docs/screenshots/in/activitylog-dark.png) |
+
 ## Pemasangan
 
 1. Unduh `VD-Backup-vX.Y.zip` terbaru dari [Rilis](https://github.com/VD171/VD-Backup/releases).
 2. Flash di manajer KernelSU / APatch / Magisk - langsung bisa dipakai, tanpa perlu reboot.
 3. Buka **WebUI** modul untuk mengonfigurasi dan menjalankan pencadangan. Selesai.
 
-**Edisi.** Setiap rilis hadir sebagai enam zip. `universal-full` - setiap arsitektur dan setiap biner (termasuk `rclone` untuk penyedia cloud dan `restic` untuk snapshot), perangkat apa pun, terbesar. `universal-lite` - setiap arsitektur tanpa dua biner terbesar (`rclone`, `restic`), terkecil, dan tetap bisa backup lokal, SSH/SFTP dan `rsync`. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - satu arsitektur dengan setiap biner, lebih kecil dari `universal-full`. Tahu arsitekturmu -> pilih `<abi>-full`; mau yang terkecil atau tanpa biner cloud raksasa -> `universal-lite`; semuanya di perangkat apa pun -> `universal-full`. Lihat [Rilis](https://github.com/VD171/VD-Backup/releases).
+**Edisi.** Setiap rilis hadir sebagai enam zip. `universal-full` - setiap arsitektur dan setiap biner tertanam (termasuk `rclone` untuk penyedia cloud dan `restic` untuk snapshot), sepenuhnya offline, tidak pernah ada yang diunduh, perangkat apa pun, terbesar. `universal-lite` - setiap arsitektur tanpa dua biner terbesar (`rclone`, `restic`), terkecil; tetap bisa backup lokal, SSH/SFTP dan `rsync` tanpa unduhan, dan pertama kali kamu memakai tujuan cloud (`rclone`) atau mode snapshot (`restic`) ia menawarkan untuk mengunduh addon kecil per-arsitektur itu sekali (diverifikasi dengan SHA-256) lalu menyimpannya di cache, sehingga fitur-fitur itu pun berfungsi. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - satu arsitektur dengan setiap biner tertanam, lebih kecil dari `universal-full`. Tahu arsitekturmu -> pilih `<abi>-full`; mau yang terkecil dan tidak keberatan dengan satu kali unduhan untuk cloud atau snapshot -> `universal-lite`; mau semuanya tertanam tanpa unduhan apa pun (offline / pemulihan) -> edisi full. Lihat [Rilis](https://github.com/VD171/VD-Backup/releases).
 
 Baru di sini? [Panduan pengguna](docs/USER-GUIDE.md) memandu Anda dari pemasangan hingga pemulihan.
 
@@ -94,7 +105,7 @@ Modul ini adalah shell + WebUI ditambah biner statis per-ABI (`tar`, `zstd`, `lz
 - **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - dokumentasi, dapat dijelajahi daring.
 - **[Panduan pengguna](docs/USER-GUIDE.md)** - menyeluruh, dari pemasangan hingga pemulihan.
 - **[Agen AI](docs/AI-AGENTS.md)** - kendalikan setiap tindakan tanpa antarmuka melalui JSON API.
-- **[Arsitektur](ARCHITECTURE.md)** dan **[Struktur berkas](docs/FILE-STRUCTURE.md)** - cara kerjanya.
+- **[Arsitektur](docs/ARCHITECTURE.md)** dan **[Struktur berkas](docs/FILE-STRUCTURE.md)** - cara kerjanya.
 - **[Biner bawaan](docs/BINARIES.md)** - asal-usul dan SHA-256 setiap biner prakompilasi, untuk audit penuh.
 - **[Pemulihan](module/etc/RECOVERY.md)** - buka dan dekripsi cadangan di PC, tanpa modul.
 - **[Berkontribusi](CONTRIBUTING.md)** dan **[Keamanan](SECURITY.md)**.

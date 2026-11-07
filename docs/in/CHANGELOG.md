@@ -6,6 +6,64 @@
 
 Semua perubahan penting pada VDBackup didokumentasikan di sini. Hanya dalam bahasa Inggris.
 
+## v1.03
+
+Cakupan backup baru:
+
+- Kategori backup khusus baru: kalender (penyedia kalender, plus ekspor portabel
+  `calendar.json`), wallpaper (wallpaper layar beranda dan layar kunci), DNS privat (mode dan
+  penentu) dan pengaturan sistem (dump lengkap pengaturan system/global/secure). Pengaturan
+  sistem bersifat opt-in dan menimpa pengaturan seluruh perangkat saat direstore, jadi ia
+  dipagari seperti SSAID, dengan persetujuan eksplisit dan entri audit lengkap.
+- Backup folder dan berkas mandiri: backup sembarang path absolut (penyimpanan bersama atau
+  data aplikasi) sebagai arsip terkompresi yang disegel manifest, dan restore ke path yang
+  sama. Restore memerlukan konfirmasi eksplisit.
+
+Restore yang lebih aman:
+
+- Setiap arsip diperiksa sebelum apa pun ditulis: backup yang isinya menunjuk ke luar
+  targetnya (sebuah path absolut atau komponen `..`) ditolak, sehingga restore yang berjalan
+  sebagai root tidak bisa ditipu untuk menulis di luar tujuan.
+
+Kemajuan dan penjadwalan:
+
+- Kemajuan live kini menampilkan kecepatan transfer, ETA dan penghitung item selama backup,
+  plus langkah terverifikasi checksum untuk unggahan cloud dan pracek "ruang tidak cukup".
+- Pekerjaan terjadwal dapat dikondisikan: hanya berjalan di Wi-Fi, hanya saat mengisi daya,
+  hanya di atas level baterai, atau hanya pada hari-hari yang dipilih; pekerjaan terjadwal
+  juga dilewati saat perangkat sangat panas. Pekerjaan yang dilewati dicoba lagi pada tick
+  berikutnya.
+
+Tujuan cloud:
+
+- Hubungkan backend rclone apa pun dari UI: menu tarik-turun remote cloud menawarkan penyedia
+  populer (Google Drive, Dropbox, OneDrive, Box, pCloud, Mega, Backblaze B2, S3, SFTP, WebDAV,
+  FTP, SMB) ditambah opsi "Custom (advanced)" tempat Anda mengetik nama backend rclone lain
+  mana pun dan parameter `key=value`-nya, sehingga semua backend rclone dapat dijangkau.
+- Masuk di perangkat (tanpa PC): penyedia yang memerlukan masuk lewat peramban (Google Drive,
+  Dropbox, OneDrive, Box, pCloud) memiliki tombol "Authorize in browser" yang membuka peramban
+  ponsel itu sendiri ke halaman persetujuan penyedia; setelah Anda menyetujui, Anda kembali ke
+  aplikasi dan remote disimpan otomatis, dengan token ditangkap di perangkat. Menempel token
+  secara manual tetap tersedia sebagai cadangan.
+
+Antarmuka:
+
+- Skala antarmuka yang dapat disesuaikan (penggeser yang dapat diseret) mengubah skala
+  seluruh antarmuka, agar pas pada layar dengan kepadatan piksel berbeda; 100% adalah default
+  dan tidak berubah.
+- Antarmuka kini ditampilkan dari kanan ke kiri untuk bahasa Arab dan Persia.
+- Ringkasan beranda dengan jumlah backup dan bilah penyimpanan, lencana status, salin hash
+  dan path ke papan klip, sakelar bergaya Android, serta aksi "Check for updates".
+- Log aktivitas adalah layar penuh yang terbuka seketika, dengan aksi "Export logs" yang
+  menyimpan berkas log yang bisa Anda lampirkan ke laporan.
+
+Perbaikan:
+
+- Restore dan impor tidak lagi gagal pada perangkat yang `tar` bawaannya tidak menerima opsi
+  `--no-absolute-names`; pemeriksaan keamanan arsip tidak bergantung pada opsi itu.
+- "Check for updates" berfungsi bahkan di tempat yang tidak membundel klien HTTP, dengan
+  beralih ke rclone bawaan; dan log aktivitas tidak lagi lama untuk terbuka.
+
 ## v1.01
 
 Rilis publik pertama. Modul WebUI KernelSU/APatch/Magisk yang mencadangkan dan memulihkan
@@ -129,3 +187,5 @@ Ramah-AI dan i18n:
   (`docs/<lang>/`), dengan dokumentasi dicerminkan ke wiki.
 - Daftar aplikasi yang kaya dan dekripsi Neo berjalan melalui helper dex yang dijalankan sebagai root
   (`IPackageManager` via ServiceManager), sehingga berfungsi di tempat ActivityThread menggantung.
+
+*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan - lihat [CONTRIBUTING.md](CONTRIBUTING.md).*

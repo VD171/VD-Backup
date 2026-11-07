@@ -16,3 +16,5 @@
 이슈, 기여를 제거할 수 있으며, 반복 위반자를 차단할 수 있습니다.
 
 이것은 Contributor Covenant의 정신을 프로젝트에 맞게 요약하여 각색한 것입니다.
+
+*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다 - [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*

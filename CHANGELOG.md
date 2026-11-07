@@ -6,6 +6,62 @@
 
 All notable changes to VDBackup are documented here. English only.
 
+## v1.03
+
+New backup scope:
+
+- New special-backup categories: calendar (the calendar provider, plus a portable
+  `calendar.json` export), wallpaper (home and lock wallpaper), private DNS (mode and
+  specifier), and system settings (the full system/global/secure settings dump). System
+  settings is opt-in and overwrites device-wide settings on restore, so it is gated like
+  SSAID with explicit consent and a full audit entry.
+- Standalone folder and file backup: back up any absolute path (shared storage or app
+  data) as a compressed, manifest-sealed archive, and restore it to the same path. Restore
+  needs an explicit confirmation.
+
+Safer restore:
+
+- Every archive is checked before anything is written: a backup whose contents point
+  outside their target (an absolute path or a `..` component) is refused, so a restore
+  running as root cannot be tricked into writing outside the destination.
+
+Progress and scheduling:
+
+- Live progress now shows transfer speed, ETA and an item counter during backups, plus a
+  checksum-verified step for cloud uploads and a "not enough space" pre-check.
+- Scheduled jobs can be gated: run only on Wi-Fi, only while charging, only above a
+  battery level, or only on chosen weekdays; a scheduled job is also skipped while the
+  device is critically hot. A skipped job retries on the next tick.
+
+Cloud destinations:
+
+- Connect any rclone backend from the UI: the cloud-remote dropdown offers the popular
+  providers (Google Drive, Dropbox, OneDrive, Box, pCloud, Mega, Backblaze B2, S3, SFTP,
+  WebDAV, FTP, SMB) plus a "Custom (advanced)" option where you type any other rclone
+  backend name and its `key=value` parameters, so all of rclone's backends are reachable.
+- On-device sign-in (no PC): providers that need a browser sign-in (Google Drive, Dropbox,
+  OneDrive, Box, pCloud) have an "Authorize in browser" button that opens the phone's own
+  browser to the provider's consent page; after you approve, you return to the app and the
+  remote is saved automatically, with the token captured on the device. A manual token
+  paste stays available as a fallback.
+
+Interface:
+
+- An adjustable interface scale (a draggable slider) rescales the whole interface, so it
+  fits screens of different pixel densities; 100% is the default and is unchanged.
+- The interface now renders right-to-left for Arabic and Persian.
+- A home overview with backup counts and a storage bar, status badges, copy-to-clipboard
+  for hashes and paths, Android-style toggle switches, and a "Check for updates" action.
+- The activity log is a full screen that opens instantly, with an "Export logs" action
+  that saves a log file you can attach to a report.
+
+Fixes:
+
+- Restore and import no longer fail on devices whose bundled `tar` does not accept the
+  `--no-absolute-names` option; the archive safety check is independent of that option.
+- "Check for updates" works even where no HTTP client is bundled, by falling back to the
+  bundled rclone; and the activity log no longer takes a long time to open.
+
 ## v1.01
 
 First public release. A KernelSU/APatch/Magisk WebUI module that backs up and restores
@@ -129,3 +185,5 @@ AI-friendly and i18n:
   (`docs/<lang>/`), with docs mirrored to the wiki.
 - Rich app listing and Neo decryption run through a dex helper driven as root
   (`IPackageManager` via ServiceManager), so they work where ActivityThread hangs.
+
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome - see [CONTRIBUTING.md](CONTRIBUTING.md).*

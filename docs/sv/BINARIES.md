@@ -36,9 +36,11 @@ Endast de två första raderna är förbyggda tredjepartsbinärer; de två sista
 källkod som finns i detta repository och kan läsas och byggas om.
 
 > **Full- kontra lite-utgåvor.** lite-utgåvorna utelämnar endast `rclone` och `restic` (de två
-> största binärerna) för att hålla sig små; `rsync` och `ssh`/`scp`/`sftp` finns fortfarande med,
-> och alla andra binärer som listas ovan finns också med. Full-utgåvorna lägger till `rclone`
-> (molnleverantörer) och `restic` (ögonblicksbilder).
+> största binärerna) för att hålla sig små och hämtar dem vid behov (verifierat med SHA-256)
+> första gången du använder en molndestination eller ögonblicksbildsläge; `rsync` och
+> `ssh`/`scp`/`sftp` finns fortfarande med, och alla andra binärer som listas ovan finns också
+> med. Full-utgåvorna levererar `rclone` (molnleverantörer) och `restic` (ögonblicksbilder)
+> inbäddade, så ingenting laddas någonsin ner.
 
 ## Manifestet på enheten: `PROVENANCE.json`
 
@@ -79,3 +81,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 Om någon levererad fil inte matchar sin registrerade källa, behandla det som ett säkerhetsproblem och
 rapportera det (se [SECURITY.md](SECURITY.md)). Det är precis den sorts avvikelse som detta
 manifest finns till för att göra synlig.
+
+*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna - se [CONTRIBUTING.md](CONTRIBUTING.md).*

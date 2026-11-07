@@ -31,3 +31,11 @@ Açık bir açıklama ve mümkünse yeniden üretme adımlarını ekleyin. Elimi
   güçlü bir parola seçin.
 - İsteğe bağlı Google Drive yardımcı uygulaması, root'u veya kilidi açılmış bir
   önyükleyiciyi ifşa etmemesi için her zaman HMA-OSS ile gizlenmelidir.
+- Geri yükleme root olarak çalışır, bu yüzden herhangi bir şey yazılmadan önce her arşiv
+  denetlenir: içeriği hedefinin dışını gösteren bir yedek (mutlak bir yol veya bir `..`
+  bileşeni) reddedilir ve arşivin tamamı onaylanana kadar hiçbir dosya çıkarılmaz.
+- Her önceden derlenmiş ikili dosya ve kütüphane, kaydedilmiş bir SHA-256 ile sabitlenmiş genel bir
+  upstream'e kadar izlenebilir ve manifest cihazda birlikte gelir, böylece paketlenmiş yük denetlenebilir
+  ve yeniden üretilebilir. Bkz. [BINARIES.md](BINARIES.md).
+
+*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır - bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*

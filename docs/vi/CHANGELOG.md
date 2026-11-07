@@ -6,6 +6,65 @@
 
 Mọi thay đổi đáng chú ý của VDBackup được ghi lại ở đây. Chỉ bằng tiếng Anh.
 
+## v1.03
+
+Phạm vi sao lưu mới:
+
+- Các danh mục sao lưu đặc biệt mới: lịch (trình cung cấp lịch, cùng một bản xuất di động
+  `calendar.json`), hình nền (hình nền màn hình chính và màn hình khóa), DNS riêng tư (chế độ
+  và bộ chỉ định) và cài đặt hệ thống (bản kết xuất đầy đủ các cài đặt system/global/secure).
+  Cài đặt hệ thống là opt-in và ghi đè các cài đặt trên toàn thiết bị khi khôi phục, nên nó
+  được rào chắn như SSAID, với sự đồng ý rõ ràng và một mục kiểm toán đầy đủ.
+- Sao lưu thư mục và tệp độc lập: sao lưu bất kỳ đường dẫn tuyệt đối nào (bộ nhớ chia sẻ hoặc
+  dữ liệu ứng dụng) thành một kho lưu trữ được nén và niêm phong bằng manifest, rồi khôi phục
+  nó về cùng đường dẫn. Khôi phục cần một xác nhận rõ ràng.
+
+Khôi phục an toàn hơn:
+
+- Mỗi kho lưu trữ được kiểm tra trước khi ghi bất cứ thứ gì: một bản sao lưu có nội dung trỏ
+  ra ngoài đích của nó (một đường dẫn tuyệt đối hoặc một thành phần `..`) sẽ bị từ chối, nên
+  một lần khôi phục chạy với quyền root không thể bị lừa để ghi ra ngoài đích.
+
+Tiến trình và lập lịch:
+
+- Tiến trình trực tiếp giờ đây hiển thị tốc độ truyền, ETA và một bộ đếm mục trong khi sao
+  lưu, cùng một bước được xác minh bằng checksum cho các lần tải lên đám mây và một bước
+  kiểm tra trước "không đủ dung lượng".
+- Các công việc đã lập lịch có thể bị điều kiện hóa: chỉ chạy trên Wi-Fi, chỉ khi đang sạc,
+  chỉ khi pin trên một mức, hoặc chỉ vào các ngày trong tuần đã chọn; một công việc đã lập
+  lịch cũng bị bỏ qua khi thiết bị nóng tới mức nguy hiểm. Một công việc bị bỏ qua sẽ thử lại
+  ở tick kế tiếp.
+
+Đích đám mây:
+
+- Kết nối bất kỳ backend rclone nào từ giao diện: danh sách thả xuống của remote đám mây
+  cung cấp các nhà cung cấp phổ biến (Google Drive, Dropbox, OneDrive, Box, pCloud, Mega,
+  Backblaze B2, S3, SFTP, WebDAV, FTP, SMB) cùng một tùy chọn "Custom (advanced)" nơi bạn gõ
+  tên bất kỳ backend rclone nào khác và các tham số `key=value` của nó, nên mọi backend của
+  rclone đều có thể truy cập.
+- Đăng nhập trên thiết bị (không cần PC): các nhà cung cấp cần đăng nhập bằng trình duyệt
+  (Google Drive, Dropbox, OneDrive, Box, pCloud) có một nút "Authorize in browser" mở trình
+  duyệt của chính điện thoại tới trang đồng ý của nhà cung cấp; sau khi bạn chấp thuận, bạn
+  quay lại ứng dụng và remote được lưu tự động, với token được bắt lấy trên thiết bị. Dán
+  token bằng tay vẫn còn sẵn như một phương án dự phòng.
+
+Giao diện:
+
+- Một tỷ lệ giao diện có thể điều chỉnh (một thanh trượt có thể kéo) co giãn toàn bộ giao diện, để
+  nó vừa với các màn hình có mật độ điểm ảnh khác nhau; 100% là mặc định và không thay đổi.
+- Giao diện giờ đây hiển thị từ phải sang trái cho tiếng Ả Rập và tiếng Ba Tư.
+- Một tổng quan trang chủ với số đếm bản sao lưu và một thanh lưu trữ, huy hiệu trạng thái,
+  sao chép hash và đường dẫn vào bảng tạm, công tắc gạt kiểu Android, và một hành động "Check for updates".
+- Nhật ký hoạt động là một màn hình đầy đủ mở ra ngay lập tức, với một hành động "Export logs" lưu
+  một tệp nhật ký mà bạn có thể đính kèm vào một báo cáo.
+
+Sửa lỗi:
+
+- Khôi phục và nhập không còn thất bại trên các thiết bị có `tar` đi kèm không chấp nhận tùy
+  chọn `--no-absolute-names`; việc kiểm tra an toàn kho lưu trữ độc lập với tùy chọn đó.
+- "Check for updates" hoạt động ngay cả khi không có HTTP client đi kèm, bằng cách quay lại dùng
+  rclone đi kèm; và nhật ký hoạt động không còn mất nhiều thời gian để mở.
+
 ## v1.01
 
 Bản phát hành công khai đầu tiên. Một mô-đun WebUI cho KernelSU/APatch/Magisk sao lưu và khôi phục các ứng
@@ -124,3 +183,5 @@ Thân thiện với AI và i18n:
   phản chiếu sang wiki.
 - Việc liệt kê ứng dụng phong phú và giải mã Neo chạy qua một trợ giúp dex được điều khiển với quyền root
   (`IPackageManager` qua ServiceManager), nên chúng hoạt động ở những nơi mà ActivityThread bị treo.
+
+*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến - xem [CONTRIBUTING.md](CONTRIBUTING.md).*

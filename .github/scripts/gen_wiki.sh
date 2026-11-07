@@ -39,6 +39,10 @@ for f in "$SRC"/*.md; do
   [ -f "$f" ] || continue
   cp "$f" "$WIKI/$(basename "$f")"
 done
+# the screenshots gallery: copy it so the pages that embed it resolve. The wiki is
+# flat, so every page sits at the wiki root and references screenshots/ there (the
+# python pass below flattens ../screenshots and docs/screenshots to screenshots).
+[ -d "$SRC/screenshots" ] && { rm -rf "$WIKI/screenshots"; cp -r "$SRC/screenshots" "$WIKI/screenshots"; }
 # Many English docs live OUTSIDE docs/ (repo root, module/, .github/) while their
 # translations are all under docs/<lang>/. Mirror every English source as a top-level
 # page so each translated page has its English counterpart (and the Home links resolve).
@@ -261,6 +265,9 @@ for fn in os.listdir(wiki):
     p = os.path.join(wiki, fn)
     t = open(p, encoding="utf-8").read()
     nt = rx.sub(lambda mm: "](" + pref + mm.group(1) + (mm.group(2) or "") + ")", t)
+    # flatten screenshot image paths (../screenshots, docs/screenshots -> screenshots)
+    # so embedded images resolve from the flat wiki root.
+    nt = re.sub(r"\]\((?:\.\./|docs/)*screenshots/", "](screenshots/", nt)
     if nt != t:
         open(p, "w", encoding="utf-8").write(nt)
 PY

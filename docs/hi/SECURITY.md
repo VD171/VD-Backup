@@ -31,3 +31,12 @@ encryption passphrases को संभालता है। हम सुर�
   एक मजबूत चुनें।
 - वैकल्पिक Google Drive companion app को हमेशा HMA-OSS के साथ छिपाया जाना चाहिए ताकि
   यह root या एक unlocked bootloader को प्रकट न करे।
+- Restore root के रूप में चलता है, इसलिए कुछ भी लिखे जाने से पहले हर archive की जाँच होती है:
+  ऐसा कोई भी backup जिसकी सामग्री अपने target से बाहर की ओर इंगित करती है (एक absolute path
+  या एक `..` component) अस्वीकार कर दिया जाता है, और जब तक पूरा archive पास नहीं हो जाता तब
+  तक कोई file extract नहीं की जाती।
+- हर prebuilt binary और library एक pinned public upstream तक पता लगाने योग्य है जिसका SHA-256 दर्ज है,
+  और manifest डिवाइस पर ही भेजा जाता है, ताकि bundled payload का audit और पुनरुत्पादन किया जा सके।
+  देखें [BINARIES.md](BINARIES.md)।
+
+*यह दस्तावेज़ीकरण Claude (Anthropic) के साथ तैयार किया गया था और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और बेहतरी का स्वागत है - [CONTRIBUTING.md](CONTRIBUTING.md) देखें।*

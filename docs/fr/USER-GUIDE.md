@@ -22,7 +22,8 @@ endroit, sans rien à "autoriser".
   - [5.3 Compression](#53-compression)
   - [5.4 Encryption](#54-encryption)
   - [5.5 Verify and dry-run](#55-verify-and-dry-run)
-  - [5.6 Special backups (messages, call log, Wi-Fi, Bluetooth)](#56-special-backups-messages-call-log-wi-fi-bluetooth)
+  - [5.6 Special backups (messages, call log, Wi-Fi, Bluetooth, calendar, wallpaper, DNS, system settings)](#56-special-backups-messages-call-log-wi-fi-bluetooth-calendar-wallpaper-dns-system-settings)
+  - [5.7 Standalone folder and file backups](#57-standalone-folder-and-file-backups)
 - [6. Restoring a backup](#6-restoring-a-backup)
 - [7. Destinations: local and remote](#7-destinations-local-and-remote)
 - [8. Scheduling and retention](#8-scheduling-and-retention)
@@ -52,6 +53,14 @@ Tout ce que VDBackup produit utilise des **formats standard** (tar, gzip, zstd, 
 restic), vos sauvegardes ne sont donc jamais enfermées dans le module et jamais liées à votre
 appareil précis. Voir la [section 11](#section-11).
 
+## Captures d'écran
+
+| Accueil | Applis | Planification |
+|:---:|:---:|:---:|
+| ![Accueil](../screenshots/fr/home-dark.png) | ![Applis](../screenshots/fr/apps-dark.png) | ![Planification](../screenshots/fr/schedule-dark.png) |
+| **Destinations** | **Paramètres** | **Journal d'activité** |
+| ![Destinations](../screenshots/fr/destinations-dark.png) | ![Paramètres](../screenshots/fr/settings-dark.png) | ![Journal d'activité](../screenshots/fr/activitylog-dark.png) |
+
 ## 2. Prérequis
 
 - **Un appareil Android rooté** géré par **KernelSU**, **APatch** ou **Magisk**.
@@ -77,11 +86,11 @@ et ils se dégradent proprement quand ils ne sont pas disponibles sur votre appa
 
 **Quelle édition télécharger.** Chaque release est livrée en plusieurs éditions zip flashables, pour que vous ne téléchargiez que ce dont vous avez besoin. Choisissez-en une :
 
-- **`VD-Backup-<ver>-universal-full.zip`** - toutes les architectures CPU et tous les binaires, dont `rclone` (fournisseurs cloud : Google Drive, S3 et plus de 70 autres backends rclone) et `restic` (snapshots dédupliqués). Fonctionne sur n'importe quel appareil. Le plus gros téléchargement.
-- **`VD-Backup-<ver>-universal-lite.zip`** - toutes les architectures, mais **sans** les deux plus gros binaires (`rclone` et `restic`). Le plus petit téléchargement ; fait toujours les sauvegardes locales, SSH/SFTP et rsync, avec le chiffrement portable `age`.
-- **`VD-Backup-<ver>-<abi>-full.zip`** (l'une parmi `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - une seule architecture avec tous les binaires (les mêmes fonctions que `universal-full` mais uniquement pour l'architecture de votre appareil, donc plus petit que `universal-full`).
+- **`VD-Backup-<ver>-universal-full.zip`** - toutes les architectures CPU et tous les binaires intégrés, dont `rclone` (fournisseurs cloud : Google Drive, S3 et plus de 70 autres backends rclone) et `restic` (snapshots dédupliqués). Entièrement hors ligne, rien n'est jamais téléchargé. Fonctionne sur n'importe quel appareil. Le plus gros téléchargement.
+- **`VD-Backup-<ver>-universal-lite.zip`** - toutes les architectures, mais **sans** les deux plus gros binaires (`rclone` et `restic`). Le plus petit téléchargement ; fait toujours les sauvegardes locales, SSH/SFTP et rsync sans aucun téléchargement, avec le chiffrement portable `age`. La première fois que vous utilisez une destination cloud (`rclone`) ou le mode instantané (`restic`), la WebUI propose de télécharger une seule fois ce petit module complémentaire propre à l'architecture (vérifié par SHA-256) et le met en cache ; ensuite ces fonctions marchent aussi.
+- **`VD-Backup-<ver>-<abi>-full.zip`** (l'une parmi `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - une seule architecture avec tous les binaires intégrés (les mêmes fonctions que `universal-full` mais uniquement pour l'architecture de votre appareil, donc plus petit que `universal-full`).
 
-Si vous connaissez l'architecture de votre appareil et voulez tout, choisissez la **`<abi>-full`** correspondante (la plupart des téléphones sont en **`arm64-v8a`**). Si vous voulez le plus petit téléchargement ou n'avez pas besoin des fournisseurs cloud (`rclone`) ni des snapshots (`restic`), choisissez **`universal-lite`**. Si vous voulez tout et n'êtes pas sûr de l'architecture, choisissez **`universal-full`**. À l'installation, le module ne conserve que l'architecture de votre appareil, quelle que soit l'édition que vous flashez.
+Si vous connaissez l'architecture de votre appareil et voulez tout intégré, choisissez la **`<abi>-full`** correspondante (la plupart des téléphones sont en **`arm64-v8a`**). Si vous voulez le plus petit téléchargement et qu'un téléchargement unique vérifié par SHA-256, la première fois que vous utilisez les fournisseurs cloud (`rclone`) ou les snapshots (`restic`), ne vous dérange pas, choisissez **`universal-lite`**. Si vous voulez tout intégré sans aucun téléchargement (hors ligne / récupération) et n'êtes pas sûr de l'architecture, choisissez une édition **full**. À l'installation, le module ne conserve que l'architecture de votre appareil, quelle que soit l'édition que vous flashez.
 
 Au premier lancement, le module amorce une configuration par défaut (seulement si aucune n'existe encore), afin que
 vos réglages soient préservés d'une mise à jour du module à l'autre.
@@ -109,6 +118,7 @@ Gardez cela à l'esprit pour deux raisons : les sauvegardes occupent de l'espace
 
 La WebUI est organisée en quelques onglets :
 
+- **Home** - un aperçu d'accueil montrant les comptes de vos sauvegardes (apps, sauvegardes, dossiers et tâches planifiées) et une barre de stockage indiquant l'espace utilisé par vos sauvegardes par rapport à l'espace libre, avec des badges de statut, copier les hachages et les chemins dans le presse-papiers, et une action **Check for updates**.
 - **Apps** - la liste des applications installées (utilisateur et système), chacune affichée avec son vrai
   nom, son nom de package, et son icône (les icônes se chargent à la demande et sont mises en cache, la liste
   reste donc réactive). Le bouton sur une ligne sauvegarde l'app ; toucher la ligne ouvre l'historique de
@@ -122,12 +132,14 @@ La WebUI est organisée en quelques onglets :
   distantes que vous ajoutez (voir la [section 7](#section-7)). Vous pouvez
   tester une destination ici avant de compter dessus.
 - **Settings** - un bascule de thème clair/sombre, un sélecteur de couleur d'accent (préréglages, une
-  couleur personnalisée, ou réinitialisation) et un sélecteur de langue, les valeurs par défaut pour les nouvelles
+  couleur personnalisée, ou réinitialisation) et un sélecteur de langue (l'interface s'affiche de droite à gauche pour l'arabe et le persan), un curseur d'échelle de l'interface que vous faites glisser
+  pour redimensionner toute l'interface (en-tête, contenu et navigation du bas ensemble) de 85 % à 120 % (100 % est la valeur par défaut), pour les écrans de différentes densités de pixels,
+  les valeurs par défaut pour les nouvelles
   tâches (compression par défaut, verify activé/désactivé, chiffrement par défaut), la politique réseau pour les
   transferts cloud (voir la [section 7](#section-7)), la sauvegarde automatique et la liste des apps exclues,
   l'option de source d'installation, la clé de chiffrement,
-  et la planification.
-- **About** - version, liens, les projets frères (Voir aussi) et le manifeste d'audit des binaires empaquetés.
+  et la planification. Les réglages activé/désactivé utilisent des interrupteurs à bascule de style Android.
+- **About** - version, liens, les projets frères (Voir aussi), le manifeste d'audit des binaires empaquetés, et une action **Check for updates** qui indique si une version plus récente a été publiée (avec ses notes de version). Vous installez toute mise à jour via votre gestionnaire root, de la même façon que vous avez flashé le module.
 
 Les confirmations et messages utilisent des boîtes de dialogue intégrées à l'app (pas les anciens pop-ups système), et une
 restauration ou un import vous demande de reconnaître qu'il écrase les données actuelles de l'app avant
@@ -135,7 +147,10 @@ de continuer.
 
 Les sauvegardes et restaurations s'exécutent **détachées** comme un processus root en arrière-plan. Vous pouvez fermer la
 WebUI, ou même fermer le gestionnaire root, et l'opération continue. Quand vous
-revenez, la WebUI se rattache et affiche la progression en direct avec un libellé de phase localisé. Sur
+revenez, la WebUI se rattache et affiche la progression en direct avec un libellé de phase localisé. Pour
+une tâche en cours, la carte de progression affiche aussi le débit de transfert en direct et le
+temps restant estimé, plus un compteur d'éléments (par exemple "12 sur 40") avec le nom de
+l'élément en cours. Sur
 les ROM qui exposent les notifications shell, vous recevez aussi une notification Android quand une tâche
 démarre et se termine ; dans tous les cas, la carte de progression intégrée à l'app est l'indicateur fiable.
 
@@ -230,16 +245,66 @@ Deux options de sûreté vous aident à faire confiance à une sauvegarde avant 
   écrire**. Utilisez-le pour estimer l'espace ou pour vérifier votre sélection d'items avant de lancer
   la vraie opération.
 
-### 5.6 Sauvegardes spéciales (messages, journal d'appels, Wi-Fi, Bluetooth)
+Quand une sauvegarde part vers une destination **cloud**, VDBackup ajoute deux garde-fous
+supplémentaires. Il effectue une étape finale **vérifiée par somme de contrôle** qui revérifie la
+copie téléversée face à l'original sur le remote, et fait échouer la tâche (plutôt que de laisser
+une copie corrompue dans le cloud) s'ils ne correspondent pas. Et avant un téléversement Full, il
+vérifie l'**espace libre** du remote et s'arrête tôt avec une erreur claire d'**"espace
+insuffisant"** si la sauvegarde ne tient pas, au lieu de remplir le remote et d'échouer à
+mi-chemin. (La vérification d'espace concerne les téléversements Full ; le Mirror est une synchro
+delta et en est exempt.)
+
+### 5.6 Sauvegardes spéciales (messages, journal d'appels, Wi-Fi, Bluetooth, calendrier, fond d'écran, DNS, réglages système)
 
 Sous les listes d'apps de l'onglet **Backups**, les **Sauvegardes spéciales** couvrent des données
-à l'échelle du système qui ne sont pas liées à une seule app : **messages (SMS/MMS)**, **contacts et
-journal d'appels**, **réseaux Wi-Fi** et **Bluetooth**. Choisissez les catégories et sauvegardez-les ; elles
-sont archivées brutes, avec la même préservation SELinux/xattr et le même chiffrement optionnel que les
-sauvegardes d'apps. En option, une **copie portable** est également écrite (messages, journal d'appels et
-contacts en JSON ouvrable), vous disposez ainsi d'une copie multi-appareils lisible sur un PC sans le module.
-Restaurer une sauvegarde spéciale écrase des données système en service et nécessite un redémarrage, elle est donc
-protégée par une reconnaissance bien visible et fiable sur le même appareil et la même ROM.
+à l'échelle du système qui ne sont pas liées à une seule app. Choisissez les catégories et
+sauvegardez-les ; elles sont archivées avec la même préservation SELinux/xattr et le même chiffrement
+optionnel que les sauvegardes d'apps. Les catégories sont :
+
+| Catégorie | Ce que c'est |
+|----------|-----------|
+| **Messages (SMS/MMS)** | Vos messages texte. |
+| **Contacts et journal d'appels** | Vos contacts et votre historique d'appels. |
+| **Réseaux Wi-Fi** | Vos réseaux Wi-Fi enregistrés. |
+| **Bluetooth** | Vos appairages Bluetooth. |
+| **Calendrier** | Le fournisseur de calendrier (app et données). Un **`calendar.json` portable** est également écrit, pour que vos événements soient lisibles sur un PC sans le module. |
+| **Fond d'écran** | Vos fonds d'écran d'accueil et de verrouillage plus `wallpaper_info.xml`, stockés comme l'image brute. |
+| **DNS** | Votre mode DNS privé et votre serveur. |
+| **Réglages système** | Un dump complet des réglages système, global et secure de l'appareil. |
+
+Pour les messages, le journal d'appels et les contacts, une **copie portable** (JSON ouvrable) est
+également écrite, vous disposez ainsi d'une copie multi-appareils lisible sur un PC sans le module.
+
+**Les réglages système sont opt-in et écrasent les réglages de votre appareil à la restauration.**
+Tout comme SSAID (voir la [section 10](#section-10)), la catégorie **Réglages système** est la plus
+sensible : la restaurer écrase les réglages à l'échelle de votre appareil, elle est donc désactivée à
+moins que vous ne la sélectionniez délibérément, vous demande d'abord de reconnaître, et est écrite
+dans le journal d'activité.
+
+Restaurer une sauvegarde spéciale écrase des données système en service et nécessite un redémarrage,
+elle est donc protégée par une reconnaissance bien visible et fiable sur le même appareil et la même
+ROM. Les restaurations sont **idempotentes** : les catégories brutes (messages, contacts, Wi-Fi,
+Bluetooth, calendrier) sont restaurées en **remplaçant** les données plutôt qu'en les fusionnant, de
+sorte que restaurer deux fois la même sauvegarde ne crée jamais de doublons, et le DNS et les réglages
+système sont simplement réappliqués.
+
+### 5.7 Sauvegardes autonomes de dossiers et de fichiers
+
+Parfois vous voulez sauvegarder un simple dossier ou fichier qui n'est pas une app - un dossier
+d'appareil photo, un répertoire de documents, une seule base de données. VDBackup peut sauvegarder
+**n'importe quel chemin absolu** sur le stockage partagé ou sous `/data`, avec le même format portable
+qu'une sauvegarde d'app : une archive `tar.zst` plus un `manifest.json`, scellé en SHA-256, avec une
+note RECOVERY quand vous la chiffrez. Ces sauvegardes de chemin sont conservées séparément, sous un
+dossier `.paths` dans votre répertoire de sauvegardes.
+
+- **Choisissez un chemin et sauvegardez-le.** La source doit être un chemin absolu sous l'un des
+  emplacements autorisés (`/storage/emulated`, `/data/media`, `/sdcard`, `/data`). Les chemins qui
+  tentent de remonter avec `..` sont refusés.
+- **La restauration réécrit vers l'emplacement d'origine**, donc, comme toute restauration, elle est
+  destructrice et vous demande de **confirmer** avant d'écraser quoi que ce soit.
+- Comme les sauvegardes d'apps, les sauvegardes et restaurations de chemin s'exécutent **détachées**
+  avec une progression en direct, utilisent la compression que vous choisissez, et peuvent être
+  chiffrées avec une phrase secrète.
 
 ## 6. Restaurer une sauvegarde
 
@@ -250,7 +315,10 @@ enregistre l'action dans un journal d'audit local.
 Une restauration est **fidèle** : VDBackup efface l'état actuel de l'app et extrait la
 sauvegarde, de sorte que l'app est ramenée à l'**état exact** capturé dans cette sauvegarde
 (y compris propriété, modes, contextes SELinux et xattr). Ce n'est pas une fusion - c'est une
-vraie restauration au point temporel de la sauvegarde.
+vraie restauration au point temporel de la sauvegarde. Parce qu'une restauration s'exécute en
+root, VDBackup vérifie aussi chaque archive avant d'extraire quoi que ce soit et refuse une archive
+altérée qui tente d'écrire hors de sa cible, de sorte qu'une sauvegarde modifiée ne peut jamais
+écraser le reste de votre système.
 
 Options de restauration utiles :
 
@@ -270,6 +338,12 @@ Options de restauration utiles :
   **"forger la source d'origine"** va plus loin et fait aussi en sorte que le paquet et la source du paquet
   à l'origine de l'installation de l'app aient l'air installés depuis le Play Store ; elle modifie la base de
   données système des paquets (sauvegardée d'abord) et prend effet après un redémarrage.
+
+**Restauration par lot.** L'onglet **Backups** dispose d'un mode **Select**, de la même manière que l'onglet
+**Apps** l'a pour la sauvegarde par lot. Activez **Select**, cochez les sauvegardes voulues avec leurs cases, et
+restaurez-les toutes en une fois. Une seule boîte de dialogue d'options couvre toute la sélection - la
+confirmation d'écrasement, le restore-test et le choix de la source d'installation s'appliquent à chaque
+sauvegarde choisie - et elles sont restaurées l'une après l'autre.
 
 **Supprimer une sauvegarde.** Ouvrez les détails d'une sauvegarde (ou l'historique d'une app) et utilisez
 **Delete** ; il vous est demandé de confirmer, et la suppression est écrite dans le journal d'activité. Vous
@@ -297,11 +371,17 @@ Le transport distant est géré par les outils empaquetés :
 - **restic** - des dépôts **Snapshot** chiffrés et dédupliqués (locaux ou distants).
 
 **Créer un remote cloud (pas de SSH nécessaire).** Dans l'onglet Destinations, choisissez le
-type de destination **rclone** et utilisez **Add cloud remote** : choisissez le backend (SFTP,
-SMB, WebDAV, FTP, S3 ou Google Drive), remplissez les champs (host/user/password, ou les
-clés S3, ou un token Drive) et enregistrez. Le remote apparaît alors dans la liste des
-remotes de la destination. Les mots de passe sont stockés obscurcis, jamais en clair. Vous pouvez lister et
-supprimer vos remotes depuis le même endroit.
+type de destination **rclone** et utilisez **Add cloud remote**. Vous pouvez connecter
+**n'importe quel backend rclone** : la liste déroulante propose les plus courants (**Google Drive,
+Dropbox, OneDrive, Box, pCloud, Mega, Backblaze B2, S3, SFTP, WebDAV, FTP, SMB**) plus une option
+**Custom (advanced)** où vous tapez n'importe quel autre type de backend et ses paramètres
+`key=value`. Remplissez les champs (host/user/password, ou les clés S3, par exemple) et
+enregistrez. Pour les fournisseurs qui vous connectent via un navigateur (Google Drive, Dropbox,
+OneDrive, Box, pCloud), utilisez le bouton **Authorize in browser** : il vous connecte via le
+navigateur du téléphone lui-même et capture le token automatiquement, donc **aucun PC n'est
+nécessaire** (coller un token à la main reste possible comme solution de repli). Le remote apparaît
+alors dans la liste des remotes de la destination. Les mots de passe sont stockés obscurcis, jamais
+en clair. Vous pouvez lister et supprimer vos remotes depuis le même endroit.
 
 Deux règles rendent l'usage distant sûr :
 
@@ -333,19 +413,37 @@ Les sauvegardes locales ne sont jamais affectées.
 
 ## 8. Planification et rétention
 
-VDBackup peut exécuter des sauvegardes automatiquement selon une planification. Dans le planificateur, vous définissez une
-tâche avec :
+VDBackup peut exécuter des sauvegardes - et des restaurations - automatiquement selon une planification. Dans le
+planificateur, vous définissez une tâche avec :
 
-- l'app (ou l'ensemble d'apps) et les items/le mode à utiliser,
+- une **cible** - une seule app, un ensemble d'apps, ou **toutes les apps** (moins la liste des apps exclues) - et
+  les items/le mode à utiliser,
+- une **action** - **Back up** (par défaut) ou **Restore latest**, qui restaure la sauvegarde la plus récente de
+  chaque app ciblée,
 - une destination,
 - une **planification de type cron** - horaire, quotidienne ou hebdomadaire, à une heure que vous choisissez (HH:MM),
 - un réglage de **rétention** : **garder les N** sauvegardes les plus récentes de cette tâche, les plus anciennes sont
-  élaguées automatiquement.
+  élaguées automatiquement,
+- des **conditions d'exécution** optionnelles : uniquement en **Wi-Fi**, uniquement en **charge**,
+  uniquement à un **niveau de batterie minimum**, et uniquement les **jours de la semaine** choisis.
 
 Les tâches planifiées sont déclenchées par un battement de cœur au démarrage dans le module : quand une tâche est
 due, elle s'exécute, enregistre son heure de dernière exécution afin de ne pas se déclencher deux fois, et applique la
 rétention pour élaguer les anciennes sauvegardes. Parce que tout s'exécute en root en arrière-plan, les
 sauvegardes planifiées n'ont pas besoin que la WebUI soit ouverte.
+
+**Conditions d'exécution (gates).** Une tâche planifiée peut porter des conditions qui doivent
+être remplies pour qu'elle s'exécute : Wi-Fi uniquement, charge uniquement, un niveau de batterie
+minimum, et des jours précis de la semaine. Quand une tâche est due mais qu'une condition n'est
+pas remplie, elle est **ignorée et réessayée à la prochaine vérification** - sa planification
+n'avance pas, elle s'exécute donc dès que la condition est satisfaite. Une vérification thermique
+intégrée ignore aussi une tâche planifiée tant que l'appareil est trop chaud. Chacun de ces sauts
+est consigné dans le journal d'activité.
+
+**La restauration planifiée écrase à chaque exécution.** Une tâche **Restore latest** re-restaure la sauvegarde
+la plus récente de chaque app ciblée à chaque déclenchement, et la restauration est destructrice : à chaque
+exécution, elle **écrase les données actuelles de l'app** par la dernière sauvegarde. C'est délibéré et opt-in -
+ne la choisissez que lorsque vous voulez maintenir les cibles à leur sauvegarde la plus récente.
 
 **Sauvegarde automatique à l'installation/mise à jour.** Dans Settings, vous pouvez activer la **sauvegarde
 automatique** : le même battement de cœur en arrière-plan remarque les apps nouvellement installées ou mises à
@@ -353,11 +451,11 @@ jour et les sauvegarde pour vous (avec rétention keep-N). La première exécuti
 est installé, de sorte que l'activer ne sauvegarde jamais tout votre appareil d'un coup.
 
 **Apps exclues (liste de blocage).** Toujours dans Settings, vous pouvez exclure les apps que vous ne voulez
-jamais voir sauvegardées automatiquement ou selon une planification ; les apps exclues sont ignorées par les deux.
+jamais voir sauvegardées automatiquement ou selon une planification ; vous pouvez en ajouter plusieurs à la fois (sélection multiple), et les apps exclues sont ignorées par les deux.
 
-**Journal d'activité.** L'onglet Schedule dispose d'un bouton **View activity log** qui affiche la piste
-d'audit locale - sauvegardes, restaurations, suppressions, exécutions planifiées et automatiques, et élagages -
-les plus récentes d'abord.
+**Journal d'activité.** L'onglet Schedule dispose d'un bouton **View activity log** qui ouvre un écran complet
+(instantanément) affichant la piste d'audit locale - sauvegardes, restaurations, suppressions, exécutions planifiées et automatiques, et élagages -
+les plus récentes d'abord. Une action **Export logs** enregistre un fichier journal (dans le dossier des sauvegardes) que vous pouvez joindre à un rapport de retour ou de bogue.
 
 ## 9. Migrer : importer Neo-Backup et Android-DataBackup
 
@@ -451,6 +549,11 @@ courantes :
   a attrapé une mauvaise sauvegarde). Relancez la sauvegarde.
 - `ERR_RESTORE_TEST` - un test de restauration a échoué ; la sauvegarde ne s'est pas extraite/vérifiée
   proprement et votre app en service est restée intacte.
+- `ERR_UNSAFE_ARCHIVE` - une archive a été refusée parce qu'elle tentait d'écrire hors de son
+  répertoire cible (chemins absolus ou `..`). Cela vous protège d'une sauvegarde altérée ; rien n'a
+  été écrit.
+- `ERR_QUOTA` - un remote cloud n'avait pas assez d'espace libre pour un téléversement Full ; la
+  sauvegarde a été arrêtée avant tout téléversement.
 
 **Ma destination distante échoue.** Utilisez le **test** de destination dans l'onglet Destinations
 pour valider les identifiants et la connectivité. Rappelez-vous que seules les destinations cloud ont besoin

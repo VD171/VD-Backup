@@ -16,3 +16,5 @@ Kabul edilemez davranışlar bakımcıya özel olarak bildirilebilir (iletişim 
 commit'leri, konuları ve katkıları kaldırabilir ve tekrar suç işleyenleri yasaklayabilir.
 
 Bu, Contributor Covenant'ın ruhunun özetlenmiş, projeye uygun bir uyarlamasıdır.
+
+*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır - bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*

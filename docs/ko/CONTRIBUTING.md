@@ -75,3 +75,5 @@ Android-DataBackup 백업을 가져올 수 있어 사람들이 마이그레이�
 
 `good first issue`와 `help wanted` 레이블을 찾아보세요. 번역, 문서, 새로운
 `rclone` destination 프리셋, WebUI 다듬기 모두 훌륭한 출발점입니다.
+
+*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다 - [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*

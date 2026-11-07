@@ -17,6 +17,7 @@
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
   <a href="docs/USER-GUIDE.md">Uživatelská příručka</a> ·
   <a href="docs/AI-AGENTS.md">AI agenti</a> ·
+  <a href="CHANGELOG.md">Seznam změn</a> ·
   <a href="CONTRIBUTING.md">Přispívání</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">Vlákno na XDA</a>
 </p>
@@ -51,12 +52,14 @@ importovat existující zálohy Neo-Backup a Android-DataBackup, abyste mohli p�
   plus repozitáře `rsync` a `restic`. Volitelně Google Drive přes drobného volitelného společníka.
 - **Integrita:** každý archiv je ověřen proti manifestu; zkušební běh (dry-run) a test
   obnovy umožňují zkontrolovat zálohu, aniž byste cokoli změnili.
-- **Selektivní obnova:** obnovte libovolnou podmnožinu položek zálohy; mažte zálohy a veďte
-  protokol aktivity/auditu každé destruktivní akce.
+- **Selektivní a dávková obnova:** obnovte libovolnou podmnožinu položek zálohy nebo vyberte
+  více záloh a obnovte je všechny najednou; mažte zálohy a veďte protokol aktivity/auditu
+  každé destruktivní akce.
 - **Speciální zálohy:** zprávy (SMS/MMS), kontakty a seznam hovorů, Wi-Fi a Bluetooth,
   s volitelným přenosným exportem do JSON, který otevřete na PC.
-- **Plánování + automatizace:** opakující se úlohy s prořezáváním keep-N, plus volitelná
-  automatická záloha při instalaci/aktualizaci a seznam vyloučených aplikací.
+- **Plánování + automatizace:** opakující se úlohy **zálohy nebo obnovy** cílící na jednu
+  aplikaci, sadu nebo všechny aplikace, s prořezáváním keep-N, plus volitelná automatická
+  záloha při instalaci/aktualizaci a seznam vyloučených aplikací.
 - **Zdroj instalace:** obnovené aplikace ve výchozím nastavení hlásí jako zdroj instalace
   Play Store (přepínatelné); pokročilá volitelná možnost také zfalšuje iniciující balíček a zdroj.
 - **Připojení jako systémová aplikace:** připojte nainstalovanou aplikaci jako systémovou, aniž
@@ -66,13 +69,21 @@ importovat existující zálohy Neo-Backup a Android-DataBackup, abyste mohli p�
 - **Migrace:** importuje existující zálohy Neo-Backup a Android-DataBackup, včetně těch
   zašifrovaných heslem.
 
+## Snímky obrazovky
+
+| Domů | Aplikace | Plán |
+|:---:|:---:|:---:|
+| ![Domů](docs/screenshots/cs/home-dark.png) | ![Aplikace](docs/screenshots/cs/apps-dark.png) | ![Plán](docs/screenshots/cs/schedule-dark.png) |
+| **Cíle** | **Nastavení** | **Protokol aktivity** |
+| ![Cíle](docs/screenshots/cs/destinations-dark.png) | ![Nastavení](docs/screenshots/cs/settings-dark.png) | ![Protokol aktivity](docs/screenshots/cs/activitylog-dark.png) |
+
 ## Instalace
 
 1. Stáhněte nejnovější `VD-Backup-vX.Y.zip` z [Vydání](https://github.com/VD171/VD-Backup/releases).
 2. Nainstalujte jej ve správci KernelSU / APatch / Magisk - použitelný okamžitě, restart není potřeba.
 3. Otevřete **WebUI** modulu, abyste nakonfigurovali a spouštěli zálohy. A je to.
 
-**Edice.** Každé vydání se dodává jako šest zipů. `universal-full` - každá architektura a každá binárka (včetně `rclone` pro cloudové poskytovatele a `restic` pro snímky), jakékoli zařízení, největší. `universal-lite` - každá architektura bez dvou největších binárek (`rclone`, `restic`), nejmenší, stále zvládá lokální zálohy, SSH/SFTP a `rsync`. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - jediná architektura se všemi binárkami, menší než `universal-full`. Znáte svou architekturu -> zvolte `<abi>-full`; chcete nejmenší nebo bez cloudových obrů -> `universal-lite`; všechno na jakémkoli zařízení -> `universal-full`. Viz [Vydání](https://github.com/VD171/VD-Backup/releases).
+**Edice.** Každé vydání se dodává jako šest zipů. `universal-full` - každá architektura a každá binárka zabudovaná (včetně `rclone` pro cloudové poskytovatele a `restic` pro snímky), plně offline, nikdy se nic nestahuje, jakékoli zařízení, největší. `universal-lite` - každá architektura bez dvou největších binárek (`rclone`, `restic`), nejmenší; stále zvládá lokální zálohy, SSH/SFTP a `rsync` bez jakéhokoli stahování a při prvním použití cloudového cíle (`rclone`) nebo režimu snímků (`restic`) nabídne jednorázové stažení onoho malého doplňku pro danou architekturu (ověřeného přes SHA-256) a uloží jej do mezipaměti, takže poté fungují i tyto funkce. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - jediná architektura se všemi binárkami zabudovanými, menší než `universal-full`. Znáte svou architekturu -> zvolte `<abi>-full`; chcete nejmenší a nevadí vám jednorázové stažení pro cloud nebo snímky -> `universal-lite`; chcete vše zabudované bez jakéhokoli stahování (offline / obnova) -> edici full. Viz [Vydání](https://github.com/VD171/VD-Backup/releases).
 
 Jste tu noví? [Uživatelská příručka](docs/USER-GUIDE.md) vás provede od instalace až po obnovu.
 
@@ -94,7 +105,7 @@ Modul tvoří shell + WebUI plus statické binárky pro každou ABI (`tar`, `zst
 - **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - dokumentace k procházení online.
 - **[Uživatelská příručka](docs/USER-GUIDE.md)** - od začátku do konce, od instalace po obnovu.
 - **[AI agenti](docs/AI-AGENTS.md)** - řiďte každou akci bezhlavě přes JSON API.
-- **[Architektura](ARCHITECTURE.md)** a **[Struktura souborů](docs/FILE-STRUCTURE.md)** - jak to funguje.
+- **[Architektura](docs/ARCHITECTURE.md)** a **[Struktura souborů](docs/FILE-STRUCTURE.md)** - jak to funguje.
 - **[Přibalené binárky](docs/BINARIES.md)** - původ a SHA-256 každé předkompilované binárky, pro úplný audit.
 - **[Obnovení](module/etc/RECOVERY.md)** - otevřete a dešifrujte zálohu na počítači, bez modulu.
 - **[Přispívání](CONTRIBUTING.md)** a **[Bezpečnost](SECURITY.md)**.

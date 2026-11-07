@@ -22,7 +22,8 @@ plek, met niets om te "toestaan".
   - [5.3 Compressie](#53-compressie)
   - [5.4 Versleuteling](#54-versleuteling)
   - [5.5 Verify en dry-run](#55-verify-en-dry-run)
-  - [5.6 Speciale back-ups (berichten, belgeschiedenis, Wi-Fi, Bluetooth)](#56-special-backups-messages-call-log-wi-fi-bluetooth)
+  - [5.6 Speciale back-ups (berichten, belgeschiedenis, Wi-Fi, Bluetooth, agenda, achtergrond, DNS, systeeminstellingen)](#56-speciale-back-ups-berichten-belgeschiedenis-wi-fi-bluetooth-agenda-achtergrond-dns-systeeminstellingen)
+  - [5.7 Zelfstandige back-ups van mappen en bestanden](#57-zelfstandige-back-ups-van-mappen-en-bestanden)
 - [6. Een backup herstellen](#6-een-backup-herstellen)
 - [7. Bestemmingen: lokaal en op afstand](#7-bestemmingen-lokaal-en-op-afstand)
 - [8. Inplannen en retentie](#8-inplannen-en-retentie)
@@ -52,6 +53,14 @@ Alles wat VDBackup produceert gebruikt **standaardformaten** (tar, gzip, zstd, a
 restic), zodat je backups nooit vastzitten aan de module en nooit gebonden zijn aan jouw
 specifieke apparaat. Zie [sectie 11](#sectie-11).
 
+## Schermafbeeldingen
+
+| Start | Apps | Planning |
+|:---:|:---:|:---:|
+| ![Start](../screenshots/nl/home-dark.png) | ![Apps](../screenshots/nl/apps-dark.png) | ![Planning](../screenshots/nl/schedule-dark.png) |
+| **Bestemmingen** | **Instellingen** | **Activiteitenlogboek** |
+| ![Bestemmingen](../screenshots/nl/destinations-dark.png) | ![Instellingen](../screenshots/nl/settings-dark.png) | ![Activiteitenlogboek](../screenshots/nl/activitylog-dark.png) |
+
 ## 2. Vereisten
 
 - **Een geroot Android-apparaat** beheerd door **KernelSU**, **APatch** of **Magisk**.
@@ -77,21 +86,27 @@ degraderen gracieus wanneer ze op jouw apparaat niet beschikbaar zijn.
 **Welke editie je downloadt.** Elke release wordt geleverd als meerdere flashbare zip-edities,
 zodat je alleen downloadt wat je nodig hebt. Kies er een:
 
-- **`VD-Backup-<ver>-universal-full.zip`** - elke CPU-architectuur en elke binary, inclusief
-  `rclone` (cloudproviders: Google Drive, S3 en 70+ andere rclone-backends) en `restic`
-  (gededupliceerde snapshots). Werkt op elk apparaat. Grootste download.
+- **`VD-Backup-<ver>-universal-full.zip`** - elke CPU-architectuur en elke binary ingebouwd,
+  inclusief `rclone` (cloudproviders: Google Drive, S3 en 70+ andere rclone-backends) en
+  `restic` (gededupliceerde snapshots). Volledig offline, er wordt nooit iets gedownload.
+  Werkt op elk apparaat. Grootste download.
 - **`VD-Backup-<ver>-universal-lite.zip`** - elke architectuur, maar **zonder** de twee
   grootste binaries (`rclone` en `restic`). Kleinste download; doet nog steeds lokale,
-  SSH/SFTP- en rsync-backups, met overdraagbare `age`-versleuteling.
+  SSH/SFTP- en rsync-backups zonder download, met overdraagbare `age`-versleuteling. De eerste
+  keer dat je een cloud-bestemming (`rclone`) of snapshot-modus (`restic`) gebruikt, biedt de
+  WebUI aan die kleine architectuurspecifieke add-on eenmalig te downloaden (geverifieerd met
+  SHA-256) en te cachen; daarna werken die functies ook.
 - **`VD-Backup-<ver>-<abi>-full.zip`** (een van `arm64-v8a`, `armeabi-v7a`, `x86`,
-  `x86_64`) - één enkele architectuur met elke binary (dezelfde functies als `universal-full`
-  maar alleen voor de architectuur van jouw apparaat, dus kleiner dan `universal-full`).
+  `x86_64`) - één enkele architectuur met elke binary ingebouwd (dezelfde functies als
+  `universal-full` maar alleen voor de architectuur van jouw apparaat, dus kleiner dan
+  `universal-full`).
 
-Als je de architectuur van je apparaat kent en alles wilt, kies dan de bijpassende
+Als je de architectuur van je apparaat kent en alles ingebouwd wilt, kies dan de bijpassende
 **`<abi>-full`** (de meeste telefoons zijn **`arm64-v8a`**). Als je de kleinste download wilt
-of geen cloudproviders (`rclone`) of snapshots (`restic`) nodig hebt, kies dan
-**`universal-lite`**. Als je alles wilt en niet zeker bent van de architectuur, kies dan
-**`universal-full`**. Bij installatie houdt de module alleen
+en een eenmalige, met SHA-256 geverifieerde download bij het eerste gebruik van cloudproviders
+(`rclone`) of snapshots (`restic`) geen bezwaar vindt, kies dan **`universal-lite`**. Als je
+alles ingebouwd wilt zonder downloads (offline / herstel) en niet zeker bent van de
+architectuur, kies dan een **full**-editie. Bij installatie houdt de module alleen
 de architectuur van jouw apparaat over, ongeacht de editie die je flasht.
 
 Bij de eerste keer draaien zet de module een standaardconfiguratie neer (alleen als er nog
@@ -120,6 +135,7 @@ Houd dit om twee redenen in gedachten: backups nemen ruimte in onder `/sdcard/VD
 
 De WebUI is georganiseerd in enkele tabbladen:
 
+- **Home** - een startoverzicht dat aantallen van je backups toont (apps, backups, mappen en geplande taken) en een opslagbalk voor hoeveel ruimte je backups gebruiken ten opzichte van de vrije ruimte, met statusbadges, kopiëren naar klembord van hashes en paden, en een actie **Check for updates**.
 - **Apps** - de lijst met geïnstalleerde apps (gebruiker en systeem), elk getoond met zijn
   echte naam, zijn pakketnaam en zijn pictogram (pictogrammen laden lui en worden gecachet,
   zodat de lijst responsief blijft). De knop op een rij back-upt de app; op de rij tikken opent
@@ -133,12 +149,15 @@ De WebUI is georganiseerd in enkele tabbladen:
   remote-bestemmingen die je toevoegt (zie [sectie 7](#sectie-7)). Je
   kunt een bestemming hier testen voordat je erop vertrouwt.
 - **Instellingen** - een licht/donker-themaschakelaar, een accentkleurkiezer (presets, een aangepaste
-  kleur, of resetten) en een taalkiezer, standaardwaarden voor
+  kleur, of resetten) en een taalkiezer (de interface wordt rechts-naar-links weergegeven voor
+  Arabisch en Perzisch), een interfaceschaal-schuifregelaar die je sleept om de hele interface
+  (header, inhoud en onderste navigatie samen) te herschalen van 85% tot 120% (100% is de standaard), voor schermen met
+  verschillende pixeldichtheden, standaardwaarden voor
   nieuwe taken (standaardcompressie, verify aan/uit, standaardversleuteling), het netwerkbeleid
   voor cloudoverdrachten (zie [sectie 7](#sectie-7)), automatische back-up en de lijst met uitgesloten
   apps, de installatiebron-optie, de
-  versleutelingssleutel en het inplannen.
-- **Over** - versie, links, de zusterprojecten (Zie ook) en het auditmanifest van de gebundelde binaries.
+  versleutelingssleutel en het inplannen. Aan/uit-instellingen gebruiken schakelaars in Android-stijl.
+- **Over** - versie, links, de zusterprojecten (Zie ook), het auditmanifest van de gebundelde binaries, en een actie **Check for updates** die meldt of er een nieuwere versie is gepubliceerd (met de bijbehorende release-notes). Elke update installeer je via je root-manager, net zoals je de module hebt geflasht.
 
 Bevestigingen en meldingen gebruiken in-app-dialogen (niet de oude systeem-pop-ups), en een
 herstel of import vraagt je te erkennen dat het de huidige app-gegevens overschrijft voordat
@@ -147,6 +166,8 @@ het doorgaat.
 Backups en herstelbewerkingen draaien **losgekoppeld** als een root-achtergrondproces. Je kunt
 de WebUI sluiten, of zelfs de root-beheerder sluiten, en de operatie gaat door. Wanneer je
 terugkomt, haakt de WebUI opnieuw aan en toont live voortgang met een gelokaliseerd faselabel.
+Voor een lopende taak toont de voortgangskaart ook de live overdrachtssnelheid en de geschatte
+resterende tijd, plus een itemteller (bijvoorbeeld "12 van 40") met de naam van het huidige item.
 Op ROM's die shell-meldingen doorgeven krijg je ook een Android-melding wanneer een taak start
 en eindigt; hoe dan ook is de in-app-voortgangskaart de betrouwbare indicator.
 
@@ -246,17 +267,66 @@ Twee veiligheidsopties helpen je een backup te vertrouwen voordat je erop vertro
   te schrijven**. Gebruik het om ruimte in te schatten of je itemselectie te controleren
   voordat je het echte ding draait.
 
-### 5.6 Speciale back-ups (berichten, belgeschiedenis, Wi-Fi, Bluetooth)
+Wanneer een backup naar een **cloud**-bestemming gaat, voegt VDBackup twee extra beveiligingen
+toe. Het voert een afsluitende **checksum-verified**-stap uit die de geüploade kopie opnieuw
+vergelijkt met het origineel op de remote, en laat de taak mislukken (in plaats van een
+beschadigde kopie in de cloud achter te laten) als ze niet overeenkomen. En voor een Full-upload
+controleert het de **vrije ruimte** van de remote en stopt het vroegtijdig met een duidelijke
+**"not enough space"**-fout als de backup niet zou passen, in plaats van de remote te vullen en
+halverwege te mislukken. (De ruimtecontrole geldt voor Full-uploads; Mirror is een delta-sync en
+is vrijgesteld.)
+
+### 5.6 Speciale back-ups (berichten, belgeschiedenis, Wi-Fi, Bluetooth, agenda, achtergrond, DNS, systeeminstellingen)
 
 Onder de app-lijsten op het **Backups**-tabblad dekken **Speciale back-ups** systeembrede
-gegevens die niet aan één enkele app gebonden zijn: **berichten (SMS/MMS)**, **contacten en
-belgeschiedenis**, **Wi-Fi-netwerken** en **Bluetooth**. Kies de categorieën en back-up ze; ze
-worden ruw gearchiveerd, met hetzelfde behoud van SELinux/xattr en optionele versleuteling als
-app-backups. Optioneel wordt ook een **draagbare kopie** geschreven (berichten, belgeschiedenis
-en contacten als openbare JSON), zodat je een apparaatoverschrijdende kopie hebt die je zonder de
-module op een pc kunt lezen. Het herstellen van een speciale back-up overschrijft live
-systeemgegevens en vereist een herstart, dus het is afgeschermd achter een prominente erkenning
-en is betrouwbaar op hetzelfde apparaat en dezelfde ROM.
+gegevens die niet aan één enkele app gebonden zijn. Kies de categorieën en back-up ze; ze worden
+gearchiveerd met hetzelfde behoud van SELinux/xattr en optionele versleuteling als app-backups.
+De categorieën zijn:
+
+| Categorie | Wat het is |
+|-----------|-----------|
+| **Berichten (SMS/MMS)** | Je tekstberichten. |
+| **Contacten en belgeschiedenis** | Je contacten en belgeschiedenis. |
+| **Wi-Fi-netwerken** | Je opgeslagen Wi-Fi-netwerken. |
+| **Bluetooth** | Je Bluetooth-koppelingen. |
+| **Agenda** | De agenda-provider (app en gegevens). Er wordt ook een **overdraagbare `calendar.json`** geschreven, zodat je afspraken zonder de module op een pc leesbaar zijn. |
+| **Achtergrond** | Je start- en vergrendelscherm-achtergrond plus `wallpaper_info.xml`, opgeslagen als de ruwe afbeelding. |
+| **DNS** | Je private DNS-modus en -server. |
+| **Systeeminstellingen** | Een volledige dump van de system-, global- en secure-instellingen van het apparaat. |
+
+Voor berichten, belgeschiedenis en contacten wordt ook een **overdraagbare kopie** (te openen
+JSON) geschreven, zodat je een apparaatoverschrijdende kopie hebt die je zonder de module op een
+pc kunt lezen.
+
+**Systeeminstellingen is opt-in en overschrijft bij herstel je apparaatinstellingen.** Net als
+SSAID (zie [sectie 10](#sectie-10)) is de categorie **Systeeminstellingen** de gevoeligste: het
+herstellen ervan overschrijft je apparaatbrede instellingen, dus het staat uit tenzij je het
+bewust selecteert, vraagt je eerst om erkenning en wordt naar het activiteitenlogboek geschreven.
+
+Het herstellen van een speciale back-up overschrijft live systeemgegevens en vereist een
+herstart, dus het is afgeschermd achter een prominente erkenning en is betrouwbaar op hetzelfde
+apparaat en dezelfde ROM. Herstelbewerkingen zijn **idempotent**: de ruwe categorieën
+(berichten, contacten, Wi-Fi, Bluetooth, agenda) worden hersteld door de gegevens te
+**vervangen** in plaats van samen te voegen, zodat dezelfde backup tweemaal herstellen nooit
+duplicaten maakt, en DNS en systeeminstellingen worden eenvoudigweg opnieuw toegepast.
+
+### 5.7 Zelfstandige back-ups van mappen en bestanden
+
+Soms wil je een gewone map of een gewoon bestand back-uppen dat geen app is - een cameramap,
+een documentenmap, een enkele database. VDBackup kan **elk absoluut pad** op gedeelde opslag of
+onder `/data` back-uppen, met hetzelfde overdraagbare formaat als een app-backup: een
+`tar.zst`-archief plus een `manifest.json`, SHA-256-verzegeld, met een RECOVERY-notitie wanneer
+je het versleutelt. Deze pad-back-ups worden apart bewaard, onder een `.paths`-map in je
+backups-map.
+
+- **Kies een pad en back-up het.** De bron moet een absoluut pad zijn onder een van de toegestane
+  locaties (`/storage/emulated`, `/data/media`, `/sdcard`, `/data`). Paden die met `..` naar
+  buiten proberen te klimmen worden geweigerd.
+- **Herstellen schrijft terug naar de oorspronkelijke locatie**, dus, zoals elk herstel, is het
+  destructief en vraagt het je om **bevestiging** voordat het iets overschrijft.
+- Net als app-backups draaien pad-back-ups en -herstelbewerkingen **losgekoppeld** met live
+  voortgang, gebruiken ze de door jou gekozen compressie en kunnen ze met een wachtwoordzin
+  worden versleuteld.
 
 ## 6. Een backup herstellen
 
@@ -267,7 +337,10 @@ vast in een lokaal auditlogboek.
 Een herstel is **getrouw**: VDBackup wist de huidige staat van de app en pakt de backup uit,
 zodat de app wordt teruggezet naar de **exacte staat** die in die backup is vastgelegd
 (inclusief eigendom, modi, SELinux-contexten en xattr). Het is geen samenvoeging - het is een
-echt herstel naar het moment in de tijd van de backup.
+echt herstel naar het moment in de tijd van de backup. Omdat een herstel als root draait,
+controleert VDBackup ook elk archief voordat het iets uitpakt en weigert het een gemanipuleerd
+archief dat buiten zijn doel probeert te schrijven, zodat een aangepaste backup nooit de rest
+van je systeem kan overschrijven.
 
 Nuttige herstelopties:
 
@@ -288,6 +361,12 @@ Nuttige herstelopties:
   **"vervals de initiërende bron"**-schakelaar gaat verder en laat ook het initiërende pakket en
   de pakketbron van de app Play-geïnstalleerd lijken; het bewerkt de systeempakketdatabase (eerst
   geback-upt) en wordt na een herstart van kracht.
+
+**Herstel in batch.** Het **Backups**-tabblad heeft een **Select**-modus, net zoals het Apps-tabblad
+die heeft voor back-up in batch. Zet **Select** aan, vink met de selectievakjes de backups aan die je
+wilt, en herstel ze allemaal tegelijk. Eén optiedialoog dekt de hele selectie - de bevestiging van
+overschrijven, de restore-test en de keuze voor de installatiebron gelden voor elke backup die je koos -
+en ze worden de een na de ander hersteld.
 
 **Een backup verwijderen.** Open de details van een backup (of de geschiedenis van een app) en
 gebruik **Verwijderen**; je wordt om bevestiging gevraagd en de verwijdering wordt naar het
@@ -315,11 +394,17 @@ Remote-transport wordt afgehandeld door de gebundelde tools:
 - **restic** - versleutelde, gededupliceerde **Snapshot**-repositories (lokaal of op afstand).
 
 **Een cloud-remote aanmaken (geen SSH nodig).** Kies in het Bestemmingen-tabblad het
-**rclone**-bestemmingstype en gebruik **Cloud-remote toevoegen**: kies het backend (SFTP, SMB,
-WebDAV, FTP, S3 of Google Drive), vul de velden in (host/gebruiker/wachtwoord, of de
-S3-sleutels, of een Drive-token) en sla op. De remote verschijnt dan in de remote-lijst van de
-bestemming. Wachtwoorden worden versluierd opgeslagen, nooit in klare tekst. Je kunt je remotes
-vanaf dezelfde plek opsommen en verwijderen.
+**rclone**-bestemmingstype en gebruik **Cloud-remote toevoegen**. Je kunt **elke rclone-backend**
+verbinden: de keuzelijst biedt de populaire (**Google Drive, Dropbox, OneDrive, Box, pCloud,
+Mega, Backblaze B2, S3, SFTP, WebDAV, FTP, SMB**) plus een optie **Aangepast (geavanceerd)** waar
+je elk ander backendtype en de bijbehorende `key=value`-parameters typt. Vul de velden in
+(host/gebruiker/wachtwoord, of de S3-sleutels, bijvoorbeeld) en sla op. Voor providers die je met
+een browser laten aanmelden (Google Drive, Dropbox, OneDrive, Box, pCloud) gebruik je de knop
+**Autoriseren in browser**: die meldt je aan via de eigen browser van de telefoon en legt de
+token automatisch vast, dus **er is geen pc nodig** (een token handmatig plakken werkt nog steeds
+als fallback). De remote verschijnt dan in de remote-lijst van de bestemming. Wachtwoorden worden
+versluierd opgeslagen, nooit in klare tekst. Je kunt je remotes vanaf dezelfde plek opsommen en
+verwijderen.
 
 Twee regels houden remote-gebruik veilig:
 
@@ -351,19 +436,37 @@ Lokale backups worden nooit beïnvloed.
 
 ## 8. Inplannen en retentie
 
-VDBackup kan backups automatisch volgens een schema uitvoeren. In de planner definieer je een
-taak met:
+VDBackup kan backups - en herstelbewerkingen - automatisch volgens een schema uitvoeren. In de
+planner definieer je een taak met:
 
-- de app (of set apps) en de te gebruiken items/modus,
+- een **doel** - een enkele app, een set apps, of **alle apps** (minus de uitgesloten-apps-lijst)
+  - en de te gebruiken items/modus,
+- een **actie** - **Back up** (de standaard) of **Restore latest**, die de meest recente backup van
+  elke doel-app herstelt,
 - een bestemming,
 - een **cron-achtig schema** - elk uur, dagelijks of wekelijks, op een tijd die je kiest (HH:MM),
 - een **retentie**-instelling: **bewaar N** meest recente backups voor die taak, oudere worden
-  automatisch gesnoeid.
+  automatisch gesnoeid,
+- optionele **uitvoeringsvoorwaarden**: alleen op **Wi-Fi**, alleen tijdens **opladen**, alleen
+  op of boven een **minimum accuniveau**, en alleen op gekozen **weekdagen**.
 
 Geplande taken worden geactiveerd door een boot-tijd-heartbeat in de module: wanneer een taak
 verschuldigd is draait het, legt zijn laatste-looptijd vast zodat het niet twee keer afgaat, en
 past retentie toe om oude backups te snoeien. Omdat alles als root op de achtergrond draait,
 hebben geplande backups niet nodig dat de WebUI open is.
+
+**Uitvoeringsvoorwaarden (gates).** Een geplande taak kan voorwaarden dragen waaraan voldaan moet
+zijn voordat hij draait: alleen Wi-Fi, alleen opladen, een minimum accuniveau en specifieke
+weekdagen. Wanneer een taak verschuldigd is maar aan een voorwaarde niet is voldaan, wordt hij
+**overgeslagen en bij de volgende controle opnieuw geprobeerd** - zijn schema rukt niet op, zodat
+hij draait zodra de voorwaarde is vervuld. Een ingebouwde thermische veiligheidscontrole slaat een
+geplande taak ook over terwijl het apparaat te heet is. Elke dergelijke overslag wordt
+vastgelegd in het activiteitenlogboek.
+
+**Gepland herstel overschrijft bij elke run.** Een **Restore latest**-taak herstelt bij elke keer dat
+hij afgaat opnieuw de meest recente backup van elke doel-app, en herstel is destructief: bij elke run
+**overschrijft het de huidige gegevens van de app** met de meest recente backup. Dit is bewust en
+opt-in - kies het alleen wanneer je de doelen op hun meest recente backup wilt houden.
 
 **Automatische back-up bij installatie/update.** In Instellingen kun je **automatische back-up**
 inschakelen: dezelfde achtergrond-heartbeat merkt apps op die nieuw geïnstalleerd of bijgewerkt
@@ -371,12 +474,14 @@ zijn en back-upt ze voor je (met keep-N-retentie). De eerste keer draaien regist
 er geïnstalleerd is, zodat het inschakelen nooit je hele apparaat in één keer back-upt.
 
 **Uitgesloten apps (blocklist).** Ook in Instellingen kun je apps uitsluiten waarvan je nooit
-wilt dat ze automatisch of volgens een schema geback-upt worden; uitgesloten apps worden door
-beide overgeslagen.
+wilt dat ze automatisch of volgens een schema geback-upt worden; je kunt er meerdere tegelijk
+toevoegen (multiselectie), en uitgesloten apps worden door beide overgeslagen.
 
 **Activiteitenlogboek.** Het Schema-tabblad heeft een knop **Activiteitenlogboek bekijken** die
-het lokale auditspoor toont - backups, herstelbewerkingen, verwijderingen, geplande en
-automatische runs, en snoeiingen - nieuwste eerst.
+een volledig scherm (direct) opent met het lokale auditspoor - backups, herstelbewerkingen,
+verwijderingen, geplande en automatische runs, en snoeiingen - nieuwste eerst. Een actie
+**Logboek exporteren** slaat een logbestand (onder de backupmap) op dat je aan een feedback- of
+bugrapport kunt toevoegen.
 
 ## 9. Inmigreren: Neo-Backup en Android-DataBackup importeren
 
@@ -473,6 +578,11 @@ veelvoorkomende:
   verificatie ving een slechte backup op). Draai de backup opnieuw.
 - `ERR_RESTORE_TEST` - een restore-test is mislukt; de backup pakte niet schoon uit/verifieerde
   niet schoon en je live-app bleef onaangeraakt.
+- `ERR_UNSAFE_ARCHIVE` - een archief werd geweigerd omdat het buiten zijn doelmap probeerde te
+  schrijven (absolute of `..`-paden). Dit beschermt je tegen een gemanipuleerde backup; er werd
+  niets geschreven.
+- `ERR_QUOTA` - een cloud-remote had niet genoeg vrije ruimte voor een Full-upload; de backup
+  werd gestopt voordat er iets werd geüpload.
 
 **Mijn remote-bestemming mislukt.** Gebruik de bestemmings-**test** in het Bestemmingen-tabblad
 om inloggegevens en connectiviteit te valideren. Onthoud dat alleen cloudbestemmingen het

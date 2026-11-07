@@ -75,3 +75,5 @@ Các trợ lý và tác nhân AI là những người đóng góp hạng nhất 
 
 Tìm các nhãn `good first issue` và `help wanted`. Bản dịch, tài liệu, các preset đích đến
 `rclone` mới và việc trau chuốt WebUI đều là những điểm khởi đầu tuyệt vời.
+
+*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến - xem [CONTRIBUTING.md](CONTRIBUTING.md).*

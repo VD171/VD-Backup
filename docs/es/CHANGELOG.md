@@ -6,6 +6,70 @@
 
 Todos los cambios relevantes de VDBackup están documentados aquí. Solo en inglés.
 
+## v1.03
+
+Nuevo alcance de backup:
+
+- Nuevas categorías de backup especial: calendario (el proveedor de calendario, más una
+  exportación portátil `calendar.json`), fondo de pantalla (fondo de inicio y de bloqueo),
+  DNS privado (modo y especificador) y ajustes del sistema (el volcado completo de los
+  ajustes system/global/secure). Los ajustes del sistema son opt-in y sobrescriben los
+  ajustes de todo el dispositivo al restaurar, así que están protegidos como SSAID, con
+  consentimiento explícito y una entrada completa de auditoría.
+- Backup independiente de carpeta y archivo: respalda cualquier ruta absoluta
+  (almacenamiento compartido o datos de app) como un archivo comprimido y sellado por
+  manifiesto, y restáuralo a la misma ruta. La restauración necesita una confirmación
+  explícita.
+
+Restauración más segura:
+
+- Cada archivo se comprueba antes de escribir nada: un backup cuyo contenido apunta fuera
+  de su destino (una ruta absoluta o un componente `..`) se rechaza, de modo que una
+  restauración que corre como root no puede ser engañada para escribir fuera del destino.
+
+Progreso y programación:
+
+- El progreso en vivo ahora muestra la velocidad de transferencia, el ETA y un contador de
+  ítems durante los backups, además de un paso verificado por checksum para las subidas a la
+  nube y una comprobación previa de "espacio insuficiente".
+- Los trabajos programados pueden condicionarse: ejecutarse solo en Wi-Fi, solo mientras se
+  carga, solo por encima de un nivel de batería, o solo en días de la semana elegidos; un
+  trabajo programado también se omite mientras el dispositivo está críticamente caliente. Un
+  trabajo omitido se reintenta en el siguiente tick.
+
+Destinos en la nube:
+
+- Conecta cualquier backend de rclone desde la interfaz: el desplegable de remoto en la nube
+  ofrece los proveedores populares (Google Drive, Dropbox, OneDrive, Box, pCloud, Mega,
+  Backblaze B2, S3, SFTP, WebDAV, FTP, SMB) más una opción "Custom (advanced)" donde escribes
+  el nombre de cualquier otro backend de rclone y sus parámetros `key=value`, de modo que todos
+  los backends de rclone quedan accesibles.
+- Inicio de sesión en el dispositivo (sin PC): los proveedores que necesitan iniciar sesión con
+  un navegador (Google Drive, Dropbox, OneDrive, Box, pCloud) tienen un botón "Authorize in
+  browser" que abre el propio navegador del teléfono en la página de consentimiento del
+  proveedor; tras aprobar, vuelves a la app y el remoto se guarda automáticamente, con el token
+  capturado en el dispositivo. Pegar un token a mano sigue disponible como alternativa.
+
+Interfaz:
+
+- Una escala de interfaz ajustable (un control deslizante arrastrable) reescala toda la
+  interfaz, de modo que encaje en pantallas de diferentes densidades de píxeles; 100% es el
+  valor predeterminado y no cambia.
+- La interfaz ahora se muestra de derecha a izquierda para árabe y persa.
+- Un resumen inicial con conteos de backup y una barra de almacenamiento, insignias de
+  estado, copiar hashes y rutas al portapapeles, interruptores de estilo Android, y una acción
+  "Check for updates".
+- El registro de actividad es una pantalla completa que se abre al instante, con una acción
+  "Export logs" que guarda un archivo de registro que puedes adjuntar a un informe.
+
+Correcciones:
+
+- La restauración y la importación ya no fallan en dispositivos cuyo `tar` empaquetado no
+  acepta la opción `--no-absolute-names`; la comprobación de seguridad del archivo es
+  independiente de esa opción.
+- "Check for updates" funciona incluso donde no hay ningún cliente HTTP empaquetado,
+  recurriendo al rclone empaquetado; y el registro de actividad ya no tarda mucho en abrir.
+
 ## v1.01
 
 Primer lanzamiento público. Un módulo WebUI para KernelSU/APatch/Magisk que respalda y restaura
@@ -128,3 +192,5 @@ AI-friendly e i18n:
   (`docs/<lang>/`), con los docs espejados en el wiki.
 - El listado rico de apps y el descifrado de Neo se ejecutan a través de un helper dex dirigido como root
   (`IPackageManager` vía ServiceManager), de modo que funcionan donde ActivityThread se bloquea.
+
+*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas - ve [CONTRIBUTING.md](CONTRIBUTING.md).*

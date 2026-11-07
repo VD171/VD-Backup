@@ -22,7 +22,8 @@ místě, bez čehokoli, co by bylo potřeba "povolit".
   - [5.3 Komprese](#53-komprese)
   - [5.4 Šifrování](#54-šifrování)
   - [5.5 Verify a dry-run](#55-verify-a-dry-run)
-  - [5.6 Speciální zálohy (zprávy, seznam hovorů, Wi-Fi, Bluetooth)](#56-special-backups-messages-call-log-wi-fi-bluetooth)
+  - [5.6 Speciální zálohy (zprávy, seznam hovorů, Wi-Fi, Bluetooth, kalendář, tapeta, DNS, systémová nastavení)](#56-speciální-zálohy-zprávy-seznam-hovorů-wi-fi-bluetooth-kalendář-tapeta-dns-systémová-nastavení)
+  - [5.7 Samostatné zálohy složek a souborů](#57-samostatné-zálohy-složek-a-souborů)
 - [6. Obnova zálohy](#6-obnova-zálohy)
 - [7. Cíle: lokální a vzdálené](#7-cíle-lokální-a-vzdálené)
 - [8. Plánování a retence](#8-plánování-a-retence)
@@ -52,6 +53,14 @@ Vše, co VDBackup produkuje, používá **standardní formáty** (tar, gzip, zst
 restic), takže vaše zálohy nikdy nejsou uzamčené do modulu a nikdy nejsou vázané na vaše
 konkrétní zařízení. Viz [sekce 11](#sekce-11).
 
+## Snímky obrazovky
+
+| Domů | Aplikace | Plán |
+|:---:|:---:|:---:|
+| ![Domů](../screenshots/cs/home-dark.png) | ![Aplikace](../screenshots/cs/apps-dark.png) | ![Plán](../screenshots/cs/schedule-dark.png) |
+| **Cíle** | **Nastavení** | **Protokol aktivity** |
+| ![Cíle](../screenshots/cs/destinations-dark.png) | ![Nastavení](../screenshots/cs/settings-dark.png) | ![Protokol aktivity](../screenshots/cs/activitylog-dark.png) |
+
 ## 2. Požadavky
 
 - **Rootnuté Android zařízení** spravované pomocí **KernelSU**, **APatch** nebo **Magisk**.
@@ -77,11 +86,11 @@ a degradují elegantně, když nejsou na vašem zařízení dostupné.
 
 **Kterou edici stáhnout.** Každé vydání je dodáváno jako několik flashovatelných zip edic, takže si stáhnete jen to, co potřebujete. Vyberte jednu:
 
-- **`VD-Backup-<ver>-universal-full.zip`** - každá architektura CPU a každá binárka, včetně `rclone` (cloudoví poskytovatelé: Google Drive, S3 a 70+ dalších rclone backendů) a `restic` (deduplikované snapshoty). Funguje na jakémkoli zařízení. Největší stahování.
-- **`VD-Backup-<ver>-universal-lite.zip`** - každá architektura, ale **bez** dvou největších binárek (`rclone` a `restic`). Nejmenší stahování; stále zvládá lokální zálohy a zálohy přes SSH/SFTP a rsync, s přenositelným šifrováním `age`.
-- **`VD-Backup-<ver>-<abi>-full.zip`** (jedna z `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - jediná architektura s každou binárkou (stejné funkce jako `universal-full`, ale jen pro architekturu vašeho zařízení, takže menší než `universal-full`).
+- **`VD-Backup-<ver>-universal-full.zip`** - každá architektura CPU a každá binárka zabudovaná, včetně `rclone` (cloudoví poskytovatelé: Google Drive, S3 a 70+ dalších rclone backendů) a `restic` (deduplikované snapshoty). Plně offline, nikdy se nic nestahuje. Funguje na jakémkoli zařízení. Největší stahování.
+- **`VD-Backup-<ver>-universal-lite.zip`** - každá architektura, ale **bez** dvou největších binárek (`rclone` a `restic`). Nejmenší stahování; stále zvládá lokální zálohy a zálohy přes SSH/SFTP a rsync bez jakéhokoli stahování, s přenositelným šifrováním `age`. Při prvním použití cloudového cíle (`rclone`) nebo režimu snapshotů (`restic`) nabídne WebUI jednorázové stažení onoho malého doplňku pro danou architekturu (ověřeného přes SHA-256) a uloží jej do mezipaměti; poté fungují i tyto funkce.
+- **`VD-Backup-<ver>-<abi>-full.zip`** (jedna z `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - jediná architektura s každou binárkou zabudovanou (stejné funkce jako `universal-full`, ale jen pro architekturu vašeho zařízení, takže menší než `universal-full`).
 
-Pokud znáte architekturu svého zařízení a chcete vše, vyberte odpovídající **`<abi>-full`** (většina telefonů je **`arm64-v8a`**). Pokud chcete nejmenší stahování nebo nepotřebujete cloudové poskytovatele (`rclone`) ani snapshoty (`restic`), vyberte **`universal-lite`**. Pokud chcete vše a nejste si jisti architekturou, vyberte **`universal-full`**. Při instalaci si modul ponechá pouze architekturu vašeho zařízení bez ohledu na to, kterou edici flashnete.
+Pokud znáte architekturu svého zařízení a chcete vše zabudované, vyberte odpovídající **`<abi>-full`** (většina telefonů je **`arm64-v8a`**). Pokud chcete nejmenší stahování a nevadí vám jednorázové stažení ověřené přes SHA-256 při prvním použití cloudových poskytovatelů (`rclone`) nebo snapshotů (`restic`), vyberte **`universal-lite`**. Pokud chcete vše zabudované bez jakéhokoli stahování (offline / obnova) a nejste si jisti architekturou, vyberte edici **full**. Při instalaci si modul ponechá pouze architekturu vašeho zařízení bez ohledu na to, kterou edici flashnete.
 
 Při prvním spuštění modul nasadí výchozí konfiguraci (pouze pokud ještě žádná neexistuje), takže
 vaše nastavení jsou zachována napříč aktualizacemi modulu.
@@ -109,6 +118,7 @@ Mějte to na paměti ze dvou důvodů: zálohy zabírají místo pod `/sdcard/VD
 
 WebUI je uspořádáno do několika záložek:
 
+- **Home** - úvodní přehled zobrazující počty vašich záloh (aplikace, zálohy, složky a naplánované úlohy) a pruh úložiště, kolik místa vaše zálohy zabírají oproti volnému, se stavovými odznaky, kopírováním hashů a cest do schránky a akcí **Check for updates**.
 - **Apps** - seznam nainstalovaných aplikací (uživatelských a systémových), každá zobrazená se svým skutečným
   jménem, názvem balíčku a ikonou (ikony se načítají líně a jsou cachované, takže seznam
   zůstává responzivní). Tlačítko na řádku aplikaci zálohuje; klepnutí na řádek otevře
@@ -122,12 +132,14 @@ WebUI je uspořádáno do několika záložek:
   cíle, které přidáte (viz [sekce 7](#sekce-7)). Cíl zde můžete
   otestovat, než se na něj spolehnete.
 - **Settings** - přepínač světlého/tmavého motivu, selektor barvy zvýraznění (předvolby, vlastní
-  barva nebo reset), selektor jazyka, výchozí hodnoty pro nové
+  barva nebo reset), selektor jazyka (rozhraní se vykresluje zprava doleva pro arabštinu a perštinu), posuvník měřítka rozhraní, kterým táhnutím přeškálujete celé rozhraní
+  (záhlaví, obsah a spodní navigace společně) od 85% do 120% (100% je výchozí), pro obrazovky s různou hustotou pixelů,
+  výchozí hodnoty pro nové
   úlohy (výchozí komprese, verify zapnuto/vypnuto, výchozí šifrování), síťová politika pro
   cloudové přenosy (viz [sekce 7](#sekce-7)), automatická záloha a seznam vyloučených
   aplikací, volba zdroje instalace, šifrovací
-  klíč, a plánování.
-- **About** - verze, odkazy, příbuzné projekty (See also) a auditní manifest přibalených binárních souborů.
+  klíč, a plánování. Nastavení zapnuto/vypnuto používají přepínače ve stylu Androidu.
+- **About** - verze, odkazy, příbuzné projekty (See also), auditní manifest přibalených binárních souborů a akce **Check for updates**, která hlásí, zda byla zveřejněna novější verze (s jejími poznámkami k vydání). Jakoukoli aktualizaci nainstalujete přes svého root manažera, stejně jako jste flashovali modul.
 
 Potvrzení a zprávy používají dialogy v aplikaci (ne stará systémová vyskakovací okna), a
 obnova nebo import vás požádá o potvrzení, že přepíše aktuální data aplikace, než
@@ -135,7 +147,9 @@ pokračuje.
 
 Zálohy a obnovy běží **oddělené** jako root proces na pozadí. Můžete zavřít
 WebUI, nebo dokonce zavřít root manažera, a operace pokračuje dál. Když se
-vrátíte, WebUI se znovu připojí a ukáže živý průběh s lokalizovaným popiskem fáze. Na
+vrátíte, WebUI se znovu připojí a ukáže živý průběh s lokalizovaným popiskem fáze. U běžící
+úlohy karta průběhu také ukazuje živou rychlost přenosu a odhadovaný zbývající čas, plus
+počítadlo položek (například "12 of 40") s názvem aktuální položky. Na
 ROMech, které vynášejí shellové notifikace, také dostanete Android notifikaci, když úloha
 začne a skončí; tak či tak je karta průběhu v aplikaci spolehlivým ukazatelem.
 
@@ -231,16 +245,60 @@ Dvě bezpečnostní volby vám pomáhají důvěřovat záloze, než se na ni sp
   čehokoli**. Použijte to k odhadu místa nebo ke kontrole výběru položek před spuštěním
   skutečné věci.
 
-### 5.6 Speciální zálohy (zprávy, seznam hovorů, Wi-Fi, Bluetooth)
+Když záloha směřuje do **cloudového** cíle, VDBackup přidá dvě další pojistky. Provede finální
+krok **checksum-verified**, který znovu zkontroluje nahranou kopii proti originálu na remotu a
+úlohu nechá selhat (místo aby v cloudu zanechal poškozenou kopii), pokud se neshodují. A před
+nahráváním Full zkontroluje **volné místo** remotu a zavčas se zastaví s jasnou chybou **"not
+enough space"**, pokud by se záloha nevešla, místo aby remote zaplnil a selhal v půli cesty.
+(Kontrola místa je pro nahrávání Full; Mirror je delta synchronizace a je výjimkou.)
+
+### 5.6 Speciální zálohy (zprávy, seznam hovorů, Wi-Fi, Bluetooth, kalendář, tapeta, DNS, systémová nastavení)
 
 Pod seznamy aplikací v záložce **Backups** pokrývají **Speciální zálohy** celosystémová
-data, která nejsou vázána na jednu aplikaci: **zprávy (SMS/MMS)**, **kontakty a seznam
-hovorů**, **sítě Wi-Fi** a **Bluetooth**. Vyberte kategorie a zálohujte je; jsou
-archivovány surové, se stejným zachováním SELinux/xattr a volitelným šifrováním jako zálohy
-aplikací. Volitelně se zapíše také **přenosná kopie** (zprávy, seznam hovorů a kontakty jako
-otevíratelný JSON), takže máte kopii napříč zařízeními, kterou si přečtete na PC bez modulu.
-Obnova speciální zálohy přepíše živá systémová data a vyžaduje restart, proto je chráněna
-výrazným potvrzením a je spolehlivá na stejném zařízení a ROM.
+data, která nejsou vázána na jednu aplikaci. Vyberte kategorie a zálohujte je; jsou
+archivovány se stejným zachováním SELinux/xattr a volitelným šifrováním jako zálohy aplikací.
+Kategorie jsou:
+
+| Kategorie | Co to je |
+|----------|-----------|
+| **Zprávy (SMS/MMS)** | Vaše textové zprávy. |
+| **Kontakty a seznam hovorů** | Vaše kontakty a historie hovorů. |
+| **Sítě Wi-Fi** | Vaše uložené Wi-Fi sítě. |
+| **Bluetooth** | Vaše Bluetooth párování. |
+| **Kalendář** | Provider kalendáře (aplikace a data). Zapíše se také **přenositelný `calendar.json`**, takže vaše události jsou čitelné na PC bez modulu. |
+| **Tapeta** | Vaše tapeta domovské a zamykací obrazovky plus `wallpaper_info.xml`, uložená jako surový obrázek. |
+| **DNS** | Váš režim a server privátního DNS. |
+| **Systémová nastavení** | Úplný dump system, global a secure nastavení zařízení. |
+
+Pro zprávy, seznam hovorů a kontakty se zapíše také **přenosná kopie** (otevíratelný JSON),
+takže máte kopii napříč zařízeními, kterou si přečtete na PC bez modulu.
+
+**Systémová nastavení jsou opt-in a při obnově přepisují nastavení vašeho zařízení.** Stejně jako
+SSAID (viz [sekce 10](#sekce-10)) je kategorie **Systémová nastavení** tou nejcitlivější: její obnova
+přepíše celosystémová nastavení vašeho zařízení, takže je vypnutá, dokud ji záměrně nevyberete,
+nejprve vás požádá o potvrzení a je zapsána do protokolu aktivity.
+
+Obnova speciální zálohy přepíše živá systémová data a vyžaduje restart, proto je chráněna výrazným
+potvrzením a je spolehlivá na stejném zařízení a ROM. Obnovy jsou **idempotentní**: surové kategorie
+(zprávy, kontakty, Wi-Fi, Bluetooth, kalendář) se obnovují **nahrazením** dat místo jejich slučování,
+takže dvojí obnova téže zálohy nikdy nevytvoří duplikáty, a DNS a systémová nastavení se jednoduše
+znovu aplikují.
+
+### 5.7 Samostatné zálohy složek a souborů
+
+Někdy chcete zálohovat prostou složku nebo soubor, který není aplikací - složku fotoaparátu,
+adresář dokumentů, jednu databázi. VDBackup umí zálohovat **libovolnou absolutní cestu** na sdíleném
+úložišti nebo pod `/data`, se stejným přenositelným formátem jako záloha aplikace: archiv `tar.zst`
+plus `manifest.json`, zapečetěný SHA-256, s poznámkou RECOVERY, když jej zašifrujete. Tyto zálohy
+cest jsou udržovány zvlášť, pod složkou `.paths` ve vašem adresáři záloh.
+
+- **Vyberte cestu a zazálohujte ji.** Zdroj musí být absolutní cesta pod jedním z povolených
+  umístění (`/storage/emulated`, `/data/media`, `/sdcard`, `/data`). Cesty, které se pokoušejí
+  uniknout pomocí `..`, jsou odmítnuty.
+- **Obnova zapisuje zpět na původní umístění**, takže je, jako každá obnova, destruktivní a před
+  přepsáním čehokoli vás požádá o **potvrzení**.
+- Jako zálohy aplikací běží zálohy a obnovy cest **oddělené** s živým průběhem, používají vámi
+  zvolenou kompresi a lze je zašifrovat passphrase.
 
 ## 6. Obnova zálohy
 
@@ -251,7 +309,9 @@ zaznamená akci do lokálního auditního logu.
 Obnova je **věrná**: VDBackup vymaže aktuální stav aplikace a rozbalí
 zálohu, takže je aplikace vrácena do **přesného stavu** zachyceného v té záloze
 (včetně vlastnictví, režimů, SELinux kontextů a xattr). Není to sloučení - je to
-pravá obnova do bodu v čase zálohy.
+pravá obnova do bodu v čase zálohy. Protože obnova běží jako root, VDBackup také zkontroluje
+každý archiv, než cokoli rozbalí, a odmítne manipulovaný, který se pokouší zapisovat mimo svůj
+cíl, takže upravená záloha nikdy nemůže přepsat zbytek vašeho systému.
 
 Užitečné volby obnovy:
 
@@ -271,6 +331,12 @@ Užitečné volby obnovy:
   volitelný přepínač **"zfalšovat iniciující zdroj"** jde dál a také učiní iniciující balíček
   a zdroj balíčku aplikace vypadajícími jako instalované z Play; upravuje systémovou databázi
   balíčků (nejprve zálohovanou) a projeví se po restartu.
+
+**Dávková obnova.** Karta **Backups** má režim **Select**, stejně jako jej karta Apps má
+pro dávkové zálohování. Zapněte **Select**, zaškrtněte zálohy, které chcete, pomocí jejich
+zaškrtávacích políček a obnovte je všechny najednou. Jeden dialog voleb pokrývá celý výběr -
+potvrzení přepsání, restore-test i volba zdroje instalace platí pro každou zálohu, kterou
+jste vybrali - a obnovují se jedna po druhé.
 
 **Mazání zálohy.** Otevřete podrobnosti zálohy (nebo historii aplikace) a použijte
 **Delete**; budete požádáni o potvrzení a smazání se zapíše do protokolu aktivity. Můžete
@@ -296,11 +362,16 @@ Vzdálený transport zpracovávají přibalené nástroje:
 - **restic** - šifrované, deduplikované **Snapshot** repozitáře (lokální nebo vzdálené).
 
 **Vytvoření cloudového remotu (není potřeba SSH).** V záložce Destinations vyberte
-typ cíle **rclone** a použijte **Add cloud remote**: zvolte backend (SFTP,
-SMB, WebDAV, FTP, S3 nebo Google Drive), vyplňte pole (host/user/password, nebo
-S3 klíče, nebo Drive token) a uložte. Remote se pak objeví v seznamu remotů cíle.
-Hesla jsou uložena zatemněná, nikdy v čistém textu. Své remoty můžete vypsat a
-smazat ze stejného místa.
+typ cíle **rclone** a použijte **Add cloud remote**. Můžete připojit **libovolný rclone
+backend**: rozbalovací nabídka nabízí ty oblíbené (**Google Drive, Dropbox, OneDrive,
+Box, pCloud, Mega, Backblaze B2, S3, SFTP, WebDAV, FTP, SMB**) plus možnost
+**Custom (advanced)**, kde zadáte jakýkoli jiný typ backendu a jeho parametry `key=value`.
+Vyplňte pole (host/user/password, nebo například S3 klíče) a uložte. U poskytovatelů,
+kteří vás přihlašují přes prohlížeč (Google Drive, Dropbox, OneDrive, Box, pCloud),
+použijte tlačítko **Authorize in browser**: přihlásí vás přes prohlížeč samotného telefonu
+a zachytí token automaticky, takže není potřeba žádné PC (ruční vložení tokenu stále
+funguje jako záloha). Remote se pak objeví v seznamu remotů cíle. Hesla jsou uložena
+zatemněná, nikdy v čistém textu. Své remoty můžete vypsat a smazat ze stejného místa.
 
 Dvě pravidla udržují vzdálené použití bezpečné:
 
@@ -332,19 +403,36 @@ Lokální zálohy nejsou nikdy ovlivněny.
 
 ## 8. Plánování a retence
 
-VDBackup může spouštět zálohy automaticky podle rozvrhu. V plánovači definujete
-úlohu s:
+VDBackup může spouštět zálohy - i obnovy - automaticky podle rozvrhu. V plánovači
+definujete úlohu s:
 
-- aplikací (nebo sadou aplikací) a položkami/režimem k použití,
+- **cílem úlohy** - jednou aplikací, sadou aplikací nebo **všemi aplikacemi** (bez seznamu
+  vyloučených aplikací) - a položkami/režimem k použití,
+- **akcí** - **Back up** (výchozí) nebo **Restore latest**, která obnoví nejnovější zálohu
+  každé cílové aplikace,
 - cílem,
 - **cron-like rozvrhem** - hodinově, denně nebo týdně, v čase, který zvolíte (HH:MM),
 - nastavením **retence**: **ponechat N** nejnovějších záloh pro tu úlohu, starší jsou
-  automaticky prořezávány.
+  automaticky prořezávány,
+- volitelnými **podmínkami spuštění**: jen na **Wi-Fi**, jen během **nabíjení**, jen při
+  **minimální úrovni baterie** a jen ve zvolené **dny v týdnu**.
 
 Naplánované úlohy jsou spouštěny bootovacím heartbeatem v modulu: když je úloha
 splatná, spustí se, zaznamená čas posledního spuštění, aby se nevyvolala dvakrát, a aplikuje
 retenci k prořezání starých záloh. Protože vše běží jako root na pozadí,
 naplánované zálohy nepotřebují, aby bylo WebUI otevřené.
+
+**Podmínky spuštění (brány).** Naplánovaná úloha může nést podmínky, které musí být splněny,
+aby se spustila: jen Wi-Fi, jen nabíjení, minimální úroveň baterie a konkrétní dny v týdnu.
+Když je úloha splatná, ale podmínka není splněna, úloha se **přeskočí a zkusí znovu při další
+kontrole** - její rozvrh se neposune, takže se spustí, jakmile je podmínka splněna. Vestavěná
+kontrola tepelné bezpečnosti také přeskočí naplánovanou úlohu, dokud je zařízení příliš horké.
+Každé takové přeskočení se zaznamená do protokolu aktivity.
+
+**Naplánovaná obnova přepisuje při každém běhu.** Úloha **Restore latest** při každém
+spuštění znovu obnoví nejnovější zálohu každé cílové aplikace a obnova je destruktivní: při
+každém běhu **přepíše aktuální data aplikace** nejnovější zálohou. Je to záměrné a volitelné -
+zvolte ji jen tehdy, když chcete cíle držet na jejich nejnovější záloze.
 
 **Automatická záloha při instalaci/aktualizaci.** V Settings můžete zapnout **automatickou
 zálohu**: stejný heartbeat na pozadí si všimne aplikací, které byly nově nainstalovány nebo
@@ -352,11 +440,12 @@ aktualizovány, a zálohuje je za vás (s retencí keep-N). První běh pouze za
 nainstalováno, takže její zapnutí nikdy nezálohuje celé zařízení najednou.
 
 **Vyloučené aplikace (blocklist).** Rovněž v Settings můžete vyloučit aplikace, které nikdy
-nechcete zálohovat automaticky nebo podle rozvrhu; vyloučené aplikace jsou oběma přeskočeny.
+nechcete zálohovat automaticky nebo podle rozvrhu; můžete jich přidat několik najednou (vícenásobný výběr) a vyloučené aplikace jsou oběma přeskočeny.
 
-**Protokol aktivity.** Záložka Schedule má tlačítko **View activity log**, které zobrazuje
-lokální auditní stopu - zálohy, obnovy, mazání, naplánované a automatické běhy a prořezávání -
-od nejnovějších.
+**Protokol aktivity.** Záložka Schedule má tlačítko **View activity log**, které otevře celou
+obrazovku (okamžitě) zobrazující lokální auditní stopu - zálohy, obnovy, mazání, naplánované
+a automatické běhy a prořezávání - od nejnovějších. Akce **Export logs** uloží soubor
+protokolu (ve složce záloh), který můžete přiložit ke zpětné vazbě nebo hlášení chyby.
 
 ## 9. Migrace dovnitř: import Neo-Backup a Android-DataBackup
 
@@ -449,6 +538,11 @@ běžící operaci a ukáže aktuální průběh.
   zachytila špatnou zálohu). Spusťte zálohu znovu.
 - `ERR_RESTORE_TEST` - restore-test selhal; záloha se nerozbalila/neověřila
   čistě a vaše živá aplikace zůstala nedotčená.
+- `ERR_UNSAFE_ARCHIVE` - archiv byl odmítnut, protože se pokusil zapisovat mimo svůj cílový
+  adresář (absolutní cesty nebo `..`). To vás chrání před manipulovanou zálohou; nic nebylo
+  zapsáno.
+- `ERR_QUOTA` - cloudový remote neměl dost volného místa pro nahrávání Full; záloha byla
+  zastavena dřív, než se cokoli nahrálo.
 
 **Můj vzdálený cíl selhává.** Použijte **test** cíle v záložce Destinations
 k validaci přihlašovacích údajů a konektivity. Pamatujte, že pouze cloudové cíle potřebují

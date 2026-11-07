@@ -22,7 +22,8 @@ tempat, tanpa ada yang perlu "diizinkan".
   - [5.3 Kompresi](#53-kompresi)
   - [5.4 Enkripsi](#54-enkripsi)
   - [5.5 Verify dan dry-run](#55-verify-dan-dry-run)
-  - [5.6 Backup khusus (pesan, log panggilan, Wi-Fi, Bluetooth)](#56-backup-khusus-pesan-log-panggilan-wi-fi-bluetooth)
+  - [5.6 Backup khusus (pesan, log panggilan, Wi-Fi, Bluetooth, kalender, wallpaper, DNS, pengaturan sistem)](#56-backup-khusus-pesan-log-panggilan-wi-fi-bluetooth-kalender-wallpaper-dns-pengaturan-sistem)
+  - [5.7 Backup folder dan file mandiri](#57-backup-folder-dan-file-mandiri)
 - [6. Merestore backup](#6-merestore-backup)
 - [7. Tujuan: lokal dan remote](#7-tujuan-lokal-dan-remote)
 - [8. Penjadwalan dan retensi](#8-penjadwalan-dan-retensi)
@@ -52,6 +53,14 @@ Semua yang dihasilkan VDBackup memakai **format standar** (tar, gzip, zstd, age,
 restic), jadi backup Anda tidak pernah terkunci pada modul dan tidak pernah terikat pada
 perangkat spesifik Anda. Lihat [bagian 11](#bagian-11).
 
+## Tangkapan layar
+
+| Beranda | Aplikasi | Jadwal |
+|:---:|:---:|:---:|
+| ![Beranda](../screenshots/in/home-dark.png) | ![Aplikasi](../screenshots/in/apps-dark.png) | ![Jadwal](../screenshots/in/schedule-dark.png) |
+| **Tujuan** | **Pengaturan** | **Log aktivitas** |
+| ![Tujuan](../screenshots/in/destinations-dark.png) | ![Pengaturan](../screenshots/in/settings-dark.png) | ![Log aktivitas](../screenshots/in/activitylog-dark.png) |
+
 ## 2. Persyaratan
 
 - **Perangkat Android yang di-root** yang dikelola oleh **KernelSU**, **APatch** atau **Magisk**.
@@ -77,11 +86,11 @@ dan mereka merosot dengan mulus saat tidak tersedia di perangkat Anda.
 
 **Edisi mana yang diunduh.** Setiap rilis hadir sebagai beberapa edisi zip yang bisa di-flash, jadi Anda hanya mengunduh yang Anda butuhkan. Pilih salah satu:
 
-- **`VD-Backup-<ver>-universal-full.zip`** - setiap arsitektur CPU dan setiap biner, termasuk `rclone` (penyedia cloud: Google Drive, S3 dan 70+ backend rclone lainnya) dan `restic` (snapshot terdeduplikasi). Berfungsi di perangkat mana pun. Unduhan terbesar.
-- **`VD-Backup-<ver>-universal-lite.zip`** - setiap arsitektur, tetapi **tanpa** dua biner terbesar (`rclone` dan `restic`). Unduhan terkecil; tetap bisa backup lokal, SSH/SFTP, dan rsync, dengan enkripsi portabel `age`.
-- **`VD-Backup-<ver>-<abi>-full.zip`** (salah satu dari `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - satu arsitektur dengan setiap biner (fitur yang sama dengan `universal-full` tetapi hanya untuk arsitektur perangkat Anda, jadi lebih kecil dari `universal-full`).
+- **`VD-Backup-<ver>-universal-full.zip`** - setiap arsitektur CPU dan setiap biner tertanam, termasuk `rclone` (penyedia cloud: Google Drive, S3 dan 70+ backend rclone lainnya) dan `restic` (snapshot terdeduplikasi). Sepenuhnya offline, tidak pernah ada yang diunduh. Berfungsi di perangkat mana pun. Unduhan terbesar.
+- **`VD-Backup-<ver>-universal-lite.zip`** - setiap arsitektur, tetapi **tanpa** dua biner terbesar (`rclone` dan `restic`). Unduhan terkecil; tetap bisa backup lokal, SSH/SFTP, dan rsync tanpa unduhan, dengan enkripsi portabel `age`. Pertama kali Anda memakai tujuan cloud (`rclone`) atau mode snapshot (`restic`), WebUI menawarkan untuk mengunduh addon kecil per-arsitektur itu sekali (diverifikasi dengan SHA-256) lalu menyimpannya di cache; setelah itu fitur-fitur tersebut pun berfungsi.
+- **`VD-Backup-<ver>-<abi>-full.zip`** (salah satu dari `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - satu arsitektur dengan setiap biner tertanam (fitur yang sama dengan `universal-full` tetapi hanya untuk arsitektur perangkat Anda, jadi lebih kecil dari `universal-full`).
 
-Jika Anda tahu arsitektur perangkat Anda dan ingin semuanya, pilih **`<abi>-full`** yang cocok (kebanyakan ponsel adalah **`arm64-v8a`**). Jika Anda ingin unduhan terkecil atau tidak membutuhkan penyedia cloud (`rclone`) atau snapshot (`restic`), pilih **`universal-lite`**. Jika Anda ingin semuanya dan tidak yakin dengan arsitekturnya, pilih **`universal-full`**. Saat dipasang, modul hanya menyimpan arsitektur perangkat Anda terlepas dari edisi yang Anda flash.
+Jika Anda tahu arsitektur perangkat Anda dan ingin semuanya tertanam, pilih **`<abi>-full`** yang cocok (kebanyakan ponsel adalah **`arm64-v8a`**). Jika Anda ingin unduhan terkecil dan tidak keberatan dengan satu kali unduhan terverifikasi SHA-256 saat pertama kali memakai penyedia cloud (`rclone`) atau snapshot (`restic`), pilih **`universal-lite`**. Jika Anda ingin semuanya tertanam tanpa unduhan apa pun (offline / pemulihan) dan tidak yakin dengan arsitekturnya, pilih edisi **full**. Saat dipasang, modul hanya menyimpan arsitektur perangkat Anda terlepas dari edisi yang Anda flash.
 
 Pada jalankan pertama modul menanamkan konfigurasi default (hanya jika belum ada), jadi
 pengaturan Anda terjaga melintasi pembaruan modul.
@@ -109,6 +118,7 @@ Ingat ini karena dua alasan: backup memakan ruang di bawah `/sdcard/VDBackup`, d
 
 WebUI diatur dalam beberapa tab:
 
+- **Home** - ringkasan beranda yang menampilkan jumlah backup Anda (aplikasi, backup, folder, dan pekerjaan terjadwal) dan sebuah bilah penyimpanan untuk berapa banyak ruang yang dipakai backup Anda dibanding yang bebas, dengan lencana status, salin hash dan path ke papan klip, serta aksi **Check for updates**.
 - **Apps** - daftar aplikasi terpasang (pengguna dan sistem), masing-masing ditampilkan dengan nama
   aslinya, nama package-nya, dan ikonnya (ikon dimuat secara malas dan di-cache, jadi daftar
   tetap responsif). Tombol pada baris membackup aplikasi; menekan baris membuka riwayat
@@ -122,11 +132,13 @@ WebUI diatur dalam beberapa tab:
   yang Anda tambahkan (lihat [bagian 7](#bagian-7)). Anda bisa
   menguji sebuah tujuan di sini sebelum mengandalkannya.
 - **Settings** - sakelar tema terang/gelap, pemilih warna aksen (preset, warna kustom,
-  atau reset), dan pemilih bahasa, default untuk pekerjaan
+  atau reset), dan pemilih bahasa (antarmuka ditampilkan dari kanan ke kiri untuk bahasa Arab dan Persia), penggeser skala antarmuka yang Anda seret untuk mengubah skala
+  seluruh antarmuka (header, konten, dan navigasi bawah bersama-sama) dari 85% hingga 120% (100% adalah default), untuk layar dengan kepadatan piksel berbeda,
+  default untuk pekerjaan
   baru (kompresi default, verify aktif/mati, enkripsi default), kebijakan jaringan untuk
   transfer cloud (lihat [bagian 7](#bagian-7)), pencadangan otomatis dan daftar aplikasi
-  yang dikecualikan, opsi sumber pemasangan, kunci enkripsi, dan penjadwalan.
-- **About** - versi, tautan, proyek saudara (See also) dan manifest audit biner yang dibundel.
+  yang dikecualikan, opsi sumber pemasangan, kunci enkripsi, dan penjadwalan. Pengaturan aktif/mati memakai sakelar bergaya Android.
+- **About** - versi, tautan, proyek saudara (See also), manifest audit biner yang dibundel, dan aksi **Check for updates** yang melaporkan apakah versi yang lebih baru telah dirilis (beserta catatan rilisnya). Anda memasang pembaruan apa pun melalui manajer root Anda, sama seperti saat Anda mem-flash modul.
 
 Konfirmasi dan pesan memakai dialog dalam-aplikasi (bukan pop-up sistem lama), dan sebuah
 restore atau impor meminta Anda mengakui bahwa ia menimpa data aplikasi saat ini sebelum
@@ -134,7 +146,9 @@ melanjutkan.
 
 Backup dan restore berjalan **terlepas** sebagai proses root latar belakang. Anda bisa menutup
 WebUI, atau bahkan menutup manajer root, dan operasi tetap berjalan. Saat Anda kembali,
-WebUI reattach dan menampilkan kemajuan live dengan label fase terlokalisasi. Pada
+WebUI reattach dan menampilkan kemajuan live dengan label fase terlokalisasi. Untuk sebuah
+pekerjaan yang sedang berjalan, kartu kemajuan juga menampilkan kecepatan transfer live dan
+perkiraan waktu tersisa, plus penghitung item (misalnya "12 of 40") dengan nama item saat ini. Pada
 ROM yang menampilkan notifikasi shell, Anda juga mendapat notifikasi Android saat sebuah pekerjaan
 mulai dan selesai; bagaimanapun kartu kemajuan dalam-aplikasi adalah indikator yang andal.
 
@@ -230,16 +244,60 @@ Dua opsi keamanan membantu Anda memercayai sebuah backup sebelum mengandalkannya
   apa pun**. Gunakan untuk memperkirakan ruang atau memeriksa pilihan item Anda sebelum menjalankan
   yang sebenarnya.
 
-### 5.6 Backup khusus (pesan, log panggilan, Wi-Fi, Bluetooth)
+Ketika sebuah backup menuju tujuan **cloud**, VDBackup menambahkan dua pengaman lagi. Ia menjalankan
+langkah **terverifikasi-checksum** terakhir yang memeriksa ulang salinan yang diunggah terhadap aslinya
+di remote, dan menggagalkan pekerjaan (alih-alih meninggalkan salinan rusak di cloud) jika keduanya tidak
+cocok. Dan sebelum unggahan Full, ia memeriksa **ruang bebas** remote dan berhenti lebih awal dengan error
+**"ruang tidak cukup"** yang jelas jika backup tidak akan muat, alih-alih memenuhi remote dan gagal di
+tengah jalan. (Pemeriksaan ruang untuk unggahan Full; Mirror adalah sinkronisasi delta dan dikecualikan.)
+
+### 5.6 Backup khusus (pesan, log panggilan, Wi-Fi, Bluetooth, kalender, wallpaper, DNS, pengaturan sistem)
 
 Di bawah daftar aplikasi pada tab **Backups**, **Backup khusus** mencakup data sistem-wide
-yang tidak terikat pada satu aplikasi: **pesan (SMS/MMS)**, **kontak dan log panggilan**,
-**jaringan Wi-Fi** dan **Bluetooth**. Pilih kategorinya dan backup; mereka diarsipkan mentah,
+yang tidak terikat pada satu aplikasi. Pilih kategorinya dan backup; mereka diarsipkan
 dengan pelestarian SELinux/xattr yang sama dan enkripsi opsional seperti backup aplikasi.
-Secara opsional sebuah **salinan portabel** juga ditulis (pesan, log panggilan dan kontak
-sebagai JSON yang dapat dibuka), sehingga Anda punya salinan lintas-perangkat yang bisa dibaca di
-PC tanpa modul. Merestore special backup menimpa data sistem yang live dan butuh reboot, jadi
-ia dibatasi di balik pemberitahuan yang menonjol dan andal pada perangkat dan ROM yang sama.
+Kategorinya adalah:
+
+| Kategori | Apa itu |
+|----------|-----------|
+| **Pesan (SMS/MMS)** | Pesan teks Anda. |
+| **Kontak dan log panggilan** | Kontak dan riwayat panggilan Anda. |
+| **Jaringan Wi-Fi** | Jaringan Wi-Fi tersimpan Anda. |
+| **Bluetooth** | Pemasangan Bluetooth Anda. |
+| **Kalender** | Provider kalender (app dan data). Sebuah **`calendar.json` portabel** juga ditulis, sehingga acara Anda dapat dibaca di PC tanpa modul. |
+| **Wallpaper** | Wallpaper beranda dan layar-kunci Anda plus `wallpaper_info.xml`, disimpan sebagai gambar mentah. |
+| **DNS** | Mode DNS privat dan server Anda. |
+| **Pengaturan sistem** | Dump lengkap pengaturan system, global, dan secure perangkat. |
+
+Untuk pesan, log panggilan, dan kontak, sebuah **salinan portabel** (JSON yang dapat dibuka) juga
+ditulis, sehingga Anda punya salinan lintas-perangkat yang bisa dibaca di PC tanpa modul.
+
+**Pengaturan sistem bersifat opt-in dan menimpa pengaturan perangkat Anda saat restore.** Sama seperti
+SSAID (lihat [bagian 10](#bagian-10)), kategori **Pengaturan sistem** adalah yang paling sensitif:
+merestorenya menimpa pengaturan di seluruh perangkat Anda, jadi ia mati kecuali Anda sengaja memilihnya,
+meminta Anda mengakui terlebih dahulu, dan ditulis ke log aktivitas.
+
+Merestore backup khusus menimpa data sistem yang live dan butuh reboot, jadi ia dibatasi di balik
+pemberitahuan yang menonjol dan andal pada perangkat dan ROM yang sama. Restore bersifat **idempoten**:
+kategori mentah (pesan, kontak, Wi-Fi, Bluetooth, kalender) direstore dengan **mengganti** data alih-alih
+menggabungkannya, jadi merestore backup yang sama dua kali tidak pernah membuat duplikat, dan DNS serta
+pengaturan sistem cukup diterapkan ulang.
+
+### 5.7 Backup folder dan file mandiri
+
+Kadang Anda ingin membackup folder atau file biasa yang bukan aplikasi - sebuah folder kamera,
+sebuah direktori dokumen, satu basis data. VDBackup dapat membackup **sembarang path absolut** di
+penyimpanan bersama atau di bawah `/data`, dengan format portabel yang sama seperti backup aplikasi:
+sebuah arsip `tar.zst` plus sebuah `manifest.json`, disegel SHA-256, dengan catatan RECOVERY saat Anda
+mengenkripsinya. Backup path ini disimpan terpisah, di bawah folder `.paths` di direktori backups Anda.
+
+- **Pilih sebuah path dan backup.** Sumbernya harus sebuah path absolut di bawah salah satu lokasi
+  yang diizinkan (`/storage/emulated`, `/data/media`, `/sdcard`, `/data`). Path yang mencoba keluar
+  dengan `..` ditolak.
+- **Merestore menulis kembali ke lokasi asli**, jadi, seperti restore mana pun, ia merusak dan meminta
+  Anda **mengonfirmasi** sebelum menimpa apa pun.
+- Seperti backup aplikasi, backup dan restore path berjalan **terlepas** dengan kemajuan live, memakai
+  kompresi pilihan Anda, dan dapat dienkripsi dengan passphrase.
 
 ## 6. Merestore backup
 
@@ -250,7 +308,9 @@ mencatat tindakan tersebut dalam log audit lokal.
 Sebuah restore bersifat **setia**: VDBackup menghapus keadaan aplikasi saat ini dan mengekstrak
 backup, sehingga aplikasi dikembalikan ke **keadaan persis** yang ditangkap dalam backup itu
 (termasuk kepemilikan, mode, konteks SELinux dan xattr). Ia bukan merge - ia adalah
-restore sejati ke titik waktu backup.
+restore sejati ke titik waktu backup. Karena restore berjalan sebagai root, VDBackup juga memeriksa
+setiap arsip sebelum mengekstrak apa pun dan menolak arsip yang dirusak yang mencoba menulis di luar
+targetnya, sehingga backup yang dimodifikasi tidak akan pernah bisa menimpa sisa sistem Anda.
 
 Opsi restore yang berguna:
 
@@ -270,6 +330,11 @@ Opsi restore yang berguna:
   penginisiasi"** melangkah lebih jauh dan juga membuat paket penginisiasi dan sumber paket aplikasi
   tampak terpasang-dari-Play; ia mengedit basis data paket sistem (dibackup terlebih dahulu) dan berlaku
   setelah reboot.
+
+**Restore massal.** Tab **Backups** punya mode **Select**, sama seperti yang dimiliki tab **Apps** untuk backup
+massal. Aktifkan **Select**, centang backup yang Anda inginkan dengan kotak centangnya, dan restore semuanya
+sekaligus. Satu dialog opsi mencakup seluruh pilihan - pengakuan penimpaan, restore-test dan pilihan sumber-instal
+berlaku untuk setiap backup yang Anda pilih - dan mereka direstore satu demi satu.
 
 **Menghapus backup.** Buka detail sebuah backup (atau riwayat sebuah aplikasi) dan gunakan **Delete**;
 Anda diminta mengonfirmasi, dan penghapusan dicatat ke log aktivitas. Anda juga bisa membatasi
@@ -296,11 +361,16 @@ Transport remote ditangani oleh alat yang dibundel:
 - **restic** - repositori **Snapshot** terenkripsi dan ter-dedup (lokal atau remote).
 
 **Membuat remote cloud (tanpa butuh SSH).** Di tab Destinations, pilih tipe tujuan
-**rclone** dan gunakan **Add cloud remote**: pilih backend (SFTP,
-SMB, WebDAV, FTP, S3 atau Google Drive), isi field (host/user/password, atau
-kunci S3, atau token Drive) dan simpan. Remote lalu muncul di daftar remote tujuan.
-Kata sandi disimpan dalam keadaan tersamar, tidak pernah dalam teks polos. Anda bisa mendaftar dan
-menghapus remote Anda dari tempat yang sama.
+**rclone** dan gunakan **Add cloud remote**. Anda bisa menghubungkan **backend rclone apa pun**:
+menu dropdown menawarkan yang populer (**Google Drive, Dropbox, OneDrive, Box, pCloud, Mega,
+Backblaze B2, S3, SFTP, WebDAV, FTP, SMB**) ditambah opsi **Custom (advanced)** tempat Anda
+mengetik tipe backend lain apa pun beserta parameter `key=value`-nya. Isi field
+(host/user/password, atau kunci S3, misalnya) dan simpan. Untuk penyedia yang membuat Anda masuk
+lewat peramban (Google Drive, Dropbox, OneDrive, Box, pCloud), gunakan tombol **Authorize in
+browser**: ia membuat Anda masuk lewat peramban ponsel sendiri dan menangkap token secara
+otomatis, jadi **tidak butuh PC** (menempel token secara manual tetap berfungsi sebagai cadangan).
+Remote lalu muncul di daftar remote tujuan. Kata sandi disimpan dalam keadaan tersamar, tidak
+pernah dalam teks polos. Anda bisa mendaftar dan menghapus remote Anda dari tempat yang sama.
 
 Dua aturan menjaga penggunaan remote tetap aman:
 
@@ -332,19 +402,36 @@ Backup lokal tidak pernah terpengaruh.
 
 ## 8. Penjadwalan dan retensi
 
-VDBackup bisa menjalankan backup secara otomatis sesuai jadwal. Di penjadwal Anda menetapkan
+VDBackup bisa menjalankan backup - dan restore - secara otomatis sesuai jadwal. Di penjadwal Anda menetapkan
 sebuah pekerjaan dengan:
 
-- aplikasi (atau sekumpulan aplikasi) dan item/mode yang dipakai,
+- sebuah **target** - satu aplikasi, sekumpulan aplikasi, atau **semua aplikasi** (dikurangi daftar
+  aplikasi-yang-dikecualikan) - dan item/mode yang dipakai,
+- sebuah **action** - **Back up** (default) atau **Restore latest**, yang merestore backup terbaru dari setiap
+  aplikasi target,
 - sebuah tujuan,
 - **jadwal mirip-cron** - per jam, harian atau mingguan, pada waktu yang Anda pilih (HH:MM),
 - pengaturan **retensi**: **simpan N** backup terbaru untuk pekerjaan itu, yang lebih lama
-  dipangkas secara otomatis.
+  dipangkas secara otomatis,
+- **kondisi jalan** opsional: hanya di **Wi-Fi**, hanya saat **mengisi daya**, hanya pada atau di atas
+  **level baterai minimum**, dan hanya pada **hari-hari dalam seminggu** yang dipilih.
 
 Pekerjaan terjadwal dipicu oleh heartbeat saat-boot di modul: saat sebuah pekerjaan
 jatuh tempo ia berjalan, mencatat waktu jalankan-terakhirnya agar tidak memicu dua kali, dan menerapkan
 retensi untuk memangkas backup lama. Karena semuanya berjalan sebagai root di latar belakang,
 backup terjadwal tidak butuh WebUI terbuka.
+
+**Kondisi jalan (gerbang).** Sebuah pekerjaan terjadwal dapat membawa kondisi yang harus terpenuhi agar
+ia berjalan: hanya Wi-Fi, hanya mengisi daya, level baterai minimum, dan hari-hari tertentu dalam
+seminggu. Ketika sebuah pekerjaan jatuh tempo tetapi sebuah kondisi tidak terpenuhi, ia **dilewati dan
+dicoba lagi pada pemeriksaan berikutnya** - jadwalnya tidak maju, sehingga ia berjalan begitu kondisinya
+terpenuhi. Sebuah pemeriksaan keamanan termal bawaan juga melewati pekerjaan terjadwal selama perangkat
+terlalu panas. Setiap pelewatan seperti itu dicatat di log aktivitas.
+
+**Restore terjadwal menimpa pada setiap jalannya.** Sebuah pekerjaan **Restore latest** me-restore ulang backup
+terbaru dari setiap aplikasi target setiap kali ia terpicu, dan restore bersifat merusak: pada setiap jalannya ia
+**menimpa data aplikasi saat ini** dengan backup terbaru. Ini disengaja dan opt-in - pilih hanya bila Anda ingin
+target dipertahankan pada backup terbarunya.
 
 **Pencadangan otomatis saat pemasangan/pembaruan.** Di Settings Anda bisa mengaktifkan **pencadangan
 otomatis**: heartbeat latar belakang yang sama memperhatikan aplikasi yang baru dipasang atau diperbarui
@@ -352,10 +439,10 @@ dan membackup-nya untuk Anda (dengan retensi keep-N). Jalankan pertama hanya men
 sehingga mengaktifkannya tidak pernah membackup seluruh perangkat Anda sekaligus.
 
 **Aplikasi yang dikecualikan (blocklist).** Juga di Settings, Anda bisa mengecualikan aplikasi yang
-tidak pernah ingin dibackup secara otomatis atau sesuai jadwal; aplikasi yang dikecualikan dilewati oleh keduanya.
+tidak pernah ingin dibackup secara otomatis atau sesuai jadwal; Anda bisa menambahkan beberapa sekaligus (pilih-banyak), dan aplikasi yang dikecualikan dilewati oleh keduanya.
 
-**Log aktivitas.** Tab Schedule punya tombol **View activity log** yang menampilkan jejak audit lokal -
-backup, restore, penghapusan, jalankan terjadwal dan otomatis, serta pemangkasan - terbaru lebih dahulu.
+**Log aktivitas.** Tab Schedule punya tombol **View activity log** yang membuka layar penuh (seketika) menampilkan jejak audit lokal -
+backup, restore, penghapusan, jalankan terjadwal dan otomatis, serta pemangkasan - terbaru lebih dahulu. Aksi **Export logs** menyimpan berkas log (di dalam folder backup) yang bisa Anda lampirkan ke laporan umpan balik atau bug.
 
 ## 9. Migrasi masuk: mengimpor Neo-Backup dan Android-DataBackup
 
@@ -449,6 +536,10 @@ umum:
   menangkap backup buruk). Jalankan ulang backup.
 - `ERR_RESTORE_TEST` - sebuah restore-test gagal; backup tidak diekstrak/diverifikasi
   dengan bersih dan aplikasi live Anda dibiarkan tak tersentuh.
+- `ERR_UNSAFE_ARCHIVE` - sebuah arsip ditolak karena mencoba menulis di luar direktori targetnya
+  (path absolut atau `..`). Ini melindungi Anda dari backup yang dirusak; tidak ada yang ditulis.
+- `ERR_QUOTA` - sebuah remote cloud tidak punya cukup ruang bebas untuk unggahan Full; backup
+  dihentikan sebelum mengunggah apa pun.
 
 **Tujuan remote saya gagal.** Gunakan **tes** tujuan di tab Destinations
 untuk memvalidasi kredensial dan konektivitas. Ingat bahwa hanya tujuan cloud yang butuh

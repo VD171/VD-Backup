@@ -1,6 +1,9 @@
 {
-  "version": "v1.01",
-  "versionCode": 10100,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.01/VD-Backup-v1.01-universal-full.zip",
-  "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/master/CHANGELOG.md"
+  "version": "v1.03",
+  "versionCode": 10300,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.03/VD-Backup-v1.03-universal-full.zip",
+  "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/master/CHANGELOG.md",
+  "notes": "",
+  "size": 0,
+  "sha256": ""
 }

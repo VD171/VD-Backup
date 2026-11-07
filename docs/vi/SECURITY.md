@@ -31,3 +31,12 @@ sớm nhất có thể và ghi công bạn nếu bạn muốn.
   hãy chọn một cụm mật khẩu mạnh.
 - Ứng dụng đồng hành Google Drive tùy chọn luôn phải được ẩn bằng HMA-OSS để nó không
   làm lộ root hay bootloader đã mở khóa.
+- Việc khôi phục chạy với quyền root, nên mọi kho lưu trữ đều được kiểm tra trước khi ghi bất
+  cứ thứ gì: một bản backup có nội dung trỏ ra ngoài đích của nó (một đường dẫn tuyệt đối hoặc
+  một thành phần `..`) sẽ bị từ chối, và không tệp nào được giải nén cho đến khi toàn bộ kho
+  lưu trữ được chấp thuận.
+- Mọi tệp nhị phân và thư viện dựng sẵn đều có thể truy vết tới một nguồn thượng nguồn công khai đã ghim
+  với một SHA-256 được ghi lại, và bản kê khai được đóng gói trên thiết bị, nên tải trọng đi kèm có thể
+  được kiểm toán và tái tạo. Xem [BINARIES.md](BINARIES.md).
+
+*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến - xem [CONTRIBUTING.md](CONTRIBUTING.md).*

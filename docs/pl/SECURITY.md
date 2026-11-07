@@ -31,3 +31,12 @@ szybko, jak zdołamy, i wymienimy Cię w podziękowaniach, jeśli sobie tego ży
   wybierz silne.
 - Opcjonalna aplikacja towarzysząca Google Drive powinna być zawsze ukryta za pomocą HMA-OSS, aby nie
   ujawniała roota ani odblokowanego bootloadera.
+- Przywracanie działa jako root, więc każde archiwum jest sprawdzane, zanim cokolwiek zostanie
+  zapisane: kopia zapasowa, której zawartość wskazuje poza swój cel (ścieżka bezwzględna lub
+  komponent `..`), zostaje odrzucona, a żaden plik nie jest wypakowywany, dopóki całe archiwum
+  nie przejdzie weryfikacji.
+- Każdy prekompilowany plik binarny i biblioteka są możliwe do prześledzenia do przypiętego publicznego
+  źródła nadrzędnego z zapisanym SHA-256, a manifest jest dostarczany na urządzeniu, więc dołączony
+  ładunek można poddać audytowi i odtworzyć. Zobacz [BINARIES.md](BINARIES.md).
+
+*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane - zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*

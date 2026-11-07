@@ -17,6 +17,7 @@
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
   <a href="docs/USER-GUIDE.md">Gebruikershandleiding</a> ·
   <a href="docs/AI-AGENTS.md">AI-agenten</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
   <a href="CONTRIBUTING.md">Bijdragen</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA-thread</a>
 </p>
@@ -51,12 +52,14 @@ bestaande back-ups van Neo-Backup en Android-DataBackup importeren zodat je kunt
   plus `rsync`- en `restic`-repository's. Optioneel Google Drive via een piepkleine optionele begeleider.
 - **Integriteit:** elk archief wordt geverifieerd tegen het manifest; droogloop (dry-run)
   en hersteltest laten je een back-up controleren zonder iets aan te raken.
-- **Selectief herstel:** herstel een willekeurige deelverzameling van de items van een back-up;
-  verwijder back-ups en houd een activiteiten-/auditlogboek bij van elke destructieve actie.
+- **Selectief herstel en herstel in batch:** herstel een willekeurige deelverzameling van de items van
+  een back-up, of selecteer meerdere back-ups en herstel ze allemaal tegelijk; verwijder back-ups en
+  houd een activiteiten-/auditlogboek bij van elke destructieve actie.
 - **Speciale back-ups:** berichten (SMS/MMS), contacten en belgeschiedenis, Wi-Fi en Bluetooth,
   met een optionele draagbare JSON-export die je op een pc kunt openen.
-- **Planning + automatisering:** terugkerende taken met keep-N-opschoning, plus optionele
-  automatische back-up bij installatie/update en een lijst met uitgesloten apps.
+- **Planning + automatisering:** terugkerende **back-up- of hersteltaken** gericht op een app, een set,
+  of alle apps, met keep-N-opschoning, plus optionele automatische back-up bij installatie/update en een
+  lijst met uitgesloten apps.
 - **Installatiebron:** herstelde apps melden standaard de Play Store als hun installatiebron
   (in/uit te schakelen); een geavanceerde optionele instelling vervalst ook het initiërende pakket en de bron.
 - **System-app-aankoppeling:** koppel een geïnstalleerde app als system-app aan zonder de echte
@@ -66,6 +69,14 @@ bestaande back-ups van Neo-Backup en Android-DataBackup importeren zodat je kunt
 - **Migreren:** importeert bestaande back-ups van Neo-Backup en Android-DataBackup,
   inclusief met wachtwoord versleutelde.
 
+## Schermafbeeldingen
+
+| Start | Apps | Planning |
+|:---:|:---:|:---:|
+| ![Start](docs/screenshots/nl/home-dark.png) | ![Apps](docs/screenshots/nl/apps-dark.png) | ![Planning](docs/screenshots/nl/schedule-dark.png) |
+| **Bestemmingen** | **Instellingen** | **Activiteitenlogboek** |
+| ![Bestemmingen](docs/screenshots/nl/destinations-dark.png) | ![Instellingen](docs/screenshots/nl/settings-dark.png) | ![Activiteitenlogboek](docs/screenshots/nl/activitylog-dark.png) |
+
 ## Installatie
 
 1. Download de nieuwste `VD-Backup-vX.Y.zip` van [Releases](https://github.com/VD171/VD-Backup/releases).
@@ -73,12 +84,17 @@ bestaande back-ups van Neo-Backup en Android-DataBackup importeren zodat je kunt
 3. Open de **WebUI** van de module om back-ups te configureren en uit te voeren. Dat is alles.
 
 **Edities.** Zes zips per release. `universal-full` - elke architectuur en elke binary
-(incl. `rclone` voor cloud-providers, `restic` voor snapshots), elk apparaat, grootst.
-`universal-lite` - elke architectuur zonder de twee grootste binaries (`rclone`, `restic`),
-kleinst, en doet nog steeds lokale, SSH/SFTP- en `rsync`-back-ups. `<abi>-full` (`arm64-v8a`,
-`armeabi-v7a`, `x86`, `x86_64`) - één architectuur met elke binary, kleiner dan
-`universal-full`. Ken je je architectuur -> kies `<abi>-full`; wil je de kleinste of geen
-cloud-giganten -> `universal-lite`; alles op elk apparaat -> `universal-full`. Zie
+ingebouwd (incl. `rclone` voor cloud-providers, `restic` voor snapshots), volledig offline,
+er wordt nooit iets gedownload, elk apparaat, grootst. `universal-lite` - elke architectuur
+zonder de twee grootste binaries (`rclone`, `restic`), kleinst; doet nog steeds lokale,
+SSH/SFTP- en `rsync`-back-ups zonder download, en de eerste keer dat je een cloud-bestemming
+(`rclone`) of snapshot-modus (`restic`) gebruikt, biedt het aan die kleine
+architectuurspecifieke add-on eenmalig te downloaden (geverifieerd met SHA-256) en te
+cachen, zodat die functies ook werken. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`,
+`x86_64`) - één architectuur met elke binary ingebouwd, kleiner dan `universal-full`. Ken je
+je architectuur -> kies `<abi>-full`; wil je de kleinste en vind je een eenmalige download
+voor cloud of snapshots geen bezwaar -> `universal-lite`; wil je alles ingebouwd zonder
+downloads (offline / herstel) -> een full-editie. Zie
 [Releases](https://github.com/VD171/VD-Backup/releases).
 
 Nieuw hier? De [Gebruikershandleiding](docs/USER-GUIDE.md) leidt je van installatie tot herstel.
@@ -101,7 +117,7 @@ De module is shell + WebUI plus statische binaries per ABI (`tar`, `zstd`, `lz4`
 - **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - de documentatie, online te doorbladeren.
 - **[Gebruikershandleiding](docs/USER-GUIDE.md)** - van begin tot eind, van installatie tot herstel.
 - **[AI-agenten](docs/AI-AGENTS.md)** - stuur elke actie headless aan via de JSON-API.
-- **[Architectuur](ARCHITECTURE.md)** en **[Bestandsstructuur](docs/FILE-STRUCTURE.md)** - hoe het werkt.
+- **[Architectuur](docs/ARCHITECTURE.md)** en **[Bestandsstructuur](docs/FILE-STRUCTURE.md)** - hoe het werkt.
 - **[Meegeleverde binaries](docs/BINARIES.md)** - herkomst en SHA-256 van elke voorgecompileerde binary, voor een volledige audit.
 - **[Herstel](module/etc/RECOVERY.md)** - een backup op een pc openen en ontsleutelen, zonder de module.
 - **[Bijdragen](CONTRIBUTING.md)** en **[Beveiliging](SECURITY.md)**.

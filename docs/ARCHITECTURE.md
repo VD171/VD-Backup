@@ -1,4 +1,4 @@
-> **Languages:** English · [العربية](docs/ar/ARCHITECTURE.md) · [Čeština](docs/cs/ARCHITECTURE.md) · [Deutsch](docs/de/ARCHITECTURE.md) · [Español](docs/es/ARCHITECTURE.md) · [فارسی](docs/fa/ARCHITECTURE.md) · [Français](docs/fr/ARCHITECTURE.md) · [हिन्दी](docs/hi/ARCHITECTURE.md) · [Bahasa Indonesia](docs/in/ARCHITECTURE.md) · [Italiano](docs/it/ARCHITECTURE.md) · [日本語](docs/ja/ARCHITECTURE.md) · [한국어](docs/ko/ARCHITECTURE.md) · [Nederlands](docs/nl/ARCHITECTURE.md) · [Polski](docs/pl/ARCHITECTURE.md) · [Português](docs/pt/ARCHITECTURE.md) · [Русский](docs/ru/ARCHITECTURE.md) · [Svenska](docs/sv/ARCHITECTURE.md) · [ไทย](docs/th/ARCHITECTURE.md) · [Türkçe](docs/tr/ARCHITECTURE.md) · [Tiếng Việt](docs/vi/ARCHITECTURE.md) · [中文](docs/zh/ARCHITECTURE.md)
+> **Languages:** English · [العربية](ar/ARCHITECTURE.md) · [Čeština](cs/ARCHITECTURE.md) · [Deutsch](de/ARCHITECTURE.md) · [Español](es/ARCHITECTURE.md) · [فارسی](fa/ARCHITECTURE.md) · [Français](fr/ARCHITECTURE.md) · [हिन्दी](hi/ARCHITECTURE.md) · [Bahasa Indonesia](in/ARCHITECTURE.md) · [Italiano](it/ARCHITECTURE.md) · [日本語](ja/ARCHITECTURE.md) · [한국어](ko/ARCHITECTURE.md) · [Nederlands](nl/ARCHITECTURE.md) · [Polski](pl/ARCHITECTURE.md) · [Português](pt/ARCHITECTURE.md) · [Русский](ru/ARCHITECTURE.md) · [Svenska](sv/ARCHITECTURE.md) · [ไทย](th/ARCHITECTURE.md) · [Türkçe](tr/ARCHITECTURE.md) · [Tiếng Việt](vi/ARCHITECTURE.md) · [中文](zh/ARCHITECTURE.md)
 
 ---
 
@@ -85,3 +85,5 @@ allowed; new capabilities are added behind `format_version` and new, additive fi
 For the full technical design (archive format, metadata schema, pipelines, crypto,
 destinations, importers) the maintainers keep detailed design notes; this file is the
 contributor-facing overview.
+
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome - see [CONTRIBUTING.md](../CONTRIBUTING.md).*

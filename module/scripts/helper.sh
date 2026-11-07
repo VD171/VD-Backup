@@ -164,12 +164,118 @@ auto_backup_scan() {                              # <jq> <now>; echoes detached 
   cp "$_cur" "$_seen"; chmod 600 "$_seen"; rm -f "$_cur"
 }
 
+# resolve a schedule job's target packages: explicit list (.packages), single (.package),
+# or every user-3 app (.all), always minus the blocklist. Echoes one package per line.
+job_targets() {                                   # <jq> <jobfile>
+  _jq="$1"; _jf="$2"
+  _ju="$("$_jq" -r '.user // 0' "$_jf" 2>/dev/null)"; case "$_ju" in ''|*[!0-9]*) _ju=0 ;; esac
+  if [ "$("$_jq" -r '.all // false' "$_jf" 2>/dev/null)" = true ]; then
+    pm list packages -3 --user "$_ju" 2>/dev/null | sed 's/^package://'
+  else
+    "$_jq" -r '([(.package // empty)] + (.packages // [])) | .[] | select(. != "")' "$_jf" 2>/dev/null
+  fi | while IFS= read -r _p; do
+    case "$_p" in ''|*..*|*/*|*' '*) continue ;; esac
+    "$_jq" -e --arg p "$_p" '((.blocklist // []) | index($p)) != null' "$STATE/config.json" >/dev/null 2>&1 && continue
+    printf '%s\n' "$_p"
+  done
+}
+# newest backup ref (dir holding manifest.json) for a package, for restore jobs
+latest_ref() {                                    # <user> <pkg>
+  _ld="$(bdir "$1")/$2"; [ -d "$_ld" ] || return 0
+  for _c in $(ls -1 "$_ld" 2>/dev/null | sort -r); do
+    [ -f "$_ld/$_c/manifest.json" ] && { printf '%s\n' "$_ld/$_c"; return 0; }
+  done
+}
+
+# --- scheduler gate probes (used by scheduler-tick; scheduler-launched ops only) ----
+# active transport is wifi? dumpsys connectivity, else the default-route interface.
+sched_is_wifi() {
+  _sd="$(dumpsys connectivity 2>/dev/null)"
+  _sid="$(printf '%s' "$_sd" | sed -n 's/.*[Aa]ctive default network[^0-9]*\([0-9][0-9]*\).*/\1/p' | head -1)"
+  if [ -n "$_sid" ]; then
+    case "$(printf '%s' "$_sd" | grep -m1 "network{$_sid}")" in
+      *TRANSPORT_WIFI*)     return 0 ;;
+      *TRANSPORT_CELLULAR*) return 1 ;;
+    esac
+  fi
+  case "$(printf '%s' "$_sd" | grep -iE 'type: WIFI.*CONNECTED' | head -1)" in *WIFI*) return 0 ;; esac
+  case "$(ip route show default 2>/dev/null | sed -n 's/.* dev \([^ ]*\).*/\1/p' | head -1)" in wlan*) return 0 ;; esac
+  return 1
+}
+# charging now? dumpsys battery: any power source, or status charging(2)/full(5).
+sched_charging() {
+  _sb="$(dumpsys battery 2>/dev/null)"
+  case "$_sb" in
+    *"AC powered: true"*|*"USB powered: true"*|*"Wireless powered: true"*|*"Dock powered: true"*) return 0 ;;
+  esac
+  case "$(printf '%s' "$_sb" | sed -n 's/.*status: \([0-9][0-9]*\).*/\1/p' | head -1)" in 2|5) return 0 ;; esac
+  return 1
+}
+# battery level 0-100; an unknown reading returns 100 so it never blocks.
+sched_batt_level() {
+  _sl="$(dumpsys battery 2>/dev/null | sed -n 's/.*level: \([0-9][0-9]*\).*/\1/p' | head -1)"
+  case "$_sl" in ''|*[!0-9]*) printf '100' ;; *) printf '%s' "$_sl" ;; esac
+}
+# any thermal zone at/above its own critical/hot trip (or an 85C fallback)? Robust
+# across ROMs: unreadable/non-numeric zones are no constraint.
+sched_too_hot() {
+  for _tz in /sys/class/thermal/thermal_zone*/temp; do
+    [ -r "$_tz" ] || continue
+    _tzv="$(cat "$_tz" 2>/dev/null)"; case "$_tzv" in ''|*[!0-9]*) continue ;; esac
+    _tzc=85000; _tzd="${_tz%/temp}"
+    for _tp in "$_tzd"/trip_point_*_type; do
+      [ -r "$_tp" ] || continue
+      case "$(cat "$_tp" 2>/dev/null)" in
+        critical|hot)
+          _tpv="$(cat "${_tp%_type}_temp" 2>/dev/null)"
+          case "$_tpv" in ''|*[!0-9]*) ;; *) _tzc="$_tpv"; break ;; esac ;;
+      esac
+    done
+    [ "$_tzv" -ge "$_tzc" ] && return 0
+  done
+  return 1
+}
+
 verb="$1"; ARGS_B64="$2"
 
 case "$verb" in
 
   ping)
     ok "\"version\":\"$(sed -n 's/^version=//p' "$MODDIR/module.prop")\",\"abi\":\"$abi\"" ;;
+
+  update-check)
+    # fetch the published update manifest (module.prop updateJson) and compare its
+    # versionCode with the installed one. Runs outside the webview (no CSP), on explicit
+    # user action only. The actual update is done by the root manager. Fetch prefers the
+    # bundled curl; if curl is absent (e.g. a build without it) it falls back to the
+    # bundled rclone's on-the-fly http backend (no remote config needed), so the check
+    # works on any device with network, not only where curl is shipped.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    cur_ver="$(sed -n 's/^version=//p' "$MODDIR/module.prop")"
+    cur_code="$(sed -n 's/^versionCode=//p' "$MODDIR/module.prop")"; case "$cur_code" in ''|*[!0-9]*) cur_code=0 ;; esac
+    url="$(sed -n 's/^updateJson=//p' "$MODDIR/module.prop")"
+    [ -n "$url" ] || { err ERR_UPDATE_CHECK "no updateJson url"; exit 0; }
+    j=""
+    if [ -x "$BIN/curl" ] || [ -x "$STATE/bin/curl" ] || command -v curl >/dev/null 2>&1; then
+      _curl="$(command -v "$BIN/curl" 2>/dev/null || command -v "$STATE/bin/curl" 2>/dev/null || echo curl)"
+      j="$("$_curl" -fsSL --max-time 20 "$url" 2>/dev/null)"
+    fi
+    if [ -z "$j" ]; then
+      _rcl="$(command -v "$BIN/rclone" 2>/dev/null || command -v "$STATE/bin/rclone" 2>/dev/null || echo rclone)"
+      j="$("$_rcl" cat ":http:${url##*/}" --http-url "${url%/*}" --timeout 20s 2>/dev/null)"
+    fi
+    [ -n "$j" ] || { err ERR_UPDATE_CHECK "could not fetch the update manifest"; exit 0; }
+    lv="$(printf '%s' "$j" | "$JQ" -r '.version // empty' 2>/dev/null)"
+    lc="$(printf '%s' "$j" | "$JQ" -r '.versionCode // 0' 2>/dev/null)"; case "$lc" in ''|*[!0-9]*) lc=0 ;; esac
+    { [ -n "$lv" ] && [ "$lc" -gt 0 ]; } || { err ERR_UPDATE_CHECK "invalid update manifest"; exit 0; }
+    zu="$(printf '%s' "$j" | "$JQ" -r '.zipUrl // empty' 2>/dev/null)"
+    cl="$(printf '%s' "$j" | "$JQ" -r '.changelog // empty' 2>/dev/null)"
+    nt="$(printf '%s' "$j" | "$JQ" -r '.notes // empty' 2>/dev/null)"
+    upd=false; [ "$lc" -gt "$cur_code" ] && upd=true
+    "$JQ" -nc --arg cv "$cur_ver" --argjson cc "$cur_code" --arg lv "$lv" --argjson lc "$lc" \
+      --argjson ua "$upd" --arg zu "$zu" --arg cl "$cl" --arg nt "$nt" \
+      '{ok:true, current_version:$cv, current_code:$cc, latest_version:$lv, latest_code:$lc,
+        update_available:$ua, zipUrl:$zu, changelog:$cl, notes:$nt}' ;;
 
   config-get)
     if [ -f "$STATE/config.json" ]; then cat "$STATE/config.json"; else echo '{}'; fi ;;
@@ -278,19 +384,41 @@ case "$verb" in
     done
     printf '}}\n' ;;
 
-  backup|restore|import|special-backup|special-restore)
+  backup|restore|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore)
     opid="$(new_opid)"
     detach "$opid" "$verb" "$ARGS_B64"
     ok "\"opid\":\"$opid\"" ;;
 
+  cloud-status)
+    # what cloud binaries are available (embedded in bin/ or fetched into $STATE/bin),
+    # and whether this (lite) build can fetch them on demand + the download size.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    has_r=false; { [ -x "$BIN/rclone" ] || [ -x "$STATE/bin/rclone" ]; } && has_r=true
+    has_s=false; { [ -x "$BIN/restic" ] || [ -x "$STATE/bin/restic" ]; } && has_s=true
+    fetchable=false; size=0
+    if [ -f "$MODDIR/etc/cloud_addons.json" ]; then
+      url="$("$JQ" -r --arg a "$BINABI" '.[$a].url // empty' "$MODDIR/etc/cloud_addons.json" 2>/dev/null)"
+      [ -n "$url" ] && fetchable=true
+      size="$("$JQ" -r --arg a "$BINABI" '.[$a].size // 0' "$MODDIR/etc/cloud_addons.json" 2>/dev/null)"
+      case "$size" in ''|*[!0-9]*) size=0 ;; esac
+    fi
+    "$JQ" -nc --argjson r "$has_r" --argjson s "$has_s" --argjson f "$fetchable" --argjson sz "$size" \
+      '{ok:true,rclone:$r,restic:$s,fetchable:$f,size:$sz}' ;;
+
   special-categories)
-    # available special-backup categories + whether each has data on this device
+    # available special-backup categories + whether each has data on this device.
+    # dns/system_settings are settings-based (not path-based); system_settings is
+    # opt-in (it overwrites device settings on restore, gated by .system_settings).
     avail() { for p in "$@"; do [ -e "$p" ] && { echo true; return; }; done; echo false; }
     m="$(avail /data/data/com.android.providers.telephony /data/user_de/0/com.android.providers.telephony)"
     c="$(avail /data/data/com.android.providers.contacts /data/user_de/0/com.android.providers.contacts)"
     w="$(avail /data/misc/wifi /data/misc/apexdata/com.android.wifi)"
     b="$(avail /data/misc/bluedroid /data/misc/bluetooth /data/data/com.android.bluetooth)"
-    printf '{"ok":true,"categories":[{"id":"messages","available":%s},{"id":"contacts","available":%s},{"id":"wifi","available":%s},{"id":"bluetooth","available":%s}]}\n' "$m" "$c" "$w" "$b" ;;
+    cal="$(avail /data/data/com.android.providers.calendar /data/user_de/0/com.android.providers.calendar)"
+    wp="$(avail /data/system/users/0/wallpaper /data/system/users/0/wallpaper_lock /data/system/users/0/wallpaper_info.xml)"
+    dnsmode="$(env -u LD_LIBRARY_PATH /system/bin/settings get global private_dns_mode 2>/dev/null)"
+    dns=false; case "$dnsmode" in ''|null) ;; *) dns=true ;; esac
+    printf '{"ok":true,"categories":[{"id":"messages","available":%s},{"id":"contacts","available":%s},{"id":"wifi","available":%s},{"id":"bluetooth","available":%s},{"id":"calendar","available":%s},{"id":"wallpaper","available":%s},{"id":"dns","available":%s},{"id":"system_settings","available":true,"opt_in":true}]}\n' "$m" "$c" "$w" "$b" "$cal" "$wp" "$dns" ;;
 
   special-list)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
@@ -390,6 +518,53 @@ case "$verb" in
     done
     printf ']}\n' ;;
 
+  path-list)
+    # standalone folder/file backups (kind:"path") live under .paths/ in the backups
+    # dir and are not app backups, so list-backups skips them. Same manifest shape.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    _a="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    _bk="$(bdir "$(printf '%s' "$_a" | "$JQ" -r '.user // 0' 2>/dev/null)")"
+    printf '{"ok":true,"backups":['
+    first=1
+    for m in "$_bk"/.paths/*/manifest.json; do
+      [ -f "$m" ] || continue
+      [ "$("$JQ" -r '.kind // empty' "$m" 2>/dev/null)" = path ] || continue
+      [ "$first" = 1 ] || printf ','; first=0
+      "$JQ" -c --arg ref "$(dirname "$m")" \
+        '{ref:$ref, source:(.source // ""), created_at:(.created_at // ""),
+          encryption:(.encryption // "none"), compression:(.compression // "")}' "$m" 2>/dev/null
+    done
+    printf ']}\n' ;;
+
+  overview)
+    # aggregate stats for the home/overview UI: app-backup counts, standalone path
+    # backups, scheduled jobs, total backups size and the filesystem free/total.
+    # Read-only; returns immediately. du is cheap on this tree.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    _a="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    u="$(printf '%s' "$_a" | "$JQ" -r '.user // 0' 2>/dev/null)"; case "$u" in ''|*[!0-9]*) u=0 ;; esac
+    bk="$(bdir "$u")"
+    apps=0; insts=0
+    for d in "$bk"/*/; do
+      [ -d "$d" ] || continue
+      case "$d" in "$bk"/.paths/) continue ;; esac
+      _c=0; for s in "$d"*/; do [ -d "$s" ] && _c=$(( _c + 1 )); done
+      [ "$_c" -gt 0 ] || continue
+      apps=$(( apps + 1 )); insts=$(( insts + _c ))
+    done
+    paths=0; for d in "$bk"/.paths/*/; do [ -d "$d" ] && paths=$(( paths + 1 )); done
+    jobs=0; for f in "$STATE/jobs"/*.json; do [ -f "$f" ] && jobs=$(( jobs + 1 )); done
+    size=0; if [ -d "$bk" ]; then size="$(du -s -B1 "$bk" 2>/dev/null | cut -f1)"; case "$size" in ''|*[!0-9]*) size=0 ;; esac; fi
+    _dfp="$bk"; [ -d "$_dfp" ] || _dfp="/data/media/$u"; [ -d "$_dfp" ] || _dfp=/data
+    free=0; total=0
+    set -- $(df -kP "$_dfp" 2>/dev/null | tail -1)
+    case "${2:-}" in *[0-9]*) total=$(( $2 * 1024 )) ;; esac
+    case "${4:-}" in *[0-9]*) free=$(( $4 * 1024 )) ;; esac
+    "$JQ" -nc --argjson apps "$apps" --argjson instances "$insts" --argjson paths "$paths" \
+      --argjson jobs "$jobs" --argjson size "$size" --argjson free "$free" --argjson total "$total" \
+      '{ok:true, apps:$apps, instances:$instances, path_backups:$paths, jobs:$jobs,
+        backups_size:$size, free:$free, total:$total}' ;;
+
   backup-info)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
     ref="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.ref // empty' 2>/dev/null)"
@@ -461,7 +636,10 @@ case "$verb" in
     name="$(printf '%s' "$j" | "$JQ" -r '.name // empty' 2>/dev/null)"
     be="$(printf '%s' "$j" | "$JQ" -r '.backend // empty' 2>/dev/null)"
     case "$name" in ''|*/*|*' '*|*:*|'['*|*']'*) err ERR_REMOTE_NAME "invalid or missing remote name"; exit 0 ;; esac
-    case "$be" in sftp|smb|webdav|ftp|s3|drive) ;; *) err ERR_REMOTE_BACKEND "unsupported backend"; exit 0 ;; esac
+    # accept any rclone backend (dropbox, onedrive, box, pcloud, mega, b2, ... all ~70):
+    # the name must be a plain rclone backend token; rclone itself rejects an unknown one
+    # (-> ERR_REMOTE_ADD). Params are passed as separate argv, so there is no injection.
+    case "$be" in ''|*[!a-z0-9]*) err ERR_REMOTE_BACKEND "invalid backend"; exit 0 ;; esac
     set --; OBS=
     for kv in $(printf '%s' "$j" | "$JQ" -r '.params // {} | to_entries[] | "\(.key)=\(.value|@base64)"' 2>/dev/null); do
       k="${kv%%=*}"; v="$(printf '%s' "${kv#*=}" | base64 -d 2>/dev/null)"
@@ -472,6 +650,51 @@ case "$verb" in
     if "$BIN/rclone" --config "$STATE/rclone.conf" listremotes 2>/dev/null | grep -qx "$name:"; then
       chmod 600 "$STATE/rclone.conf" 2>/dev/null; ok "\"name\":\"$(jstr "$name")\",\"backend\":\"$(jstr "$be")\""
     else err ERR_REMOTE_ADD "could not create the rclone remote"; fi ;;
+
+  remote-authorize)
+    # on-device OAuth for backends that need a browser (dropbox/onedrive/box/pcloud/...).
+    # `rclone authorize <backend>` starts a local callback server on 127.0.0.1:53682 and
+    # prints a consent URL; we open that URL in the phone browser (am VIEW) so the user
+    # consents right here, the redirect returns to localhost and rclone captures the
+    # token. The WebUI polls remote-authorize-poll for the token, then calls remote-add.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    be="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.backend // empty' 2>/dev/null)"
+    case "$be" in ''|*[!a-z0-9]*) err ERR_REMOTE_BACKEND "invalid backend"; exit 0 ;; esac
+    mkdir -p "$STATE/staging" 2>/dev/null
+    if [ -f "$STATE/staging/authorize.pgid" ]; then kill -- "-$(cat "$STATE/staging/authorize.pgid" 2>/dev/null)" 2>/dev/null; fi
+    out="$STATE/staging/authorize.out"; : > "$out"
+    RB="$BIN/rclone"; export RB be out
+    # a branded success/failure page in the device browser (path has no spaces).
+    TPL="$MODDIR/etc/authorize-landing.html"; [ -f "$TPL" ] || TPL=""; export TPL
+    setsid sh -c '"$RB" authorize "$be" ${TPL:+--template $TPL} > "$out" 2>&1; echo __AUTHDONE__ >> "$out"' &
+    echo "$!" > "$STATE/staging/authorize.pgid"
+    url=""; i=0
+    while [ "$i" -lt 10 ]; do
+      url="$(sed -n 's#.*following link: \(http://127\.0\.0\.1:53682/[^ ]*\).*#\1#p' "$out" 2>/dev/null | head -1)"
+      [ -n "$url" ] && break
+      sleep 1; i=$((i+1))
+    done
+    [ -n "$url" ] && env -u LD_LIBRARY_PATH /system/bin/am start -a android.intent.action.VIEW -d "$url" >/dev/null 2>&1
+    if [ -n "$url" ]; then ok "\"url\":\"$(jstr "$url")\""; else err ERR_AUTHORIZE "no consent URL from rclone (is the device online?)"; fi ;;
+
+  remote-authorize-poll)
+    # poll the authorize output: {done:false,url} while waiting, {done:true,token} once
+    # the user has consented, or ERR_AUTHORIZE if it finished without a token.
+    out="$STATE/staging/authorize.out"
+    [ -f "$out" ] || { err ERR_AUTHORIZE "no authorization in progress"; exit 0; }
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    tok="$(sed -n '/Paste the following into your remote machine/,/End paste/p' "$out" 2>/dev/null | grep -m1 '^{.*}$')"
+    if [ -n "$tok" ]; then "$JQ" -nc --arg t "$tok" '{ok:true,done:true,token:$t}'
+    elif grep -q '__AUTHDONE__' "$out" 2>/dev/null; then err ERR_AUTHORIZE "authorization finished without a token (cancelled or denied)"
+    else
+      url="$(sed -n 's#.*following link: \(http://127\.0\.0\.1:53682/[^ ]*\).*#\1#p' "$out" 2>/dev/null | head -1)"
+      "$JQ" -nc --arg u "$url" '{ok:true,done:false,url:$u}'
+    fi ;;
+
+  remote-authorize-cancel)
+    if [ -f "$STATE/staging/authorize.pgid" ]; then kill -- "-$(cat "$STATE/staging/authorize.pgid" 2>/dev/null)" 2>/dev/null; fi
+    rm -f "$STATE/staging/authorize.out" "$STATE/staging/authorize.pgid"
+    ok '"cancelled":true' ;;
 
   remote-list)
     printf '{"ok":true,"remotes":['
@@ -516,17 +739,29 @@ case "$verb" in
     j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
     id="$(printf '%s' "$j" | "$JQ" -r '.id // empty' 2>/dev/null)"
     case "$id" in ""|*/*|*' '*) err ERR_JOB_ID "invalid or missing job id"; exit 0 ;; esac
-    pkg="$(printf '%s' "$j" | "$JQ" -r '.package // empty' 2>/dev/null)"
-    case "$pkg" in ''|*..*|*/*|*' '*) err ERR_JOB_PKG "job needs a valid package"; exit 0 ;; esac
+    # target: a single .package, an explicit .packages[], or .all (every user app)
+    has_t="$(printf '%s' "$j" | "$JQ" -r '((.package // "") != "") or (((.packages // []) | length) > 0) or (.all == true)' 2>/dev/null)"
+    [ "$has_t" = true ] || { err ERR_JOB_PKG "job needs a package, packages[] or all:true"; exit 0; }
+    bad="$(printf '%s' "$j" | "$JQ" -r '([(.package // empty)] + (.packages // [])) | .[] | select((test("[/ ]")) or (test("\\.\\.")))' 2>/dev/null)"
+    [ -z "$bad" ] || { err ERR_JOB_PKG "invalid package name in job"; exit 0; }
+    action="$(printf '%s' "$j" | "$JQ" -r '.action // "backup"' 2>/dev/null)"
+    case "$action" in backup|restore) : ;; *) err ERR_JOB_ACTION "action must be backup or restore"; exit 0 ;; esac
     mkdir -p "$STATE/jobs"; chmod 700 "$STATE/jobs" 2>/dev/null
     old_last=0
     [ -f "$STATE/jobs/$id.json" ] && old_last="$("$JQ" -r '.last_run // 0' "$STATE/jobs/$id.json" 2>/dev/null)"
     case "$old_last" in ''|*[!0-9]*) old_last=0 ;; esac
     tmp="$STATE/jobs/.$id.tmp"
+    # optional gate fields (require_wifi/require_charging/min_battery/days) pass through
+    # when present and are left unset when absent (no forced defaults); types normalized.
     printf '%s' "$j" | "$JQ" --argjson old_last "$old_last" '
         .keep = (.keep // 5) | .cron = (.cron // "daily")
       | .mode = (.mode // "full") | .dest = (.dest // "local")
-      | .last_run = (.last_run // $old_last)' > "$tmp" 2>/dev/null \
+      | .action = (.action // "backup")
+      | .last_run = (.last_run // $old_last)
+      | (if has("require_wifi")     then .require_wifi     = (.require_wifi == true)     else . end)
+      | (if has("require_charging") then .require_charging = (.require_charging == true) else . end)
+      | (if (has("min_battery") and ((.min_battery|type) == "string")) then .min_battery = ((.min_battery|tonumber?) // .min_battery) else . end)
+      | (if has("days") then .days = ((.days // []) | map(if type == "string" then (tonumber? // empty) else . end)) else . end)' > "$tmp" 2>/dev/null \
       && mv "$tmp" "$STATE/jobs/$id.json" && chmod 600 "$STATE/jobs/$id.json" \
       && "$JQ" -c '{ok:true,job:.}' "$STATE/jobs/$id.json" \
       || { rm -f "$tmp"; err ERR_JOB_WRITE "could not store job"; } ;;
@@ -558,6 +793,9 @@ case "$verb" in
     now="$(date +%s)"
     mkdir -p "$STATE/jobs"
     RAN=""; PRUNED=""; checked=0; launchn=0
+    # a transient gate skips the job WITHOUT stamping last_run (retries next tick) + audits
+    gate_skip() { printf '{"ts":"%s","op":"scheduler-gated","id":"%s","reason":"%s"}\n' \
+      "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(jstr "$id")" "$(jstr "$1")" >> "$LOGS/audit.jsonl"; }
     for f in "$STATE/jobs"/*.json; do
       [ -f "$f" ] || continue
       checked=$(( checked + 1 ))
@@ -566,21 +804,49 @@ case "$verb" in
       at="$("$JQ" -r '.at // empty' "$f" 2>/dev/null)"
       last="$("$JQ" -r '.last_run // 0' "$f" 2>/dev/null)"; case "$last" in ''|*[!0-9]*) last=0 ;; esac
       keep="$("$JQ" -r '.keep // 5' "$f" 2>/dev/null)"; case "$keep" in ''|*[!0-9]*) keep=5 ;; esac
-      pkg="$("$JQ" -r '.package // empty' "$f" 2>/dev/null)"
       is_due "$cron" "$at" "$last" "$now" || continue
-      [ -n "$pkg" ] || continue
-      launchn=$(( launchn + 1 ))
-      b64="$(base64 < "$f" | tr -d '\n')"
-      opid="$(new_opid)-$launchn"
-      detach "$opid" backup "$b64"
+      # optional per-job gates (all absent = no constraint). A failed gate skips the job
+      # WITHOUT stamping last_run, so it retries on the next heartbeat tick.
+      if [ "$("$JQ" -r '.require_wifi // false' "$f" 2>/dev/null)" = true ] && ! sched_is_wifi; then gate_skip wifi; continue; fi
+      if [ "$("$JQ" -r '.require_charging // false' "$f" 2>/dev/null)" = true ] && ! sched_charging; then gate_skip charging; continue; fi
+      minb="$("$JQ" -r '.min_battery // empty' "$f" 2>/dev/null)"
+      case "$minb" in ''|*[!0-9]*) : ;; *) [ "$(sched_batt_level)" -ge "$minb" ] || { gate_skip battery; continue; } ;; esac
+      if [ "$("$JQ" -r '((.days // []) | length) > 0' "$f" 2>/dev/null)" = true ]; then
+        today="$(date +%w)"
+        "$JQ" -e --argjson d "$today" --arg ds "$today" '(.days // []) | (index($d) != null) or (index($ds) != null)' "$f" >/dev/null 2>&1 \
+          || { gate_skip days; continue; }
+      fi
+      # minimal thermal safety: never launch a scheduled op while critically hot
+      if sched_too_hot; then gate_skip thermal; continue; fi
+      action="$("$JQ" -r '.action // "backup"' "$f" 2>/dev/null)"
+      juser="$("$JQ" -r '.user // 0' "$f" 2>/dev/null)"; case "$juser" in ''|*[!0-9]*) juser=0 ;; esac
+      jmode="$("$JQ" -r '.mode // "full"' "$f" 2>/dev/null)"
+      jdest="$("$JQ" -r '.dest // "local"' "$f" 2>/dev/null)"
+      jref="$("$JQ" -r '.ref // empty' "$f" 2>/dev/null)"
+      fired=0
+      # resolve this job's target packages (single / list / all, minus blocklist) and
+      # launch one detached op per target: a backup, or a restore of its latest backup.
+      for pkg in $(job_targets "$JQ" "$f"); do
+        launchn=$(( launchn + 1 )); fired=1
+        opid="$(new_opid)-$launchn"
+        if [ "$action" = restore ]; then
+          ref="$jref"; [ -n "$ref" ] || ref="$(latest_ref "$juser" "$pkg")"
+          [ -n "$ref" ] || { launchn=$(( launchn - 1 )); continue; }   # nothing to restore for this pkg
+          argj="$("$JQ" -nc --arg ref "$ref" '{ref:$ref}')"
+          detach "$opid" restore "$(printf '%s' "$argj" | base64 | tr -d '\n')"
+        else
+          argj="$("$JQ" -nc --arg p "$pkg" --argjson u "$juser" --arg m "$jmode" --arg d "$jdest" \
+            '{package:$p,user:$u,mode:$m,dest:$d,items:["apk","data","data_de","obb","external","media"],sched:true}')"
+          detach "$opid" backup "$(printf '%s' "$argj" | base64 | tr -d '\n')"
+          for r in $(prune_pkg "$juser" "$pkg" "$keep"); do PRUNED="$PRUNED$("$JQ" -cn --arg r "$r" '$r'),"; done
+        fi
+        RAN="$RAN$("$JQ" -cn --arg id "$id" --arg opid "$opid" --arg pkg "$pkg" --arg a "$action" '{id:$id,opid:$opid,package:$pkg,action:$a}'),"
+        printf '{"ts":"%s","op":"scheduler-run","id":"%s","opid":"%s","package":"%s","action":"%s"}\n' \
+          "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(jstr "$id")" "$(jstr "$opid")" "$(jstr "$pkg")" "$(jstr "$action")" >> "$LOGS/audit.jsonl"
+      done
+      [ "$fired" = 1 ] || continue   # due but no target resolved: do not stamp, retry next tick
       tmp="$STATE/jobs/.$id.tmp"
       "$JQ" --argjson now "$now" '.last_run=$now' "$f" > "$tmp" 2>/dev/null && mv "$tmp" "$f" && chmod 600 "$f"
-      RAN="$RAN$("$JQ" -cn --arg id "$id" --arg opid "$opid" --arg pkg "$pkg" '{id:$id,opid:$opid,package:$pkg}'),"
-      printf '{"ts":"%s","op":"scheduler-run","id":"%s","opid":"%s","package":"%s"}\n' \
-        "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(jstr "$id")" "$(jstr "$opid")" "$(jstr "$pkg")" >> "$LOGS/audit.jsonl"
-      for r in $(prune_pkg "$("$JQ" -r '.user // 0' "$f")" "$pkg" "$keep"); do
-        PRUNED="$PRUNED$("$JQ" -cn --arg r "$r" '$r'),"
-      done
     done
     AUTO=""
     for _ao in $(auto_backup_scan "$JQ" "$now"); do AUTO="$AUTO\"$(jstr "$_ao")\","; done
@@ -728,14 +994,38 @@ case "$verb" in
     printf '{"ok":true,"entries":['
     if [ -f "$LOGS/audit.jsonl" ]; then
       first=1
+      # audit lines are already one valid JSON object each (our own writer), so a cheap
+      # shape check beats spawning jq per line (that made the log slow to open).
       tail -n "$n" "$LOGS/audit.jsonl" 2>/dev/null | sed '1!G;h;$!d' | while IFS= read -r line; do
-        [ -n "$line" ] || continue
-        printf '%s' "$line" | "$JQ" -e . >/dev/null 2>&1 || continue
+        case "$line" in '{'*'}') ;; *) continue ;; esac
         [ "$first" = 1 ] || printf ','; first=0
         printf '%s' "$line"
       done
     fi
     printf ']}\n' ;;
+
+  log-export)
+    # bundle the activity log plus a short build/device header into one user-visible
+    # text file under the backups dir, so a user can attach it to a bug report. The
+    # path is returned for the UI to show. No secrets: audit.jsonl holds op metadata.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    u="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.user // 0' 2>/dev/null)"
+    case "$u" in ''|*[!0-9]*) u=0 ;; esac
+    _bk="$(bdir "$u")"; mkdir -p "$_bk" 2>/dev/null
+    out="$_bk/vdbackup-log-$(date -u +%Y%m%dT%H%M%SZ).txt"
+    {
+      echo "VDBackup activity log export"
+      echo "version:     $(sed -n 's/^version=//p' "$MODDIR/module.prop")"
+      echo "device:      $(getprop ro.product.device) / Android $(getprop ro.build.version.release) (sdk $(getprop ro.build.version.sdk)) / $(getprop ro.product.cpu.abi)"
+      echo "fingerprint: $(getprop ro.build.fingerprint)"
+      echo "exported:    $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      echo "-------------------- audit.jsonl --------------------"
+      [ -f "$LOGS/audit.jsonl" ] && cat "$LOGS/audit.jsonl"
+    } > "$out" 2>/dev/null
+    _mo="$(stat -c '%u:%g' "/data/media/$u" 2>/dev/null)"
+    case "$_mo" in *[0-9]:*[0-9]) chown "$_mo" "$out" 2>/dev/null ;; esac
+    restorecon "$out" 2>/dev/null
+    if [ -s "$out" ]; then ok "\"path\":\"$(jstr "$out")\""; else err ERR_LOG_EXPORT "could not write the log export"; fi ;;
 
   prune)
     # manual retention: keep the newest <keep> backups of a package, delete the rest.

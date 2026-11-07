@@ -1,0 +1,86 @@
+<!--
+ ======================================================================
+  VD BACKUP  ::  root backup & restore, no grant prompt
+  Full app/data backup & restore as root - KernelSU/APatch/Magisk WebUI.
+
+  Copyright (C) 2026  VD171
+  SPDX-License-Identifier: AGPL-3.0-or-later
+
+  Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+  modified version, even as a service, and you MUST offer its source.
+
+  Site           : https://vd171.ru
+  Site           : https://vd.priv8.ru
+  Source         : https://github.com/VD171/VD-Backup
+  GitHub         : @VD171 https://github.com/VD171
+  XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+  XDA-Thread     : https://xdaforums.com/t/VD-Backup.4807267/
+  Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+  Telegram       : @Priv8_VD https://t.me/Priv8_VD
+  Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+  E-mail         : vd.priv8@pm.me
+ ======================================================================
+
+  rclone authorize --template: the OAuth landing page the device browser shows
+  after sign-in. Styled like the VDBackup WebUI so the sign-in feels in-app.
+  Go template: {{ .Error }} is set only on failure.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VDBackup</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: #0b1220; color: #eaf1fb;
+    font-family: Roboto, system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .card {
+    width: 100%; max-width: 420px; background: #141f33;
+    border: 1px solid #32425d; border-radius: 18px; padding: 28px 24px;
+    box-shadow: 0 18px 50px -20px rgba(0,0,0,.7); text-align: center;
+  }
+  .mark {
+    width: 72px; height: 72px; margin: 0 auto 18px; border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, #34d399 16%, transparent);
+  }
+  .mark svg { width: 40px; height: 40px; }
+  .err .mark { background: color-mix(in srgb, #f87171 16%, transparent); }
+  h1 { font-size: 22px; font-weight: 800; margin: 0 0 8px; letter-spacing: -.01em; }
+  p { font-size: 15px; line-height: 1.55; color: #94a3b8; margin: 0 0 6px; }
+  .brand { margin-top: 20px; font-size: 13px; font-weight: 700; color: #34d399; letter-spacing: .02em; }
+  .hint { margin-top: 14px; font-size: 13px; color: #64748b; }
+  code { color: #f87171; word-break: break-all; }
+</style>
+</head>
+<body>
+  {{ if .Error }}
+  <div class="card err">
+    <div class="mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </div>
+    <h1>Sign-in failed</h1>
+    <p>The authorization did not complete. You can close this tab, return to VDBackup and try again.</p>
+    <p class="hint"><code>{{ .Error }}</code></p>
+    <div class="brand">VDBackup</div>
+  </div>
+  {{ else }}
+  <div class="card">
+    <div class="mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    </div>
+    <h1>Authorized</h1>
+    <p>You are signed in. Close this tab and return to VDBackup.</p>
+    <p class="hint">The cloud remote is saved automatically when you go back to the app.</p>
+    <div class="brand">VDBackup</div>
+  </div>
+  {{ end }}
+</body>
+</html>

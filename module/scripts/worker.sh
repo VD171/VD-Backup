@@ -47,10 +47,13 @@ case "$abi" in
   x86_64) BINABI=x86_64 ;; x86) BINABI=x86 ;; *) BINABI=arm64-v8a ;;
 esac
 BIN="$MODDIR/bin/$BINABI"
-export PATH="$BIN:$PATH"
+CLOUD="$STATE/bin"                 # on-demand cloud binaries (rclone/restic), fetched + sha256-verified
+CLOUD_MANIFEST="$MODDIR/etc/cloud_addons.json"
+export PATH="$BIN:$CLOUD:$PATH"
 # bundled binaries sourced from Termux link against Termux libs shipped in bin/<abi>/lib.
 # Termux uses versioned sonames (.so.1/.so.3) so this never shadows the framework's libs.
-export LD_LIBRARY_PATH="$BIN/lib:${LD_LIBRARY_PATH:-}"
+# $CLOUD/lib holds the libs of any on-demand-fetched binaries (the lite edition).
+export LD_LIBRARY_PATH="$BIN/lib:$CLOUD/lib:${LD_LIBRARY_PATH:-}"
 
 # the state dirs must exist for every op: a missing staging dir would make the
 # dumpsys redirect (and metadata: versionName/Code, perms) silently fail.
@@ -116,10 +119,10 @@ if command -v nsenter >/dev/null 2>&1; then exec_ns() { nsenter --mount=/proc/1/
 else exec_ns() { "$@"; }; fi
 
 # prefer bundled binaries, fall back to whatever the ROM provides
-bin_or() { if [ -x "$BIN/$1" ]; then echo "$BIN/$1"; else echo "$1"; fi; }
+bin_or() { if [ -x "$BIN/$1" ]; then echo "$BIN/$1"; elif [ -x "$CLOUD/$1" ]; then echo "$CLOUD/$1"; else echo "$1"; fi; }
 TAR="$(bin_or tar)"; ZSTD="$(bin_or zstd)"; AGE="$(bin_or age)"; JQ="$(bin_or jq)"
 GZIP="$(bin_or gzip)"; RCLONE="$(bin_or rclone)"; RSYNC="$(bin_or rsync)"; RESTIC="$(bin_or restic)"
-SQLITE="$(bin_or sqlite3)"
+SQLITE="$(bin_or sqlite3)"; CURL="$(bin_or curl)"
 
 # pick tar flags by implementation: GNU tar does xattr/acl/caps + selinux; toybox
 # tar does modes/owner + --selinux (labels) but not per-file xattr/caps.
@@ -127,6 +130,14 @@ TARHELP="$("$TAR" --help 2>&1)"
 if   echo "$TARHELP" | grep -q -- '--xattrs';  then TARC="--acls --xattrs --selinux -p"   # GNU tar (captures user.*/security.* + selinux)
 elif echo "$TARHELP" | grep -q -- '--selinux'; then TARC="--selinux"                                          # toybox tar
 else TARC="-p"; fi
+# Extraction hardening (restore runs as root). The real guard is archive_safe/
+# scan_members (a tar -t pre-scan that refuses absolute or '..' members before any
+# write); GNU tar also strips leading '/' by default. --no-absolute-names is only an
+# extra belt-and-suspenders and is NOT accepted by every build (GNU tar 1.35 rejects
+# it), so use it only when this tar actually lists it; empty otherwise. TARX =
+# preserve + (optional) hardening; NAN = just the optional hardening for staging.
+if echo "$TARHELP" | grep -q -- '--no-absolute-names'; then NAN="--no-absolute-names"; else NAN=""; fi
+TARX="$TARC $NAN"
 
 VERB="$1"; OPID="$2"; ARGS_B64="$3"
 PROG="$LOGS/progress-$OPID.json"
@@ -136,9 +147,17 @@ cleanup() { verifier_restore; rm -f "$LOGS/$OPID.pid"; }
 trap cleanup EXIT
 
 jstr() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'; }
-prog() {  # prog <percent> <phase> <item>
-  printf '{"opid":"%s","percent":%s,"phase":"%s","item":"%s","done":false}\n' \
-    "$OPID" "$1" "$(jstr "$2")" "$(jstr "$3")" > "$PROG"; }
+# progx: progress with optional rich fields (speed/ETA/N-of-M/current item) for the
+# WebUI. The first five JSON fields (opid/percent/phase/item/done) are unchanged; rate/
+# eta/n/of/cur are extra and optional (empty string / 0 = unknown).
+# progx <percent> <phase> <item> <rate> <eta> <n> <of> <cur>
+progx() {
+  _pxn="$6"; case "$_pxn" in ''|*[!0-9]*) _pxn=0 ;; esac
+  _pxo="$7"; case "$_pxo" in ''|*[!0-9]*) _pxo=0 ;; esac
+  printf '{"opid":"%s","percent":%s,"phase":"%s","item":"%s","done":false,"rate":"%s","eta":"%s","n":%s,"of":%s,"cur":"%s"}\n' \
+    "$OPID" "$1" "$(jstr "$2")" "$(jstr "$3")" "$(jstr "$4")" "$(jstr "$5")" "$_pxn" "$_pxo" "$(jstr "$8")" > "$PROG"; }
+prog() {  # prog <percent> <phase> <item> (back-compat: no rich extras)
+  progx "$1" "$2" "$3" "" "" 0 0 ""; }
 finish() { # finish <ok> <code>
   printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":%s,"code":"%s"}\n' \
     "$OPID" "$1" "$2" > "$PROG"; }
@@ -320,6 +339,27 @@ decomp() { case "$1" in
   *.tar.gz*) "$GZIP" -dc "$1" ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c "$1" ;;
   *.tar.zst*) "$ZSTD" -dqc "$1" ;; *.tar*) cat "$1" ;; *) "$ZSTD" -dqc "$1" ;; esac; }
 
+# Anti-path-traversal guard. Restore extracts tar archives AS ROOT, so a tampered
+# backup/import/special archive must never escape its target dir. scan_members reads
+# a tar listing on stdin and returns non-zero if any member is an absolute path or
+# holds a ".." component; archive_safe lists an archive (decrypting/decompressing by
+# encryption flag + filename) and returns 0 only when every member is contained.
+# Callers run this BEFORE the destructive wipe + extraction and abort on failure.
+scan_members() {
+  while IFS= read -r _m; do
+    case "$_m" in /*|..|../*|*/../*|*/..) return 1 ;; esac
+  done
+  return 0
+}
+archive_safe() {   # <archive> <enc:none|age|age-scrypt>; 0 = safe, 1 = unsafe
+  { case "$2" in
+      age|age-scrypt) dec_age "$1" | { case "$1" in
+          *.tar.gz*) "$GZIP" -dc ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c ;;
+          *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; } ;;
+      *) decomp "$1" ;;
+    esac; } | exec_ns "$TAR" -t 2>/dev/null | scan_members
+}
+
 # media_own [-R] <path>: create <path> and give it the ownership + SELinux context
 # of /sdcard content, so backups written as root are visible to the user and the
 # file managers under /storage/emulated/0/VDBackup.
@@ -383,9 +423,13 @@ resolve_dest() {
 # Offline edition omits the cloud transport binaries (rclone/restic/rsync/ssh/sftp)
 # from bin/<abi>/. A cloud/remote destination needs one of them; abort clearly so the
 # WebUI can tell the user to flash the full edition instead of failing obscurely.
-need_cloud_bin() { # <tool>...; finish ERR_NO_CLOUD and return 1 if any is missing
-  for _t in "$@"; do
-    [ -x "$BIN/$_t" ] || { audit "cloud transport missing: $_t (offline edition)"; finish false ERR_NO_CLOUD; return 1; }
+need_cloud_bin() { # <tool>...; if any is missing: ERR_CLOUD_FETCHABLE when the lite addon
+  for _t in "$@"; do                # manifest is present (UI offers the on-demand download), else ERR_NO_CLOUD
+    if [ ! -x "$BIN/$_t" ] && [ ! -x "$CLOUD/$_t" ]; then
+      if [ -f "$CLOUD_MANIFEST" ]; then audit "cloud bin missing (fetchable): $_t"; finish false ERR_CLOUD_FETCHABLE
+      else audit "cloud bin missing: $_t"; finish false ERR_NO_CLOUD; fi
+      return 1
+    fi
   done
   return 0
 }
@@ -414,13 +458,63 @@ item_paths() {
 # collide with the user's other files at the chosen destination path.
 remote_pfx() { printf '%s' "${DPATH:+$DPATH/}vdbackup"; }
 
+# Live rclone transfer: run rclone with periodic one-line stats and feed progx so the
+# WebUI shows percent / speed / ETA. A sentinel file carries rclone's real exit code
+# past the pipe (pipefail is NOT assumed), so ERR_TRANSFER detection never regresses.
+rclone_live() {   # <phase> <basepct> <rclone args...>; returns rclone's exit code
+  _rlph="$1"; _rlbp="$2"; shift 2
+  _rlrc="$STATE/staging/rclone-rc.$OPID"; rm -f "$_rlrc"
+  { exec_ns "$RCLONE" --config "$STATE/rclone.conf" \
+       --stats 1s --stats-one-line --stats-log-level NOTICE "$@" 2>&1; echo $? > "$_rlrc"; } \
+  | while IFS= read -r _rll; do
+      case "$_rll" in *Transferred:*) ;; *) continue ;; esac
+      _rlp="$(printf '%s' "$_rll" | sed -n 's/.*[, ]\([0-9][0-9]*\)%.*/\1/p')"
+      case "$_rlp" in ''|*[!0-9]*) _rlp="$_rlbp" ;; esac
+      _rlr="$(printf '%s' "$_rll" | sed -n 's#.*%,[ ]*\([0-9.]*[ ]*[KMGTPEi]*B/s\).*#\1#p')"
+      _rle="$(printf '%s' "$_rll" | sed -n 's/.*ETA[ ]*\([0-9hdms][0-9hdms.]*\).*/\1/p')"
+      progx "$_rlp" "$_rlph" "$PKG" "$_rlr" "$_rle" 0 0 ""
+    done
+  _rlx="$(cat "$_rlrc" 2>/dev/null)"; rm -f "$_rlrc"
+  case "$_rlx" in ''|*[!0-9]*) return 1 ;; esac
+  return "$_rlx"; }
+
+# Quota guard (best-effort): if the remote reports free space and the backup would not
+# fit, finish ERR_QUOTA before uploading. Backends without "about"/free info are skipped.
+rclone_quota_guard() {   # <remote:> <neededbytes>; returns 1 (and finishes) on overflow
+  _qab="$(exec_ns "$RCLONE" --config "$STATE/rclone.conf" about --json "$1" 2>/dev/null)"
+  [ -n "$_qab" ] || return 0
+  _qfree="$(printf '%s' "$_qab" | "$JQ" -r '.free // empty' 2>/dev/null)"
+  case "$_qfree" in ''|*[!0-9]*) return 0 ;; esac
+  case "$2" in ''|*[!0-9]*) return 0 ;; esac
+  if [ "$2" -gt "$_qfree" ]; then
+    audit "quota exceeded need=$2 free=$_qfree $PKG"; finish false ERR_QUOTA; return 1; fi
+  return 0; }
+
+# Checksum seal (best-effort): confirm the remote copy matches the local source by hash.
+# A backend with no common hash is skipped with an audit note (never a hard fail).
+rclone_check_seal() {   # <localdir> <remote:path>; 0 = verified or skipped, 1 = mismatch
+  _cso="$(exec_ns "$RCLONE" --config "$STATE/rclone.conf" check "$1" "$2" 2>&1)"; _csr=$?
+  case "$_cso" in
+    *"no common hash"*|*"hash unsupported"*|*"Hash unsupported"*|*"not support hash"*|*"no hashes"*)
+      audit "verify seal skipped (remote has no hashes) $PKG"; return 0 ;;
+  esac
+  return $_csr; }
+
 # Full mode: ship the just-built local backup dir to a remote destination
 transfer_full() {
   case "$DTYPE" in rclone|gdrive) net_guard || return 1 ;; esac
   case "$DTYPE" in
     rclone) [ -n "$DREMOTE" ] || { audit "rclone dest without remote $PKG"; finish false ERR_NO_DEST; return 1; }
-            exec_ns "$RCLONE" --config "$STATE/rclone.conf" copy "$DEST" "$DREMOTE:$(remote_pfx)/$PKG/${TS}_${VC}" >/dev/null 2>&1 \
-              || { audit "rclone transfer failed $PKG"; finish false ERR_TRANSFER; return 1; } ;;
+            _tneed="$(du -s -B1 "$DEST" 2>/dev/null | cut -f1)"; _tneed="${_tneed:-0}"
+            rclone_quota_guard "$DREMOTE:" "$_tneed" || return 1
+            _tdst="$DREMOTE:$(remote_pfx)/$PKG/${TS}_${VC}"
+            rclone_live transfer 95 copy "$DEST" "$_tdst" \
+              || { audit "rclone transfer failed $PKG"; finish false ERR_TRANSFER; return 1; }
+            if [ "$VERIFY" != false ]; then
+              progx 99 verified "$PKG" "" "" 0 0 ""
+              rclone_check_seal "$DEST" "$_tdst" \
+                || { audit "rclone checksum seal failed $PKG"; finish false ERR_VERIFY; return 1; }
+            fi ;;
     gdrive) companion_ensure || { audit "gdrive companion missing $PKG"; finish false ERR_COMPANION; return 1; }
             drive_ok "$(drive_cmd check)" || { audit "gdrive no consent $PKG"; finish false ERR_DRIVE_CONSENT; return 1; }
             _pfx="$(remote_pfx)/$PKG/${TS}_${VC}"
@@ -483,22 +577,22 @@ do_mirror() {
       "$ZSTD" -q -10 -c "$p" > "$apkdir/$(basename "$p").zst"; done
     case "$DTYPE" in
       local)  mkdir -p "$(remote_pfx)/$PKG/apk" && exec_ns "$RSYNC" -a --delete "$apkdir/" "$(remote_pfx)/$PKG/apk/" >/dev/null 2>&1 ;;
-      rclone) exec_ns "$RCLONE" --config "$STATE/rclone.conf" sync "$apkdir" "$DREMOTE:$(remote_pfx)/$PKG/apk" >/dev/null 2>&1 ;;
+      rclone) rclone_live "mirror apk" 18 sync "$apkdir" "$DREMOTE:$(remote_pfx)/$PKG/apk" ;;
     esac
     rm -rf "$apkdir"
   fi
-  sync_one() { # <label> <src>
+  sync_one() { # <label> <src> <basepct>
     [ -e "$2" ] || return 0
     case "$DTYPE" in
-      rclone) exec_ns "$RCLONE" --config "$STATE/rclone.conf" sync "$2" "$DREMOTE:$(remote_pfx)/$PKG/$1" >/dev/null 2>&1 ;;
+      rclone) rclone_live "mirror $1" "${3:-50}" sync "$2" "$DREMOTE:$(remote_pfx)/$PKG/$1" ;;
       local)  mkdir -p "$(remote_pfx)/$PKG/$1" && exec_ns "$RSYNC" -a --delete "$2/" "$(remote_pfx)/$PKG/$1/" >/dev/null 2>&1 ;;
     esac
   }
-  prog 30 mirror data;     echo " $ITEMS " | grep -q ' data '     && sync_one data     "/data/user/$U/$PKG"
-  prog 50 mirror data_de;  echo " $ITEMS " | grep -q ' data_de '  && sync_one data_de  "/data/user_de/$U/$PKG"
-  prog 65 mirror external; echo " $ITEMS " | grep -q ' external ' && sync_one external "/data/media/$U/Android/data/$PKG"
-  prog 78 mirror obb;      echo " $ITEMS " | grep -q ' obb '      && sync_one obb      "/data/media/$U/Android/obb/$PKG"
-  prog 88 mirror media;    echo " $ITEMS " | grep -q ' media '    && sync_one media    "/data/media/$U/Android/media/$PKG"
+  prog 30 mirror data;     echo " $ITEMS " | grep -q ' data '     && sync_one data     "/data/user/$U/$PKG" 30
+  prog 50 mirror data_de;  echo " $ITEMS " | grep -q ' data_de '  && sync_one data_de  "/data/user_de/$U/$PKG" 50
+  prog 65 mirror external; echo " $ITEMS " | grep -q ' external ' && sync_one external "/data/media/$U/Android/data/$PKG" 65
+  prog 78 mirror obb;      echo " $ITEMS " | grep -q ' obb '      && sync_one obb      "/data/media/$U/Android/obb/$PKG" 78
+  prog 88 mirror media;    echo " $ITEMS " | grep -q ' media '    && sync_one media    "/data/media/$U/Android/media/$PKG" 88
   prog 98 verify "$PKG"; audit "mirror $PKG -> ${DREMOTE:-$DPATH}"; notify backup_done "$PKG"; finish true ERR_NONE
 }
 
@@ -641,10 +735,16 @@ backup() {
     emit_item "$typ" "$(basename "$out")" "$COMP" "$enc" "$orig" "$stored" "$sha" "${ctx:-}" "$uid" "$gid"
   }
 
+  # count selected items for "N of M" progress (apk + the five data trees)
+  ITEMN=0; ITEMOF=0
+  for _cit in apk data data_de obb external media; do
+    echo " $ITEMS " | grep -q " $_cit " && ITEMOF=$(( ITEMOF + 1 ))
+  done
+
   # APK: always compressed, never raw; crypto only if encrypt_apk
   APKS='[]'
   if echo " $ITEMS " | grep -q ' apk '; then
-    prog 15 apk "$PKG"
+    ITEMN=$(( ITEMN + 1 )); progx 15 apk "$PKG" "" "" "$ITEMN" "$ITEMOF" apk
     for p in $(exec_ns pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do
       name="$(basename "$p")"
       if use_apk_age; then
@@ -658,11 +758,11 @@ backup() {
 
   # freeze app, then archive each data item
   prog 30 freezing "$PKG"; freeze "$PKG"
-  echo " $ITEMS " | grep -q ' data '     && { prog 40 data     "$PKG"; archive_dir data     "/data/user/$U/$PKG" || return; }
-  echo " $ITEMS " | grep -q ' data_de '  && { prog 55 data_de  "$PKG"; archive_dir data_de  "/data/user_de/$U/$PKG" || return; }
-  echo " $ITEMS " | grep -q ' external ' && { prog 65 external "$PKG"; archive_dir external "/data/media/$U/Android/data/$PKG" || return; }
-  echo " $ITEMS " | grep -q ' obb '      && { prog 72 obb      "$PKG"; archive_dir obb      "/data/media/$U/Android/obb/$PKG" || return; }
-  echo " $ITEMS " | grep -q ' media '    && { prog 80 media    "$PKG"; archive_dir media    "/data/media/$U/Android/media/$PKG" || return; }
+  echo " $ITEMS " | grep -q ' data '     && { ITEMN=$(( ITEMN + 1 )); progx 40 data     "$PKG" "" "" "$ITEMN" "$ITEMOF" data;     archive_dir data     "/data/user/$U/$PKG" || return; }
+  echo " $ITEMS " | grep -q ' data_de '  && { ITEMN=$(( ITEMN + 1 )); progx 55 data_de  "$PKG" "" "" "$ITEMN" "$ITEMOF" data_de;  archive_dir data_de  "/data/user_de/$U/$PKG" || return; }
+  echo " $ITEMS " | grep -q ' external ' && { ITEMN=$(( ITEMN + 1 )); progx 65 external "$PKG" "" "" "$ITEMN" "$ITEMOF" external; archive_dir external "/data/media/$U/Android/data/$PKG" || return; }
+  echo " $ITEMS " | grep -q ' obb '      && { ITEMN=$(( ITEMN + 1 )); progx 72 obb      "$PKG" "" "" "$ITEMN" "$ITEMOF" obb;      archive_dir obb      "/data/media/$U/Android/obb/$PKG" || return; }
+  echo " $ITEMS " | grep -q ' media '    && { ITEMN=$(( ITEMN + 1 )); progx 80 media    "$PKG" "" "" "$ITEMN" "$ITEMOF" media;    archive_dir media    "/data/media/$U/Android/media/$PKG" || return; }
 
   # framework state (shell)
   prog 86 framework "$PKG"
@@ -883,14 +983,16 @@ restore() {
         [ "$got" = "$want" ] || { TFAIL=$((TFAIL+1)); TERR="$TERR sha:$arc"; continue; }
       fi
       sub="$TDIR/item$i"; mkdir -p "$sub"
+      _tenc=none; echo "$arc" | grep -q '\.age$' && _tenc=age
+      archive_safe "$af" "$_tenc" || { TFAIL=$((TFAIL+1)); TERR="$TERR unsafe:$arc"; continue; }
       if echo "$arc" | grep -q '\.age$'; then
         if [ -z "$PW" ]; then TFAIL=$((TFAIL+1)); TERR="$TERR nopass:$arc"; continue; fi
         dec_age "$af" | { case "$arc" in
             *.tar.gz*) "$GZIP" -dc ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c ;;
-            *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; } | exec_ns "$TAR" -x -C "$sub" 2>/dev/null \
+            *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; } | exec_ns "$TAR" $NAN -x -C "$sub" 2>/dev/null \
           || { TFAIL=$((TFAIL+1)); TERR="$TERR extract:$arc"; }
       else
-        decomp "$af" | exec_ns "$TAR" -x -C "$sub" 2>/dev/null || { TFAIL=$((TFAIL+1)); TERR="$TERR extract:$arc"; }
+        decomp "$af" | exec_ns "$TAR" $NAN -x -C "$sub" 2>/dev/null || { TFAIL=$((TFAIL+1)); TERR="$TERR extract:$arc"; }
       fi
     done
     rm -rf "$TDIR"
@@ -961,6 +1063,10 @@ restore() {
       got="$(sha256sum "$af" 2>/dev/null | cut -d' ' -f1)"
       [ "$want" = "$got" ] || { audit "restore sha mismatch $arc"; finish false ERR_VERIFY; return; }
     fi
+    # anti-traversal: reject a tampered archive BEFORE the destructive wipe, so a
+    # crafted member can never escape into the filesystem and no live data is lost.
+    _renc=none; echo "$arc" | grep -q '\.age$' && _renc=age
+    archive_safe "$af" "$_renc" || { audit "restore unsafe archive $arc"; finish false ERR_UNSAFE_ARCHIVE; return; }
     # faithful restore: reproduce the backed-up state exactly (wipe then extract),
     # so files created after the backup do not linger. Extraction is checked; a
     # failure after the wipe is reported (never a silent success).
@@ -969,9 +1075,9 @@ restore() {
       [ -n "$PW" ] || { finish false ERR_CRYPTO_PASS; return; }
       dec_age "$af" | { case "$arc" in
           *.tar.gz*) "$GZIP" -dc ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c ;;
-          *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; } | exec_ns "$TAR" $TARC -x -C "$parent" 2>/dev/null
+          *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; } | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
     else
-      decomp "$af" | exec_ns "$TAR" $TARC -x -C "$parent" 2>/dev/null
+      decomp "$af" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
     fi
     [ $? -eq 0 ] || { audit "restore extract failed $arc"; finish false ERR_RESTORE; return; }
     # remap: app data dirs follow the live uid; media dirs just relabel
@@ -1042,8 +1148,9 @@ do_import_databackup() {
   freeze "$PKG"
   prog 30 installing "$PKG"
   if [ -f "$REF/apk.tar.zst" ]; then
+    archive_safe "$REF/apk.tar.zst" none || { audit "import-db unsafe apk archive $PKG"; finish false ERR_UNSAFE_ARCHIVE; return; }
     TMP="$STATE/staging/dbimp.$OPID"; rm -rf "$TMP"; mkdir -p "$TMP"
-    "$ZSTD" -dqc "$REF/apk.tar.zst" | exec_ns "$TAR" -x -C "$TMP" 2>/dev/null
+    "$ZSTD" -dqc "$REF/apk.tar.zst" | exec_ns "$TAR" $NAN -x -C "$TMP" 2>/dev/null
     verifier_off
     SESSION="$(exec_ns pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
     if [ -n "$SESSION" ]; then
@@ -1058,8 +1165,9 @@ do_import_databackup() {
   prog 60 extracting "$PKG"
   db_item() { # <archive> <parent> <target>
     f="$REF/$1"; [ -f "$f" ] || return 0
+    archive_safe "$f" none || { audit "import-db unsafe archive $1 $PKG"; finish false ERR_UNSAFE_ARCHIVE; return 1; }
     exec_ns rm -rf "$3" 2>/dev/null                   # faithful: wipe then extract (migration)
-    mkdir -p "$2"; decomp "$f" | exec_ns "$TAR" $TARC -x -C "$2" 2>/dev/null
+    mkdir -p "$2"; decomp "$f" | exec_ns "$TAR" $TARX -x -C "$2" 2>/dev/null
     [ $? -eq 0 ] || { audit "import-db extract failed $1 $PKG"; finish false ERR_RESTORE; return 1; }
     [ "$LIVEU" != 0 ] && exec_ns chown -hR "$LIVEU:$LIVEG" "$3" 2>/dev/null
     exec_ns restorecon -R "$3" 2>/dev/null
@@ -1146,10 +1254,16 @@ do_import_neo() {
         src="$STATE/staging/neo.$OPID.$1"; neo_decrypt_to "$f.enc" "$src" || { rm -f "$src"; continue; }
       elif [ -f "$f" ]; then :                        # plain archive
       else continue; fi
+      # anti-traversal: reject a tampered archive BEFORE the wipe (decrypted temp has
+      # no suffix, so decompress by $ext, not by filename).
+      if ! { case "$ext" in *.zst) "$ZSTD" -dqc "$src" ;; *.gz) "$GZIP" -dc "$src" ;; *) cat "$src" ;; esac; } \
+           | exec_ns "$TAR" -t 2>/dev/null | scan_members; then
+        [ "$src" != "$f" ] && rm -f "$src"
+        audit "import-neo unsafe archive $1 $PKG"; finish false ERR_UNSAFE_ARCHIVE; return 1; fi
       exec_ns rm -rf "$2" 2>/dev/null                 # faithful: wipe then extract (migration)
       mkdir -p "$2"                                    # Neo archives are ./-relative (dir contents)
       { case "$ext" in *.zst) "$ZSTD" -dqc "$src" ;; *.gz) "$GZIP" -dc "$src" ;; *) cat "$src" ;; esac; } \
-        | exec_ns "$TAR" $TARC -x -C "$2" 2>/dev/null
+        | exec_ns "$TAR" $TARX -x -C "$2" 2>/dev/null
       _erc=$?
       [ "$src" != "$f" ] && rm -f "$src"
       [ "$_erc" -eq 0 ] || { audit "import-neo extract failed $1 $PKG"; finish false ERR_RESTORE; return 1; }
@@ -1185,6 +1299,8 @@ special_paths() {   # <category>; echoes each existing owned path, one per line
     contacts)  set -- /data/data/com.android.providers.contacts  /data/user_de/0/com.android.providers.contacts ;;
     wifi)      set -- /data/misc/wifi /data/misc/apexdata/com.android.wifi ;;
     bluetooth) set -- /data/misc/bluedroid /data/misc/bluetooth /data/data/com.android.bluetooth ;;
+    calendar)  set -- /data/data/com.android.providers.calendar /data/user_de/0/com.android.providers.calendar ;;
+    wallpaper) set -- "/data/system/users/${U:-0}/wallpaper" "/data/system/users/${U:-0}/wallpaper_lock" "/data/system/users/${U:-0}/wallpaper_info.xml" ;;
     *) return 1 ;;
   esac
   for _p in "$@"; do [ -e "$_p" ] && printf '%s\n' "$_p"; done
@@ -1227,8 +1343,78 @@ special_export() {   # <category> <dest-dir>
       exec_ns test -f "$_cc" && { _copy "$_cc"; _jexport "$_stg/contacts2.db" \
         "SELECT rc._id AS contact_id, (SELECT d1.data1 FROM data d1 WHERE d1.raw_contact_id=rc._id AND d1.mimetype_id=(SELECT _id FROM mimetypes WHERE mimetype='vnd.android.cursor.item/name') LIMIT 1) AS name, (SELECT group_concat(d2.data1,';') FROM data d2 WHERE d2.raw_contact_id=rc._id AND d2.mimetype_id=(SELECT _id FROM mimetypes WHERE mimetype='vnd.android.cursor.item/phone_v2')) AS phones, (SELECT group_concat(d3.data1,';') FROM data d3 WHERE d3.raw_contact_id=rc._id AND d3.mimetype_id=(SELECT _id FROM mimetypes WHERE mimetype='vnd.android.cursor.item/email_v2')) AS emails FROM raw_contacts rc WHERE rc.deleted=0;" \
         "$_ed/contacts.json"; } ;;
+    calendar)
+      _cdb=/data/data/com.android.providers.calendar/databases/calendar.db
+      exec_ns test -f "$_cdb" && { _copy "$_cdb"; _jexport "$_stg/calendar.db" \
+        "SELECT _id,calendar_id,title,eventLocation,description,dtstart,dtend,eventTimezone,allDay,rrule,duration FROM Events ORDER BY dtstart;" \
+        "$_ed/calendar.json"; } ;;
   esac
   exec_ns rm -rf "$_stg" 2>/dev/null
+}
+
+# Settings-based special categories (dns, system_settings) are NOT path-based: they
+# are read and re-applied through the framework `settings` tool (an app_process
+# wrapper, so clear LD_LIBRARY_PATH or the bundled Termux libs shadow ART's libs,
+# same hazard as abx2xml). `settings put` is idempotent (overwrite), so a re-restore
+# never duplicates anything. DEST/IFILE/use_special_age/emit_special_settings come
+# from do_special_backup; REF from do_special_restore.
+sget() { exec_ns env -u LD_LIBRARY_PATH /system/bin/settings "$@"; }
+# encrypt a settings sidecar in place when the backup is encrypted; drop the
+# plaintext (never leak) if encryption fails. Mirrors special_export's _jexport.
+enc_sidecar() {   # <plaintext-file>
+  use_special_age || return 0
+  if enc_age "$1.age" < "$1"; then rm -f "$1"
+  else rm -f "$1" "$1.age"; audit "settings sidecar encryption failed ${1##*/}"; fi
+}
+special_dns_export() {   # private DNS (mode + specifier) -> dns.json, no raw archive
+  _m="$(sget get global private_dns_mode 2>/dev/null)"; case "$_m" in null) _m="" ;; esac
+  _s="$(sget get global private_dns_specifier 2>/dev/null)"; case "$_s" in null) _s="" ;; esac
+  "$JQ" -n --arg mode "$_m" --arg specifier "$_s" '{mode:$mode,specifier:$specifier}' > "$DEST/dns.json" || return 0
+  enc_sidecar "$DEST/dns.json"
+  emit_special_settings dns '["dns.json"]'
+}
+special_sys_export() {   # full system/global/secure settings dump (opt-in, sensitive)
+  _files='[]'
+  for _ns in system global secure; do
+    sget list "$_ns" > "$DEST/settings_$_ns.txt" 2>/dev/null
+    if [ -s "$DEST/settings_$_ns.txt" ]; then
+      enc_sidecar "$DEST/settings_$_ns.txt"
+      _files="$(printf '%s' "$_files" | "$JQ" --arg f "settings_$_ns.txt" '. + [$f]')"
+    else rm -f "$DEST/settings_$_ns.txt"; fi
+  done
+  emit_special_settings system_settings "$_files"
+}
+# read a settings sidecar (decrypting when the item is encrypted) to stdout
+special_sidecar_cat() {   # <basename-without-age> <enc>
+  if [ "$2" = age-scrypt ]; then dec_age "$REF/$1.age"
+  else cat "$REF/$1" 2>/dev/null; fi
+}
+special_dns_restore() {   # <enc>; put mode+specifier back (idempotent), audit old->new
+  _tmp="$STATE/staging/dns.$OPID.json"
+  special_sidecar_cat dns.json "$1" > "$_tmp" 2>/dev/null
+  [ -s "$_tmp" ] || { rm -f "$_tmp"; return 0; }
+  _m="$("$JQ" -r '.mode // empty' "$_tmp" 2>/dev/null)"
+  _s="$("$JQ" -r '.specifier // empty' "$_tmp" 2>/dev/null)"
+  _om="$(sget get global private_dns_mode 2>/dev/null)"; _os="$(sget get global private_dns_specifier 2>/dev/null)"
+  { [ -n "$_m" ] && [ "$_m" != null ]; } && sget put global private_dns_mode "$_m" 2>/dev/null
+  { [ -n "$_s" ] && [ "$_s" != null ]; } && sget put global private_dns_specifier "$_s" 2>/dev/null
+  audit "dns-restore mode=${_om}->${_m} specifier=${_os}->${_s}"
+  rm -f "$_tmp"
+}
+special_sys_restore() {   # <enc>; re-apply each namespace line by line (idempotent put)
+  for _ns in system global secure; do
+    _tmp="$STATE/staging/set.$OPID.$_ns"
+    special_sidecar_cat "settings_$_ns.txt" "$1" > "$_tmp" 2>/dev/null
+    [ -s "$_tmp" ] || { rm -f "$_tmp"; continue; }
+    while IFS= read -r _ln; do
+      case "$_ln" in *=*) : ;; *) continue ;; esac
+      _k="${_ln%%=*}"; _v="${_ln#*=}"; [ -n "$_k" ] || continue
+      _ov="$(sget get "$_ns" "$_k" 2>/dev/null)"
+      sget put "$_ns" "$_k" "$_v" 2>/dev/null
+      audit "system_settings put $_ns $_k ${_ov}->${_v}"
+    done < "$_tmp"
+    rm -f "$_tmp"
+  done
 }
 
 do_special_backup() {
@@ -1237,6 +1423,9 @@ do_special_backup() {
   COMP="$(jget "$ARGS" '.compression')"; { [ -z "$COMP" ] || [ "$COMP" = null ]; } && COMP="$(cfg .compression)"; [ -n "$COMP" ] || COMP="zstd:10"
   PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
   PORTABLE="$(jget "$ARGS" '.portable')"   # also emit openable JSON sidecars (default on)
+  # system_settings is opt-in + sensitive (it overwrites device settings on restore),
+  # gated by an explicit .system_settings flag exactly like ssaid; default OFF.
+  SYSSET="$(jget "$ARGS" '.system_settings')"
   use_special_age() { [ -n "$PW" ]; }
   prog 2 preparing "special"; audit "special-backup start $CATS"; notify backup_start "special"
   BK="$(backups_dir 0)/.special"; TS="$(date -u +%Y%m%dT%H%M%SZ)"; DEST="$BK/$TS"
@@ -1245,28 +1434,38 @@ do_special_backup() {
   emit_special() {  # <cat> <archive> <srcpath> <ctx> <sha>
     "$JQ" -n --arg category "$1" --arg archive "$2" --arg path "$3" --arg ctx "$4" --arg sha "$5" \
       --arg enc "$(use_special_age && echo age-scrypt || echo none)" --arg comp "$COMP" \
-      '{category:$category,archive:$archive,source_path:$path,root_context:$ctx,sha256:$sha,encryption:$enc,compression:$comp}' >> "$IFILE"; }
+      '{category:$category,kind:"path",archive:$archive,source_path:$path,root_context:$ctx,sha256:$sha,encryption:$enc,compression:$comp}' >> "$IFILE"; }
+  emit_special_settings() {  # <cat> <files-json-array>
+    "$JQ" -n --arg category "$1" --argjson files "$2" \
+      --arg enc "$(use_special_age && echo age-scrypt || echo none)" \
+      '{category:$category,kind:"settings",files:$files,encryption:$enc}' >> "$IFILE"; }
   pct=10; nc=0; for _c in $CATS; do nc=$((nc+1)); done; [ "$nc" -gt 0 ] || nc=1
   done_c=0
   for cat in $CATS; do
-    idx=0
-    special_paths "$cat" | while IFS= read -r src; do
-      [ -e "$src" ] || continue
-      idx=$((idx+1))
-      parent="$(dirname "$src")"; base="$(basename "$src")"
-      ctx="$(ls -Zd "$src" 2>/dev/null | cut -d' ' -f1)"
-      ext="$(comp_ext "$COMP")"; arc="$cat.$idx.$ext"; use_special_age && arc="$arc.age"
-      if use_special_age; then
-        exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" | enc_age "$DEST/$arc" \
-          || { audit "special archive failed $cat:$src"; continue; }
-      else
-        exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" > "$DEST/$arc" \
-          || { audit "special archive failed $cat:$src"; continue; }
-      fi
-      sha="$(sha256sum "$DEST/$arc" 2>/dev/null | cut -d' ' -f1)"
-      emit_special "$cat" "$arc" "$src" "$ctx" "$sha"
-    done
-    [ "$PORTABLE" != false ] && special_export "$cat" "$DEST"
+    case "$cat" in
+      dns)             special_dns_export ;;
+      system_settings) if [ "$SYSSET" = true ]; then special_sys_export
+                       else audit "special-backup skip system_settings (not opted in)"; fi ;;
+      *)
+        idx=0
+        special_paths "$cat" | while IFS= read -r src; do
+          [ -e "$src" ] || continue
+          idx=$((idx+1))
+          parent="$(dirname "$src")"; base="$(basename "$src")"
+          ctx="$(ls -Zd "$src" 2>/dev/null | cut -d' ' -f1)"
+          ext="$(comp_ext "$COMP")"; arc="$cat.$idx.$ext"; use_special_age && arc="$arc.age"
+          if use_special_age; then
+            exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" | enc_age "$DEST/$arc" \
+              || { audit "special archive failed $cat:$src"; continue; }
+          else
+            exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" > "$DEST/$arc" \
+              || { audit "special archive failed $cat:$src"; continue; }
+          fi
+          sha="$(sha256sum "$DEST/$arc" 2>/dev/null | cut -d' ' -f1)"
+          emit_special "$cat" "$arc" "$src" "$ctx" "$sha"
+        done
+        [ "$PORTABLE" != false ] && special_export "$cat" "$DEST" ;;
+    esac
     done_c=$((done_c+1)); prog $(( 10 + done_c * 80 / nc )) archiving "$cat"
   done
   prog 92 manifest "special"
@@ -1296,23 +1495,41 @@ do_special_restore() {
     finish false ERR_CRYPTO_PASS; return; fi
   WANTC="$(jget "$ARGS" '.categories | join(" ")')"; [ "$WANTC" = null ] && WANTC=""
   want_cat() { [ -z "$WANTC" ] && return 0; case " $WANTC " in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
+  SYSSET="$(jget "$ARGS" '.system_settings')"
   prog 5 preparing "special"; audit "special-restore start $REF"; notify restore_start "special"
+  # Raw (path-based) categories restore with REPLACE semantics: the provider dir is
+  # wiped then re-extracted, so a re-restore never merges or duplicates rows. The
+  # settings categories (dns/system_settings) re-apply with idempotent `settings put`.
   n="$("$JQ" '.items | length' "$M")"; i=0
   while [ "$i" -lt "${n:-0}" ]; do
     cat="$("$JQ" -r ".items[$i].category // empty" "$M")"
+    kind="$("$JQ" -r ".items[$i].kind // \"path\"" "$M")"
     arc="$("$JQ" -r ".items[$i].archive // empty" "$M")"
     src="$("$JQ" -r ".items[$i].source_path // empty" "$M")"
     enc="$("$JQ" -r ".items[$i].encryption // \"none\"" "$M")"
     i=$((i+1))
+    if [ "$kind" = settings ]; then
+      want_cat "$cat" || continue
+      prog $(( 10 + i * 80 / (n>0?n:1) )) applying "$cat"
+      case "$cat" in
+        dns)             special_dns_restore "$enc" ;;
+        system_settings) if [ "$SYSSET" = true ]; then special_sys_restore "$enc"
+                         else audit "special-restore skip system_settings (not opted in)"; fi ;;
+      esac
+      continue
+    fi
     { [ -z "$arc" ] || [ -z "$src" ]; } && continue
     want_cat "$cat" || continue
     case "$src" in /data/*) : ;; *) audit "special-restore skip unsafe path $src"; continue ;; esac
     parent="$(dirname "$src")"; base="$(basename "$src")"
     prog $(( 10 + i * 80 / (n>0?n:1) )) extracting "$cat"
+    # anti-traversal: reject a tampered archive BEFORE the destructive wipe
+    _senc=none; [ "$enc" = age-scrypt ] && _senc=age
+    archive_safe "$REF/$arc" "$_senc" || { audit "special-restore unsafe archive $cat:$arc"; finish false ERR_UNSAFE_ARCHIVE; return; }
     exec_ns rm -rf "$src" 2>/dev/null
     mkdir -p "$parent"
-    if [ "$enc" = age-scrypt ]; then dec_age "$REF/$arc" | decomp "$arc" | exec_ns "$TAR" $TARC -x -C "$parent" 2>/dev/null
-    else decomp "$REF/$arc" | exec_ns "$TAR" $TARC -x -C "$parent" 2>/dev/null; fi
+    if [ "$enc" = age-scrypt ]; then dec_age "$REF/$arc" | decomp "$arc" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
+    else decomp "$REF/$arc" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null; fi
     [ $? -eq 0 ] || { audit "special-restore extract failed $cat:$arc"; finish false ERR_RESTORE; return; }
     exec_ns restorecon -R "$src" 2>/dev/null
   done
@@ -1320,14 +1537,176 @@ do_special_restore() {
   finish true ERR_NONE
 }
 
+# on-demand fetch of the large cloud binaries (rclone + restic) for the lite edition.
+# Downloads the per-ABI addon named in etc/cloud_addons.json, verifies it against the
+# sha256 baked into the module (mandatory - the binary runs as root), then extracts it
+# into $CLOUD. Nothing else is ever downloaded; the full editions ship these embedded.
+do_cloud_fetch() {
+  prog 2 preparing "cloud"
+  [ -f "$CLOUD_MANIFEST" ] || { finish false ERR_NO_CLOUD; return; }
+  url="$("$JQ" -r --arg a "$BINABI" '.[$a].url // empty' "$CLOUD_MANIFEST" 2>/dev/null)"
+  sha="$("$JQ" -r --arg a "$BINABI" '.[$a].sha256 // empty' "$CLOUD_MANIFEST" 2>/dev/null)"
+  case "$url" in https://*) : ;; *) audit "cloud-fetch: bad url"; finish false ERR_FETCH; return ;; esac
+  case "$sha" in [0-9a-f][0-9a-f]*) : ;; *) audit "cloud-fetch: no sha256"; finish false ERR_FETCH; return ;; esac
+  [ -x "$CURL" ] || [ "$CURL" = curl ] || { finish false ERR_FETCH; return; }
+  _total="$("$JQ" -r --arg a "$BINABI" '.[$a].size // 0' "$CLOUD_MANIFEST" 2>/dev/null)"
+  case "$_total" in ''|*[!0-9]*) _total=0 ;; esac
+  mkdir -p "$STATE/staging" "$CLOUD"
+  _tmp="$STATE/staging/cloud-$BINABI.tar.zst"; rm -f "$_tmp"
+  prog 10 downloading "cloud"
+  # download in the background and drive the progress bar off bytes-so-far vs the known
+  # total, so the UI shows real download progress (mapped into the 10-80% band).
+  "$CURL" -fsSL --retry 2 -o "$_tmp" "$url" 2>/dev/null & _cpid=$!
+  while kill -0 "$_cpid" 2>/dev/null; do
+    if [ "$_total" -gt 0 ] && [ -f "$_tmp" ]; then
+      _sz="$(stat -c%s "$_tmp" 2>/dev/null || echo 0)"
+      _pct=$(( 10 + 70 * _sz / _total )); [ "$_pct" -gt 80 ] && _pct=80
+      prog "$_pct" downloading "cloud"
+    fi
+    sleep 1
+  done
+  wait "$_cpid" 2>/dev/null || { audit "cloud-fetch: download failed"; rm -f "$_tmp"; finish false ERR_FETCH; return; }
+  [ -s "$_tmp" ] || { audit "cloud-fetch: empty download"; rm -f "$_tmp"; finish false ERR_FETCH; return; }
+  prog 80 verifying "cloud"
+  _got="$(sha256sum "$_tmp" 2>/dev/null | cut -d' ' -f1)"
+  [ "$_got" = "$sha" ] || { audit "cloud-fetch: sha256 mismatch want=$sha got=$_got"; rm -f "$_tmp"; finish false ERR_FETCH_VERIFY; return; }
+  prog 90 installing "cloud"
+  "$ZSTD" -dc "$_tmp" 2>/dev/null | "$TAR" -x -C "$CLOUD" -f - 2>/dev/null \
+    || { audit "cloud-fetch: extract failed"; rm -f "$_tmp"; finish false ERR_FETCH; return; }
+  chmod 0755 "$CLOUD/rclone" "$CLOUD/restic" 2>/dev/null
+  rm -f "$_tmp"
+  if [ -x "$CLOUD/rclone" ] && [ -x "$CLOUD/restic" ]; then audit "cloud-fetch ok ($BINABI)"; finish true ERR_NONE
+  else audit "cloud-fetch: missing binary after extract"; finish false ERR_FETCH; fi
+}
+
+# ----------------------------------------------------------------------
+# Standalone folder/file backup (not per-app): tar.zst any absolute path under
+# shared storage or /data into .paths/<sanitized>_<ts>/ with its own manifest, and
+# ship it to the resolved destination via the same transfer path as a full backup.
+do_path_backup() {
+  U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
+  SRCP="$(jget "$ARGS" '.path')"
+  case "$SRCP" in ''|null) finish false ERR_BAD_PATH; return ;; /*) : ;; *) finish false ERR_BAD_PATH; return ;; esac
+  case "$SRCP" in *..*) finish false ERR_BAD_PATH; return ;; esac   # never allow traversal in the source
+  # shared storage, or any /data path (root can read all); reject anything else.
+  case "$SRCP" in /storage/emulated/*|/data/media/*|/sdcard/*|/data/*) : ;; *) finish false ERR_BAD_PATH; return ;; esac
+  exec_ns test -e "$SRCP" || { finish false ERR_NO_PATH; return; }
+  COMP="$(jget "$ARGS" '.compression')"; { [ -z "$COMP" ] || [ "$COMP" = null ]; } && COMP="$(cfg .compression)"; [ -n "$COMP" ] || COMP="zstd:10"
+  PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
+  ENCDATA="$(jget "$ARGS" '.encrypt_data')"; [ "$ENCDATA" = null ] && ENCDATA="$(cfg .encrypt_data)"
+  if [ "$ENCDATA" = true ] && [ -z "$PW" ]; then finish false ERR_CRYPTO_PASS; return; fi
+  use_data_age() { [ "$ENCDATA" = true ] && [ -n "$PW" ]; }
+  resolve_dest
+  transport_guard full || return
+  prog 2 preparing "path"; audit "path-backup start $SRCP"; notify backup_start "path"
+  SAFE="$(printf '%s' "$SRCP" | sed -e 's#^/##' -e 's#[^A-Za-z0-9._-]#_#g')"; [ -n "$SAFE" ] || SAFE=path
+  BACKUPS="$(backups_dir "$U")"; BK="$BACKUPS/.paths"; TS="$(date -u +%Y%m%dT%H%M%SZ)"; DEST="$BK/${SAFE}_${TS}"
+  media_own "$BACKUPS"; media_own "$BK"; mkdir -p "$DEST"
+  parent="$(dirname "$SRCP")"; base="$(basename "$SRCP")"
+  ctx="$(ls -Zd "$SRCP" 2>/dev/null | cut -d' ' -f1)"
+  uid="$(stat -c %u "$SRCP" 2>/dev/null || echo 0)"; gid="$(stat -c %g "$SRCP" 2>/dev/null || echo 0)"
+  ext="$(comp_ext "$COMP")"; enc=none; arc="data.$ext"
+  prog 20 archiving "path"
+  if use_data_age; then enc=age; arc="$arc.age"
+    exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" | enc_age "$DEST/$arc" \
+      || { audit "path-backup archive failed $SRCP"; finish false ERR_BACKUP; return; }
+  else
+    exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" > "$DEST/$arc" \
+      || { audit "path-backup archive failed $SRCP"; finish false ERR_BACKUP; return; }
+  fi
+  # completeness check: the written archive reads back as a full tar (catches truncation)
+  if [ "$enc" = age ]; then
+    dec_age "$DEST/$arc" | { case "$COMP" in gzip) "$GZIP" -dc ;; lz4) "$ZSTD" -dq --format=lz4 -c ;; none) cat ;; *) "$ZSTD" -dqc ;; esac; } | exec_ns "$TAR" -t >/dev/null 2>&1 \
+      || { audit "path-backup incomplete $SRCP"; finish false ERR_BACKUP; return; }
+  else
+    decomp "$DEST/$arc" | exec_ns "$TAR" -t >/dev/null 2>&1 \
+      || { audit "path-backup incomplete $SRCP"; finish false ERR_BACKUP; return; }
+  fi
+  sha="$(sha256sum "$DEST/$arc" 2>/dev/null | cut -d' ' -f1)"
+  prog 90 manifest "path"
+  FP="$(getprop ro.build.fingerprint)"; SDK="$(getprop ro.build.version.sdk)"; SEL="$(getenforce 2>/dev/null | tr 'A-Z' 'a-z')"
+  "$JQ" -n --arg producer "VDBackup $(sed -n 's/^version=//p' "$MODDIR/module.prop")" \
+    --arg created "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --argjson epoch "$(date +%s)" \
+    --arg fp "$FP" --argjson sdk "${SDK:-0}" --arg abi "$abi" --arg sel "${SEL:-unknown}" \
+    --arg src "$SRCP" --arg archive "$arc" --arg comp "$COMP" --arg enc "$enc" \
+    --arg ctx "${ctx:-}" --argjson uid "${uid:-0}" --argjson gid "${gid:-0}" --argjson user "$U" --arg sha "$sha" \
+    '{format_version:1, kind:"path", producer:$producer, created_at:$created, created_epoch:$epoch,
+      device:{fingerprint:$fp, sdk:$sdk, abi:$abi, selinux:$sel}, user_id:$user,
+      source:$src, archive:$archive, compression:$comp, encryption:$enc,
+      root_context:$ctx, owner_uid:$uid, owner_gid:$gid, sha256:$sha}' > "$DEST/manifest.json"
+  sha256sum "$DEST/manifest.json" | cut -d' ' -f1 > "$DEST/manifest.json.sha256"
+  use_data_age && cp "$MODDIR/etc/RECOVERY.md" "$DEST/RECOVERY.md" 2>/dev/null
+  media_own -R "$DEST"
+  [ -s "$DEST/manifest.json" ] || { finish false ERR_BACKUP; return; }
+  # reuse the full-backup transfer path (namespaced under .paths/<sanitized>)
+  PKG=".paths/$SAFE"; VC="$TS"
+  prog 95 transfer "path"; transfer_full || return
+  audit "path-backup done $SRCP -> $DEST"; notify backup_done "path"
+  finish true ERR_NONE
+}
+
+# Restore a standalone path backup: verify, anti-traversal guard, wipe the original
+# path and extract the archive back into place, restoring ownership/context.
+do_path_restore() {
+  REF="$(jget "$ARGS" '.ref')"
+  case "$REF" in /data/media/*/VDBackup/.paths/*) : ;; *) finish false ERR_BAD_REF; return ;; esac
+  case "$REF" in *..*) finish false ERR_BAD_REF; return ;; esac
+  M="$REF/manifest.json"; [ -f "$M" ] || { finish false ERR_NO_BACKUP; return; }
+  [ "$(jget "$ARGS" '.confirm')" = true ] || { finish false ERR_CONFIRM; return; }   # heavy-friction gate
+  PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
+  if [ -f "$M.sha256" ]; then
+    want="$(cat "$M.sha256")"; got="$(sha256sum "$M" | cut -d' ' -f1)"
+    [ "$want" = "$got" ] || { finish false ERR_MANIFEST_SHA; return; }
+  fi
+  SRCP="$("$JQ" -r '.source // empty' "$M")"
+  arc="$("$JQ" -r '.archive // empty' "$M")"
+  enc="$("$JQ" -r '.encryption // "none"' "$M")"
+  ctx="$("$JQ" -r '.root_context // empty' "$M")"
+  uid="$("$JQ" -r '.owner_uid // 0' "$M")"; gid="$("$JQ" -r '.owner_gid // 0' "$M")"
+  case "$SRCP" in /storage/emulated/*|/data/media/*|/sdcard/*|/data/*) : ;; *) finish false ERR_BAD_PATH; return ;; esac
+  case "$SRCP" in *..*) finish false ERR_BAD_PATH; return ;; esac
+  { [ -n "$arc" ] && [ "$arc" != null ]; } || { finish false ERR_NO_BACKUP; return; }
+  if [ "$enc" = age ] && [ -z "$PW" ]; then finish false ERR_CRYPTO_PASS; return; fi
+  prog 5 preparing "path"; audit "path-restore start $REF -> $SRCP"; notify restore_start "path"
+  # anti-traversal: reject a tampered archive BEFORE the destructive wipe
+  _renc=none; [ "$enc" = age ] && _renc=age
+  archive_safe "$REF/$arc" "$_renc" || { audit "path-restore unsafe archive $arc"; finish false ERR_UNSAFE_ARCHIVE; return; }
+  # integrity before the destructive restore
+  want="$("$JQ" -r '.sha256 // empty' "$M")"
+  if [ -n "$want" ] && [ "$want" != null ]; then
+    got="$(sha256sum "$REF/$arc" 2>/dev/null | cut -d' ' -f1)"
+    [ "$want" = "$got" ] || { audit "path-restore sha mismatch $arc"; finish false ERR_VERIFY; return; }
+  fi
+  parent="$(dirname "$SRCP")"; mkdir -p "$parent"
+  prog 40 extracting "path"
+  exec_ns rm -rf "$SRCP" 2>/dev/null
+  if [ "$enc" = age ]; then
+    dec_age "$REF/$arc" | { case "$arc" in
+        *.tar.gz*) "$GZIP" -dc ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c ;;
+        *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; } | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
+  else
+    decomp "$REF/$arc" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
+  fi
+  [ $? -eq 0 ] || { audit "path-restore extract failed $arc"; finish false ERR_RESTORE; return; }
+  case "$uid" in ''|*[!0-9]*) uid=0 ;; esac; case "$gid" in ''|*[!0-9]*) gid=0 ;; esac
+  [ "$uid" != 0 ] && exec_ns chown -hR "$uid:$gid" "$SRCP" 2>/dev/null
+  if [ -n "$ctx" ] && [ "$ctx" != null ]; then exec_ns chcon -hR "$ctx" "$SRCP" 2>/dev/null || exec_ns restorecon -R "$SRCP" 2>/dev/null
+  else exec_ns restorecon -R "$SRCP" 2>/dev/null; fi
+  prog 97 finalizing "path"; audit "path-restore done $SRCP"; notify restore_done "path"
+  finish true ERR_NONE
+}
+
 # mark the operation live immediately, before any (possibly slow) validation, so the
 # UI never sits on a stale "starting" while the first guard/dumpsys runs.
-case "$VERB" in backup|restore|import|special-backup|special-restore) prog 2 preparing "" ;; esac
+case "$VERB" in backup|restore|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore) prog 2 preparing "" ;; esac
 case "$VERB" in
   backup)          backup ;;
   restore)         restore ;;
   import)          do_import ;;
   special-backup)  do_special_backup ;;
   special-restore) do_special_restore ;;
+  cloud-fetch)     do_cloud_fetch ;;
+  path-backup)     do_path_backup ;;
+  path-restore)    do_path_restore ;;
   *)               finish false ERR_UNKNOWN_VERB ;;
 esac

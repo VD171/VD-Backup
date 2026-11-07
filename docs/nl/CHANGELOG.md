@@ -6,6 +6,69 @@
 
 Alle noemenswaardige wijzigingen aan VDBackup worden hier gedocumenteerd. Alleen in het Engels.
 
+## v1.03
+
+Nieuwe backup-reikwijdte:
+
+- Nieuwe speciale-backupcategorieën: agenda (de agenda-provider plus een draagbare export
+  `calendar.json`), achtergrond (start- en vergrendelscherm-achtergrond), privé-DNS (modus
+  en specificeerder) en systeeminstellingen (de volledige dump van de system-, global- en
+  secure-instellingen). Systeeminstellingen zijn opt-in en overschrijven bij herstel de
+  apparaatbrede instellingen, dus ze zijn net als SSAID afgeschermd, met uitdrukkelijke
+  toestemming en een volledige auditvermelding.
+- Losstaande map- en bestandsback-up: back-up elk absoluut pad (gedeelde opslag of
+  app-gegevens) als een gecomprimeerd, met manifest verzegeld archief, en herstel het naar
+  hetzelfde pad. Herstel vereist een uitdrukkelijke bevestiging.
+
+Veiliger herstel:
+
+- Elk archief wordt gecontroleerd voordat er iets wordt geschreven: een backup waarvan de
+  inhoud buiten het doel wijst (een absoluut pad of een `..`-component) wordt geweigerd,
+  zodat een als root draaiend herstel niet verleid kan worden om buiten de bestemming te
+  schrijven.
+
+Voortgang en planning:
+
+- Live voortgang toont nu overdrachtssnelheid, ETA en een itemteller tijdens backups, plus
+  een met checksum geverifieerde stap voor cloud-uploads en een voorcontrole op "niet genoeg
+  ruimte".
+- Geplande taken kunnen voorwaardelijk worden gemaakt: alleen op Wi-Fi, alleen tijdens
+  opladen, alleen boven een batterijniveau, of alleen op gekozen weekdagen; een geplande
+  taak wordt ook overgeslagen terwijl het apparaat kritiek heet is. Een overgeslagen taak
+  wordt bij de volgende tick opnieuw geprobeerd.
+
+Cloud-bestemmingen:
+
+- Verbind elke rclone-backend vanuit de UI: de cloud-remote-keuzelijst biedt de populaire
+  providers (Google Drive, Dropbox, OneDrive, Box, pCloud, Mega, Backblaze B2, S3, SFTP,
+  WebDAV, FTP, SMB) plus een optie "Aangepast (geavanceerd)" waar je elke andere
+  rclone-backendnaam en de bijbehorende `key=value`-parameters typt, zodat alle
+  rclone-backends bereikbaar zijn.
+- Aanmelden op het apparaat (geen pc): providers die een browser-aanmelding nodig hebben
+  (Google Drive, Dropbox, OneDrive, Box, pCloud) hebben een knop "Autoriseren in browser"
+  die de eigen browser van de telefoon opent naar de toestemmingspagina van de provider;
+  nadat je goedkeurt, keer je terug naar de app en wordt de remote automatisch opgeslagen,
+  met de token vastgelegd op het apparaat. Een token handmatig plakken blijft beschikbaar
+  als fallback.
+
+Interface:
+
+- Een aanpasbare interfaceschaal (een versleepbare schuifregelaar) herschaalt de hele interface,
+  zodat die past op schermen met verschillende pixeldichtheden; 100% is de standaard en is ongewijzigd.
+- De interface wordt nu rechts-naar-links weergegeven voor Arabisch en Perzisch.
+- Een startoverzicht met backup-aantallen en een opslagbalk, statusbadges, kopiëren naar
+  klembord van hashes en paden, schakelaars in Android-stijl, en een actie "Check for updates".
+- Het activiteitenlogboek is een volledig scherm dat direct opent, met een actie "Export logs"
+  die een logbestand opslaat dat je aan een rapport kunt toevoegen.
+
+Fixes:
+
+- Herstel en import mislukken niet langer op apparaten waarvan de meegeleverde `tar` de optie
+  `--no-absolute-names` niet accepteert; de veiligheidscontrole van het archief staat los van
+  die optie.
+- "Check for updates" werkt zelfs waar geen HTTP-client is meegeleverd, door terug te vallen op
+  de meegeleverde rclone; en het activiteitenlogboek duurt niet langer lang om te openen.
+
 ## v1.01
 
 Eerste openbare uitgave. Een KernelSU/APatch/Magisk-WebUI-module die apps en hun gegevens volledig
@@ -133,3 +196,5 @@ AI-vriendelijk en i18n:
   documentatie gespiegeld naar de wiki.
 - De uitgebreide app-lijst en de Neo-ontsleuteling lopen via een als root aangestuurde dex-helper
   (`IPackageManager` via ServiceManager), zodat ze werken waar ActivityThread vastloopt.
+
+*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom - zie [CONTRIBUTING.md](CONTRIBUTING.md).*

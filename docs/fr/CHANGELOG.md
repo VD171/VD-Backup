@@ -6,6 +6,71 @@
 
 Toutes les modifications notables de VDBackup sont documentées ici. En anglais uniquement.
 
+## v1.03
+
+Nouvelle portée de sauvegarde :
+
+- Nouvelles catégories de sauvegarde spéciale : calendrier (le fournisseur de calendrier,
+  plus un export portable `calendar.json`), fond d'écran (fond d'écran d'accueil et de
+  verrouillage), DNS privé (mode et spécificateur) et paramètres système (le vidage complet
+  des paramètres system/global/secure). Les paramètres système sont opt-in et écrasent les
+  paramètres de tout l'appareil à la restauration, ils sont donc encadrés comme le SSAID,
+  avec un consentement explicite et une entrée d'audit complète.
+- Sauvegarde autonome de dossier et de fichier : sauvegardez n'importe quel chemin absolu
+  (stockage partagé ou données d'app) sous forme d'archive compressée et scellée par
+  manifeste, et restaurez-la au même chemin. La restauration nécessite une confirmation
+  explicite.
+
+Restauration plus sûre :
+
+- Chaque archive est vérifiée avant toute écriture : une sauvegarde dont le contenu pointe
+  hors de sa cible (un chemin absolu ou un composant `..`) est refusée, de sorte qu'une
+  restauration tournant en root ne peut pas être piégée pour écrire hors de la destination.
+
+Progression et planification :
+
+- La progression en direct montre désormais la vitesse de transfert, l'ETA et un compteur
+  d'éléments pendant les sauvegardes, plus une étape vérifiée par checksum pour les envois
+  vers le cloud et une pré-vérification « espace insuffisant ».
+- Les tâches planifiées peuvent être conditionnées : ne s'exécuter qu'en Wi-Fi, qu'en
+  charge, qu'au-dessus d'un niveau de batterie, ou que certains jours de la semaine ; une
+  tâche planifiée est aussi ignorée pendant que l'appareil est en surchauffe critique. Une
+  tâche ignorée est réessayée au tick suivant.
+
+Destinations cloud :
+
+- Connectez n'importe quel backend rclone depuis l'interface : la liste déroulante de remote
+  cloud propose les fournisseurs populaires (Google Drive, Dropbox, OneDrive, Box, pCloud,
+  Mega, Backblaze B2, S3, SFTP, WebDAV, FTP, SMB) plus une option "Custom (advanced)" où vous
+  tapez le nom de n'importe quel autre backend rclone et ses paramètres `key=value`, de sorte
+  que tous les backends de rclone sont accessibles.
+- Connexion sur l'appareil (sans PC) : les fournisseurs qui nécessitent une connexion par
+  navigateur (Google Drive, Dropbox, OneDrive, Box, pCloud) disposent d'un bouton
+  "Authorize in browser" qui ouvre le navigateur du téléphone lui-même sur la page de
+  consentement du fournisseur ; après votre approbation, vous revenez à l'app et le remote
+  est enregistré automatiquement, le token étant capturé sur l'appareil. Un collage manuel du
+  token reste disponible comme solution de repli.
+
+Interface :
+
+- Une échelle d'interface ajustable (un curseur que l'on fait glisser) redimensionne toute
+  l'interface, afin qu'elle convienne aux écrans de différentes densités de pixels ; 100 %
+  est la valeur par défaut et reste inchangée.
+- L'interface s'affiche désormais de droite à gauche pour l'arabe et le persan.
+- Un aperçu d'accueil avec des comptes de sauvegarde et une barre de stockage, des badges de
+  statut, copier les hachages et les chemins dans le presse-papiers, des interrupteurs à
+  bascule de style Android, et une action « Check for updates ».
+- Le journal d'activité est un écran complet qui s'ouvre instantanément, avec une action
+  « Export logs » qui enregistre un fichier journal que vous pouvez joindre à un rapport.
+
+Corrections :
+
+- La restauration et l'import n'échouent plus sur les appareils dont le `tar` embarqué
+  n'accepte pas l'option `--no-absolute-names` ; la vérification de sécurité de l'archive est
+  indépendante de cette option.
+- « Check for updates » fonctionne même là où aucun client HTTP n'est embarqué, en se
+  repliant sur le rclone embarqué ; et le journal d'activité ne met plus longtemps à s'ouvrir.
+
 ## v1.01
 
 Première version publique. Un module WebUI pour KernelSU/APatch/Magisk qui sauvegarde et restaure
@@ -129,3 +194,5 @@ AI-friendly et i18n :
   (`docs/<lang>/`), avec les docs reflétés sur le wiki.
 - Le listage riche des apps et le déchiffrement Neo passent par un helper dex piloté en root
   (`IPackageManager` via ServiceManager), de sorte qu'ils fonctionnent là où ActivityThread se bloque.
+
+*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues - voir [CONTRIBUTING.md](CONTRIBUTING.md).*

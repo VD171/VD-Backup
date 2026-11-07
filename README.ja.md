@@ -17,6 +17,7 @@
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
   <a href="docs/USER-GUIDE.md">ユーザーガイド</a> ·
   <a href="docs/AI-AGENTS.md">AI エージェント</a> ·
+  <a href="CHANGELOG.md">変更履歴</a> ·
   <a href="CONTRIBUTING.md">貢献</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA スレッド</a>
 </p>
@@ -51,12 +52,14 @@ Android-DataBackup のバックアップをインポートして移行するこ�
   および `restic` リポジトリ。小さなオプトインのコンパニオンによる Google Drive も任意で利用できます。
 - **整合性:** すべてのアーカイブはマニフェストと照合して検証されます。dry-run と復元テストにより、
   何も変更せずにバックアップを確認できます。
-- **選択的復元:** バックアップの項目の任意の一部を復元でき、バックアップの削除や、すべての破壊的な
-  操作の活動/監査ログの保持も行えます。
+- **選択的復元と一括復元:** バックアップの項目の任意の一部を復元でき、あるいは複数のバックアップを
+  まとめて選んで一度に復元でき、バックアップの削除や、すべての破壊的な操作の活動/監査ログの保持も
+  行えます。
 - **特殊バックアップ:** メッセージ (SMS/MMS)、連絡先と通話履歴、Wi-Fi と Bluetooth。PC で開ける
   ポータブルな JSON エクスポートも任意で付けられます。
-- **スケジュール + 自動化:** keep-N 方式で古い世代を刈り込む定期ジョブに加え、インストール/更新時の
-  オプトインの自動バックアップと除外アプリ一覧。
+- **スケジュール + 自動化:** 単一のアプリ, 集合, またはすべてのアプリを対象とする **バックアップまたは復元**
+  の定期ジョブ (keep-N 方式で古い世代を刈り込み) に加え、インストール/更新時のオプトインの自動バックアップと
+  除外アプリ一覧。
 - **インストール元:** 復元したアプリは、デフォルトでインストール元として Play ストアを報告します
   (切り替え可能)。高度なオプトインでは、呼び出し元パッケージとソースも偽装します。
 - **システムアプリのマウント:** 実際の `/system` パーティションに触れずに、インストール済みアプリを
@@ -66,6 +69,14 @@ Android-DataBackup のバックアップをインポートして移行するこ�
 - **移行 (インポート):** 既存の Neo-Backup および Android-DataBackup のバックアップを、
   パスワードで暗号化されたものも含めてインポートします。
 
+## スクリーンショット
+
+| ホーム | アプリ | スケジュール |
+|:---:|:---:|:---:|
+| ![ホーム](docs/screenshots/ja/home-dark.png) | ![アプリ](docs/screenshots/ja/apps-dark.png) | ![スケジュール](docs/screenshots/ja/schedule-dark.png) |
+| **保存先** | **設定** | **アクティビティログ** |
+| ![保存先](docs/screenshots/ja/destinations-dark.png) | ![設定](docs/screenshots/ja/settings-dark.png) | ![アクティビティログ](docs/screenshots/ja/activitylog-dark.png) |
+
 ## インストール
 
 1. 最新の `VD-Backup-vX.Y.zip` を [リリース](https://github.com/VD171/VD-Backup/releases) から
@@ -73,7 +84,7 @@ Android-DataBackup のバックアップをインポートして移行するこ�
 2. KernelSU / APatch / Magisk のマネージャーでフラッシュします - すぐに使え、再起動は不要です。
 3. モジュールの **WebUI** を開いて設定し、バックアップを実行します。これだけです。
 
-**エディション。** 各リリースは 6 つの zip で提供されます。`universal-full` - すべてのアーキテクチャとすべてのバイナリ (クラウドプロバイダー用の `rclone`、スナップショット用の `restic` を含む)、どの端末でも使え、最大。`universal-lite` - すべてのアーキテクチャから最大の 2 つのバイナリ (`rclone`、`restic`) を除いたもので、最小、ローカル・SSH/SFTP・`rsync` のバックアップは引き続き可能。`<abi>-full` (`arm64-v8a`、`armeabi-v7a`、`x86`、`x86_64`) - 単一アーキテクチャにすべてのバイナリを含み、`universal-full` より小さい。自分のアーキテクチャが分かる -> `<abi>-full`、最小またはクラウドの大型バイナリ不要 -> `universal-lite`、どの端末でもすべて -> `universal-full`。[リリース](https://github.com/VD171/VD-Backup/releases) を参照してください。
+**エディション。** 各リリースは 6 つの zip で提供されます。`universal-full` - すべてのアーキテクチャとすべてのバイナリを埋め込み (クラウドプロバイダー用の `rclone`、スナップショット用の `restic` を含む)、完全オフラインで何もダウンロードされず、どの端末でも使え、最大。`universal-lite` - すべてのアーキテクチャから最大の 2 つのバイナリ (`rclone`、`restic`) を除いたもので、最小。ローカル・SSH/SFTP・`rsync` のバックアップはダウンロードなしで引き続き可能で、クラウドの保存先 (`rclone`) やスナップショットモード (`restic`) を初めて使うときに、そのアーキテクチャ別の小さなアドオンを一度だけダウンロードするか尋ね (SHA-256 で検証)、キャッシュするので、それらの機能も使えるようになります。`<abi>-full` (`arm64-v8a`、`armeabi-v7a`、`x86`、`x86_64`) - 単一アーキテクチャにすべてのバイナリを埋め込み、`universal-full` より小さい。自分のアーキテクチャが分かる -> `<abi>-full`、最小でクラウドやスナップショット用の一度きりのダウンロードを許容できる -> `universal-lite`、すべてを埋め込みでダウンロードなし (オフライン / 復旧) にしたい -> full エディション。[リリース](https://github.com/VD171/VD-Backup/releases) を参照してください。
 
 はじめての方へ: [ユーザーガイド](docs/USER-GUIDE.md) がインストールから復元までを案内します。
 
@@ -95,7 +106,7 @@ ABI ごとの静的バイナリ (`tar`、`zstd`、`lz4`、`rclone`、`rsync`、s
 - **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - オンラインで閲覧できるドキュメント。
 - **[ユーザーガイド](docs/USER-GUIDE.md)** - インストールから復元まで、一通り解説。
 - **[AI エージェント](docs/AI-AGENTS.md)** - JSON API を通じてすべてのアクションをヘッドレスで操作。
-- **[アーキテクチャ](ARCHITECTURE.md)** と **[ファイル構成](docs/FILE-STRUCTURE.md)** - 仕組みの解説。
+- **[アーキテクチャ](docs/ARCHITECTURE.md)** と **[ファイル構成](docs/FILE-STRUCTURE.md)** - 仕組みの解説。
 - **[同梱バイナリ](docs/BINARIES.md)** - すべてのビルド済みバイナリの出所と SHA-256、完全な監査のため。
 - **[復元](module/etc/RECOVERY.md)** - モジュールなしで PC 上でバックアップを開いて復号。
 - **[貢献](CONTRIBUTING.md)** と **[セキュリティ](SECURITY.md)**。

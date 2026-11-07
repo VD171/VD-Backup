@@ -36,9 +36,11 @@ Alleen de eerste twee rijen zijn voorgebouwde binaries van derden; de laatste tw
 vanuit broncode die in deze repository leeft en gelezen en herbouwd kan worden.
 
 > **Full- versus lite-edities.** De lite-edities laten alleen `rclone` en `restic` (de twee
-> grootste binaries) weg om klein te blijven; `rsync` en `ssh`/`scp`/`sftp` zijn nog steeds
-> aanwezig, en elke andere hierboven genoemde binary is er ook. De Full-edities voegen `rclone`
-> (cloudproviders) en `restic` (snapshots) toe.
+> grootste binaries) weg om klein te blijven en halen ze op aanvraag op (geverifieerd met
+> SHA-256) de eerste keer dat je een cloud-bestemming of snapshot-modus gebruikt; `rsync` en
+> `ssh`/`scp`/`sftp` zijn nog steeds aanwezig, en elke andere hierboven genoemde binary is er
+> ook. De Full-edities leveren `rclone` (cloudproviders) en `restic` (snapshots) ingebouwd, dus
+> er wordt nooit iets gedownload.
 
 ## Het manifest op het apparaat: `PROVENANCE.json`
 
@@ -80,3 +82,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 Als een meegeleverd bestand niet overeenkomt met de vastgelegde bron, behandel het dan als een
 beveiligingsprobleem en meld het (zie [SECURITY.md](SECURITY.md)). Dit is precies het soort
 discrepantie dat dit manifest bestaat om zichtbaar te maken.
+
+*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom - zie [CONTRIBUTING.md](CONTRIBUTING.md).*

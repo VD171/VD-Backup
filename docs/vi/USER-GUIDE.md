@@ -21,7 +21,8 @@ này sẽ thấy quen thuộc - chỉ là mọi thứ diễn ra ở một nơi, 
   - [5.3 Nén](#53-nén)
   - [5.4 Mã hóa](#54-mã-hóa)
   - [5.5 Xác minh và chạy thử (dry-run)](#55-xác-minh-và-chạy-thử-dry-run)
-  - [5.6 Sao lưu đặc biệt (tin nhắn, nhật ký cuộc gọi, Wi-Fi, Bluetooth)](#56-sao-lưu-đặc-biệt-tin-nhắn-nhật-ký-cuộc-gọi-wi-fi-bluetooth)
+  - [5.6 Sao lưu đặc biệt (tin nhắn, nhật ký cuộc gọi, Wi-Fi, Bluetooth, lịch, hình nền, DNS, cài đặt hệ thống)](#56-sao-lưu-đặc-biệt-tin-nhắn-nhật-ký-cuộc-gọi-wi-fi-bluetooth-lịch-hình-nền-dns-cài-đặt-hệ-thống)
+  - [5.7 Sao lưu thư mục và tệp độc lập](#57-sao-lưu-thư-mục-và-tệp-độc-lập)
 - [6. Khôi phục một bản sao lưu](#6-khôi-phục-một-bản-sao-lưu)
 - [7. Đích: cục bộ và từ xa](#7-đích-cục-bộ-và-từ-xa)
 - [8. Lập lịch và lưu giữ](#8-lập-lịch-và-lưu-giữ)
@@ -51,6 +52,14 @@ Mọi thứ VDBackup tạo ra đều dùng **các định dạng chuẩn** (tar,
 restic), nên các bản sao lưu của bạn không bao giờ bị khóa vào mô-đun và không bao giờ
 gắn với thiết bị cụ thể của bạn. Xem [phần 11](#phần-11).
 
+## Ảnh chụp màn hình
+
+| Trang chủ | Ứng dụng | Lên lịch |
+|:---:|:---:|:---:|
+| ![Trang chủ](../screenshots/vi/home-dark.png) | ![Ứng dụng](../screenshots/vi/apps-dark.png) | ![Lên lịch](../screenshots/vi/schedule-dark.png) |
+| **Đích** | **Cài đặt** | **Nhật ký hoạt động** |
+| ![Đích](../screenshots/vi/destinations-dark.png) | ![Cài đặt](../screenshots/vi/settings-dark.png) | ![Nhật ký hoạt động](../screenshots/vi/activitylog-dark.png) |
+
 ## 2. Yêu cầu
 
 - **Một thiết bị Android đã root** được quản lý bởi **KernelSU**, **APatch** hoặc
@@ -77,21 +86,27 @@ một cách nhẹ nhàng khi chúng không khả dụng trên thiết bị của
 **Nên tải phiên bản nào.** Mỗi bản phát hành đi kèm nhiều phiên bản zip có thể flash, nên bạn chỉ tải
 cái mình cần. Hãy chọn một:
 
-- **`VD-Backup-<ver>-universal-full.zip`** - mọi kiến trúc CPU và mọi tệp nhị phân, bao gồm
-  `rclone` (nhà cung cấp đám mây: Google Drive, S3 và 70+ backend rclone khác) và `restic`
-  (snapshot khử trùng lặp). Hoạt động trên mọi thiết bị. Bản tải lớn nhất.
+- **`VD-Backup-<ver>-universal-full.zip`** - mọi kiến trúc CPU và mọi tệp nhị phân được nhúng sẵn,
+  bao gồm `rclone` (nhà cung cấp đám mây: Google Drive, S3 và 70+ backend rclone khác) và `restic`
+  (snapshot khử trùng lặp). Hoàn toàn ngoại tuyến, không bao giờ tải xuống gì. Hoạt động trên mọi
+  thiết bị. Bản tải lớn nhất.
 - **`VD-Backup-<ver>-universal-lite.zip`** - mọi kiến trúc, nhưng **không có** hai tệp nhị phân
   lớn nhất (`rclone` và `restic`). Bản tải nhỏ nhất; vẫn làm được sao lưu cục bộ, SSH/SFTP và
-  rsync, với mã hóa `age` khả chuyển.
+  rsync mà không cần tải xuống, với mã hóa `age` khả chuyển. Lần đầu tiên bạn dùng đích đám mây
+  (`rclone`) hoặc chế độ snapshot (`restic`), WebUI sẽ đề nghị tải phần bổ trợ nhỏ theo kiến trúc
+  đó một lần (được xác minh bằng SHA-256) và lưu vào bộ nhớ đệm; sau đó các tính năng ấy cũng
+  hoạt động.
 - **`VD-Backup-<ver>-<abi>-full.zip`** (một trong `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) -
-  một kiến trúc duy nhất với mọi tệp nhị phân (cùng tính năng như `universal-full` nhưng chỉ cho
-  kiến trúc thiết bị của bạn, nên nhỏ hơn `universal-full`).
+  một kiến trúc duy nhất với mọi tệp nhị phân được nhúng sẵn (cùng tính năng như `universal-full`
+  nhưng chỉ cho kiến trúc thiết bị của bạn, nên nhỏ hơn `universal-full`).
 
-Nếu bạn biết kiến trúc thiết bị của mình và muốn đầy đủ, hãy chọn **`<abi>-full`** khớp (hầu hết
-điện thoại là **`arm64-v8a`**). Nếu bạn muốn bản tải nhỏ nhất hoặc không cần nhà cung cấp đám mây
-(`rclone`) hay snapshot (`restic`), hãy chọn **`universal-lite`**. Nếu bạn muốn đầy đủ nhưng không
-chắc về kiến trúc, hãy chọn **`universal-full`**. Khi cài đặt, mô-đun chỉ giữ lại kiến trúc của thiết bị bạn bất
-kể bạn flash phiên bản nào.
+Nếu bạn biết kiến trúc thiết bị của mình và muốn đầy đủ mọi thứ được nhúng sẵn, hãy chọn
+**`<abi>-full`** khớp (hầu hết điện thoại là **`arm64-v8a`**). Nếu bạn muốn bản tải nhỏ nhất và
+không ngại một lần tải xuống được xác minh bằng SHA-256 trong lần đầu dùng nhà cung cấp đám mây
+(`rclone`) hay snapshot (`restic`), hãy chọn **`universal-lite`**. Nếu bạn muốn mọi thứ được nhúng
+sẵn mà không tải xuống gì (ngoại tuyến / khôi phục) nhưng không chắc về kiến trúc, hãy chọn một
+phiên bản **full**. Khi cài đặt, mô-đun chỉ giữ lại kiến trúc của thiết bị bạn bất kể bạn flash
+phiên bản nào.
 
 Ở lần chạy đầu, mô-đun gieo một cấu hình mặc định (chỉ khi chưa có cái nào), nên các cài
 đặt của bạn được giữ nguyên qua các lần cập nhật mô-đun.
@@ -119,6 +134,7 @@ Hãy nhớ điều này vì hai lý do: các bản sao lưu chiếm dung lượn
 
 WebUI được tổ chức thành một vài tab:
 
+- **Home** - một tổng quan trang chủ hiển thị số lượng các bản sao lưu của bạn (ứng dụng, bản sao lưu, thư mục và công việc đã lập lịch) và một thanh lưu trữ cho biết các bản sao lưu của bạn dùng bao nhiêu dung lượng so với dung lượng trống, kèm huy hiệu trạng thái, sao chép hash và đường dẫn vào bảng tạm, và một hành động **Check for updates**.
 - **Apps** - danh sách các ứng dụng đã cài (người dùng và hệ thống), mỗi cái hiển thị với
   tên thật, tên gói, và biểu tượng của nó (biểu tượng tải lười và được lưu đệm, nên danh
   sách vẫn phản hồi nhanh). Nút trên một hàng sao lưu ứng dụng; chạm vào hàng sẽ mở lịch sử
@@ -132,10 +148,12 @@ WebUI được tổ chức thành một vài tab:
   từ xa nào bạn thêm (xem [phần 7](#phần-7)). Bạn có thể kiểm tra một đích ở
   đây trước khi dựa vào nó.
 - **Settings** - một công tắc chủ đề sáng/tối, một bộ chọn màu nhấn (mẫu dựng sẵn, màu tùy chỉnh,
-  hoặc đặt lại), một bộ chọn ngôn ngữ, các mặc định cho công việc mới (nén mặc định, bật/tắt xác minh,
+  hoặc đặt lại), một bộ chọn ngôn ngữ (giao diện hiển thị từ phải sang trái cho tiếng Ả Rập
+  và tiếng Ba Tư), một thanh trượt tỷ lệ giao diện mà bạn kéo để co giãn toàn bộ
+  giao diện (đầu trang, nội dung và thanh điều hướng dưới cùng cùng nhau) từ 85% đến 120% (100% là mặc định), cho các màn hình có mật độ điểm ảnh khác nhau, các mặc định cho công việc mới (nén mặc định, bật/tắt xác minh,
   mã hóa mặc định), chính sách mạng cho các lần truyền đám mây (xem [phần 7](#phần-7)), sao lưu tự động
-  và danh sách ứng dụng loại trừ, tùy chọn nguồn cài đặt, khóa mã hóa, và lập lịch.
-- **About** - phiên bản, liên kết, các dự án anh em (See also) và tệp kê khai kiểm toán nhị phân đi kèm.
+  và danh sách ứng dụng loại trừ, tùy chọn nguồn cài đặt, khóa mã hóa, và lập lịch. Các thiết lập bật/tắt dùng công tắc gạt kiểu Android.
+- **About** - phiên bản, liên kết, các dự án anh em (See also), tệp kê khai kiểm toán nhị phân đi kèm, và một hành động **Check for updates** báo cáo liệu một phiên bản mới hơn đã được phát hành hay chưa (cùng với ghi chú phát hành của nó). Bạn cài đặt mọi bản cập nhật thông qua trình quản lý root của mình, giống như cách bạn đã flash mô-đun.
 
 Các xác nhận và thông báo dùng hộp thoại trong ứng dụng (không phải các cửa sổ bật lên của
 hệ thống kiểu cũ), và một lần khôi phục hoặc nhập sẽ yêu cầu bạn thừa nhận rằng nó ghi đè
@@ -143,7 +161,9 @@ dữ liệu ứng dụng hiện tại trước khi tiến hành.
 
 Các lần sao lưu và khôi phục chạy **tách rời** như một tiến trình root nền. Bạn có thể đóng
 WebUI, hoặc thậm chí đóng trình quản lý root, và thao tác vẫn tiếp tục. Khi bạn quay lại,
-WebUI gắn lại và hiển thị tiến trình trực tiếp với nhãn pha đã bản địa hóa. Trên các ROM
+WebUI gắn lại và hiển thị tiến trình trực tiếp với nhãn pha đã bản địa hóa. Đối với một công
+việc đang chạy, thẻ tiến trình cũng hiển thị tốc độ truyền trực tiếp và thời gian còn lại ước
+tính, cùng một bộ đếm mục (ví dụ "12 of 40") với tên của mục hiện tại. Trên các ROM
 hiển thị thông báo shell, bạn cũng nhận được một thông báo Android khi một công việc bắt
 đầu và kết thúc; dù sao đi nữa, thẻ tiến trình trong ứng dụng là chỉ báo đáng tin cậy.
 
@@ -241,17 +261,62 @@ Hai tùy chọn an toàn giúp bạn tin tưởng một bản sao lưu trước 
   không ghi gì cả**. Dùng nó để ước tính dung lượng hoặc để kiểm tra lựa chọn mục của bạn
   trước khi chạy thứ thật.
 
-### 5.6 Sao lưu đặc biệt (tin nhắn, nhật ký cuộc gọi, Wi-Fi, Bluetooth)
+Khi một bản sao lưu đi tới một đích **đám mây**, VDBackup thêm hai lớp bảo vệ nữa. Nó chạy một
+bước **checksum-verified** cuối cùng để kiểm tra lại bản sao đã tải lên so với bản gốc trên
+remote, và khiến công việc thất bại (thay vì để lại một bản sao hỏng trên đám mây) nếu chúng
+không khớp. Và trước một lần tải lên Full, nó kiểm tra **dung lượng trống** của remote và dừng
+sớm với một lỗi rõ ràng **"not enough space"** nếu bản sao lưu sẽ không vừa, thay vì lấp đầy
+remote rồi thất bại giữa chừng. (Kiểm tra dung lượng là cho các lần tải lên Full; Mirror là một
+đồng bộ delta và được miễn trừ.)
+
+### 5.6 Sao lưu đặc biệt (tin nhắn, nhật ký cuộc gọi, Wi-Fi, Bluetooth, lịch, hình nền, DNS, cài đặt hệ thống)
 
 Bên dưới các danh sách ứng dụng trong tab **Backups**, **Sao lưu đặc biệt** bao gồm dữ liệu
-toàn hệ thống không gắn với một ứng dụng đơn lẻ: **tin nhắn (SMS/MMS)**, **danh bạ và nhật ký
-cuộc gọi**, **mạng Wi-Fi** và **Bluetooth**. Chọn các hạng mục và sao lưu chúng; chúng được
-lưu trữ ở dạng thô, với cùng việc bảo toàn SELinux/xattr và mã hóa tùy chọn như các bản sao
-lưu ứng dụng. Tùy chọn, một **bản sao khả chuyển** cũng được ghi (tin nhắn, nhật ký cuộc gọi
-và danh bạ dưới dạng JSON mở được), nên bạn có một bản sao xuyên thiết bị mà bạn có thể đọc
-trên PC mà không cần mô-đun. Khôi phục một bản sao lưu đặc biệt sẽ ghi đè dữ liệu hệ thống
-đang chạy và cần khởi động lại, nên nó được canh gác sau một lời thừa nhận nổi bật và đáng tin
-cậy trên cùng thiết bị và cùng ROM.
+toàn hệ thống không gắn với một ứng dụng đơn lẻ. Chọn các hạng mục và sao lưu chúng; chúng được
+lưu trữ với cùng việc bảo toàn SELinux/xattr và mã hóa tùy chọn như các bản sao lưu ứng dụng. Các
+hạng mục là:
+
+| Hạng mục | Nó là gì |
+|----------|-----------|
+| **Tin nhắn (SMS/MMS)** | Các tin nhắn văn bản của bạn. |
+| **Danh bạ và nhật ký cuộc gọi** | Danh bạ và lịch sử cuộc gọi của bạn. |
+| **Mạng Wi-Fi** | Các mạng Wi-Fi bạn đã lưu. |
+| **Bluetooth** | Các cặp ghép nối Bluetooth của bạn. |
+| **Lịch** | Provider lịch (ứng dụng và dữ liệu). Một **`calendar.json` khả chuyển** cũng được ghi, nên các sự kiện của bạn đọc được trên PC mà không cần mô-đun. |
+| **Hình nền** | Hình nền màn hình chính và màn hình khóa của bạn cùng `wallpaper_info.xml`, lưu ở dạng ảnh thô. |
+| **DNS** | Chế độ và máy chủ DNS riêng tư của bạn. |
+| **Cài đặt hệ thống** | Một bản dump đầy đủ các cài đặt system, global và secure của thiết bị. |
+
+Đối với tin nhắn, nhật ký cuộc gọi và danh bạ, một **bản sao khả chuyển** (JSON mở được) cũng được
+ghi, nên bạn có một bản sao xuyên thiết bị mà bạn có thể đọc trên PC mà không cần mô-đun.
+
+**Cài đặt hệ thống là opt-in và ghi đè các cài đặt thiết bị của bạn khi khôi phục.** Giống hệt SSAID
+(xem [phần 10](#phần-10)), hạng mục **Cài đặt hệ thống** là hạng mục nhạy cảm nhất: khôi phục nó sẽ
+ghi đè các cài đặt trên toàn thiết bị của bạn, nên nó tắt trừ khi bạn chủ ý chọn nó, yêu cầu bạn thừa
+nhận trước, và được ghi vào nhật ký hoạt động.
+
+Khôi phục một bản sao lưu đặc biệt sẽ ghi đè dữ liệu hệ thống đang chạy và cần khởi động lại, nên nó
+được canh gác sau một lời thừa nhận nổi bật và đáng tin cậy trên cùng thiết bị và cùng ROM. Các lần
+khôi phục là **idempotent**: các hạng mục thô (tin nhắn, danh bạ, Wi-Fi, Bluetooth, lịch) được khôi
+phục bằng cách **thay thế** dữ liệu thay vì hợp nhất nó, nên khôi phục cùng một bản sao lưu hai lần
+không bao giờ tạo ra các bản trùng lặp, và DNS cùng cài đặt hệ thống chỉ đơn giản được áp dụng lại.
+
+### 5.7 Sao lưu thư mục và tệp độc lập
+
+Đôi khi bạn muốn sao lưu một thư mục hoặc tệp thông thường không phải là một ứng dụng - một thư mục
+camera, một thư mục tài liệu, một cơ sở dữ liệu đơn. VDBackup có thể sao lưu **bất kỳ đường dẫn tuyệt
+đối nào** trên bộ nhớ dùng chung hoặc dưới `/data`, với cùng định dạng khả chuyển như một bản sao lưu
+ứng dụng: một kho lưu trữ `tar.zst` cộng một `manifest.json`, được niêm phong bằng SHA-256, kèm một
+ghi chú RECOVERY khi bạn mã hóa nó. Các bản sao lưu đường dẫn này được giữ riêng, dưới một thư mục
+`.paths` trong thư mục backups của bạn.
+
+- **Chọn một đường dẫn và sao lưu nó.** Nguồn phải là một đường dẫn tuyệt đối dưới một trong các vị
+  trí được phép (`/storage/emulated`, `/data/media`, `/sdcard`, `/data`). Các đường dẫn cố trèo ra
+  ngoài bằng `..` sẽ bị từ chối.
+- **Khôi phục ghi lại về vị trí gốc**, nên, như bất kỳ lần khôi phục nào, nó có tính phá hủy và yêu
+  cầu bạn **xác nhận** trước khi nó ghi đè bất cứ thứ gì.
+- Giống các bản sao lưu ứng dụng, sao lưu và khôi phục đường dẫn chạy **tách rời** với tiến trình
+  trực tiếp, dùng nén bạn chọn, và có thể được mã hóa bằng một cụm mật khẩu.
 
 ## 6. Khôi phục một bản sao lưu
 
@@ -262,7 +327,10 @@ một nhật ký kiểm toán cục bộ.
 Một lần khôi phục là **trung thực**: VDBackup xóa trạng thái hiện tại của ứng dụng và giải
 nén bản sao lưu, nên ứng dụng được đưa về **đúng trạng thái** được chụp trong bản sao lưu
 đó (bao gồm sở hữu, chế độ, ngữ cảnh SELinux và xattr). Nó không phải là một lần hợp nhất -
-nó là một lần khôi phục thật về thời điểm của bản sao lưu.
+nó là một lần khôi phục thật về thời điểm của bản sao lưu. Vì một lần khôi phục chạy với quyền root,
+VDBackup cũng kiểm tra mọi kho lưu trữ trước khi giải nén bất cứ thứ gì và từ chối một kho bị giả mạo
+cố ghi ra ngoài đích của nó, nên một bản sao lưu đã bị sửa đổi không bao giờ có thể ghi đè phần còn
+lại của hệ thống bạn.
 
 Các tùy chọn khôi phục hữu ích:
 
@@ -282,6 +350,12 @@ Các tùy chọn khôi phục hữu ích:
   opt-in nâng cao **"giả mạo nguồn khởi tạo"** còn đi xa hơn và cũng làm cho gói khởi tạo và
   nguồn gói của ứng dụng trông như được cài từ Play; nó chỉnh sửa cơ sở dữ liệu gói của hệ
   thống (được sao lưu trước tiên) và có hiệu lực sau khi khởi động lại.
+
+**Khôi phục hàng loạt.** Tab **Backups** có chế độ **Select**, giống như cách tab Apps có nó
+cho sao lưu hàng loạt. Bật **Select**, đánh dấu các bản sao lưu bạn muốn bằng các ô đánh dấu
+của chúng, và khôi phục tất cả cùng một lúc. Một hộp thoại tùy chọn duy nhất bao trùm toàn bộ
+lựa chọn - việc xác nhận ghi đè, kiểm tra khôi phục và tùy chọn nguồn cài đặt áp dụng cho mọi
+bản sao lưu bạn đã chọn - và chúng được khôi phục lần lượt nối tiếp nhau.
 
 **Xóa một bản sao lưu.** Mở chi tiết của một bản sao lưu (hoặc lịch sử của một ứng dụng) và
 dùng **Delete**; bạn được yêu cầu xác nhận, và việc xóa được ghi vào nhật ký hoạt động. Bạn
@@ -308,11 +382,16 @@ Việc truyền từ xa được xử lý bởi các công cụ đóng gói sẵ
 - **restic** - các kho **Snapshot** đã mã hóa, khử trùng lặp (cục bộ hoặc từ xa).
 
 **Tạo một remote đám mây (không cần SSH).** Trong tab Destinations, chọn loại đích
-**rclone** và dùng **Add cloud remote**: chọn backend (SFTP, SMB, WebDAV, FTP, S3 hoặc
-Google Drive), điền các trường (host/user/password, hoặc các khóa S3, hoặc một token Drive)
-và lưu. Remote sau đó xuất hiện trong danh sách remote của đích. Mật khẩu được lưu ở dạng
-che giấu, không bao giờ ở dạng văn bản rõ. Bạn có thể liệt kê và xóa các remote của mình từ
-cùng một chỗ.
+**rclone** và dùng **Add cloud remote**. Bạn có thể kết nối **bất kỳ backend rclone nào**:
+menu thả xuống cung cấp những cái phổ biến (**Google Drive, Dropbox, OneDrive, Box, pCloud,
+Mega, Backblaze B2, S3, SFTP, WebDAV, FTP, SMB**) cùng một tùy chọn **Custom (advanced)** nơi
+bạn gõ bất kỳ loại backend nào khác và các tham số `key=value` của nó. Điền các trường
+(host/user/password, hoặc các khóa S3, chẳng hạn) và lưu. Với các nhà cung cấp đăng nhập cho
+bạn bằng trình duyệt (Google Drive, Dropbox, OneDrive, Box, pCloud) hãy dùng nút **Authorize
+in browser**: nó đăng nhập cho bạn qua trình duyệt của chính điện thoại và tự động bắt lấy
+token, nên **không cần PC** (dán token thủ công vẫn hoạt động như một phương án dự phòng).
+Remote sau đó xuất hiện trong danh sách remote của đích. Mật khẩu được lưu ở dạng che giấu,
+không bao giờ ở dạng văn bản rõ. Bạn có thể liệt kê và xóa các remote của mình từ cùng một chỗ.
 
 Hai quy tắc giữ cho việc dùng từ xa an toàn:
 
@@ -344,20 +423,38 @@ bao giờ tiêu dữ liệu di động. Các bản sao lưu cục bộ không ba
 
 ## 8. Lập lịch và lưu giữ
 
-VDBackup có thể chạy các bản sao lưu tự động theo một lịch. Trong bộ lập lịch bạn định
-nghĩa một công việc với:
+VDBackup có thể chạy các bản sao lưu - và các bản khôi phục - tự động theo một lịch. Trong bộ
+lập lịch bạn định nghĩa một công việc với:
 
-- ứng dụng (hoặc tập hợp ứng dụng) và các mục/chế độ để dùng,
+- một **mục tiêu** - một ứng dụng duy nhất, một tập hợp ứng dụng, hoặc **tất cả ứng dụng**
+  (trừ danh sách ứng dụng loại trừ) - và các mục/chế độ để dùng,
+- một **hành động** - **Back up** (mặc định) hoặc **Restore latest**, khôi phục bản sao lưu
+  gần nhất của mỗi ứng dụng mục tiêu,
 - một đích,
 - một **lịch kiểu cron** - theo giờ, theo ngày hoặc theo tuần, vào một thời điểm bạn chọn
   (HH:MM),
 - một cài đặt **lưu giữ**: **giữ N** bản sao lưu gần nhất cho công việc đó, các bản cũ hơn
-  được tỉa tự động.
+  được tỉa tự động,
+- các **điều kiện chạy** tùy chọn: chỉ trên **Wi-Fi**, chỉ khi đang **sạc**, chỉ ở mức **pin
+  tối thiểu** trở lên, và chỉ vào các **ngày trong tuần** đã chọn.
 
 Các công việc theo lịch được kích hoạt bởi một nhịp lúc khởi động trong mô-đun: khi một công
 việc đến hạn nó chạy, ghi lại thời điểm chạy lần cuối để nó không kích hoạt hai lần, và áp
 dụng lưu giữ để tỉa các bản sao lưu cũ. Vì mọi thứ chạy với quyền root ở nền, các bản sao
 lưu theo lịch không cần WebUI phải mở.
+
+**Điều kiện chạy (cổng).** Một công việc theo lịch có thể mang các điều kiện phải được thỏa để
+nó chạy: chỉ Wi-Fi, chỉ khi sạc, một mức pin tối thiểu, và các ngày cụ thể trong tuần. Khi một
+công việc đến hạn nhưng một điều kiện không được thỏa, nó bị **bỏ qua và thử lại ở lần kiểm tra
+kế tiếp** - lịch của nó không đẩy tiến, nên nó chạy ngay khi điều kiện được thỏa. Một kiểm tra
+an toàn nhiệt tích hợp cũng bỏ qua một công việc theo lịch khi thiết bị quá nóng. Mỗi lần bỏ qua
+như vậy được ghi vào nhật ký hoạt động.
+
+**Khôi phục theo lịch ghi đè ở mỗi lần chạy.** Một công việc **Restore latest** khôi phục lại
+bản sao lưu gần nhất của mỗi ứng dụng mục tiêu mỗi khi nó kích hoạt, và khôi phục là hành động
+phá hủy: ở mỗi lần chạy nó **ghi đè dữ liệu hiện tại của ứng dụng** bằng bản sao lưu gần nhất.
+Điều này là có chủ đích và phải tự chọn - chỉ chọn nó khi bạn muốn giữ các mục tiêu ở bản sao
+lưu gần nhất của chúng.
 
 **Tự động sao lưu khi cài đặt/cập nhật.** Trong Settings bạn có thể bật **sao lưu tự động**:
 chính nhịp nền đó nhận thấy các ứng dụng vừa được cài mới hoặc được cập nhật và sao lưu chúng
@@ -365,12 +462,13 @@ cho bạn (với lưu giữ keep-N). Lần chạy đầu tiên chỉ ghi lại n
 nó không bao giờ sao lưu toàn bộ thiết bị của bạn cùng một lúc.
 
 **Ứng dụng loại trừ (danh sách chặn).** Cũng trong Settings, bạn có thể loại trừ các ứng dụng
-mà bạn không bao giờ muốn được sao lưu tự động hoặc theo lịch; các ứng dụng bị loại trừ được
-cả hai bỏ qua.
+mà bạn không bao giờ muốn được sao lưu tự động hoặc theo lịch; bạn có thể thêm nhiều ứng dụng cùng
+lúc (chọn nhiều), và các ứng dụng bị loại trừ được cả hai bỏ qua.
 
-**Nhật ký hoạt động.** Tab Schedule có một nút **View activity log** hiển thị dấu vết kiểm toán
-cục bộ - sao lưu, khôi phục, xóa, các lần chạy theo lịch và tự động, và các lần tỉa - mới nhất
-trước.
+**Nhật ký hoạt động.** Tab Schedule có một nút **View activity log** mở ra một màn hình đầy đủ (ngay
+lập tức) hiển thị dấu vết kiểm toán cục bộ - sao lưu, khôi phục, xóa, các lần chạy theo lịch và tự
+động, và các lần tỉa - mới nhất trước. Một hành động **Export logs** lưu một tệp nhật ký (trong thư
+mục sao lưu) mà bạn có thể đính kèm vào một báo cáo phản hồi hoặc báo lỗi.
 
 ## 9. Di chuyển vào: nhập Neo-Backup và Android-DataBackup
 
@@ -467,6 +565,11 @@ mã phổ biến:
   được một bản sao lưu xấu). Chạy lại bản sao lưu.
 - `ERR_RESTORE_TEST` - một bài kiểm tra khôi phục thất bại; bản sao lưu không giải nén/xác
   minh sạch sẽ và ứng dụng đang chạy của bạn được để nguyên không bị chạm.
+- `ERR_UNSAFE_ARCHIVE` - một kho lưu trữ bị từ chối vì nó cố ghi ra ngoài thư mục đích của mình
+  (đường dẫn tuyệt đối hoặc `..`). Điều này bảo vệ bạn khỏi một bản sao lưu bị giả mạo; không có gì
+  được ghi.
+- `ERR_QUOTA` - một remote đám mây không có đủ dung lượng trống cho một lần tải lên Full; bản sao
+  lưu đã bị dừng trước khi tải lên bất cứ thứ gì.
 
 **Đích từ xa của tôi thất bại.** Dùng **bài kiểm tra** đích trong tab Destinations để xác
 thực thông tin đăng nhập và kết nối. Nhớ rằng chỉ các đích đám mây mới cần mạng; sao

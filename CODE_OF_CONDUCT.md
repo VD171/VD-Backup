@@ -17,3 +17,5 @@ issues and contributions that violate this code, and may ban repeat offenders.
 
 This is a condensed, project-appropriate adaptation of the spirit of the Contributor
 Covenant.
+
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome - see [CONTRIBUTING.md](CONTRIBUTING.md).*

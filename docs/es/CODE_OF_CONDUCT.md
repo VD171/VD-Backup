@@ -17,3 +17,5 @@ issues y contribuciones que violen este código, y pueden banear a reincidentes.
 
 Esta es una adaptación condensada y apropiada para el proyecto del espíritu del Contributor
 Covenant.
+
+*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas - ve [CONTRIBUTING.md](CONTRIBUTING.md).*

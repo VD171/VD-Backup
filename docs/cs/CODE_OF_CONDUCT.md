@@ -16,3 +16,5 @@ Nepřijatelné chování lze soukromě nahlásit správci (kontakt viz
 issues a příspěvky, které porušují tento kodex, a mohou zablokovat opakované narušitele.
 
 Toto je zhuštěná adaptace ducha Contributor Covenant přizpůsobená projektu.
+
+*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány - viz [CONTRIBUTING.md](CONTRIBUTING.md).*

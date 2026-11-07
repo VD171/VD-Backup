@@ -31,3 +31,12 @@ schnell wir können und nennen dich, wenn du möchtest.
   wähle eine starke.
 - Die optionale Google-Drive-Begleit-App sollte immer mit HMA-OSS versteckt werden, damit sie
   weder Root noch einen entsperrten Bootloader verrät.
+- Die Wiederherstellung läuft als Root, daher wird jedes Archiv geprüft, bevor irgendetwas
+  geschrieben wird: ein Backup, dessen Inhalte außerhalb ihres Ziels zeigen (ein absoluter
+  Pfad oder eine `..`-Komponente), wird abgelehnt, und keine Datei wird entpackt, bis das
+  gesamte Archiv freigegeben ist.
+- Jede vorkompilierte Binärdatei und Bibliothek ist auf einen fixierten öffentlichen Upstream mit
+  einem festgehaltenen SHA-256 zurückverfolgbar, und das Manifest wird auf dem Gerät mitgeliefert,
+  sodass die gebündelte Nutzlast geprüft und reproduziert werden kann. Siehe [BINARIES.md](BINARIES.md).
+
+*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen - siehe [CONTRIBUTING.md](CONTRIBUTING.md).*

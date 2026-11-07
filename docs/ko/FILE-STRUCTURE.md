@@ -32,7 +32,6 @@ VD-Backup/
 ├── README.md + README.<code>.md    # English + the 21 standard languages
 ├── CHANGELOG.md                    # English only
 ├── CONTRIBUTING.md                 # how to contribute
-├── ARCHITECTURE.md                 # the big picture
 ├── CODE_OF_CONDUCT.md  SECURITY.md
 ├── LICENSE                         # GNU AGPL-3.0-or-later
 ├── docs/                           # public docs (this file)

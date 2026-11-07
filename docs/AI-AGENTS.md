@@ -43,6 +43,7 @@ destinations (`rclone`/`restic`/ssh) talk to the network.
 | Verb | Args (JSON) | Returns |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` counts (sizes in bytes): apps with backups, total backup instances, standalone path backups, scheduled jobs, total backups size, and the backups filesystem free/total. Non-detached, returns immediately; used by the WebUI home overview. |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | the config object (or `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | generates the `age` keypair for encryption |
@@ -63,17 +64,54 @@ destinations (`rclone`/`restic`/ssh) talk to the network.
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref must be under the backups dir) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` keep newest N of a package |
 | `log-read` | `{limit?}` | `{ok,entries:[...]}` audit log, newest first |
-| `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth) |
+| `log-export` | `{user?}` | `{ok:true,path}` (absolute path of a written `.txt` under the backups dir) or `{ok:false,code:"ERR_LOG_EXPORT"}`. Writes the activity log (`audit.jsonl`) plus a short build/device header to a single user-visible text file so it can be attached to a bug report. Non-detached, returns immediately. |
+| `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` system-wide backup (detached) |
 | `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (reboot-required; `confirm` gates it) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
+| `path-backup` | `{path,compression?,password?}` | `{ok,opid}` back up any absolute path as `tar.zst`+`manifest.json` under `.paths/` (detached) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` restore a path backup to its original location (`confirm` gates it; detached) |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
 | `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | mount an installed app as a system app (systemless sub-module; live via NoMount else next boot) |
 | `companion-status` / `companion-install` | `{}` | Google Drive companion status / on-demand install |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | destination management |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone remote management (creates the `rclone.conf` entry a `type:"rclone"` dest points to) |
-| `schedule-set` / `schedule-list` / `schedule-delete` | `{id,package,mode,dest,cron,at,keep,items}` | scheduled jobs |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone remote management (creates the `rclone.conf` entry a `type:"rclone"` dest points to); `backend` may be any rclone backend, no whitelist |
+| `remote-authorize` | `{backend}` | `{ok:true,url}` (the engine already opened the phone browser to that consent URL via an Android VIEW intent) or `{ok:false,code:"ERR_AUTHORIZE"}`. Runs `rclone authorize <backend>` on a local callback server (`127.0.0.1:53682`) for on-device OAuth. |
+| `remote-authorize-poll` | `{}` | `{ok:true,done:false,url}` while waiting, `{ok:true,done:true,token}` once the user consented (the `token` to pass to `remote-add`), or `{ok:false,code:"ERR_AUTHORIZE"}`. |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; stops a pending authorization. |
+| `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (are the `rclone`/`restic` binaries present, can this `lite` edition fetch them, download size in bytes) |
+| `cloud-fetch` | `{}` | `{ok,opid}` (detached) fetch+verify+install the `rclone`/`restic` addon on a `lite` edition |
+| `schedule-set` / `schedule-list` / `schedule-delete` | see below | scheduled jobs (a backup or a restore; targeting one app, a set, or all apps) |
 | `scheduler-tick` | `{}` | runs due jobs + applies retention + the auto-backup observer (the boot heartbeat calls this) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (not detached; returns immediately; `ERR_UPDATE_CHECK` on failure - see below) |
+
+### `progress` fields
+
+Polling `progress` returns the live `progress-<opid>.json` for the operation. These fields
+are **always present**:
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `opid` | string | the operation id |
+| `percent` | int | 0-100 completion |
+| `phase` | string | current phase label |
+| `item` | string | current item type being processed |
+| `done` | bool | true on a terminal write (finish / dry-run / restore-test) |
+
+A running operation may also carry these **optional** live fields. They are absent or empty
+when unknown, and are **omitted on terminal writes** (finish / dry-run / restore-test):
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `rate` | string | transfer speed, e.g. `"4.2 MiB/s"` (empty = unknown) |
+| `eta` | string | estimated time remaining, e.g. `"1m12s"` (empty = unknown) |
+| `n` | int | current item index (0 = unknown) |
+| `of` | int | total item count (0 = unknown) |
+| `cur` | string | current item name (empty = none) |
+
+Cloud transfers populate `rate`/`eta` (the percent comes from rclone); local Full backups
+populate `n`/`of`/`cur`. Phase labels include the checksum-seal phase **`verified`** and,
+for cloud transfers, **`transfer`** and **`mirror <item>`**.
 
 ### `backup` args
 
@@ -103,11 +141,63 @@ initiating package and package source by editing the package database, applies a
 reboot). `import` takes `"from": "neo" | "databackup"` and, for an encrypted Neo backup,
 `"password"`.
 
+### `schedule-set` args
+
+A schedule job picks **one** target and an **action**:
+
+```json
+{
+  "id": "nightly-games",
+  "action": "backup",             // "backup" (default) | "restore"
+  "package": "com.example.app",   // one app   - OR -
+  "packages": ["com.a","com.b"],  // a set of apps   - OR -
+  "all": true,                    // all apps, minus the excluded-apps list
+  "cron": "daily",                // hourly | daily | weekly
+  "at": "02:30",                  // HH:MM
+  "mode": "full",
+  "dest": "local",
+  "keep": 5,
+  "items": ["apk","data"],
+  "require_wifi": false,          // gate: only run on Wi-Fi
+  "require_charging": false,      // gate: only run while charging
+  "min_battery": 0,               // gate: only run at/above this battery % (0-100)
+  "days": [1,2,3,4,5]             // gate: only run on these weekdays (0=Sunday)
+}
+```
+
+Give exactly **one** of `package`, `packages` or `all` for the target. A `backup` job
+keeps the usual `mode`/`dest`/`keep`/`items`. A `restore` job (`action: "restore"`)
+restores each target app's **latest** backup (or an explicit `ref`) and **overwrites the
+app's current data on every run** - it is deliberate and opt-in, so set it only on a
+direct user request.
+
+### Scheduler gating
+
+A scheduled job may carry **optional gate conditions**. When a due job's gate is not met it
+is **skipped and retried on the next tick, without advancing its schedule** (its `last_run`
+is not stamped, so it fires as soon as the condition holds):
+
+| Field | Type | Gate |
+|-------|------|------|
+| `require_wifi` | bool | only run while on Wi-Fi |
+| `require_charging` | bool | only run while charging |
+| `min_battery` | int (0-100) | only run at or above this battery level |
+| `days` | array of int (0-6, 0=Sunday) | only run on these weekdays |
+
+A minimal **thermal safety** check is always applied on top of these: a scheduled op is
+skipped while the device is critically hot. Every gate skip is written to the audit trail as
+`op:"scheduler-gated"` with a `reason` of `wifi` / `charging` / `battery` / `days` /
+`thermal`.
+
 ### `remote-add` args
 
 A cloud destination is a `type:"rclone"` dest that names an `rclone` remote; create
-that remote first with `remote-add`. Password fields are stored obscured, never in
-clear. Supported `backend` values and their `params`:
+that remote first with `remote-add`. The `backend` may be **any rclone backend** - there
+is no whitelist. `remote-add` accepts any backend name (`dropbox`, `onedrive`, `box`,
+`pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` and the ~70 others
+rclone supports), and the `params` are passed straight through to the `rclone` config as
+`key=value` pairs. Password fields are stored obscured, never in clear. Common backends
+and their `params`:
 
 ```
 sftp   : host, port, user, pass           smb  : host, port, user, pass
@@ -116,10 +206,21 @@ s3     : provider, access_key_id, secret_access_key, endpoint, region
 drive  : token, scope                     (token = output of `rclone authorize "drive"`)
 ```
 
+**On-device OAuth (no PC).** Backends that need a browser sign-in (Google Drive, Dropbox,
+OneDrive, Box, pCloud) do not require a desktop or a manually pasted token. Call
+`remote-authorize` with `{backend}`: the engine runs `rclone authorize <backend>` against a
+local callback server (`127.0.0.1:53682`) and opens the phone's own browser at the provider
+consent page via an Android VIEW intent, returning `{ok:true,url}` (or
+`{ok:false,code:"ERR_AUTHORIZE"}`). Poll `remote-authorize-poll` (`{}`): it returns
+`{ok:true,done:false,url}` while waiting and `{ok:true,done:true,token}` once the user
+approves - pass that `token` to `remote-add`. `remote-authorize-cancel` (`{}`) stops a
+pending authorization (`{ok:true,cancelled:true}`). Manually pasting the output of
+`rclone authorize "<backend>"` from any computer is still supported as a fallback.
+
 Google Drive has two paths: this `drive` remote (no Google Cloud project needed, uses
-rclone's own OAuth - run `rclone authorize "drive"` once on any computer and pass the
-token) or the opt-in companion app (your own OAuth client id). Both end up as ordinary
-destinations.
+rclone's own OAuth - authorize on-device with `remote-authorize`, or run
+`rclone authorize "drive"` once on any computer and pass the token) or the opt-in companion
+app (your own OAuth client id). Both end up as ordinary destinations.
 
 ### Network policy
 
@@ -130,6 +231,106 @@ The config field `network_policy` controls which connection cloud transfers may 
 aborts with `ERR_NET_POLICY` if it does not match - for both manual and scheduled jobs.
 Local destinations are never gated.
 
+### Cloud integrity and quota
+
+- **Checksum seal (cloud).** After a successful cloud copy the engine runs a remote checksum
+  check (`rclone check`); a mismatch fails the op with `ERR_VERIFY`. Backends that share no
+  common hash with the local side are skipped (not a failure).
+- **Quota check (cloud, Full mode).** Before a Full-mode upload to an `rclone` remote the
+  engine queries the remote's free space (`rclone about --json`) and refuses with
+  `ERR_QUOTA` if the backup would not fit. Remotes that report no quota information are
+  skipped. Mirror mode is a delta sync and is exempt.
+
+### Cloud binaries (`lite` edition)
+
+A `full` edition bundles every binary and never needs the network. The `lite` edition omits
+the two largest, `rclone` and `restic`, and fetches them on demand the first time you run a
+cloud or snapshot action. `cloud-status` reports whether they are already present, whether this
+edition can fetch them, and the download size in bytes. `cloud-fetch` runs **detached** (poll
+`progress` with its `opid`): it downloads the per-architecture `rclone`+`restic` addon, verifies
+it against the SHA-256 baked into the module, and installs it into the runtime cache. Its
+progress phases are `downloading`, `verifying`, and `installing`; the final code is `ERR_NONE`
+on success, or `ERR_FETCH` (download failed) / `ERR_FETCH_VERIFY` (checksum mismatch, discarded)
+on failure. On a `full` edition it is unnecessary. A `backup`/`restore` to a cloud or snapshot
+destination on the `lite` edition, before the binaries are present, fails with
+`ERR_CLOUD_FETCHABLE`; the client should offer to run `cloud-fetch`, then retry.
+
+### Special backup categories
+
+`special-categories` reports which system-wide categories a device has; `special-backup`
+captures the ones you pass in `categories` and `special-restore` re-applies them. The
+categories are:
+
+| Category | What it is | Restore semantics |
+|----------|-----------|-------------------|
+| `messages` | SMS/MMS | provider replace (wipe + extract) |
+| `contacts` | contacts and call log | provider replace (wipe + extract) |
+| `wifi` | saved Wi-Fi networks | provider replace (wipe + extract) |
+| `bluetooth` | Bluetooth pairings | provider replace (wipe + extract) |
+| `calendar` | the calendar provider (`com.android.providers.calendar`, app + data); also exported portably to `calendar.json` | provider replace (wipe + extract) |
+| `wallpaper` | home and lock wallpaper plus `wallpaper_info.xml`, stored raw (binary) | files replaced |
+| `dns` | the private DNS mode and specifier, read from settings | idempotent `settings put` |
+| `system_settings` | the full system/global/secure settings dump | **opt-in**, idempotent `settings put`, overwrites device settings |
+
+**`system_settings` is strictly opt-in and destructive on restore.** Like `ssaid`, it
+overwrites device-wide settings when it is restored, so it is gated behind explicit user
+consent and written to the audit trail. Never select it by default; only on a direct,
+deliberate user request.
+
+### Standalone path backup
+
+`path-backup` / `path-restore` back up and restore **any absolute path** - a folder or a
+single file - on shared storage or under `/data`, outside the per-app model. The archive
+is written as `tar.zst` plus a `manifest.json` in VDBackup's own format (SHA-256 sealed,
+with a RECOVERY kit when encrypted) under `.paths/` in the backups directory.
+
+```json
+// path-backup
+{ "path": "/sdcard/DCIM/Camera", "compression": "zstd:10", "password": "..." }
+// path-restore
+{ "ref": "<.paths ref>", "confirm": true, "password": "..." }
+```
+
+- The source path must be **absolute** and under one of the allowed roots:
+  `/storage/emulated`, `/data/media`, `/sdcard`, `/data`. A path that does not exist fails
+  with `ERR_NO_PATH`; a path outside the allowed roots, or one containing `..`, fails with
+  `ERR_BAD_PATH`.
+- `path-restore` writes back to the original location, so it is destructive and requires
+  `"confirm": true` - a heavy-friction gate, like `special-restore`. A `ref` that is not a
+  valid path backup fails with `ERR_BAD_REF`.
+- Both run **detached**; poll `progress` with the returned `opid`.
+
+### `update-check`
+
+`update-check` reports whether a newer version of the module has been published, so an agent
+(or the WebUI) can surface it. It is a **read verb that returns immediately** - it is **not**
+detached, so there is no `opid` to poll. Triggered only by an explicit user action, it fetches
+the module's published update manifest (the `updateJson` URL from `module.prop`) with the bundled
+`curl` over a root-side HTTP request - this runs outside the WebView, so it is not subject to the
+WebUI CSP - and compares the published `versionCode` with the installed one. It takes **no
+arguments**.
+
+On success it returns:
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `ok` | bool | `true` |
+| `current_version` | string | the installed versionName |
+| `current_code` | int | the installed versionCode |
+| `latest_version` | string | the published versionName |
+| `latest_code` | int | the published versionCode |
+| `update_available` | bool | `true` when `latest_code` is greater than `current_code` |
+| `zipUrl` | string | the published zip URL |
+| `changelog` | string | the published changelog URL |
+| `notes` | string | the release notes |
+
+If there is no `updateJson` URL, the network request fails, or the manifest cannot be parsed, it
+returns `{"ok":false,"code":"ERR_UPDATE_CHECK"}`.
+
+`update-check` only **reports** availability and release notes; the update itself is performed by
+your root manager (KernelSU / APatch / Magisk) through the module's `updateJson`, never by this
+verb.
+
 ## Safety rails your agent must respect
 
 - **`ssaid` is strictly opt-in (default off).** It backs up / restores the device
@@ -139,6 +340,18 @@ Local destinations are never gated.
 - **Mutating actions (restore, delete, import) are destructive** and are logged to a
   local audit trail (`logs/audit.jsonl`). Restore is faithful (wipe-then-extract), so
   it reverts the app to the backup's exact state. Confirm intent before you call them.
+- **`system_settings` is opt-in and destructive, exactly like `ssaid`.** Restoring it
+  overwrites device-wide settings, so send it only on a direct user request; it is gated
+  by explicit consent and recorded in the audit trail.
+- **Restore is idempotent.** Raw provider restores (messages/contacts/wifi/bluetooth/
+  calendar) **replace** rather than merge - the provider data is wiped and the archive is
+  extracted over it - so re-restoring the same backup cannot duplicate rows. `dns` and
+  `system_settings` are re-applied with idempotent `settings put`.
+- **Archive extraction is guarded against path traversal.** Restore runs as root, so
+  every archive (restore, import, special-restore, path-restore) is checked before any
+  write: one whose members use absolute paths or contain `..` is rejected up front with
+  `ERR_UNSAFE_ARCHIVE`, before a single destructive write happens (GNU tar also runs with
+  `--no-absolute-names`). A tampered archive can never escape its target directory.
 - **Never weaken** preservation (SELinux/uid/gid/modes/xattr) or the APK rule (APKs
   are always compressed, never encrypted unless `encrypt_apk` is set).
 - Treat the JSON output as the source of truth; check `ok`/`code`, poll `progress`,

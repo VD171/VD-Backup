@@ -17,3 +17,5 @@ issue dan kontribusi yang melanggar kode ini, dan boleh memblokir pelanggar beru
 
 Ini adalah adaptasi ringkas dan sesuai-proyek dari semangat Contributor
 Covenant.
+
+*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan - lihat [CONTRIBUTING.md](CONTRIBUTING.md).*

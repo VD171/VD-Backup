@@ -37,9 +37,11 @@ Yalnızca ilk iki satır önceden derlenmiş üçüncü taraf ikili dosyalardır
 depoda bulunan ve okunup yeniden derlenebilen kaynaktan derlenir.
 
 > **Full ve lite sürümler.** lite sürümler küçük kalmak için yalnızca `rclone` ve `restic`
-> (en büyük iki ikili dosya) atlar; `rsync` ve `ssh`/`scp`/`sftp` hâlâ mevcuttur ve yukarıda
-> listelenen diğer tüm ikili dosyalar da mevcuttur. Full sürümler `rclone` (bulut sağlayıcıları)
-> ve `restic` (anlık görüntüler) ekler.
+> (en büyük iki ikili dosya) atlar ve bir bulut hedefini ya da anlık görüntü modunu ilk kez
+> kullandığınızda bunları isteğe bağlı olarak (SHA-256 ile doğrulanarak) indirir; `rsync` ve
+> `ssh`/`scp`/`sftp` hâlâ mevcuttur ve yukarıda listelenen diğer tüm ikili dosyalar da mevcuttur.
+> Full sürümler `rclone` (bulut sağlayıcıları) ve `restic` (anlık görüntüler) gömülü halde sunar,
+> böylece hiçbir şey asla indirilmez.
 
 ## Cihaz üzerindeki manifest: `PROVENANCE.json`
 
@@ -83,3 +85,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 Sevk edilen herhangi bir dosya kayıtlı kaynağıyla eşleşmezse, bunu bir güvenlik sorunu
 olarak değerlendirin ve bildirin (bkz. [SECURITY.md](SECURITY.md)). Bu, tam olarak bu
 manifestin görünür kılmak için var olduğu türden bir tutarsızlıktır.
+
+*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır - bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*

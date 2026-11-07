@@ -83,3 +83,6 @@ Thumbs.db
 .idea/
 *.iml
 .vscode/
+
+# build-generated per-release (URLs+sha256 of the on-demand cloud addons)
+module/etc/cloud_addons.json

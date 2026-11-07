@@ -36,7 +36,7 @@ buram yang diselipkan.
 Hanya dua baris pertama yang merupakan biner pihak ketiga prabangun; dua terakhir dibangun
 dari sumber yang berada di repositori ini dan dapat dibaca serta dibangun ulang.
 
-> **Edisi Full vs lite.** Edisi lite hanya menghilangkan `rclone` dan `restic` (dua biner terbesar) agar tetap kecil; `rsync` dan `ssh`/`scp`/`sftp` tetap disertakan, dan setiap biner lain yang tercantum di atas juga hadir. Edisi Full menambahkan `rclone` (penyedia cloud) dan `restic` (snapshot).
+> **Edisi Full vs lite.** Edisi lite hanya menghilangkan `rclone` dan `restic` (dua biner terbesar) agar tetap kecil dan mengambilnya sesuai permintaan (diverifikasi dengan SHA-256) saat pertama kali Anda memakai tujuan cloud atau mode snapshot; `rsync` dan `ssh`/`scp`/`sftp` tetap disertakan, dan setiap biner lain yang tercantum di atas juga hadir. Edisi Full menyertakan `rclone` (penyedia cloud) dan `restic` (snapshot) secara tertanam, sehingga tidak pernah ada yang diunduh.
 
 ## Manifes di perangkat: `PROVENANCE.json`
 
@@ -80,3 +80,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 Jika ada berkas yang dikirim tidak cocok dengan sumber tercatatnya, perlakukan sebagai
 masalah keamanan dan laporkan (lihat [SECURITY.md](SECURITY.md)). Ini persis jenis
 ketidaksesuaian yang karenanya manifes ini ada untuk membuatnya terlihat.
+
+*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan - lihat [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -41,14 +41,22 @@ window.I18N = (function () {
       e.setAttribute("placeholder", t(e.getAttribute("data-i18n-ph")));
     });
   }
+  var RTL = { ar: 1, fa: 1 };
+  // set the document language + writing direction so Arabic/Persian render right
+  // to left (the CSS mirrors under dir=rtl); every other language stays ltr.
+  function setDir(code) {
+    var el = document.documentElement;
+    el.setAttribute("lang", code);
+    el.setAttribute("dir", RTL[code] ? "rtl" : "ltr");
+  }
   function set(code) {
     if (code === "en" || AVAILABLE.indexOf(code) < 0) {
-      strings = Object.assign({}, EN); apply(); return Promise.resolve();
+      strings = Object.assign({}, EN); setDir("en"); apply(); return Promise.resolve();
     }
     return fetch("lang/" + code + ".json")
       .then(function (r) { return r.json(); })
-      .then(function (j) { strings = Object.assign({}, EN, j); apply(); })
-      .catch(function () { strings = Object.assign({}, EN); apply(); });
+      .then(function (j) { strings = Object.assign({}, EN, j); setDir(code); apply(); })
+      .catch(function () { strings = Object.assign({}, EN); setDir("en"); apply(); });
   }
   function detect() {
     var l = (navigator.language || "en").toLowerCase().slice(0, 2);

@@ -75,3 +75,5 @@ AI asistenti a agenti jsou zde plnohodnotnými přispěvateli, nikoli dodatečno
 
 Hledejte štítky `good first issue` a `help wanted`. Překlady, dokumentace, nové
 předvolby destinací `rclone` a vylepšování WebUI jsou skvělé výchozí body.
+
+*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány - viz [CONTRIBUTING.md](CONTRIBUTING.md).*

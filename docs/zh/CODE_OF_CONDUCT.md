@@ -16,3 +16,5 @@
 issue 和贡献，并可以封禁屡次违规者。
 
 这是对 Contributor Covenant 精神的一个浓缩的、适合本项目的改编。
+
+*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进 - 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*

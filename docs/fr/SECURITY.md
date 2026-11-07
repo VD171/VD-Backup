@@ -31,3 +31,12 @@ que possible et vous créditerons si vous le souhaitez.
   choisissez-en une solide.
 - L'application compagnon Google Drive optionnelle devrait toujours être masquée avec HMA-OSS afin qu'elle ne
   révèle ni le root ni un bootloader déverrouillé.
+- La restauration s'exécute en tant que root, donc chaque archive est vérifiée avant toute
+  écriture : un backup dont le contenu pointe en dehors de sa cible (un chemin absolu ou un
+  composant `..`) est refusé, et aucun fichier n'est extrait tant que l'archive entière n'est
+  pas validée.
+- Chaque binaire et bibliothèque précompilés sont traçables jusqu'à une source amont publique figée,
+  avec un SHA-256 enregistré, et le manifeste est embarqué sur l'appareil, de sorte que la charge
+  fournie peut être auditée et reproduite. Voir [BINARIES.md](BINARIES.md).
+
+*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues - voir [CONTRIBUTING.md](CONTRIBUTING.md).*

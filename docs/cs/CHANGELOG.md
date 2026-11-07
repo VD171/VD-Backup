@@ -6,6 +6,63 @@
 
 Všechny podstatné změny ve VDBackup jsou zdokumentovány zde. Pouze anglicky.
 
+## v1.03
+
+Nový rozsah zálohování:
+
+- Nové kategorie speciální zálohy: kalendář (poskytovatel kalendáře plus přenosný export
+  `calendar.json`), tapeta (tapeta domovské a zamykací obrazovky), soukromé DNS (režim a
+  specifikátor) a systémová nastavení (úplný výpis nastavení system/global/secure). Systémová
+  nastavení jsou opt-in a při obnově přepíšou nastavení celého zařízení, takže jsou ohrazena
+  jako SSAID, s výslovným souhlasem a úplným auditním záznamem.
+- Samostatná záloha složky a souboru: zálohujte libovolnou absolutní cestu (sdílené úložiště
+  nebo data aplikace) jako komprimovaný archiv zapečetěný manifestem a obnovte ji na stejnou
+  cestu. Obnova vyžaduje výslovné potvrzení.
+
+Bezpečnější obnova:
+
+- Každý archiv je zkontrolován, než se cokoli zapíše: záloha, jejíž obsah ukazuje mimo svůj
+  cíl (absolutní cesta nebo komponenta `..`), je odmítnuta, takže obnovu běžící jako root
+  nelze oklamat k zápisu mimo cílové umístění.
+
+Průběh a plánování:
+
+- Živý průběh nyní ukazuje rychlost přenosu, ETA a počítadlo položek během záloh, plus krok
+  ověřený kontrolním součtem pro cloudové nahrávání a předběžnou kontrolu "nedostatek místa".
+- Naplánované úlohy lze podmínit: spouštět jen na Wi-Fi, jen při nabíjení, jen nad úrovní
+  baterie nebo jen ve zvolených dnech týdne; naplánovaná úloha se také přeskočí, když je
+  zařízení kriticky horké. Přeskočená úloha se zkusí znovu při dalším ticku.
+
+Cloudové cíle:
+
+- Připojte jakýkoli backend rclone z rozhraní: rozbalovací nabídka cloudového vzdáleného cíle
+  nabízí oblíbené poskytovatele (Google Drive, Dropbox, OneDrive, Box, pCloud, Mega, Backblaze
+  B2, S3, SFTP, WebDAV, FTP, SMB) a navíc možnost "Custom (advanced)", kde zadáte název
+  jakéhokoli jiného backendu rclone a jeho parametry `key=value`, takže jsou dosažitelné
+  všechny backendy rclone.
+- Přihlášení přímo na zařízení (bez PC): poskytovatelé, kteří vyžadují přihlášení přes
+  prohlížeč (Google Drive, Dropbox, OneDrive, Box, pCloud), mají tlačítko "Authorize in
+  browser", které otevře prohlížeč samotného telefonu na souhlasové stránce poskytovatele; po
+  schválení se vrátíte do aplikace a vzdálený cíl se uloží automaticky, přičemž token je
+  zachycen na zařízení. Ruční vložení tokenu zůstává k dispozici jako záložní možnost.
+
+Rozhraní:
+
+- Nastavitelné měřítko rozhraní (tažný posuvník) přeškáluje celé rozhraní, aby se vešlo na
+  obrazovky s různou hustotou pixelů; 100% je výchozí a zůstává nezměněno.
+- Rozhraní se nyní vykresluje zprava doleva pro arabštinu a perštinu.
+- Úvodní přehled s počty záloh a pruhem úložiště, stavovými odznaky, kopírováním hashů a cest
+  do schránky, přepínači ve stylu Androidu a akcí "Check for updates".
+- Protokol aktivity je celá obrazovka, která se otevře okamžitě, s akcí "Export logs", která
+  uloží soubor protokolu, jejž můžete přiložit k hlášení.
+
+Opravy:
+
+- Obnova a import již neselhávají na zařízeních, jejichž přibalený `tar` nepřijímá volbu
+  `--no-absolute-names`; bezpečnostní kontrola archivu je na této volbě nezávislá.
+- "Check for updates" funguje i tam, kde není přibalen žádný HTTP klient, díky záloze v podobě
+  přibaleného rclone; a protokol aktivity se už neotevírá dlouho.
+
 ## v1.01
 
 První veřejné vydání. Modul WebUI pro KernelSU/APatch/Magisk, který zálohuje a obnovuje aplikace a
@@ -125,3 +182,5 @@ Vstřícné k AI a i18n:
   přičemž dokumentace je zrcadlena na wiki.
 - Bohatý výpis aplikací a dešifrování Neo probíhají přes pomocný nástroj dex řízený jako root
   (`IPackageManager` přes ServiceManager), takže fungují i tam, kde ActivityThread zamrzá.
+
+*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány - viz [CONTRIBUTING.md](CONTRIBUTING.md).*

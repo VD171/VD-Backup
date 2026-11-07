@@ -75,3 +75,5 @@ Gli assistenti e gli agenti IA sono qui contributori di prima classe, non un rip
 
 Cerca le etichette `good first issue` e `help wanted`. Traduzioni, documentazione, nuovi
 preset di destinazione `rclone` e rifiniture della WebUI sono tutti ottimi punti di partenza.
+
+*Questa documentazione è stata generata con Claude (Anthropic) ed è mantenuta da VD171. Correzioni e miglioramenti sono benvenuti - vedi [CONTRIBUTING.md](CONTRIBUTING.md).*

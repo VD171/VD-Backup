@@ -31,3 +31,12 @@ que pudermos e daremos crédito a você se desejar.
   escolha uma forte.
 - O app companheiro opcional do Google Drive deve sempre ser ocultado com o HMA-OSS para que ele não
   revele root ou um bootloader desbloqueado.
+- A restauração roda como root, então todo pacote é verificado antes de qualquer coisa ser
+  gravada: um backup cujo conteúdo aponte para fora do seu destino (um caminho absoluto ou
+  um componente `..`) é recusado, e nenhum arquivo é extraído enquanto o pacote inteiro não
+  for aprovado.
+- Todo binário e biblioteca pré-compilados são rastreáveis até um upstream público fixado, com um
+  SHA-256 registrado, e o manifesto é embarcado no dispositivo, de modo que o payload empacotado pode
+  ser auditado e reproduzido. Veja [BINARIES.md](BINARIES.md).
+
+*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas - veja [CONTRIBUTING.md](CONTRIBUTING.md).*

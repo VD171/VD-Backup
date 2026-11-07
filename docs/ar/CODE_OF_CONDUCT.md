@@ -17,3 +17,5 @@
 
 هذا تكييف مختصر وملائم للمشروع من روح
 ميثاق المساهم (Contributor Covenant).
+
+*أُنشئت هذه الوثائق بمساعدة Claude (Anthropic) ويتولى صيانتها VD171. التصحيحات والتحسينات مرحب بها - انظر [CONTRIBUTING.md](CONTRIBUTING.md).*

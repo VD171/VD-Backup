@@ -22,7 +22,8 @@ miejscu, bez niczego do "zezwolenia".
   - [5.3 Kompresja](#53-kompresja)
   - [5.4 Szyfrowanie](#54-szyfrowanie)
   - [5.5 Verify i dry-run](#55-verify-i-dry-run)
-  - [5.6 Kopie specjalne (wiadomości, rejestr połączeń, Wi-Fi, Bluetooth)](#56-special-backups-messages-call-log-wi-fi-bluetooth)
+  - [5.6 Kopie specjalne (wiadomości, rejestr połączeń, Wi-Fi, Bluetooth, kalendarz, tapeta, DNS, ustawienia systemowe)](#56-kopie-specjalne-wiadomości-rejestr-połączeń-wi-fi-bluetooth-kalendarz-tapeta-dns-ustawienia-systemowe)
+  - [5.7 Samodzielne kopie folderów i plików](#57-samodzielne-kopie-folderów-i-plików)
 - [6. Przywracanie kopii](#6-przywracanie-kopii)
 - [7. Cele: lokalne i zdalne](#7-cele-lokalne-i-zdalne)
 - [8. Planowanie i retencja](#8-planowanie-i-retencja)
@@ -52,6 +53,14 @@ Wszystko, co produkuje VDBackup, używa **standardowych formatów** (tar, gzip, 
 restic), więc twoje kopie nigdy nie są zamknięte w module i nigdy nie są związane z twoim
 konkretnym urządzeniem. Zobacz [sekcja 11](#sekcja-11).
 
+## Zrzuty ekranu
+
+| Ekran główny | Aplikacje | Harmonogram |
+|:---:|:---:|:---:|
+| ![Ekran główny](../screenshots/pl/home-dark.png) | ![Aplikacje](../screenshots/pl/apps-dark.png) | ![Harmonogram](../screenshots/pl/schedule-dark.png) |
+| **Cele** | **Ustawienia** | **Dziennik aktywności** |
+| ![Cele](../screenshots/pl/destinations-dark.png) | ![Ustawienia](../screenshots/pl/settings-dark.png) | ![Dziennik aktywności](../screenshots/pl/activitylog-dark.png) |
+
 ## 2. Wymagania
 
 - **Urządzenie z Androidem z rootem** zarządzane przez **KernelSU**, **APatch** lub **Magisk**.
@@ -78,21 +87,26 @@ i degradują się elegancko, gdy nie są dostępne na twoim urządzeniu.
 **Którą edycję pobrać.** Każde wydanie jest dostarczane jako kilka flashowalnych edycji zip, więc
 pobierasz tylko to, czego potrzebujesz. Wybierz jedną:
 
-- **`VD-Backup-<ver>-universal-full.zip`** - każda architektura CPU i każdy plik binarny, w tym
+- **`VD-Backup-<ver>-universal-full.zip`** - każda architektura CPU i każdy plik binarny wbudowany, w tym
   `rclone` (dostawcy chmury: Google Drive, S3 i 70+ innych backendów rclone) i `restic`
-  (zdeduplikowane migawki). Działa na każdym urządzeniu. Największy plik do pobrania.
+  (zdeduplikowane migawki). W pełni offline, nic nigdy nie jest pobierane. Działa na każdym
+  urządzeniu. Największy plik do pobrania.
 - **`VD-Backup-<ver>-universal-lite.zip`** - każda architektura, ale **bez** dwóch największych
   plików binarnych (`rclone` i `restic`). Najmniejszy plik do pobrania; nadal wykonuje kopie
-  lokalne oraz przez SSH/SFTP i rsync, z przenośnym szyfrowaniem `age`.
+  lokalne oraz przez SSH/SFTP i rsync bez pobierania, z przenośnym szyfrowaniem `age`. Przy
+  pierwszym użyciu miejsca docelowego w chmurze (`rclone`) lub trybu migawek (`restic`) WebUI
+  proponuje jednorazowe pobranie tego małego dodatku dla danej architektury (zweryfikowanego
+  przez SHA-256) i zapisuje go w pamięci podręcznej; potem te funkcje też działają.
 - **`VD-Backup-<ver>-<abi>-full.zip`** (jedna z `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) -
-  pojedyncza architektura z każdym plikiem binarnym (te same funkcje co `universal-full`, ale
+  pojedyncza architektura z każdym plikiem binarnym wbudowanym (te same funkcje co `universal-full`, ale
   tylko dla architektury twojego urządzenia, więc mniejszy niż `universal-full`).
 
-Jeśli znasz architekturę swojego urządzenia i chcesz wszystko, wybierz pasującą
+Jeśli znasz architekturę swojego urządzenia i chcesz wszystko wbudowane, wybierz pasującą
 **`<abi>-full`** (większość telefonów to **`arm64-v8a`**). Jeśli chcesz najmniejszy plik do
-pobrania lub nie potrzebujesz dostawców chmury (`rclone`) ani migawek (`restic`), wybierz
-**`universal-lite`**. Jeśli chcesz wszystko i nie masz pewności co do architektury, wybierz
-**`universal-full`**. Podczas instalacji moduł zachowuje
+pobrania i nie przeszkadza ci jednorazowe, zweryfikowane przez SHA-256 pobranie przy pierwszym
+użyciu dostawców chmury (`rclone`) lub migawek (`restic`), wybierz **`universal-lite`**. Jeśli
+chcesz wszystko wbudowane bez pobierania (offline / odzyskiwanie) i nie masz pewności co do
+architektury, wybierz edycję **full**. Podczas instalacji moduł zachowuje
 tylko architekturę twojego urządzenia, niezależnie od tego, którą edycję flashujesz.
 
 Przy pierwszym uruchomieniu moduł zasiewa domyślną konfigurację (tylko jeśli żadna jeszcze nie istnieje), więc
@@ -121,6 +135,7 @@ Miej to na uwadze z dwóch powodów: kopie zajmują miejsce pod `/sdcard/VDBacku
 
 WebUI jest zorganizowane w kilka zakładek:
 
+- **Home** - przegląd startowy pokazujący liczby twoich kopii (aplikacje, kopie, foldery i zaplanowane zadania) oraz pasek pamięci, ile miejsca zajmują twoje kopie w stosunku do wolnego, ze znaczkami statusu, kopiowaniem hashów i ścieżek do schowka oraz akcją **Check for updates**.
 - **Apps** - lista zainstalowanych aplikacji (użytkownika i systemowych), każda pokazana ze swoją prawdziwą
   nazwą, nazwą pakietu i ikoną (ikony ładują się leniwie i są cachowane, więc lista
   pozostaje responsywna). Przycisk w wierszu tworzy kopię aplikacji; dotknięcie wiersza otwiera
@@ -134,12 +149,15 @@ WebUI jest zorganizowane w kilka zakładek:
   cele, które dodasz (zobacz [sekcja 7](#sekcja-7)). Możesz tu
   przetestować cel, zanim na nim polegniesz.
 - **Settings** - przełącznik motywu jasny/ciemny, selektor koloru akcentu (gotowe ustawienia,
-  własny kolor lub reset), selektor języka, domyślne wartości dla nowych
+  własny kolor lub reset), selektor języka (interfejs jest renderowany od prawej do lewej dla
+  języka arabskiego i perskiego), suwak skali interfejsu, który przeciągasz, aby przeskalować
+  cały interfejs (nagłówek, treść i dolna nawigacja razem) od 85% do 120% (100% jest domyślne), do ekranów o różnej
+  gęstości pikseli, domyślne wartości dla nowych
   zadań (domyślna kompresja, verify wł/wył, domyślne szyfrowanie), polityka sieciowa dla
   przesyłów chmurowych (zobacz [sekcja 7](#sekcja-7)), automatyczna kopia i lista wykluczonych
   aplikacji, opcja źródła instalacji, klucz
-  szyfrowania oraz planowanie.
-- **About** - wersja, linki, projekty siostrzane (See also) oraz manifest audytu dołączonych plików binarnych.
+  szyfrowania oraz planowanie. Ustawienia wł/wył używają przełączników w stylu Androida.
+- **About** - wersja, linki, projekty siostrzane (See also), manifest audytu dołączonych plików binarnych oraz akcja **Check for updates**, która zgłasza, czy opublikowano nowszą wersję (wraz z jej informacjami o wydaniu). Każdą aktualizację instalujesz przez swojego menedżera roota, tak samo jak flashowałeś moduł.
 
 Potwierdzenia i komunikaty używają dialogów w aplikacji (nie starych systemowych wyskakujących okien), a
 przywracanie lub import prosi cię o potwierdzenie, że nadpisuje bieżące dane aplikacji, zanim
@@ -147,7 +165,9 @@ kontynuuje.
 
 Kopie i przywracania działają **odłączone** jako proces root w tle. Możesz zamknąć
 WebUI, a nawet zamknąć menedżer root, a operacja trwa dalej. Gdy
-wrócisz, WebUI podłącza się ponownie i pokazuje żywy postęp ze zlokalizowaną etykietą fazy. Na
+wrócisz, WebUI podłącza się ponownie i pokazuje żywy postęp ze zlokalizowaną etykietą fazy. Dla
+trwającego zadania karta postępu pokazuje też na żywo prędkość transferu i szacowany pozostały
+czas oraz licznik elementów (na przykład "12 z 40") z nazwą bieżącego elementu. Na
 ROM-ach, które wynoszą powiadomienia shellowe, otrzymasz również powiadomienie Androida, gdy zadanie
 się rozpocznie i zakończy; tak czy inaczej karta postępu w aplikacji jest niezawodnym wskaźnikiem.
 
@@ -243,17 +263,64 @@ Dwie opcje bezpieczeństwa pomagają ci zaufać kopii, zanim na niej polegniesz:
   czegokolwiek**. Użyj tego, by oszacować miejsce lub sprawdzić swój wybór elementów przed uruchomieniem
   prawdziwej rzeczy.
 
-### 5.6 Kopie specjalne (wiadomości, rejestr połączeń, Wi-Fi, Bluetooth)
+Gdy kopia trafia do celu w **chmurze**, VDBackup dodaje dwa dodatkowe zabezpieczenia. Uruchamia
+końcowy krok **checksum-verified**, który ponownie porównuje przesłaną kopię z oryginałem na zdalnym
+celu, i kończy zadanie niepowodzeniem (zamiast zostawiać uszkodzoną kopię w chmurze), jeśli się nie
+zgadzają. A przed wysyłką Full sprawdza **wolne miejsce** zdalnego celu i zatrzymuje się wcześnie z
+czytelnym błędem **"not enough space"**, jeśli kopia by się nie zmieściła, zamiast zapełniać zdalny
+cel i zawieść w połowie. (Kontrola miejsca dotyczy wysyłek Full; Mirror jest synchronizacją delta i
+jest z tego wyłączony.)
+
+### 5.6 Kopie specjalne (wiadomości, rejestr połączeń, Wi-Fi, Bluetooth, kalendarz, tapeta, DNS, ustawienia systemowe)
 
 Pod listami aplikacji na zakładce **Backups** sekcja **Kopie specjalne** obejmuje dane
-ogólnosystemowe, które nie są powiązane z pojedynczą aplikacją: **wiadomości (SMS/MMS)**,
-**kontakty i rejestr połączeń**, **sieci Wi-Fi** i **Bluetooth**. Wybierz kategorie i wykonaj ich
-kopię; są one archiwizowane w surowej postaci, z tym samym zachowaniem SELinux/xattr i opcjonalnym
-szyfrowaniem co kopie aplikacji. Opcjonalnie zapisywana jest też **przenośna kopia** (wiadomości,
-rejestr połączeń i kontakty jako otwieralny JSON), więc masz kopię międzyurządzeniową, którą możesz
-odczytać na komputerze bez modułu. Przywracanie kopii specjalnej nadpisuje żywe dane systemowe i
-wymaga restartu, więc jest zabezpieczone wyraźnym potwierdzeniem i jest niezawodne na tym samym
-urządzeniu i tej samej ROM.
+ogólnosystemowe, które nie są powiązane z pojedynczą aplikacją. Wybierz kategorie i wykonaj ich
+kopię; są one archiwizowane z tym samym zachowaniem SELinux/xattr i opcjonalnym szyfrowaniem co
+kopie aplikacji. Kategorie to:
+
+| Kategoria | Czym jest |
+|-----------|-----------|
+| **Wiadomości (SMS/MMS)** | Twoje wiadomości tekstowe. |
+| **Kontakty i rejestr połączeń** | Twoje kontakty i historia połączeń. |
+| **Sieci Wi-Fi** | Twoje zapisane sieci Wi-Fi. |
+| **Bluetooth** | Twoje sparowania Bluetooth. |
+| **Kalendarz** | Provider kalendarza (aplikacja i dane). Zapisywany jest też **przenośny `calendar.json`**, więc twoje wydarzenia są czytelne na PC bez modułu. |
+| **Tapeta** | Twoja tapeta ekranu głównego i blokady oraz `wallpaper_info.xml`, przechowywana jako surowy obraz. |
+| **DNS** | Twój tryb i serwer prywatnego DNS. |
+| **Ustawienia systemowe** | Pełny zrzut ustawień system, global i secure urządzenia. |
+
+Dla wiadomości, rejestru połączeń i kontaktów zapisywana jest też **przenośna kopia** (otwieralny
+JSON), więc masz kopię międzyurządzeniową, którą możesz odczytać na komputerze bez modułu.
+
+**Ustawienia systemowe są opt-in i nadpisują ustawienia twojego urządzenia przy przywracaniu.**
+Tak jak SSAID (zobacz [sekcja 10](#sekcja-10)), kategoria **Ustawienia systemowe** jest
+najwrażliwsza: jej przywrócenie nadpisuje ustawienia całego urządzenia, więc jest wyłączona,
+chyba że wybierzesz ją celowo, najpierw prosi cię o potwierdzenie i jest zapisywana w dzienniku
+aktywności.
+
+Przywracanie kopii specjalnej nadpisuje żywe dane systemowe i wymaga restartu, więc jest
+zabezpieczone wyraźnym potwierdzeniem i jest niezawodne na tym samym urządzeniu i tej samej ROM.
+Przywracania są **idempotentne**: surowe kategorie (wiadomości, kontakty, Wi-Fi, Bluetooth,
+kalendarz) są przywracane przez **zastąpienie** danych zamiast ich scalania, więc dwukrotne
+przywrócenie tej samej kopii nigdy nie tworzy duplikatów, a DNS i ustawienia systemowe są po
+prostu ponownie stosowane.
+
+### 5.7 Samodzielne kopie folderów i plików
+
+Czasami chcesz zrobić kopię zwykłego folderu lub pliku, który nie jest aplikacją - folderu
+aparatu, katalogu dokumentów, pojedynczej bazy danych. VDBackup potrafi zrobić kopię **dowolnej
+ścieżki bezwzględnej** w pamięci współdzielonej lub pod `/data`, w tym samym przenośnym formacie
+co kopia aplikacji: archiwum `tar.zst` plus `manifest.json`, zapieczętowane SHA-256, z notatką
+RECOVERY, gdy je zaszyfrujesz. Te kopie ścieżek są trzymane osobno, pod folderem `.paths` w twoim
+katalogu kopii.
+
+- **Wybierz ścieżkę i wykonaj jej kopię.** Źródło musi być ścieżką bezwzględną pod jedną z
+  dozwolonych lokalizacji (`/storage/emulated`, `/data/media`, `/sdcard`, `/data`). Ścieżki, które
+  próbują wyjść na zewnątrz za pomocą `..`, są odrzucane.
+- **Przywracanie zapisuje z powrotem do oryginalnej lokalizacji**, więc, jak każde przywracanie,
+  jest destrukcyjne i prosi cię o **potwierdzenie**, zanim cokolwiek nadpisze.
+- Jak kopie aplikacji, kopie i przywracania ścieżek działają **odłączone** z żywym postępem,
+  używają wybranej przez ciebie kompresji i mogą być zaszyfrowane za pomocą passphrase.
 
 ## 6. Przywracanie kopii
 
@@ -264,7 +331,10 @@ zapisuje akcję w lokalnym logu audytu.
 Przywracanie jest **wierne**: VDBackup wymazuje bieżący stan aplikacji i rozpakowuje
 kopię, więc aplikacja jest przywracana do **dokładnego stanu** uchwyconego w tej kopii
 (wraz z własnością, trybami, kontekstami SELinux i xattr). To nie jest scalenie - to
-prawdziwe przywrócenie do punktu w czasie kopii.
+prawdziwe przywrócenie do punktu w czasie kopii. Ponieważ przywracanie działa jako root,
+VDBackup sprawdza też każde archiwum, zanim cokolwiek rozpakuje, i odrzuca zmanipulowane, które
+próbuje zapisać poza swoim celem, więc zmodyfikowana kopia nigdy nie może nadpisać reszty twojego
+systemu.
 
 Przydatne opcje przywracania:
 
@@ -284,6 +354,12 @@ Przydatne opcje przywracania:
   przełącznik **"sfałszuj źródło inicjujące"** idzie dalej i sprawia też, że pakiet inicjujący i
   źródło pakietu aplikacji wyglądają na zainstalowane z Play; edytuje on systemową bazę pakietów
   (wcześniej zarchiwizowaną) i wchodzi w życie po restarcie.
+
+**Przywracanie wsadowe.** Zakładka **Backups** ma tryb **Select**, tak samo jak zakładka Apps ma go
+do wsadowego tworzenia kopii. Włącz **Select**, zaznacz polami wyboru kopie, które chcesz, i przywróć
+je wszystkie naraz. Jedno okno opcji obejmuje cały wybór - potwierdzenie nadpisania, restore-test oraz
+wybór źródła instalacji dotyczą każdej wybranej przez ciebie kopii - a są one przywracane jedna po
+drugiej.
 
 **Usuwanie kopii.** Otwórz szczegóły kopii (lub historię aplikacji) i użyj **Delete**;
 zostaniesz poproszony o potwierdzenie, a usunięcie jest zapisywane w dzienniku aktywności.
@@ -311,11 +387,16 @@ Transport zdalny jest obsługiwany przez dołączone narzędzia:
 - **restic** - zaszyfrowane, deduplikowane repozytoria **Snapshot** (lokalne lub zdalne).
 
 **Tworzenie zdalnego chmurowego (SSH niepotrzebne).** W zakładce Destinations wybierz
-typ celu **rclone** i użyj **Add cloud remote**: wybierz backend (SFTP,
-SMB, WebDAV, FTP, S3 lub Google Drive), wypełnij pola (host/user/password, lub
-klucze S3, lub token Drive) i zapisz. Zdalny pojawia się wtedy na liście zdalnych celu.
-Hasła są przechowywane zaciemnione, nigdy w postaci jawnej. Możesz wylistować i
-usunąć swoje zdalne z tego samego miejsca.
+typ celu **rclone** i użyj **Add cloud remote**. Możesz połączyć **dowolny backend rclone**:
+lista rozwijana oferuje popularne (**Google Drive, Dropbox, OneDrive, Box, pCloud, Mega,
+Backblaze B2, S3, SFTP, WebDAV, FTP, SMB**) oraz opcję **Custom (advanced)**, w której wpisujesz
+dowolny inny typ backendu i jego parametry `key=value`. Wypełnij pola (host/user/password, lub
+na przykład klucze S3) i zapisz. Dla dostawców, którzy logują cię przez przeglądarkę (Google
+Drive, Dropbox, OneDrive, Box, pCloud), użyj przycisku **Authorize in browser**: loguje cię przez
+własną przeglądarkę telefonu i automatycznie przechwytuje token, więc **nie jest potrzebny PC**
+(ręczne wklejenie tokena nadal działa jako rozwiązanie zapasowe). Zdalny pojawia się wtedy na
+liście zdalnych celu. Hasła są przechowywane zaciemnione, nigdy w postaci jawnej. Możesz
+wylistować i usunąć swoje zdalne z tego samego miejsca.
 
 Dwie reguły utrzymują użycie zdalnych bezpiecznym:
 
@@ -347,19 +428,37 @@ Kopie lokalne nigdy nie są dotknięte.
 
 ## 8. Planowanie i retencja
 
-VDBackup potrafi uruchamiać kopie automatycznie według harmonogramu. W planerze definiujesz
-zadanie z:
+VDBackup potrafi uruchamiać kopie - oraz przywracanie - automatycznie według harmonogramu. W planerze
+definiujesz zadanie z:
 
-- aplikacją (lub zestawem aplikacji) oraz elementami/trybem do użycia,
-- celem,
+- **celem** - pojedyncza aplikacja, zestaw aplikacji lub **wszystkie aplikacje** (minus lista
+  wykluczonych aplikacji) - oraz elementami/trybem do użycia,
+- **akcją** - **Back up** (domyślna) lub **Restore latest**, która przywraca najnowszą kopię każdej
+  aplikacji docelowej,
+- celem (miejscem docelowym),
 - **harmonogramem w stylu cron** - co godzinę, codziennie lub co tydzień, o wybranej przez ciebie porze (HH:MM),
 - ustawieniem **retencji**: **zachowaj N** najnowszych kopii dla tego zadania, starsze są
-  przycinane automatycznie.
+  przycinane automatycznie,
+- opcjonalnymi **warunkami uruchomienia**: tylko przez **Wi-Fi**, tylko podczas **ładowania**, tylko
+  przy **minimalnym poziomie baterii** lub wyższym, i tylko w wybrane **dni tygodnia**.
 
 Zaplanowane zadania są wyzwalane przez heartbeat rozruchowy w module: gdy zadanie jest
 należne, uruchamia się, zapisuje czas ostatniego uruchomienia, by nie wystrzelić dwa razy, i stosuje
 retencję, by przyciąć stare kopie. Ponieważ wszystko działa jako root w tle,
 zaplanowane kopie nie potrzebują otwartego WebUI.
+
+**Warunki uruchomienia (bramki).** Zaplanowane zadanie może nieść warunki, które muszą być spełnione,
+aby się uruchomiło: tylko Wi-Fi, tylko ładowanie, minimalny poziom baterii oraz określone dni
+tygodnia. Gdy zadanie jest należne, ale warunek nie jest spełniony, jest ono **pomijane i ponawiane
+przy następnym sprawdzeniu** - jego harmonogram się nie przesuwa, więc uruchamia się, gdy tylko
+warunek zostanie spełniony. Wbudowane zabezpieczenie termiczne również pomija zaplanowane zadanie,
+gdy urządzenie jest zbyt gorące. Każde takie pominięcie jest zapisywane w dzienniku aktywności.
+
+**Zaplanowane przywracanie nadpisuje przy każdym uruchomieniu.** Zadanie **Restore latest** ponownie
+przywraca najnowszą kopię każdej aplikacji docelowej za każdym razem, gdy się uruchamia, a przywracanie
+jest destrukcyjne: przy każdym uruchomieniu **nadpisuje bieżące dane aplikacji** najnowszą kopią. Jest to
+zamierzone i opcjonalne (opt-in) - wybieraj to tylko wtedy, gdy chcesz utrzymywać cele na ich najnowszej
+kopii.
 
 **Automatyczna kopia przy instalacji/aktualizacji.** W Settings możesz włączyć **automatyczną
 kopię zapasową**: ten sam heartbeat w tle zauważa aplikacje, które zostały właśnie zainstalowane
@@ -368,12 +467,13 @@ jedynie rejestruje, co jest zainstalowane, więc jej włączenie nigdy nie tworz
 urządzenia naraz.
 
 **Wykluczone aplikacje (blocklist).** Również w Settings możesz wykluczyć aplikacje, których
-nigdy nie chcesz kopiować automatycznie ani według harmonogramu; wykluczone aplikacje są pomijane
-przez oba mechanizmy.
+nigdy nie chcesz kopiować automatycznie ani według harmonogramu; możesz dodać kilka naraz
+(wielokrotny wybór), a wykluczone aplikacje są pomijane przez oba mechanizmy.
 
-**Dziennik aktywności.** Zakładka Schedule ma przycisk **View activity log**, który pokazuje
-lokalny ślad audytu - kopie, przywracania, usunięcia, zaplanowane i automatyczne uruchomienia oraz
-przycięcia - od najnowszych.
+**Dziennik aktywności.** Zakładka Schedule ma przycisk **View activity log**, który otwiera pełny
+ekran (natychmiast) pokazujący lokalny ślad audytu - kopie, przywracania, usunięcia, zaplanowane i
+automatyczne uruchomienia oraz przycięcia - od najnowszych. Akcja **Export logs** zapisuje plik
+dziennika (w folderze kopii zapasowych), który możesz dołączyć do zgłoszenia opinii lub błędu.
 
 ## 9. Migracja do środka: import Neo-Backup i Android-DataBackup
 
@@ -466,6 +566,11 @@ działającej operacji i pokaże bieżący postęp.
   wychwyciła złą kopię). Uruchom kopię ponownie.
 - `ERR_RESTORE_TEST` - restore-test się nie powiódł; kopia nie rozpakowała/zweryfikowała się
   czysto, a twoja żywa aplikacja pozostała nietknięta.
+- `ERR_UNSAFE_ARCHIVE` - archiwum zostało odrzucone, ponieważ próbowało zapisać poza swoim
+  katalogiem docelowym (ścieżki bezwzględne lub z `..`). To chroni cię przed zmanipulowaną kopią;
+  nic nie zostało zapisane.
+- `ERR_QUOTA` - zdalny cel w chmurze nie miał dość wolnego miejsca na wysyłkę Full; kopia została
+  zatrzymana, zanim cokolwiek wysłano.
 
 **Mój zdalny cel zawodzi.** Użyj **testu** celu w zakładce Destinations,
 by zwalidować poświadczenia i łączność. Pamiętaj, że tylko cele chmurowe potrzebują

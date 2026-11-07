@@ -31,6 +31,11 @@ soon as we can and credit you if you wish.
   choose a strong one.
 - The optional Google Drive companion app should always be hidden with HMA-OSS so it
   does not reveal root or an unlocked bootloader.
+- Restore runs as root, so every archive is checked before anything is written: a
+  backup whose contents point outside their target (an absolute path or a `..`
+  component) is refused, and no file is extracted until the whole archive is cleared.
 - Every prebuilt binary and library is traceable to a pinned public upstream with a
   recorded SHA-256, and the manifest ships on-device, so the bundled payload can be
   audited and reproduced. See [docs/BINARIES.md](docs/BINARIES.md).
+
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome - see [CONTRIBUTING.md](CONTRIBUTING.md).*

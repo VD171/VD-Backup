@@ -35,9 +35,10 @@ VDBackup에서 프라이버시와 보안은 선택 사항이 아닙니다. 백�
 빌드되며, 읽고 다시 빌드할 수 있습니다.
 
 > **Full 대 lite 에디션.** lite 에디션은 크기를 작게 유지하기 위해 `rclone` 과 `restic`(가장 큰 두
-> 바이너리)만 생략합니다. `rsync` 와 `ssh`/`scp`/`sftp` 는 여전히 포함되며, 위에 나열된 그 밖의
+> 바이너리)만 생략하고, 클라우드 대상이나 스냅샷 모드를 처음 사용할 때 이를 필요 시 내려받습니다
+> (SHA-256으로 검증). `rsync` 와 `ssh`/`scp`/`sftp` 는 여전히 포함되며, 위에 나열된 그 밖의
 > 모든 바이너리도 포함됩니다. Full 에디션은 `rclone`(클라우드 제공업체)과 `restic`(스냅샷)을
-> 추가합니다.
+> 내장하므로 아무것도 다운로드하지 않습니다.
 
 ## 기기 내 매니페스트: `PROVENANCE.json`
 
@@ -78,3 +79,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 제공된 파일이 기록된 출처와 일치하지 않으면 보안 문제로 간주하고 신고하십시오
 ([SECURITY.md](SECURITY.md) 참조). 이것이 바로 이 매니페스트가 드러내기 위해 존재하는 종류의
 불일치입니다.
+
+*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다 - [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*

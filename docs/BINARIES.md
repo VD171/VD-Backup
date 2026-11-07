@@ -36,9 +36,11 @@ Only the first two rows are prebuilt third-party binaries; the last two are buil
 source that lives in this repository and can be read and rebuilt.
 
 > **Full vs lite editions.** The lite editions omit only `rclone` and `restic` (the
-> two largest binaries) to stay small; `rsync` and `ssh`/`scp`/`sftp` are still present,
-> and every other binary listed above is present too. The full editions add `rclone`
-> (cloud providers) and `restic` (snapshots).
+> two largest binaries) to stay small and fetch them on demand (SHA-256-verified) the
+> first time you use a cloud destination or snapshot mode; `rsync` and `ssh`/`scp`/`sftp`
+> are still present, and every other binary listed above is present too. The full editions
+> ship `rclone` (cloud providers) and `restic` (snapshots) embedded, so nothing is ever
+> downloaded.
 
 ## The on-device manifest: `PROVENANCE.json`
 
@@ -79,3 +81,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 If any shipped file does not match its recorded source, treat it as a security issue and
 report it (see [SECURITY.md](../SECURITY.md)). This is exactly the kind of discrepancy this
 manifest exists to make visible.
+
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome - see [CONTRIBUTING.md](../CONTRIBUTING.md).*

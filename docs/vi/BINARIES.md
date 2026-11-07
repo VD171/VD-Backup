@@ -36,9 +36,10 @@ Chỉ hai hàng đầu là tệp nhị phân bên thứ ba dựng sẵn; hai hà
 trong kho này và có thể đọc và dựng lại.
 
 > **Phiên bản Full so với lite.** Các phiên bản lite chỉ bỏ qua `rclone` và `restic` (hai tệp nhị
-> phân lớn nhất) để giữ kích thước nhỏ; `rsync` và `ssh`/`scp`/`sftp` vẫn có mặt, và mọi tệp nhị phân
-> khác được liệt kê ở trên cũng có mặt. Các phiên bản Full thêm `rclone` (nhà cung cấp đám mây) và
-> `restic` (ảnh chụp nhanh).
+> phân lớn nhất) để giữ kích thước nhỏ và tải chúng theo nhu cầu (được xác minh bằng SHA-256) trong
+> lần đầu bạn dùng đích đám mây hoặc chế độ ảnh chụp nhanh; `rsync` và `ssh`/`scp`/`sftp` vẫn có mặt,
+> và mọi tệp nhị phân khác được liệt kê ở trên cũng có mặt. Các phiên bản Full cung cấp `rclone`
+> (nhà cung cấp đám mây) và `restic` (ảnh chụp nhanh) được nhúng sẵn, nên không bao giờ tải xuống gì.
 
 ## Bản kê trên thiết bị: `PROVENANCE.json`
 
@@ -79,3 +80,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 Nếu bất kỳ tệp được đi kèm nào không khớp với nguồn đã ghi của nó, hãy coi đó là một vấn đề bảo mật
 và báo cáo nó (xem [SECURITY.md](SECURITY.md)). Đây chính là loại sai lệch mà bản kê này tồn tại để
 làm cho nó hiển thị rõ.
+
+*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến - xem [CONTRIBUTING.md](CONTRIBUTING.md).*

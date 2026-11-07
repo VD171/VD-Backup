@@ -35,7 +35,7 @@ a jak ověřit, že nebylo nic neprůhledného podstrčeno.
 Pouze první dva řádky jsou předkompilované binární soubory třetích stran; poslední dva jsou sestaveny ze
 zdroje, který se nachází v tomto repozitáři a lze jej číst a znovu sestavit.
 
-> **Edice Full vs lite.** Edice lite vynechávají pouze `rclone` a `restic` (dva největší binární soubory), aby zůstaly malé; `rsync` a `ssh`/`scp`/`sftp` jsou stále přítomné a každý další binární soubor uvedený výše je přítomen také. Edice Full přidávají `rclone` (poskytovatelé cloudu) a `restic` (snímky).
+> **Edice Full vs lite.** Edice lite vynechávají pouze `rclone` a `restic` (dva největší binární soubory), aby zůstaly malé, a stahují je na vyžádání (ověřené přes SHA-256) při prvním použití cloudového cíle nebo režimu snímků; `rsync` a `ssh`/`scp`/`sftp` jsou stále přítomné a každý další binární soubor uvedený výše je přítomen také. Edice Full dodávají `rclone` (poskytovatelé cloudu) a `restic` (snímky) zabudované, takže se nikdy nic nestahuje.
 
 ## Manifest na zařízení: `PROVENANCE.json`
 
@@ -76,3 +76,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 Pokud některý dodaný soubor neodpovídá svému zaznamenanému zdroji, považujte to za bezpečnostní
 problém a nahlaste jej (viz [SECURITY.md](SECURITY.md)). To je přesně ten druh nesrovnalosti, který tento
 manifest existuje proto, aby jej učinil viditelným.
+
+*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány - viz [CONTRIBUTING.md](CONTRIBUTING.md).*

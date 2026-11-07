@@ -6,6 +6,69 @@
 
 Todas as mudanças relevantes do VDBackup estão documentadas aqui. Apenas em inglês.
 
+## v1.03
+
+Novo escopo de backup:
+
+- Novas categorias de backup especial: calendário (o provider de calendário, mais uma
+  exportação portátil `calendar.json`), papel de parede (papéis de parede da tela inicial e
+  de bloqueio), DNS privado (modo e especificador) e configurações do sistema (o despejo
+  completo das configurações system/global/secure). As configurações do sistema são opt-in e
+  sobrescrevem as configurações de todo o dispositivo na restauração, então são protegidas
+  como o SSAID, com consentimento explícito e uma entrada completa de auditoria.
+- Backup avulso de pasta e arquivo: faça backup de qualquer caminho absoluto (armazenamento
+  compartilhado ou dados de app) como um arquivo comprimido e selado por manifesto, e
+  restaure-o para o mesmo caminho. A restauração exige uma confirmação explícita.
+
+Restauração mais segura:
+
+- Todo arquivo é verificado antes de qualquer escrita: um backup cujo conteúdo aponta para
+  fora do seu alvo (um caminho absoluto ou um componente `..`) é recusado, de modo que uma
+  restauração rodando como root não pode ser enganada a escrever fora do destino.
+
+Progresso e agendamento:
+
+- O progresso ao vivo agora mostra velocidade de transferência, ETA e um contador de itens
+  durante os backups, além de uma etapa verificada por checksum para uploads de nuvem e uma
+  pré-checagem de "espaço insuficiente".
+- Jobs agendados podem ser condicionados: rodar apenas no Wi-Fi, apenas carregando, apenas
+  acima de um nível de bateria, ou apenas em dias da semana escolhidos; um job agendado
+  também é pulado enquanto o dispositivo está criticamente quente. Um job pulado tenta de
+  novo no próximo tick.
+
+Destinos de nuvem:
+
+- Conecte qualquer backend rclone pela interface: a lista suspensa de remoto de nuvem
+  oferece os provedores populares (Google Drive, Dropbox, OneDrive, Box, pCloud, Mega,
+  Backblaze B2, S3, SFTP, WebDAV, FTP, SMB) mais uma opção "Custom (advanced)" onde você
+  digita o nome de qualquer outro backend rclone e seus parâmetros `key=value`, de modo que
+  todos os backends do rclone ficam acessíveis.
+- Login no próprio dispositivo (sem PC): provedores que precisam de um login por navegador
+  (Google Drive, Dropbox, OneDrive, Box, pCloud) têm um botão "Authorize in browser" que
+  abre o próprio navegador do telefone na página de consentimento do provedor; depois que
+  você aprova, você retorna ao app e o remoto é salvo automaticamente, com o token capturado
+  no dispositivo. Colar um token à mão continua disponível como fallback.
+
+Interface:
+
+- Uma escala de interface ajustável (um controle deslizante arrastável) redimensiona toda a
+  interface, de modo que ela sirva a telas de diferentes densidades de pixels; 100% é o padrão e
+  permanece inalterado.
+- A interface agora é renderizada da direita para a esquerda para árabe e persa.
+- Um resumo inicial com contagens de backup e uma barra de armazenamento, selos de status,
+  copiar hashes e caminhos para a área de transferência, interruptores de alternância no estilo
+  Android, e uma ação "Check for updates".
+- O log de atividades é uma tela cheia que abre instantaneamente, com uma ação "Export logs" que
+  salva um arquivo de log que você pode anexar a um relatório.
+
+Correções:
+
+- A restauração e a importação não falham mais em dispositivos cujo `tar` embarcado não
+  aceita a opção `--no-absolute-names`; a verificação de segurança do arquivo é independente
+  dessa opção.
+- "Check for updates" funciona mesmo onde nenhum cliente HTTP está embarcado, recorrendo ao
+  rclone embarcado; e o log de atividades não demora mais para abrir.
+
 ## v1.01
 
 Primeiro lançamento público. Um módulo WebUI para KernelSU/APatch/Magisk que faz backup e restaura
@@ -127,3 +190,5 @@ AI-friendly e i18n:
   (`docs/<lang>/`), com os docs espelhados no wiki.
 - A listagem rica de apps e a descriptografia do Neo rodam através de um helper dex dirigido como root
   (`IPackageManager` via ServiceManager), de modo que funcionam onde o ActivityThread trava.
+
+*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas - veja [CONTRIBUTING.md](CONTRIBUTING.md).*

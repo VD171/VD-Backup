@@ -30,8 +30,9 @@
 
 只有前两行是预构建的第三方二进制文件；后两者是从本仓库内的源代码构建的，可供阅读和重新构建。
 
-> **Full 版与 lite 版。** lite 版为保持小巧，仅省略 `rclone` 和 `restic`（两个最大的二进制文件）；
-> `rsync` 和 `ssh`/`scp`/`sftp` 仍然包含在内，上面列出的其他所有二进制文件也都存在。Full 版新增 `rclone`（云服务提供商）和 `restic`（快照）。
+> **Full 版与 lite 版。** lite 版为保持小巧，仅省略 `rclone` 和 `restic`（两个最大的二进制文件），
+> 并在你首次使用云端目标或快照模式时按需获取它们（通过 SHA-256 校验）；`rsync` 和 `ssh`/`scp`/`sftp`
+> 仍然包含在内，上面列出的其他所有二进制文件也都存在。Full 版内置 `rclone`（云服务提供商）和 `restic`（快照），因此永不下载任何内容。
 
 ## 设备上的清单：`PROVENANCE.json`
 
@@ -69,3 +70,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 
 如果任何随附的文件与其记录的来源不匹配，请将其视为安全问题并报告（见 [SECURITY.md](SECURITY.md)）。
 这正是此清单存在的目的所要暴露的那类差异。
+
+*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进 - 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*

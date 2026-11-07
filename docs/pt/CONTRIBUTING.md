@@ -75,3 +75,5 @@ Assistentes e agentes de IA são colaboradores de primeira classe aqui, não um 
 
 Procure pelos labels `good first issue` e `help wanted`. Traduções, docs, novos
 presets de destino `rclone` e polimento da WebUI são todos ótimos pontos de partida.
+
+*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas - veja [CONTRIBUTING.md](CONTRIBUTING.md).*

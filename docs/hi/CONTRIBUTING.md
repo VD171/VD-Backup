@@ -75,3 +75,5 @@ AI assistants और agents यहाँ first-class योगदानकर्
 
 `good first issue` और `help wanted` labels देखें। Translations, docs, नए
 `rclone` destination presets और WebUI polish सभी बेहतरीन शुरुआती बिंदु हैं।
+
+*यह दस्तावेज़ीकरण Claude (Anthropic) के साथ तैयार किया गया था और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और बेहतरी का स्वागत है - [CONTRIBUTING.md](CONTRIBUTING.md) देखें।*

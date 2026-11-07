@@ -17,6 +17,7 @@
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
   <a href="docs/USER-GUIDE.md">Guía de usuario</a> ·
   <a href="docs/AI-AGENTS.md">Agentes de IA</a> ·
+  <a href="CHANGELOG.md">Registro de cambios</a> ·
   <a href="CONTRIBUTING.md">Cómo contribuir</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">Hilo en XDA</a>
 </p>
@@ -51,12 +52,14 @@ importar copias de seguridad existentes de Neo-Backup y Android-DataBackup para 
   además de repositorios `rsync` y `restic`. Google Drive opcional mediante un pequeño complemento opt-in.
 - **Integridad:** cada archivo se verifica contra el manifiesto; dry-run y
   restore-test te dejan comprobar una copia sin tocar nada.
-- **Restauración selectiva:** restaura cualquier subconjunto de los elementos de una copia; elimina copias y
-  mantén un registro de actividad/auditoría de cada acción destructiva.
+- **Restauración selectiva y por lotes:** restaura cualquier subconjunto de los elementos de una copia, o
+  selecciona varias copias y restáuralas todas de una vez; elimina copias y mantén un registro de
+  actividad/auditoría de cada acción destructiva.
 - **Copias especiales:** mensajes (SMS/MMS), contactos y registro de llamadas, Wi-Fi y Bluetooth,
   con una exportación JSON portátil opcional que puedes abrir en un PC.
-- **Programación + automatización:** trabajos recurrentes con poda keep-N, además de copia
-  automática opt-in al instalar/actualizar y una lista de apps excluidas.
+- **Programación + automatización:** trabajos recurrentes de **copia o restauración** que apuntan a una
+  app, un conjunto o todas las apps, con poda keep-N, además de copia automática opt-in al
+  instalar/actualizar y una lista de apps excluidas.
 - **Origen de instalación:** las apps restauradas indican Play Store como su origen de instalación de
   forma predeterminada (conmutable); una opción avanzada opt-in también falsifica el paquete iniciador y el origen.
 - **Montaje como app de sistema:** monta una app instalada como app de sistema sin tocar la
@@ -66,13 +69,21 @@ importar copias de seguridad existentes de Neo-Backup y Android-DataBackup para 
 - **Migrar hacia aquí:** importa copias de seguridad existentes de Neo-Backup y Android-DataBackup,
   incluidas las protegidas con contraseña.
 
+## Capturas de pantalla
+
+| Inicio | Apps | Programación |
+|:---:|:---:|:---:|
+| ![Inicio](docs/screenshots/es/home-dark.png) | ![Apps](docs/screenshots/es/apps-dark.png) | ![Programación](docs/screenshots/es/schedule-dark.png) |
+| **Destinos** | **Ajustes** | **Registro de actividad** |
+| ![Destinos](docs/screenshots/es/destinations-dark.png) | ![Ajustes](docs/screenshots/es/settings-dark.png) | ![Registro de actividad](docs/screenshots/es/activitylog-dark.png) |
+
 ## Instalación
 
 1. Descarga el `VD-Backup-vX.Y.zip` más reciente desde [Versiones](https://github.com/VD171/VD-Backup/releases).
 2. Instálalo en el gestor KernelSU / APatch / Magisk - utilizable al instante, sin necesidad de reiniciar.
 3. Abre la **WebUI** del módulo para configurar y ejecutar las copias. Eso es todo.
 
-**Ediciones.** Cada release viene como seis zips. `universal-full` - todas las arquitecturas y todos los binarios (incl. `rclone` para proveedores de nube y `restic` para instantáneas), cualquier dispositivo, el más grande. `universal-lite` - todas las arquitecturas sin los dos binarios más grandes (`rclone`, `restic`), el más pequeño, y sigue haciendo copias locales, SSH/SFTP y `rsync`. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - una sola arquitectura con todos los binarios, más pequeño que `universal-full`. ¿Conoces tu arquitectura? -> elige `<abi>-full`; ¿quieres el más pequeño o sin los gigantes de la nube? -> `universal-lite`; todo en cualquier dispositivo -> `universal-full`. Ve [Versiones](https://github.com/VD171/VD-Backup/releases).
+**Ediciones.** Cada release viene como seis zips. `universal-full` - todas las arquitecturas y todos los binarios integrados (incl. `rclone` para proveedores de nube y `restic` para instantáneas), totalmente sin conexión, nunca se descarga nada, cualquier dispositivo, el más grande. `universal-lite` - todas las arquitecturas sin los dos binarios más grandes (`rclone`, `restic`), el más pequeño; sigue haciendo copias locales, SSH/SFTP y `rsync` sin ninguna descarga, y la primera vez que uses un destino en la nube (`rclone`) o el modo de instantáneas (`restic`) ofrece descargar ese pequeño complemento específico de la arquitectura una sola vez (verificado por SHA-256) y lo guarda en caché, de modo que esas funciones también funcionan. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - una sola arquitectura con todos los binarios integrados, más pequeño que `universal-full`. ¿Conoces tu arquitectura? -> elige `<abi>-full`; ¿quieres el más pequeño y no te importa una descarga única para la nube o las instantáneas? -> `universal-lite`; ¿quieres todo integrado sin ninguna descarga (sin conexión / recuperación)? -> una edición full. Ve [Versiones](https://github.com/VD171/VD-Backup/releases).
 
 ¿Recién llegas? La [Guía de usuario](docs/USER-GUIDE.md) te lleva desde la instalación hasta la restauración.
 
@@ -94,7 +105,7 @@ El módulo es shell + WebUI más binarios estáticos por ABI (`tar`, `zstd`, `lz
 - **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - la documentación, navegable en línea.
 - **[Guía de usuario](docs/USER-GUIDE.md)** - de principio a fin, desde la instalación hasta la restauración.
 - **[Agentes de IA](docs/AI-AGENTS.md)** - gestiona cada acción sin interfaz mediante la API JSON.
-- **[Arquitectura](ARCHITECTURE.md)** y **[Estructura de archivos](docs/FILE-STRUCTURE.md)** - cómo funciona.
+- **[Arquitectura](docs/ARCHITECTURE.md)** y **[Estructura de archivos](docs/FILE-STRUCTURE.md)** - cómo funciona.
 - **[Binarios incluidos](docs/BINARIES.md)** - procedencia y SHA-256 de cada binario precompilado, para una auditoría completa.
 - **[Recuperación](module/etc/RECOVERY.md)** - abre y descifra una copia de seguridad en un PC, sin el módulo.
 - **[Cómo contribuir](CONTRIBUTING.md)** y **[Seguridad](SECURITY.md)**.

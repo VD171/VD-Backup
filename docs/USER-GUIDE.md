@@ -22,7 +22,8 @@ place, with nothing to "allow".
   - [5.3 Compression](#53-compression)
   - [5.4 Encryption](#54-encryption)
   - [5.5 Verify and dry-run](#55-verify-and-dry-run)
-  - [5.6 Special backups (messages, call log, Wi-Fi, Bluetooth)](#56-special-backups-messages-call-log-wi-fi-bluetooth)
+  - [5.6 Special backups (messages, call log, Wi-Fi, Bluetooth, calendar, wallpaper, DNS, system settings)](#56-special-backups-messages-call-log-wi-fi-bluetooth-calendar-wallpaper-dns-system-settings)
+  - [5.7 Standalone folder and file backups](#57-standalone-folder-and-file-backups)
 - [6. Restoring a backup](#6-restoring-a-backup)
 - [7. Destinations: local and remote](#7-destinations-local-and-remote)
 - [8. Scheduling and retention](#8-scheduling-and-retention)
@@ -52,6 +53,14 @@ Everything VDBackup produces uses **standard formats** (tar, gzip, zstd, age, zi
 restic), so your backups are never locked into the module and are never tied to your
 specific device. See [section 11](#11-portability-opening-backups-on-a-pc).
 
+## Screenshots
+
+| Home | Apps | Schedule |
+|:---:|:---:|:---:|
+| ![Home](screenshots/en/home-dark.png) | ![Apps](screenshots/en/apps-dark.png) | ![Schedule](screenshots/en/schedule-dark.png) |
+| **Destinations** | **Settings** | **Activity log** |
+| ![Destinations](screenshots/en/destinations-dark.png) | ![Settings](screenshots/en/settings-dark.png) | ![Activity log](screenshots/en/activitylog-dark.png) |
+
 ## 2. Requirements
 
 - **A rooted Android device** managed by **KernelSU**, **APatch** or **Magisk**.
@@ -78,22 +87,27 @@ and they degrade gracefully when they are not available on your device.
 **Which edition to download.** Each release ships as several flashable zip editions, so
 you download only what you need. Pick one:
 
-- **`VD-Backup-<ver>-universal-full.zip`** - every CPU architecture and every binary,
-  including `rclone` (cloud providers: Google Drive, S3 and 70+ other rclone backends) and
-  `restic` (deduplicated snapshots). Works on any device. Largest download.
+- **`VD-Backup-<ver>-universal-full.zip`** - every CPU architecture and every binary
+  embedded, including `rclone` (cloud providers: Google Drive, S3 and 70+ other rclone
+  backends) and `restic` (deduplicated snapshots). Fully offline, nothing is ever
+  downloaded. Works on any device. Largest download.
 - **`VD-Backup-<ver>-universal-lite.zip`** - every architecture, but **without** the two
   largest binaries (`rclone` and `restic`). Smallest download; still does local, SSH/SFTP
-  and rsync backups, with portable `age` encryption.
+  and rsync backups with no download, with portable `age` encryption. The first time you
+  use a cloud destination (`rclone`) or snapshot mode (`restic`), the WebUI offers to
+  download that small per-architecture addon once (verified by SHA-256) and caches it;
+  afterwards those features work too.
 - **`VD-Backup-<ver>-<abi>-full.zip`** (one of `arm64-v8a`, `armeabi-v7a`, `x86`,
-  `x86_64`) - a single architecture with every binary (same features as `universal-full`
-  but only your device's architecture, so smaller than `universal-full`).
+  `x86_64`) - a single architecture with every binary embedded (same features as
+  `universal-full` but only your device's architecture, so smaller than `universal-full`).
 
 Pick the matching **`<abi>-full`** if you know your device's architecture and want
-everything (most phones are **`arm64-v8a`**). Pick **`universal-lite`** if you want the
-smallest download or do not need cloud providers (`rclone`) or snapshots (`restic`). Pick
-**`universal-full`** if you want everything and are not sure of the architecture. On
-install the module keeps only your device's architecture regardless of the edition you
-flash.
+everything embedded (most phones are **`arm64-v8a`**). Pick **`universal-lite`** if you
+want the smallest download and do not mind a one-time, SHA-256-verified download the first
+time you use cloud providers (`rclone`) or snapshots (`restic`). Pick a **full** edition if
+you want everything embedded with zero downloads (offline / recovery) and are not sure of
+the architecture. On install the module keeps only your device's architecture regardless of
+the edition you flash.
 
 On first run the module seeds a default configuration (only if none exists yet), so
 your settings are preserved across module updates.
@@ -121,6 +135,7 @@ Keep this in mind for two reasons: backups take up space under `/sdcard/VDBackup
 
 The WebUI is organized into a few tabs:
 
+- **Home** - a home overview showing counts of your backups (apps, backups, folders and scheduled jobs) and a storage bar for how much space your backups use versus free, with status badges, copy-to-clipboard for hashes and paths, and a **Check for updates** action.
 - **Apps** - the list of installed apps (user and system), each shown with its real
   name, its package name, and its icon (icons load lazily and are cached, so the list
   stays responsive). The button on a row backs the app up; tapping the row opens that
@@ -134,12 +149,18 @@ The WebUI is organized into a few tabs:
   destinations you add (see [section 7](#7-destinations-local-and-remote)). You can
   test a destination here before relying on it.
 - **Settings** - a light/dark theme toggle, an accent-colour picker (presets, a custom
-  colour, or reset), a language selector, defaults for new jobs (default compression,
+  colour, or reset), a language selector (the interface renders right-to-left for Arabic
+  and Persian), an interface scale slider you drag to rescale the whole interface
+  (header, content and bottom navigation together) from 85% to 120% (100% is the
+  default), for screens of different pixel densities, defaults for new jobs (default compression,
   verify on/off, default encryption), the network policy for cloud transfers (see
   [section 7](#7-destinations-local-and-remote)), auto-backup and the excluded-apps list,
-  the install-source option, the encryption key, and scheduling.
-- **About** - version, links, the sibling projects (See also) and the bundled-binary
-  audit manifest.
+  the install-source option, the encryption key, and scheduling. On/off settings use
+  Android-style toggle switches.
+- **About** - version, links, the sibling projects (See also), the bundled-binary
+  audit manifest, and a **Check for updates** action that reports whether a newer version has
+  been published (with its release notes). You install any update through your root manager,
+  the same way you flashed the module.
 
 Confirmations and messages use in-app dialogs (not the old system pop-ups), and a
 restore or import asks you to acknowledge that it overwrites the current app data before
@@ -147,7 +168,10 @@ it proceeds.
 
 Backups and restores run **detached** as a background root process. You can close the
 WebUI, or even close the root manager, and the operation keeps going. When you come
-back, the WebUI reattaches and shows live progress with a localized phase label. On
+back, the WebUI reattaches and shows live progress with a localized phase label. For a
+running job the progress card also shows the live transfer speed and the estimated time
+remaining, plus an item counter (for example "12 of 40") with the name of the current
+item. On
 ROMs that surface shell notifications you also get an Android notification when a job
 starts and finishes; either way the in-app progress card is the reliable indicator.
 
@@ -243,16 +267,63 @@ Two safety options help you trust a backup before you rely on it:
   anything**. Use it to estimate space or to check your item selection before running
   the real thing.
 
-### 5.6 Special backups (messages, call log, Wi-Fi, Bluetooth)
+When a backup goes to a **cloud** destination, VDBackup adds two more safeguards. It runs a
+final **checksum-verified** step that re-checks the uploaded copy against the original on the
+remote, and fails the job (rather than leaving a corrupt copy in the cloud) if they do not
+match. And before a Full upload it checks the remote's **free space** and stops early with a
+clear **"not enough space"** error if the backup would not fit, instead of filling the remote
+and failing partway. (The space check is for Full uploads; Mirror is a delta sync and is
+exempt.)
+
+### 5.6 Special backups (messages, call log, Wi-Fi, Bluetooth, calendar, wallpaper, DNS, system settings)
 
 Below the app lists on the **Backups** tab, **Special backups** cover system-wide data
-that is not tied to a single app: **messages (SMS/MMS)**, **contacts and call log**,
-**Wi-Fi networks** and **Bluetooth**. Pick the categories and back them up; they are
-archived raw, with the same SELinux/xattr preservation and optional encryption as app
-backups. Optionally a **portable copy** is written too (messages, call log and contacts
-as openable JSON), so you have a cross-device copy you can read on a PC without the
-module. Restoring a special backup overwrites live system data and needs a reboot, so it
-is gated behind a prominent acknowledgment and is reliable on the same device and ROM.
+that is not tied to a single app. Pick the categories and back them up; they are archived
+with the same SELinux/xattr preservation and optional encryption as app backups. The
+categories are:
+
+| Category | What it is |
+|----------|-----------|
+| **Messages (SMS/MMS)** | Your text messages. |
+| **Contacts and call log** | Your contacts and call history. |
+| **Wi-Fi networks** | Your saved Wi-Fi networks. |
+| **Bluetooth** | Your Bluetooth pairings. |
+| **Calendar** | The calendar provider (app and data). A **portable `calendar.json`** is also written, so your events are readable on a PC without the module. |
+| **Wallpaper** | Your home and lock-screen wallpaper plus `wallpaper_info.xml`, stored as the raw image. |
+| **DNS** | Your private DNS mode and server. |
+| **System settings** | A full dump of the device system, global and secure settings. |
+
+For messages, call log and contacts, a **portable copy** (openable JSON) is written too,
+so you have a cross-device copy you can read on a PC without the module.
+
+**System settings is opt-in and overwrites your device settings on restore.** Just like
+SSAID (see [section 10](#10-ssaid-device-android_id)), the **System settings** category
+is the most sensitive one: restoring it overwrites your device-wide settings, so it is
+off unless you deliberately select it, asks you to acknowledge first, and is written to
+the activity log.
+
+Restoring a special backup overwrites live system data and needs a reboot, so it is gated
+behind a prominent acknowledgment and is reliable on the same device and ROM. Restores are
+**idempotent**: the raw categories (messages, contacts, Wi-Fi, Bluetooth, calendar) are
+restored by **replacing** the data rather than merging it, so restoring the same backup
+twice never creates duplicates, and DNS and system settings are simply re-applied.
+
+### 5.7 Standalone folder and file backups
+
+Sometimes you want to back up a plain folder or file that is not an app - a camera
+folder, a documents directory, a single database. VDBackup can back up **any absolute
+path** on shared storage or under `/data`, with the same portable format as an app
+backup: a `tar.zst` archive plus a `manifest.json`, SHA-256 sealed, with a RECOVERY note
+when you encrypt it. These path backups are kept separately, under a `.paths` folder in
+your backups directory.
+
+- **Pick a path and back it up.** The source must be an absolute path under one of the
+  allowed locations (`/storage/emulated`, `/data/media`, `/sdcard`, `/data`). Paths that
+  try to climb out with `..` are refused.
+- **Restoring writes back to the original location**, so, like any restore, it is
+  destructive and asks you to **confirm** before it overwrites anything.
+- Like app backups, path backups and restores run **detached** with live progress, use
+  your chosen compression, and can be encrypted with a passphrase.
 
 ## 6. Restoring a backup
 
@@ -263,7 +334,10 @@ records the action in a local audit log.
 A restore is **faithful**: VDBackup wipes the app's current state and extracts the
 backup, so the app is reverted to the **exact state** captured in that backup
 (including ownership, modes, SELinux contexts and xattr). It is not a merge - it is a
-true restore to the backup's point in time.
+true restore to the backup's point in time. Because a restore runs as root, VDBackup
+also checks every archive before it extracts anything and refuses a tampered one that
+tries to write outside its target, so a modified backup can never overwrite the rest of
+your system.
 
 Useful restore options:
 
@@ -284,6 +358,12 @@ Useful restore options:
   toggle goes further and also makes the app's initiating package and package source look
   Play-installed; it edits the system package database (backed up first) and takes effect
   after a reboot.
+
+**Batch restore.** The **Backups** tab has a **Select** mode, the same way the Apps tab
+has it for batch backup. Turn **Select** on, tick the backups you want with their
+checkboxes, and restore them all at once. One options dialog covers the whole selection -
+the overwrite acknowledgment, the restore-test and the install-source choice apply to
+every backup you picked - and they are restored one after another.
 
 **Deleting a backup.** Open a backup's details (or an app's history) and use **Delete**;
 you are asked to confirm, and the deletion is written to the activity log. You can also
@@ -310,11 +390,16 @@ Remote transport is handled by the bundled tools:
 - **restic** - encrypted, de-duplicated **Snapshot** repositories (local or remote).
 
 **Creating a cloud remote (no SSH needed).** In the Destinations tab, pick the
-**rclone** destination type and use **Add cloud remote**: choose the backend (SFTP,
-SMB, WebDAV, FTP, S3 or Google Drive), fill in the fields (host/user/password, or the
-S3 keys, or a Drive token) and save. The remote then appears in the destination's
-remote list. Passwords are stored obscured, never in clear text. You can list and
-delete your remotes from the same place.
+**rclone** destination type and use **Add cloud remote**. You can connect **any rclone
+backend**: the dropdown offers the popular ones (**Google Drive, Dropbox, OneDrive, Box,
+pCloud, Mega, Backblaze B2, S3, SFTP, WebDAV, FTP, SMB**) plus a **Custom (advanced)**
+option where you type any other backend type and its `key=value` parameters. Fill in the
+fields (host/user/password, or the S3 keys, for example) and save. For providers that sign
+you in with a browser (Google Drive, Dropbox, OneDrive, Box, pCloud) use the **Authorize in
+browser** button: it signs you in through the phone's own browser and captures the token
+automatically, so **no PC is needed** (pasting a token by hand still works as a fallback).
+The remote then appears in the destination's remote list. Passwords are stored obscured,
+never in clear text. You can list and delete your remotes from the same place.
 
 Two rules keep remote use safe:
 
@@ -346,19 +431,36 @@ Local backups are never affected.
 
 ## 8. Scheduling and retention
 
-VDBackup can run backups automatically on a schedule. In the scheduler you define a
-job with:
+VDBackup can run backups - and restores - automatically on a schedule. In the scheduler
+you define a job with:
 
-- the app (or set of apps) and the items/mode to use,
+- a **target** - a single app, a set of apps, or **all apps** (minus the excluded-apps
+  list) - and the items/mode to use,
+- an **action** - **Back up** (the default) or **Restore latest**, which restores each
+  target app's most recent backup,
 - a destination,
 - a **cron-like schedule** - hourly, daily or weekly, at a time you choose (HH:MM),
 - a **retention** setting: **keep N** most recent backups for that job, older ones are
-  pruned automatically.
+  pruned automatically,
+- optional **run conditions**: only on **Wi-Fi**, only while **charging**, only at or above
+  a **minimum battery level**, and only on chosen **days of the week**.
 
 Scheduled jobs are triggered by a boot-time heartbeat in the module: when a job is
 due it runs, records its last-run time so it does not fire twice, and applies
 retention to prune old backups. Because everything runs as root in the background,
 scheduled backups do not need the WebUI to be open.
+
+**Run conditions (gates).** A scheduled job can carry conditions that must hold for it to
+run: Wi-Fi only, charging only, a minimum battery level, and specific days of the week. When
+a job is due but a condition is not met, it is **skipped and tried again at the next check** -
+its schedule does not advance, so it runs as soon as the condition is satisfied. A built-in
+thermal safety check also skips a scheduled job while the device is too hot. Every such skip
+is recorded in the activity log.
+
+**Scheduled restore overwrites on every run.** A **Restore latest** job re-restores each
+target app's most recent backup every time it fires, and restore is destructive: on every
+run it **overwrites the app's current data** with the latest backup. This is deliberate and
+opt-in - choose it only when you want the targets held at their most recent backup.
 
 **Auto-backup on install/update.** In Settings you can turn on **automatic backup**: the
 same background heartbeat notices apps that were newly installed or updated and backs them
@@ -366,11 +468,13 @@ up for you (with keep-N retention). The first run only records what is installed
 enabling it never backs up your whole device at once.
 
 **Excluded apps (blocklist).** Also in Settings, you can exclude apps you never want
-backed up automatically or on a schedule; excluded apps are skipped by both.
+backed up automatically or on a schedule; you can add several at once (multi-select), and
+excluded apps are skipped by both.
 
-**Activity log.** The Schedule tab has a **View activity log** button that shows the local
-audit trail - backups, restores, deletions, scheduled and automatic runs, and prunes -
-newest first.
+**Activity log.** The Schedule tab has a **View activity log** button that opens a full
+screen (instantly) showing the local audit trail - backups, restores, deletions, scheduled
+and automatic runs, and prunes - newest first. An **Export logs** action saves a log file
+(under the backups folder) you can attach to a feedback or bug report.
 
 ## 9. Migrating in: importing Neo-Backup and Android-DataBackup
 
@@ -464,6 +568,11 @@ ones:
   caught a bad backup). Re-run the backup.
 - `ERR_RESTORE_TEST` - a restore-test failed; the backup did not extract/verify
   cleanly and your live app was left untouched.
+- `ERR_UNSAFE_ARCHIVE` - an archive was refused because it tried to write outside its
+  target directory (absolute or `..` paths). This protects you from a tampered backup;
+  nothing was written.
+- `ERR_QUOTA` - a cloud remote did not have enough free space for a Full upload; the backup
+  was stopped before uploading anything.
 
 **My remote destination fails.** Use the destination **test** in the Destinations tab
 to validate credentials and connectivity. Remember that only cloud destinations need

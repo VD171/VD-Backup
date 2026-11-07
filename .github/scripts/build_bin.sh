@@ -49,8 +49,8 @@ termux_arch() { case "$1" in
 esac; }
 
 ABIS="arm64-v8a armeabi-v7a x86 x86_64"
-TOOL_PKGS="tar zstd gzip jq rclone restic rsync openssh age util-linux sqlite"
-WANT_BINS="tar zstd gzip jq rclone restic rsync ssh sftp age age-keygen script sqlite3"
+TOOL_PKGS="tar zstd gzip jq rclone restic rsync openssh age util-linux sqlite curl"
+WANT_BINS="tar zstd gzip jq rclone restic rsync ssh sftp age age-keygen script sqlite3 curl"
 # libs always provided by Android (never bundle these)
 BIONIC="libc.so libm.so libdl.so liblog.so libandroid.so libz.so libselinux.so libc++.so libc++_shared.so libstdc++.so libEGL.so libnativehelper.so libbinder.so"
 

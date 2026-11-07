@@ -31,3 +31,11 @@ secepat mungkin dan memberi Anda kredit jika Anda menginginkannya.
   pilihlah yang kuat.
 - Aplikasi pendamping Google Drive opsional sebaiknya selalu disembunyikan dengan HMA-OSS agar
   tidak mengungkap root atau bootloader yang tidak terkunci.
+- Pemulihan berjalan sebagai root, jadi setiap arsip diperiksa sebelum apa pun ditulis: sebuah
+  backup yang isinya menunjuk ke luar targetnya (sebuah path absolut atau komponen `..`) akan
+  ditolak, dan tidak ada berkas yang diekstrak sampai seluruh arsip lolos pemeriksaan.
+- Setiap biner dan pustaka prakompilasi dapat dilacak ke upstream publik yang disematkan dengan
+  SHA-256 yang tercatat, dan manifes disertakan di perangkat, sehingga muatan yang dibundel dapat
+  diaudit dan direproduksi. Lihat [BINARIES.md](BINARIES.md).
+
+*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan - lihat [CONTRIBUTING.md](CONTRIBUTING.md).*

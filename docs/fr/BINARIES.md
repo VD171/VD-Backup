@@ -37,7 +37,7 @@ vérifier que rien d'opaque n'a été glissé dedans.
 Seules les deux premières lignes sont des binaires tiers préconstruits ; les deux dernières sont
 construites depuis des sources qui vivent dans ce dépôt et peuvent être lues et reconstruites.
 
-> **Éditions Full vs lite.** Les éditions lite n'omettent que `rclone` et `restic` (les deux plus gros binaires) pour rester petites ; `rsync` et `ssh`/`scp`/`sftp` sont toujours présents, et tous les autres binaires listés ci-dessus sont également présents. Les éditions Full ajoutent `rclone` (fournisseurs cloud) et `restic` (instantanés).
+> **Éditions Full vs lite.** Les éditions lite n'omettent que `rclone` et `restic` (les deux plus gros binaires) pour rester petites et les récupèrent à la demande (vérifiés par SHA-256) la première fois que vous utilisez une destination cloud ou le mode instantané ; `rsync` et `ssh`/`scp`/`sftp` sont toujours présents, et tous les autres binaires listés ci-dessus sont également présents. Les éditions Full fournissent `rclone` (fournisseurs cloud) et `restic` (instantanés) intégrés, de sorte que rien n'est jamais téléchargé.
 
 ## Le manifeste sur l'appareil : `PROVENANCE.json`
 
@@ -79,3 +79,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 Si un fichier livré ne correspond pas à sa source enregistrée, traitez cela comme un problème de
 sécurité et signalez-le (voir [SECURITY.md](SECURITY.md)). C'est exactement le genre d'écart que
 ce manifeste existe pour rendre visible.
+
+*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues - voir [CONTRIBUTING.md](CONTRIBUTING.md).*

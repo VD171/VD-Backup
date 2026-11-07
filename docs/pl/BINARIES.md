@@ -36,9 +36,11 @@ Tylko dwa pierwsze wiersze to prekompilowane pliki binarne osób trzecich; dwa o
 źródeł, które znajdują się w tym repozytorium i mogą być odczytane oraz ponownie zbudowane.
 
 > **Edycje Full kontra lite.** Edycje lite pomijają tylko `rclone` i `restic` (dwa największe
-> pliki binarne), aby pozostać małymi; `rsync` i `ssh`/`scp`/`sftp` są nadal obecne, a każdy
-> inny plik binarny wymieniony powyżej również jest obecny. Edycje Full dodają `rclone`
-> (dostawcy chmury) i `restic` (migawki).
+> pliki binarne), aby pozostać małymi, i pobierają je na żądanie (zweryfikowane przez SHA-256)
+> przy pierwszym użyciu miejsca docelowego w chmurze lub trybu migawek; `rsync` i
+> `ssh`/`scp`/`sftp` są nadal obecne, a każdy inny plik binarny wymieniony powyżej również jest
+> obecny. Edycje Full dostarczają `rclone` (dostawcy chmury) i `restic` (migawki) wbudowane,
+> więc nic nigdy nie jest pobierane.
 
 ## Manifest na urządzeniu: `PROVENANCE.json`
 
@@ -79,3 +81,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 Jeśli jakikolwiek dostarczony plik nie zgadza się ze swoim zapisanym źródłem, potraktuj to jako problem
 bezpieczeństwa i zgłoś go (zobacz [SECURITY.md](SECURITY.md)). To jest dokładnie ten rodzaj rozbieżności, który ten
 manifest istnieje, aby uczynić widocznym.
+
+*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane - zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*

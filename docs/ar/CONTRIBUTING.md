@@ -75,3 +75,5 @@ Android-DataBackup** - اتحاد ميزاتها تحت رخصة AGPLv3، مع �
 
 ابحث عن وسمَي `good first issue` و`help wanted`. الترجمات، والتوثيق، والإعدادات
 المسبقة الجديدة لوجهات `rclone`، وتحسين واجهة WebUI كلها نقاط انطلاق رائعة.
+
+*أُنشئت هذه الوثائق بمساعدة Claude (Anthropic) ويتولى صيانتها VD171. التصحيحات والتحسينات مرحب بها - انظر [CONTRIBUTING.md](CONTRIBUTING.md).*

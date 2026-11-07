@@ -17,6 +17,7 @@
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
   <a href="docs/USER-GUIDE.md">Kullanıcı kılavuzu</a> ·
   <a href="docs/AI-AGENTS.md">Yapay zeka aracıları</a> ·
+  <a href="CHANGELOG.md">Değişiklik günlüğü</a> ·
   <a href="CONTRIBUTING.md">Katkıda bulunma</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA konusu</a>
 </p>
@@ -51,12 +52,14 @@ Neo-Backup ve Android-DataBackup yedeklerini içe aktarabilir.
   ayrıca `rsync` ve `restic` depoları. Küçük, tercihe bağlı bir yardımcı ile isteğe bağlı Google Drive.
 - **Bütünlük:** her arşiv manifest'e karşı doğrulanır; dry-run ve geri yükleme testi, hiçbir şeye
   dokunmadan bir yedeği denetlemenizi sağlar.
-- **Seçmeli geri yükleme:** bir yedeğin öğelerinden herhangi bir alt kümeyi geri yükleyin;
-  yedekleri silin ve her yıkıcı eylemin bir etkinlik/denetim günlüğünü tutun.
+- **Seçmeli ve toplu geri yükleme:** bir yedeğin öğelerinden herhangi bir alt kümeyi geri
+  yükleyin veya birden çok yedeği seçip hepsini tek seferde geri yükleyin; yedekleri silin ve
+  her yıkıcı eylemin bir etkinlik/denetim günlüğünü tutun.
 - **Özel yedekler:** mesajlar (SMS/MMS), kişiler ve arama günlüğü, Wi-Fi ve Bluetooth;
   bir PC'de açabileceğiniz isteğe bağlı taşınabilir bir JSON dışa aktarımıyla.
-- **Zamanlama + otomasyon:** keep-N budamalı yinelenen işler, ayrıca kurulum/güncellemede
-  katılımlı otomatik yedekleme ve bir hariç tutulan uygulamalar listesi.
+- **Zamanlama + otomasyon:** tek bir uygulamayı, bir kümeyi veya tüm uygulamaları hedefleyen
+  **yedekleme veya geri yükleme** için yinelenen işler, keep-N budamayla, ayrıca
+  kurulum/güncellemede katılımlı otomatik yedekleme ve bir hariç tutulan uygulamalar listesi.
 - **Kurulum kaynağı:** geri yüklenen uygulamalar varsayılan olarak kurulum kaynağı olarak
   Play Store'u bildirir (açılıp kapatılabilir); gelişmiş bir katılımlı seçenek ayrıca başlatan
   paketi ve kaynağı sahteler.
@@ -67,13 +70,21 @@ Neo-Backup ve Android-DataBackup yedeklerini içe aktarabilir.
 - **İçe taşıma:** mevcut Neo-Backup ve Android-DataBackup yedeklerini, parolayla şifrelenenler
   dahil, içe aktarır.
 
+## Ekran görüntüleri
+
+| Ana ekran | Uygulamalar | Zamanlama |
+|:---:|:---:|:---:|
+| ![Ana ekran](docs/screenshots/tr/home-dark.png) | ![Uygulamalar](docs/screenshots/tr/apps-dark.png) | ![Zamanlama](docs/screenshots/tr/schedule-dark.png) |
+| **Hedefler** | **Ayarlar** | **Etkinlik günlüğü** |
+| ![Hedefler](docs/screenshots/tr/destinations-dark.png) | ![Ayarlar](docs/screenshots/tr/settings-dark.png) | ![Etkinlik günlüğü](docs/screenshots/tr/activitylog-dark.png) |
+
 ## Kurulum
 
 1. En son `VD-Backup-vX.Y.zip` dosyasını [Sürümler](https://github.com/VD171/VD-Backup/releases) sayfasından indirin.
 2. KernelSU / APatch / Magisk yöneticisinde flaşlayın - hemen kullanılabilir, yeniden başlatma gerekmez.
 3. Yedeklemeleri yapılandırmak ve çalıştırmak için modülün **WebUI**'sini açın. Hepsi bu.
 
-**Sürüm çeşitleri.** Her sürüm altı zip halinde gelir. `universal-full` - her mimari ve her ikili (bulut sağlayıcıları için `rclone` ve anlık görüntüler için `restic` dahil), her cihaz, en büyüğü. `universal-lite` - her mimari, ancak en büyük iki ikili (`rclone`, `restic`) çıkarılmış, en küçüğü, yine de yerel, SSH/SFTP ve `rsync` yedeklemeleri yapar. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - her ikiliyle tek bir mimari, `universal-full`'dan küçük. Mimarini biliyor musun -> `<abi>-full` seç; en küçüğünü mü yoksa bulut devleri olmadan mı istiyorsun -> `universal-lite`; her cihazda her şey -> `universal-full`. Bkz. [Sürümler](https://github.com/VD171/VD-Backup/releases).
+**Sürüm çeşitleri.** Her sürüm altı zip halinde gelir. `universal-full` - her mimari ve her ikili gömülü halde (bulut sağlayıcıları için `rclone` ve anlık görüntüler için `restic` dahil), tamamen çevrimdışı, hiçbir şey asla indirilmez, her cihaz, en büyüğü. `universal-lite` - her mimari, ancak en büyük iki ikili (`rclone`, `restic`) çıkarılmış, en küçüğü; yine de yerel, SSH/SFTP ve `rsync` yedeklemelerini indirme olmadan yapar ve bir bulut hedefini (`rclone`) ya da anlık görüntü modunu (`restic`) ilk kez kullandığında o küçük mimariye özel eklentiyi bir kez indirmeyi önerir (SHA-256 ile doğrulanır) ve önbelleğe alır, böylece o özellikler de çalışır. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - her ikili gömülü halde tek bir mimari, `universal-full`'dan küçük. Mimarini biliyor musun -> `<abi>-full` seç; en küçüğünü istiyor ve bulut ya da anlık görüntüler için tek seferlik bir indirmeye aldırmıyorsan -> `universal-lite`; her şeyi gömülü halde ve hiçbir indirme olmadan istiyorsan (çevrimdışı / kurtarma) -> bir full sürüm. Bkz. [Sürümler](https://github.com/VD171/VD-Backup/releases).
 
 Yeni misiniz? [Kullanıcı kılavuzu](docs/USER-GUIDE.md) sizi kurulumdan geri yüklemeye kadar adım adım götürür.
 
@@ -95,7 +106,7 @@ ABI başına statik ikili dosyalardan (`tar`, `zstd`, `lz4`, `rclone`, `rsync`, 
 - **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - belgeler, çevrimiçi göz atılabilir.
 - **[Kullanıcı kılavuzu](docs/USER-GUIDE.md)** - baştan sona, kurulumdan geri yüklemeye.
 - **[Yapay zeka aracıları](docs/AI-AGENTS.md)** - her eylemi JSON API üzerinden arayüzsüz yönetin.
-- **[Mimari](ARCHITECTURE.md)** ve **[Dosya yapısı](docs/FILE-STRUCTURE.md)** - nasıl çalışır.
+- **[Mimari](docs/ARCHITECTURE.md)** ve **[Dosya yapısı](docs/FILE-STRUCTURE.md)** - nasıl çalışır.
 - **[Paket içi ikili dosyalar](docs/BINARIES.md)** - her önceden derlenmiş ikili dosyanın kaynağı ve SHA-256 değeri, tam denetim için.
 - **[Kurtarma](module/etc/RECOVERY.md)** - bir yedeği modül olmadan bilgisayarda açın ve şifresini çözün.
 - **[Katkıda bulunma](CONTRIBUTING.md)** ve **[Güvenlik](SECURITY.md)**.

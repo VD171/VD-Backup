@@ -31,3 +31,11 @@ a připíšeme vám zásluhy, pokud si to budete přát.
   zvolte silnou.
 - Volitelná doprovodná aplikace Google Drive by měla být vždy skryta pomocí HMA-OSS, aby
   neodhalila root ani odemčený bootloader.
+- Obnovení běží jako root, takže každý archiv je zkontrolován, než se cokoli zapíše:
+  záloha, jejíž obsah ukazuje mimo svůj cíl (absolutní cesta nebo komponenta `..`), je
+  odmítnuta a žádný soubor není rozbalen, dokud není prověřen celý archiv.
+- Každý předkompilovaný binární soubor a knihovna jsou dohledatelné k připnutému veřejnému upstreamu
+  se zaznamenaným SHA-256 a manifest je dodáván v zařízení, takže přibalený obsah lze auditovat a
+  reprodukovat. Viz [BINARIES.md](BINARIES.md).
+
+*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány - viz [CONTRIBUTING.md](CONTRIBUTING.md).*

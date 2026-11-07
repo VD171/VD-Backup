@@ -6,6 +6,72 @@
 
 Alle nennenswerten Änderungen an VDBackup werden hier dokumentiert. Nur auf Englisch.
 
+## v1.03
+
+Neuer Backup-Umfang:
+
+- Neue Spezial-Backup-Kategorien: Kalender (der Kalender-Provider plus ein portabler Export
+  `calendar.json`), Hintergrundbild (Start- und Sperrbildschirm-Hintergrund), privates DNS
+  (Modus und Spezifizierer) und Systemeinstellungen (der vollständige Abzug der system-,
+  global- und secure-Einstellungen). Systemeinstellungen sind opt-in und überschreiben beim
+  Wiederherstellen die geräteweiten Einstellungen, daher sind sie wie SSAID abgesichert, mit
+  ausdrücklicher Zustimmung und einem vollständigen Audit-Eintrag.
+- Eigenständiges Ordner- und Datei-Backup: sichere jeden absoluten Pfad (geteilter Speicher
+  oder App-Daten) als komprimiertes, per Manifest versiegeltes Archiv und stelle es am
+  selben Pfad wieder her. Die Wiederherstellung braucht eine ausdrückliche Bestätigung.
+
+Sicherere Wiederherstellung:
+
+- Jedes Archiv wird vor jedem Schreibvorgang geprüft: ein Backup, dessen Inhalt aus seinem
+  Ziel herauszeigt (ein absoluter Pfad oder eine `..`-Komponente), wird abgelehnt, sodass
+  eine als root laufende Wiederherstellung nicht dazu verleitet werden kann, außerhalb des
+  Ziels zu schreiben.
+
+Fortschritt und Planung:
+
+- Der Live-Fortschritt zeigt jetzt Übertragungsgeschwindigkeit, ETA und einen Elementzähler
+  während der Backups, dazu einen per Checksumme verifizierten Schritt für Cloud-Uploads und
+  eine Vorabprüfung auf "nicht genug Speicher".
+- Geplante Aufträge können bedingt ausgeführt werden: nur über Wi-Fi, nur beim Laden, nur ab
+  einem Akkustand, oder nur an gewählten Wochentagen; ein geplanter Auftrag wird außerdem
+  übersprungen, während das Gerät kritisch heiß ist. Ein übersprungener Auftrag wird beim
+  nächsten Tick erneut versucht.
+
+Cloud-Ziele:
+
+- Verbinde jedes rclone-Backend über die Oberfläche: das Dropdown für Cloud-Remotes bietet die
+  gängigen Anbieter (Google Drive, Dropbox, OneDrive, Box, pCloud, Mega, Backblaze B2, S3,
+  SFTP, WebDAV, FTP, SMB) sowie eine Option "Benutzerdefiniert (erweitert)", in der du den
+  Namen jedes anderen rclone-Backends und seine `key=value`-Parameter eintippst, sodass alle
+  Backends von rclone erreichbar sind.
+- Anmeldung direkt auf dem Gerät (kein PC): Anbieter, die eine Anmeldung per Browser benötigen
+  (Google Drive, Dropbox, OneDrive, Box, pCloud), haben eine Schaltfläche "Im Browser
+  autorisieren", die den Browser des Telefons selbst auf der Zustimmungsseite des Anbieters
+  öffnet; nach deiner Zustimmung kehrst du zur App zurück und das Remote wird automatisch
+  gespeichert, wobei der Token auf dem Gerät erfasst wird. Ein manuelles Einfügen des Tokens
+  bleibt als Fallback verfügbar.
+
+Oberfläche:
+
+- Eine anpassbare Oberflächenskalierung (ein ziehbarer Schieberegler) skaliert die gesamte
+  Oberfläche, damit sie auf Bildschirme unterschiedlicher Pixeldichte passt; 100% ist die
+  Voreinstellung und bleibt unverändert.
+- Die Oberfläche wird jetzt für Arabisch und Persisch von rechts nach links dargestellt.
+- Eine Startübersicht mit Backup-Zählungen und einem Speicherbalken, Status-Badges, Kopieren
+  von Hashes und Pfaden in die Zwischenablage, Umschalter im Android-Stil und eine Aktion
+  "Check for updates".
+- Das Aktivitätsprotokoll ist ein ganzer Bildschirm, der sofort öffnet, mit einer Aktion
+  "Export logs", die eine Protokolldatei speichert, die du an einen Bericht anhängen kannst.
+
+Fehlerbehebungen:
+
+- Wiederherstellung und Import schlagen auf Geräten, deren mitgeliefertes `tar` die Option
+  `--no-absolute-names` nicht akzeptiert, nicht mehr fehl; die Sicherheitsprüfung des Archivs
+  ist von dieser Option unabhängig.
+- "Check for updates" funktioniert auch dort, wo kein HTTP-Client mitgeliefert wird, indem auf
+  das mitgelieferte rclone zurückgegriffen wird; und das Aktivitätsprotokoll braucht nicht mehr
+  lange zum Öffnen.
+
 ## v1.01
 
 Erste öffentliche Veröffentlichung. Ein KernelSU/APatch/Magisk-WebUI-Modul, das Apps und ihre
@@ -134,3 +200,5 @@ KI-freundlich und i18n:
 - Die reichhaltige App-Auflistung und die Neo-Entschlüsselung laufen über einen als Root gesteuerten
   dex-Helfer (`IPackageManager` über ServiceManager), sodass sie auch dort funktionieren, wo
   ActivityThread hängt.
+
+*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen - siehe [CONTRIBUTING.md](CONTRIBUTING.md).*

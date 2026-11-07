@@ -75,3 +75,5 @@ AI-assistenter och agenter är förstklassiga bidragsgivare här, inte en eftert
 
 Leta efter etiketterna `good first issue` och `help wanted`. Översättningar, dokumentation, nya
 `rclone`-destinationsförinställningar och WebUI-putsning är alla utmärkta startpunkter.
+
+*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna - se [CONTRIBUTING.md](CONTRIBUTING.md).*

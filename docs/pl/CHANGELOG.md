@@ -6,6 +6,67 @@
 
 Wszystkie istotne zmiany w VDBackup są udokumentowane tutaj. Tylko po angielsku.
 
+## v1.03
+
+Nowy zakres kopii:
+
+- Nowe kategorie kopii specjalnej: kalendarz (dostawca kalendarza plus przenośny eksport
+  `calendar.json`), tapeta (tapeta ekranu głównego i blokady), prywatny DNS (tryb i
+  specyfikator) oraz ustawienia systemu (pełny zrzut ustawień system/global/secure).
+  Ustawienia systemu są opt-in i nadpisują przy przywracaniu ustawienia obejmujące całe
+  urządzenie, więc są zabezpieczone jak SSAID, z wyraźną zgodą i pełnym wpisem audytu.
+- Samodzielna kopia folderu i pliku: wykonaj kopię dowolnej ścieżki bezwzględnej (pamięć
+  współdzielona lub dane aplikacji) jako skompresowane, zapieczętowane manifestem archiwum i
+  przywróć ją do tej samej ścieżki. Przywracanie wymaga wyraźnego potwierdzenia.
+
+Bezpieczniejsze przywracanie:
+
+- Każde archiwum jest sprawdzane, zanim cokolwiek zostanie zapisane: kopia, której zawartość
+  wskazuje poza swój cel (ścieżka bezwzględna lub komponent `..`), jest odrzucana, więc
+  przywracanie działające jako root nie może zostać oszukane do zapisu poza miejscem
+  docelowym.
+
+Postęp i harmonogram:
+
+- Postęp na żywo pokazuje teraz prędkość transferu, ETA i licznik elementów podczas kopii,
+  plus krok weryfikowany sumą kontrolną dla przesyłów do chmury oraz wstępne sprawdzenie
+  "za mało miejsca".
+- Zaplanowane zadania można warunkować: uruchamiać tylko na Wi-Fi, tylko podczas ładowania,
+  tylko powyżej poziomu baterii lub tylko w wybranych dniach tygodnia; zaplanowane zadanie
+  jest też pomijane, gdy urządzenie jest krytycznie gorące. Pominięte zadanie jest ponawiane
+  przy następnym ticku.
+
+Cele w chmurze:
+
+- Podłącz dowolny backend rclone z interfejsu: rozwijana lista zdalnych celów chmurowych
+  oferuje popularnych dostawców (Google Drive, Dropbox, OneDrive, Box, pCloud, Mega,
+  Backblaze B2, S3, SFTP, WebDAV, FTP, SMB) oraz opcję "Custom (advanced)", w której
+  wpisujesz nazwę dowolnego innego backendu rclone i jego parametry `key=value`, dzięki
+  czemu dostępne są wszystkie backendy rclone.
+- Logowanie na urządzeniu (bez PC): dostawcy, którzy wymagają logowania przez przeglądarkę
+  (Google Drive, Dropbox, OneDrive, Box, pCloud), mają przycisk "Authorize in browser",
+  który otwiera własną przeglądarkę telefonu na stronie zgody dostawcy; po zatwierdzeniu
+  wracasz do aplikacji, a zdalny cel jest zapisywany automatycznie, z tokenem przechwyconym
+  na urządzeniu. Ręczne wklejenie tokenu pozostaje dostępne jako rozwiązanie zapasowe.
+
+Interfejs:
+
+- Regulowana skala interfejsu (przeciągany suwak) przeskalowuje cały interfejs, aby pasował do
+  ekranów o różnej gęstości pikseli; 100% to wartość domyślna i pozostaje niezmieniona.
+- Interfejs jest teraz renderowany od prawej do lewej dla języka arabskiego i perskiego.
+- Przegląd startowy z liczbami kopii i paskiem pamięci, znaczkami statusu, kopiowaniem hashów
+  i ścieżek do schowka, przełącznikami w stylu Androida oraz akcją "Check for updates".
+- Dziennik aktywności to pełny ekran, który otwiera się natychmiast, z akcją "Export logs",
+  która zapisuje plik dziennika, który możesz dołączyć do zgłoszenia.
+
+Poprawki:
+
+- Przywracanie i import nie zawodzą już na urządzeniach, których dołączony `tar` nie
+  akceptuje opcji `--no-absolute-names`; kontrola bezpieczeństwa archiwum jest niezależna od
+  tej opcji.
+- "Check for updates" działa nawet tam, gdzie nie dołączono żadnego klienta HTTP, przechodząc
+  na dołączony rclone; a dziennik aktywności nie otwiera się już długo.
+
 ## v1.01
 
 Pierwsze publiczne wydanie. Moduł WebUI dla KernelSU/APatch/Magisk, który tworzy kopie zapasowe i
@@ -135,3 +196,5 @@ Przyjazny dla AI i i18n:
   dokumentacja jest zwierciadlana do wiki.
 - Bogaty wykaz aplikacji i odszyfrowywanie Neo działają przez pomocnika dex sterowanego jako root
   (`IPackageManager` przez ServiceManager), więc działają tam, gdzie ActivityThread się zawiesza.
+
+*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane - zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*

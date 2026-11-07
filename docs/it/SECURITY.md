@@ -31,3 +31,12 @@ prima possibile e ti daremo credito se lo desideri.
   scegline una robusta.
 - L'app companion opzionale per Google Drive dovrebbe sempre essere nascosta con HMA-OSS così da non
   rivelare il root o un bootloader sbloccato.
+- Il ripristino viene eseguito come root, quindi ogni archivio viene controllato prima di
+  scrivere qualsiasi cosa: un backup il cui contenuto punti al di fuori della sua destinazione
+  (un percorso assoluto o un componente `..`) viene rifiutato, e nessun file viene estratto
+  finché l'intero archivio non è stato approvato.
+- Ogni binario e libreria precompilati sono tracciabili fino a un upstream pubblico fissato, con un
+  SHA-256 registrato, e il manifest è incluso sul dispositivo, così che il payload incluso possa
+  essere verificato e riprodotto. Vedi [BINARIES.md](BINARIES.md).
+
+*Questa documentazione è stata generata con Claude (Anthropic) ed è mantenuta da VD171. Correzioni e miglioramenti sono benvenuti - vedi [CONTRIBUTING.md](CONTRIBUTING.md).*

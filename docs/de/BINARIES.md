@@ -37,7 +37,7 @@ Nur die ersten beiden Zeilen sind vorgebaute Drittanbieter-Binärdateien; die le
 werden aus Quellcode gebaut, der in diesem Repository liegt und gelesen und neu gebaut werden
 kann.
 
-> **Full- vs. lite-Editionen.** Die lite-Editionen lassen nur `rclone` und `restic` (die zwei größten Binärdateien) weg, um klein zu bleiben; `rsync` und `ssh`/`scp`/`sftp` sind weiterhin vorhanden, und jede andere oben aufgeführte Binärdatei ist ebenfalls vorhanden. Die Full-Editionen fügen `rclone` (Cloud-Anbieter) und `restic` (Snapshots) hinzu.
+> **Full- vs. lite-Editionen.** Die lite-Editionen lassen nur `rclone` und `restic` (die zwei größten Binärdateien) weg, um klein zu bleiben, und laden sie bei Bedarf (per SHA-256 verifiziert) beim ersten Nutzen eines Cloud-Ziels oder des Snapshot-Modus nach; `rsync` und `ssh`/`scp`/`sftp` sind weiterhin vorhanden, und jede andere oben aufgeführte Binärdatei ist ebenfalls vorhanden. Die Full-Editionen liefern `rclone` (Cloud-Anbieter) und `restic` (Snapshots) eingebettet, sodass nie etwas heruntergeladen wird.
 
 ## Das Manifest auf dem Gerät: `PROVENANCE.json`
 
@@ -80,3 +80,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 Wenn eine mitgelieferte Datei nicht zu ihrer erfassten Quelle passt, behandeln Sie es als
 Sicherheitsproblem und melden Sie es (siehe [SECURITY.md](SECURITY.md)). Genau diese Art von
 Abweichung soll dieses Manifest sichtbar machen.
+
+*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen - siehe [CONTRIBUTING.md](CONTRIBUTING.md).*

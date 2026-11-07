@@ -75,3 +75,5 @@ Asystenci i agenci AI są tu pełnoprawnymi współtwórcami, a nie dodatkiem na
 
 Szukaj etykiet `good first issue` i `help wanted`. Tłumaczenia, dokumentacja, nowe
 gotowe ustawienia miejsc docelowych `rclone` i dopieszczanie WebUI to świetne punkty startowe.
+
+*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane - zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*

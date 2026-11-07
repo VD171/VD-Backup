@@ -6,6 +6,66 @@
 
 VDBackup'taki tüm kayda değer değişiklikler burada belgelenir. Yalnızca İngilizce.
 
+## v1.03
+
+Yeni yedek kapsamı:
+
+- Yeni özel yedek kategorileri: takvim (takvim sağlayıcısı, artı taşınabilir bir
+  `calendar.json` dışa aktarımı), duvar kağıdı (ana ekran ve kilit ekranı duvar kağıdı),
+  özel DNS (mod ve belirteç) ve sistem ayarları (system/global/secure ayarlarının tam
+  dökümü). Sistem ayarları opt-in'dir ve geri yüklemede cihaz genelindeki ayarların üzerine
+  yazar, bu yüzden SSAID gibi açık onay ve tam bir denetim kaydıyla çevrelenmiştir.
+- Bağımsız klasör ve dosya yedeği: herhangi bir mutlak yolu (paylaşılan depolama veya
+  uygulama verisi) sıkıştırılmış, manifestoyla mühürlenmiş bir arşiv olarak yedekleyin ve
+  aynı yola geri yükleyin. Geri yükleme açık bir onay gerektirir.
+
+Daha güvenli geri yükleme:
+
+- Her arşiv, herhangi bir şey yazılmadan önce denetlenir: içeriği hedefinin dışını gösteren
+  (mutlak bir yol veya bir `..` bileşeni) bir yedek reddedilir, böylece root olarak çalışan
+  bir geri yükleme, hedefin dışına yazması için kandırılamaz.
+
+İlerleme ve zamanlama:
+
+- Canlı ilerleme artık yedekler sırasında aktarım hızını, ETA'yı ve bir öğe sayacını, ayrıca
+  bulut yüklemeleri için sağlama toplamıyla doğrulanmış bir adımı ve bir "yeterli alan yok"
+  ön kontrolünü gösterir.
+- Zamanlanmış işler koşullandırılabilir: yalnızca Wi-Fi'de, yalnızca şarj olurken, yalnızca
+  bir pil düzeyinin üzerinde veya yalnızca seçilen hafta günlerinde çalışsın; zamanlanmış bir
+  iş, cihaz kritik derecede sıcakken de atlanır. Atlanan bir iş bir sonraki tick'te yeniden
+  denenir.
+
+Bulut hedefleri:
+
+- Arayüzden herhangi bir rclone arka ucuna bağlanın: bulut uzağı açılır listesi popüler
+  sağlayıcıları (Google Drive, Dropbox, OneDrive, Box, pCloud, Mega, Backblaze B2, S3, SFTP,
+  WebDAV, FTP, SMB) ve başka herhangi bir rclone arka uç adını ve onun `key=value`
+  parametrelerini yazdığınız bir "Custom (advanced)" seçeneğini sunar, böylece rclone'un tüm
+  arka uçlarına erişilebilir.
+- Cihaz üzerinde oturum açma (PC gerekmez): tarayıcıyla oturum açmayı gerektiren
+  sağlayıcıların (Google Drive, Dropbox, OneDrive, Box, pCloud) telefonun kendi tarayıcısını
+  sağlayıcının onay sayfasına açan bir "Authorize in browser" düğmesi vardır; onayladıktan
+  sonra uygulamaya dönersiniz ve uzak otomatik olarak kaydedilir, belirteç cihazda yakalanır.
+  Bir belirteci elle yapıştırmak yedek olarak kullanılabilir kalır.
+
+Arayüz:
+
+- Ayarlanabilir bir arayüz ölçeği (sürüklenebilir bir kaydırıcı) tüm arayüzü yeniden ölçekler,
+  böylece farklı piksel yoğunluklu ekranlara uyar; %100 varsayılandır ve değişmez.
+- Arayüz artık Arapça ve Farsça için sağdan sola görüntülenir.
+- Yedek sayıları ve bir depolama çubuğu, durum rozetleri, karma ve yolları panoya kopyalama,
+  Android tarzı aç/kapat anahtarları ve bir "Check for updates" eylemi olan bir başlangıç genel görünümü.
+- Etkinlik günlüğü, anında açılan tam bir ekrandır; bir rapora ekleyebileceğiniz bir günlük
+  dosyasını kaydeden bir "Export logs" eylemi vardır.
+
+Düzeltmeler:
+
+- Geri yükleme ve içe aktarma, paketlenmiş `tar`'ı `--no-absolute-names` seçeneğini kabul
+  etmeyen cihazlarda artık başarısız olmuyor; arşivin güvenlik kontrolü bu seçenekten
+  bağımsızdır.
+- "Check for updates", hiçbir HTTP istemcisi paketlenmemiş olsa bile, paketlenmiş rclone'a geri
+  dönerek çalışır; ve etkinlik günlüğünün açılması artık uzun sürmüyor.
+
 ## v1.01
 
 İlk genel sürüm. Uygulamaları ve verilerini tamamen root olarak, izin istemi olmadan yedekleyen ve geri
@@ -132,3 +192,5 @@ Yapay zeka dostu ve i18n:
 - Zengin uygulama listesi ve Neo şifre çözümü, root olarak çalıştırılan bir dex yardımcısı aracılığıyla
   yürütülür (`IPackageManager`, ServiceManager üzerinden), böylece ActivityThread'in takıldığı yerlerde
   bile çalışırlar.
+
+*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır - bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*

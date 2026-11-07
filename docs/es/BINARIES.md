@@ -36,7 +36,7 @@ nada opaco.
 Solo las dos primeras filas son binarios de terceros precompilados; las dos últimas se compilan
 desde código fuente que vive en este repositorio y puede leerse y recompilarse.
 
-> **Ediciones Full vs lite.** Las ediciones lite omiten solo `rclone` y `restic` (los dos binarios más grandes) para mantenerse pequeñas; `rsync` y `ssh`/`scp`/`sftp` siguen presentes, y cualquier otro binario listado arriba también está presente. Las ediciones Full añaden `rclone` (proveedores de nube) y `restic` (instantáneas).
+> **Ediciones Full vs lite.** Las ediciones lite omiten solo `rclone` y `restic` (los dos binarios más grandes) para mantenerse pequeñas y los descargan bajo demanda (verificados por SHA-256) la primera vez que usas un destino en la nube o el modo de instantáneas; `rsync` y `ssh`/`scp`/`sftp` siguen presentes, y cualquier otro binario listado arriba también está presente. Las ediciones Full traen `rclone` (proveedores de nube) y `restic` (instantáneas) integrados, así que nunca se descarga nada.
 
 ## El manifiesto en el dispositivo: `PROVENANCE.json`
 
@@ -77,3 +77,5 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 Si algún archivo incluido no coincide con su fuente registrada, trátalo como un problema de
 seguridad e infórmalo (consulta [SECURITY.md](SECURITY.md)). Esta es exactamente la clase de
 discrepancia que este manifiesto existe para hacer visible.
+
+*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas - ve [CONTRIBUTING.md](CONTRIBUTING.md).*

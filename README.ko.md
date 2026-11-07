@@ -17,6 +17,7 @@
   <a href="https://github.com/VD171/VD-Backup/wiki">위키</a> ·
   <a href="docs/USER-GUIDE.md">사용자 가이드</a> ·
   <a href="docs/AI-AGENTS.md">AI 에이전트</a> ·
+  <a href="CHANGELOG.md">변경 이력</a> ·
   <a href="CONTRIBUTING.md">기여</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA 스레드</a>
 </p>
@@ -50,12 +51,12 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
   와 `restic` 저장소. 작은 옵트인 동반 앱을 통한 Google Drive도 선택적으로 사용 가능.
 - **무결성:** 모든 아카이브는 매니페스트와 대조하여 검증됩니다. dry-run과 복원 테스트로 아무것도
   건드리지 않고 백업을 확인할 수 있습니다.
-- **선택적 복원:** 백업 항목의 어떤 부분집합이든 복원합니다. 백업을 삭제하고 모든 파괴적 동작의
-  활동/감사 로그를 보관합니다.
+- **선택적 복원 및 일괄 복원:** 백업 항목의 어떤 부분집합이든 복원하거나, 여러 백업을 다중 선택해
+  한 번에 모두 복원합니다. 백업을 삭제하고 모든 파괴적 동작의 활동/감사 로그를 보관합니다.
 - **특수 백업:** 메시지(SMS/MMS), 연락처와 통화 기록, Wi-Fi와 Bluetooth. PC에서 열 수 있는
   선택적 이식형 JSON 내보내기와 함께.
-- **스케줄링 + 자동화:** keep-N 정리를 갖춘 반복 작업과, 옵트인 방식의 설치/업데이트 시 자동
-  백업 및 제외 앱 목록.
+- **스케줄링 + 자동화:** 단일 앱, 집합, 또는 모든 앱을 대상으로 하는 반복 **백업 또는 복원** 작업과
+  keep-N 정리, 옵트인 방식의 설치/업데이트 시 자동 백업 및 제외 앱 목록.
 - **설치 출처:** 복원된 앱은 기본적으로 Play Store를 설치 출처로 보고합니다(전환 가능). 고급
   옵트인은 초기 패키지와 출처까지 위조합니다.
 - **시스템 앱 마운트:** 실제 `/system` 파티션을 건드리지 않고 설치된 앱을 시스템 앱으로
@@ -64,6 +65,14 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
 - **마이그레이션 (가져오기):** 기존 Neo-Backup 및 Android-DataBackup 백업을, 암호로 암호화된
   것을 포함하여 가져옵니다.
 
+## 스크린샷
+
+| 홈 | 앱 | 예약 |
+|:---:|:---:|:---:|
+| ![홈](docs/screenshots/ko/home-dark.png) | ![앱](docs/screenshots/ko/apps-dark.png) | ![예약](docs/screenshots/ko/schedule-dark.png) |
+| **대상** | **설정** | **활동 로그** |
+| ![대상](docs/screenshots/ko/destinations-dark.png) | ![설정](docs/screenshots/ko/settings-dark.png) | ![활동 로그](docs/screenshots/ko/activitylog-dark.png) |
+
 ## 설치
 
 1. [릴리스](https://github.com/VD171/VD-Backup/releases)에서 최신 `VD-Backup-vX.Y.zip`을
@@ -71,13 +80,15 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
 2. KernelSU / APatch / Magisk 관리자에서 플래시합니다 - 즉시 사용 가능하며 재부팅이 필요 없습니다.
 3. 모듈의 **WebUI**를 열어 설정하고 백업을 실행합니다. 이것으로 끝입니다.
 
-**에디션.** 릴리스마다 zip 6개. `universal-full` - 모든 아키텍처와 모든 바이너리(클라우드
-공급자용 `rclone`, 스냅샷용 `restic` 포함), 모든 기기, 가장 큼. `universal-lite` - 모든
-아키텍처에서 가장 큰 바이너리 두 개(`rclone`, `restic`)를 뺀 것, 가장 작고, 여전히 로컬,
-SSH/SFTP, `rsync` 백업 가능. `<abi>-full`(`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) -
-단일 아키텍처에 모든 바이너리, `universal-full`보다 작음. 아키텍처를 안다면 -> `<abi>-full`;
-가장 작거나 클라우드 거대 바이너리가 필요 없다면 -> `universal-lite`; 모든 기기에서 전부 ->
-`universal-full`. [릴리스](https://github.com/VD171/VD-Backup/releases)를 참고하세요.
+**에디션.** 릴리스마다 zip 6개. `universal-full` - 모든 아키텍처와 모든 바이너리를 내장(클라우드
+공급자용 `rclone`, 스냅샷용 `restic` 포함), 완전 오프라인으로 아무것도 다운로드하지 않음, 모든 기기,
+가장 큼. `universal-lite` - 모든 아키텍처에서 가장 큰 바이너리 두 개(`rclone`, `restic`)를 뺀 것,
+가장 작음. 로컬, SSH/SFTP, `rsync` 백업은 다운로드 없이 그대로 가능하며, 클라우드 대상(`rclone`)이나
+스냅샷 모드(`restic`)를 처음 사용할 때 해당 아키텍처용 작은 애드온을 한 번(SHA-256으로 검증) 내려받아
+캐시하도록 제안하므로 그 기능도 동작함. `<abi>-full`(`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) -
+단일 아키텍처에 모든 바이너리 내장, `universal-full`보다 작음. 아키텍처를 안다면 -> `<abi>-full`;
+가장 작게 쓰면서 클라우드나 스냅샷 첫 사용 시 한 번의 다운로드가 괜찮다면 -> `universal-lite`; 다운로드
+없이 모든 것을 내장하길 원한다면(오프라인 / 복구) -> full 에디션. [릴리스](https://github.com/VD171/VD-Backup/releases)를 참고하세요.
 
 처음이신가요? [사용자 가이드](docs/USER-GUIDE.md)가 설치부터 복원까지 안내합니다.
 
@@ -99,7 +110,7 @@ SSH/SFTP, `rsync` 백업 가능. `<abi>-full`(`arm64-v8a`, `armeabi-v7a`, `x86`,
 - **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - 온라인에서 둘러볼 수 있는 문서.
 - **[사용자 가이드](docs/USER-GUIDE.md)** - 설치부터 복원까지 처음부터 끝까지.
 - **[AI 에이전트](docs/AI-AGENTS.md)** - JSON API를 통해 모든 작업을 헤드리스로 수행.
-- **[아키텍처](ARCHITECTURE.md)** 와 **[파일 구조](docs/FILE-STRUCTURE.md)** - 작동 방식.
+- **[아키텍처](docs/ARCHITECTURE.md)** 와 **[파일 구조](docs/FILE-STRUCTURE.md)** - 작동 방식.
 - **[포함된 바이너리](docs/BINARIES.md)** - 모든 사전 컴파일된 바이너리의 출처와 SHA-256, 전체 감사를 위해.
 - **[복구](module/etc/RECOVERY.md)** - 모듈 없이 PC에서 백업을 열고 복호화.
 - **[기여](CONTRIBUTING.md)** 와 **[보안](SECURITY.md)**.
