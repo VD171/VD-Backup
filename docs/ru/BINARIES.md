@@ -30,7 +30,7 @@
 | нативные инструменты в `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + их closure в `lib/` | Официальный apt-репозиторий **Termux** (`packages.termux.dev/apt`), официальные пакеты `.deb` | `.github/scripts/build_bin.sh` скачивает файлы `.deb` + их транзитивные зависимости, распаковывает их и копирует двоичные файлы плюс только те разделяемые библиотеки, которые нужны каждому |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (запасной конвертер ABX) | Релиз на GitHub **rhythmcache/android-xml-converter** (`ABX_RELEASE`, статический ELF) | скачивается из зафиксированного релиза скриптом `build_bin.sh` |
 | `companion.apk` (опциональный companion для Google Drive) | **Этот репозиторий**, `companion/` (Gradle/Kotlin) | собирается из исходного кода в CI и подписывается ключом проекта (`VD_Key`); это не готовый blob |
-| `vdbhelper.dex` (framework-хелпер) | **Этот репозиторий**, `dex/src/` (Java) | компилируется из исходного кода в CI с помощью `javac` + `d8` |
+| `vdbackup_helper.dex` (framework-хелпер) | **Этот репозиторий**, `dex/src/` (Java) | компилируется из исходного кода в CI с помощью `javac` + `d8` |
 
 Только первые две строки - это готовые сторонние двоичные файлы; последние две собираются из
 исходного кода, который находится в этом репозитории и может быть прочитан и пересобран.

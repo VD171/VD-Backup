@@ -21,7 +21,7 @@ VD-Backup/
 │   ├── META-INF/.../update-binary  # standard installer stub (Magisk/KernelSU/APatch)
 │   ├── bin/<abi>/                  # per-ABI static binaries (tar, zstd, rclone, ...)
 │   │   ├── arm64-v8a/  armeabi-v7a/  x86/  x86_64/
-│   ├── etc/                        # notify.sh, authorize-landing.html (OAuth), RECOVERY.md
+│   ├── etc/                        # notify.sh, authorize-landing.html (OAuth), RECOVERY.md, vdbackup_helper.dex, companion.apk
 │   └── webroot/                    # the WebUI
 │       ├── index.html              # layout (tabs: Apps, Backups, Destinations, Settings)
 │       ├── scripts.js              # app logic + root bridge (execCommand/helper)

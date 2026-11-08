@@ -112,7 +112,7 @@ jobs:
           echo "$KS" | base64 -d > companion/release.keystore
           export VDB_COMPANION_KEYSTORE="$PWD/companion/release.keystore"
           ( cd companion && ./gradlew --no-daemon :app:assembleRelease )
-          cp "$(ls companion/app/build/outputs/apk/release/*.apk | head -1)" module/companion.apk
+          cp "$(ls companion/app/build/outputs/apk/release/*.apk | head -1)" module/etc/companion.apk
           rm -f companion/release.keystore
 
       - name: Patch-bump version

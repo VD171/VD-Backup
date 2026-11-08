@@ -141,6 +141,8 @@ La WebUI è organizzata in alcune schede :
   e la pianificazione. Le impostazioni on/off usano interruttori in stile Android.
 - **About** - versione, link, i progetti fratelli (Vedi anche), il manifesto di audit dei binari impacchettati, e un'azione **Check for updates** che segnala se è stata pubblicata una versione più recente (con le sue note di rilascio). Installi qualsiasi aggiornamento tramite il tuo gestore root, allo stesso modo in cui hai flashato il modulo.
 
+L'app controlla inoltre da sola se c'è una versione più recente ogni volta che la apri (al massimo una volta all'ora) e mostra il banner di aggiornamento solo quando c'è; resta in silenzio se aggiornata o offline.
+
 Le conferme e i messaggi usano finestre di dialogo integrate nell'app (non i vecchi pop-up di sistema), e un
 ripristino o un'importazione ti chiede di riconoscere che sovrascrive i dati attuali dell'app prima
 di procedere.
@@ -159,6 +161,8 @@ inizia e finisce ; in ogni caso, la scheda di avanzamento integrata nell'app è 
 Il flusso di base : apri **Apps**, scegli un'app, seleziona cosa includere, scegli una modalità,
 imposta la compressione e (opzionalmente) la cifratura, poi esegui. L'avanzamento appare in tempo reale e una
 notifica ti dice quando è finito.
+
+Nella finestra di backup puoi anche scegliere la **destinazione** di questo backup - archiviazione locale o qualsiasi destinazione cloud/remota aggiunta - senza prima cambiare la destinazione predefinita nelle Impostazioni.
 
 ### 5.1 Scegliere cosa salvare
 

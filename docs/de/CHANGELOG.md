@@ -6,6 +6,29 @@
 
 Alle nennenswerten Änderungen an VDBackup werden hier dokumentiert. Nur auf Englisch.
 
+## v1.03.2
+
+Fehlerbehebungen:
+
+- Die Cloud-Anmeldeseite auf dem Gerät zeigte immer "Sign-in failed", selbst wenn die Anmeldung
+  erfolgreich war. Jetzt zeigt sie das echte Ergebnis.
+- Gespeicherte Backups lassen sich jetzt mit einem Dateimanager öffnen: die Backup-Ordner
+  pro App waren nur für den Eigentümer zugänglich, sodass selbst ein Root-Dateimanager nicht
+  hineinkam; sie sind jetzt zugänglich wie der Rest von /sdcard/VDBackup.
+
+Cloud-Ziele:
+
+- Die optionale Google-Drive-Companion-App wird jetzt gebaut und mitgeliefert, sodass Google
+  Drive zusätzlich zu rclone über den Companion auf dem Gerät funktioniert (dein
+  Gerätekonto, kein manuelles Einfügen eines Tokens).
+
+Oberfläche:
+
+- Der Backup-Dialog hat eine Zielauswahl, sodass ein Backup an ein gewähltes Cloud- oder
+  Remote-Ziel gehen kann, ohne vorher das Standardziel in den Einstellungen zu ändern.
+- Die App sucht beim Öffnen nach einer neueren Version (höchstens einmal pro Stunde) und zeigt das
+  Update-Banner nur, wenn es eine gibt; sie bleibt still, wenn aktuell oder offline.
+
 ## v1.03.1
 
 Neuer Backup-Umfang:

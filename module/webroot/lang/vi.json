@@ -16,6 +16,7 @@
   "settings_language": "Ngôn ngữ",
   "settings_mode": "Chế độ sao lưu mặc định",
   "settings_dest": "Đích mặc định",
+  "ui_backup_dest": "Đích",
   "settings_network": "Chuyển lên đám mây qua",
   "opt_net_any": "Wi-Fi và dữ liệu di động",
   "opt_net_wifi": "Chỉ Wi-Fi",

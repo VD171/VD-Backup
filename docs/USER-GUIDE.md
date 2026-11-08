@@ -162,6 +162,8 @@ The WebUI is organized into a few tabs:
   been published (with its release notes). You install any update through your root manager,
   the same way you flashed the module.
 
+The app also checks for a newer version on its own each time you open it (at most once an hour) and shows the update banner only when one exists; it stays silent when you are up to date or offline.
+
 Confirmations and messages use in-app dialogs (not the old system pop-ups), and a
 restore or import asks you to acknowledge that it overwrites the current app data before
 it proceeds.
@@ -180,6 +182,8 @@ starts and finishes; either way the in-app progress card is the reliable indicat
 The basic flow: open **Apps**, choose an app, select what to include, pick a mode,
 set compression and (optionally) encryption, then run. Progress appears live and a
 notification tells you when it is done.
+
+In the backup dialog you can also choose the **destination** for this backup - local storage or any cloud/remote destination you have added - without changing the default destination in Settings first.
 
 ### 5.1 Choosing what to back up
 

@@ -30,7 +30,7 @@ a jak ověřit, že nebylo nic neprůhledného podstrčeno.
 | nativní nástroje v `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + jejich uzávěr `lib/` | Oficiální apt repozitář **Termux** (`packages.termux.dev/apt`), oficiální balíčky `.deb` | `.github/scripts/build_bin.sh` stáhne soubory `.deb` + jejich tranzitivní závislosti, rozbalí je a zkopíruje binární soubory plus pouze ty sdílené knihovny, které každý z nich potřebuje |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (záložní převodník ABX) | Vydání na GitHubu **rhythmcache/android-xml-converter** (`ABX_RELEASE`, statický ELF) | staženo z připnutého vydání skriptem `build_bin.sh` |
 | `companion.apk` (volitelný companion pro Google Drive) | **Tento repozitář**, `companion/` (Gradle/Kotlin) | sestaven ze zdroje v CI a podepsán klíčem projektu (`VD_Key`); není to předkompilovaný blob |
-| `vdbhelper.dex` (framework helper) | **Tento repozitář**, `dex/src/` (Java) | zkompilován ze zdroje v CI pomocí `javac` + `d8` |
+| `vdbackup_helper.dex` (framework helper) | **Tento repozitář**, `dex/src/` (Java) | zkompilován ze zdroje v CI pomocí `javac` + `d8` |
 
 Pouze první dva řádky jsou předkompilované binární soubory třetích stran; poslední dva jsou sestaveny ze
 zdroje, který se nachází v tomto repozitáři a lze jej číst a znovu sestavit.

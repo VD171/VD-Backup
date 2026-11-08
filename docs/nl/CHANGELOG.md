@@ -6,6 +6,29 @@
 
 Alle noemenswaardige wijzigingen aan VDBackup worden hier gedocumenteerd. Alleen in het Engels.
 
+## v1.03.2
+
+Oplossingen:
+
+- De cloud-aanmeldpagina op het apparaat toonde altijd "Sign-in failed", zelfs als het aanmelden
+  was gelukt. Nu toont ze het echte resultaat.
+- Opgeslagen back-ups kunnen nu met een bestandsbeheerder worden geopend: de back-upmappen
+  per app waren alleen voor de eigenaar, dus zelfs een root-bestandsbeheerder kon er niet
+  in; ze zijn nu toegankelijk zoals de rest van /sdcard/VDBackup.
+
+Cloud-bestemmingen:
+
+- De optionele Google Drive-companion-app wordt nu gebouwd en meegeleverd, dus Google Drive
+  werkt via de companion op het apparaat (je apparaataccount, geen handmatige token plakken)
+  naast rclone.
+
+Interface:
+
+- Het back-updialoogvenster heeft een bestemmingskiezer, zodat een back-up naar een gekozen
+  cloud- of externe bestemming kan zonder eerst de standaardbestemming in Instellingen te wijzigen.
+- De app controleert op een nieuwere versie bij het openen (hooguit eens per uur) en toont de
+  updatebanner alleen als er een is; blijft stil als up-to-date of offline.
+
 ## v1.03.1
 
 Nieuwe backup-reikwijdte:

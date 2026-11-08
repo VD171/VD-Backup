@@ -16,6 +16,7 @@
   "settings_language": "Språk",
   "settings_mode": "Standardläge för säkerhetskopiering",
   "settings_dest": "Standardmål",
+  "ui_backup_dest": "Mål",
   "settings_network": "Molnöverföringar via",
   "opt_net_any": "Wi-Fi och mobildata",
   "opt_net_wifi": "Endast Wi-Fi",

@@ -593,6 +593,10 @@
         <label><input type="checkbox" class="switch" id="bi-verify" checked><span data-i18n="ui_verify">Verify after backup</span></label>
         <label><input type="checkbox" class="switch" id="bi-dryrun"><span data-i18n="ui_dryrun">Dry run (estimate only)</span></label>
       </div>
+      <div class="field">
+        <label for="backup-dest" data-i18n="ui_backup_dest">Destination</label>
+        <select id="backup-dest"></select>
+      </div>
       <input id="backup-pass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"
              hidden data-i18n-ph="backup_passphrase" placeholder="Encryption passphrase">
       <div class="modal-actions">

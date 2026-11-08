@@ -30,7 +30,7 @@ mang theo, mỗi tệp đến từ đâu, và cách kiểm chứng rằng không
 | Các công cụ gốc `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) cùng bao đóng `lib/` của chúng | Kho apt **Termux** chính thức (`packages.termux.dev/apt`), các gói `.deb` chính thức | `.github/scripts/build_bin.sh` tải xuống các tệp `.deb` cùng các phụ thuộc bắc cầu của chúng, giải nén chúng, và chỉ sao chép các tệp nhị phân cùng những thư viện dùng chung mà mỗi tệp cần |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (bộ chuyển đổi ABX dự phòng) | GitHub release của **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF tĩnh) | tải xuống từ release được ghim bởi `build_bin.sh` |
 | `companion.apk` (companion Google Drive tùy chọn) | **Kho này**, `companion/` (Gradle/Kotlin) | được CI dựng từ mã nguồn và ký bằng khóa dự án (`VD_Key`); không phải khối blob dựng sẵn |
-| `vdbhelper.dex` (trình trợ giúp framework) | **Kho này**, `dex/src/` (Java) | được CI biên dịch từ mã nguồn bằng `javac` + `d8` |
+| `vdbackup_helper.dex` (trình trợ giúp framework) | **Kho này**, `dex/src/` (Java) | được CI biên dịch từ mã nguồn bằng `javac` + `d8` |
 
 Chỉ hai hàng đầu là tệp nhị phân bên thứ ba dựng sẵn; hai hàng cuối được dựng từ mã nguồn nằm
 trong kho này và có thể đọc và dựng lại.

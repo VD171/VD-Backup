@@ -160,6 +160,8 @@ A WebUI é organizada em algumas abas:
   e agendamento. As configurações de ligar/desligar usam interruptores de alternância no estilo Android.
 - **About** - versão, links, os projetos irmãos (See also), o manifesto de auditoria dos binários embarcados, e uma ação **Check for updates** que informa se uma versão mais nova foi publicada (com suas notas de versão). Você instala qualquer atualização pelo seu gerenciador root, do mesmo jeito que você instalou o módulo.
 
+O app também verifica por conta própria se há uma versão mais nova toda vez que você o abre (no máximo 1 vez por hora) e mostra o aviso de atualização só quando há uma; fica silencioso se estiver atualizado ou offline.
+
 Confirmações e mensagens usam diálogos no app (não os antigos pop-ups do sistema), e um
 restore ou import pede que você reconheça que ele sobrescreve os dados atuais do app antes
 de prosseguir.
@@ -177,6 +179,8 @@ começa e termina; de qualquer forma o card de progresso no app é o indicador c
 O fluxo básico: abra **Apps**, escolha um app, selecione o que incluir, escolha um modo,
 defina a compressão e (opcionalmente) a criptografia, depois execute. O progresso aparece ao vivo e uma
 notificação te avisa quando termina.
+
+No diálogo de backup você também pode escolher o **destino** deste backup - armazenamento local ou qualquer destino de nuvem/remoto que você adicionou - sem precisar mudar antes o destino padrão nas Configurações.
 
 ### 5.1 Escolhendo o que fazer backup
 

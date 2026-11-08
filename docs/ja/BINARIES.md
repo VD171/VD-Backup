@@ -32,7 +32,7 @@ VDBackup において、プライバシーとセキュリティは任意では�
 | `bin/<abi>/` のネイティブツール (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) とその `lib/` 依存閉包 | 公式の **Termux** apt リポジトリ (`packages.termux.dev/apt`)、公式の `.deb` パッケージ | `.github/scripts/build_bin.sh` が `.deb` ファイルとその推移的依存関係をダウンロードして展開し、バイナリと各自が必要とする共有ライブラリのみをコピーします |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX コンバーターのフォールバック) | **rhythmcache/android-xml-converter** の GitHub リリース (`ABX_RELEASE`、静的 ELF) | `build_bin.sh` が固定されたリリースからダウンロードします |
 | `companion.apk` (任意の Google Drive コンパニオン) | **このリポジトリ**、`companion/` (Gradle/Kotlin) | CI によってソースからビルドされ、プロジェクトキー (`VD_Key`) で署名されます。ビルド済みブロブではありません |
-| `vdbhelper.dex` (フレームワークヘルパー) | **このリポジトリ**、`dex/src/` (Java) | CI によって `javac` + `d8` でソースからコンパイルされます |
+| `vdbackup_helper.dex` (フレームワークヘルパー) | **このリポジトリ**、`dex/src/` (Java) | CI によって `javac` + `d8` でソースからコンパイルされます |
 
 ビルド済みのサードパーティバイナリは最初の 2 行だけです。残りの 2 つはこのリポジトリ内にある
 ソースからビルドされ、読むことも再ビルドすることもできます。

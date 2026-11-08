@@ -16,6 +16,7 @@
   "settings_language": "Jazyk",
   "settings_mode": "Výchozí režim zálohy",
   "settings_dest": "Výchozí cíl",
+  "ui_backup_dest": "Cíl",
   "settings_network": "Přenosy do cloudu přes",
   "opt_net_any": "Wi-Fi a mobilní data",
   "opt_net_wifi": "Pouze Wi-Fi",

@@ -89,7 +89,7 @@ jobs:
               companion/app/src/main/res/values/oauth.xml
           fi
           ( cd companion && ./gradlew --no-daemon :app:assembleRelease )
-          cp "$(ls companion/app/build/outputs/apk/release/*.apk | head -1)" module/companion.apk
+          cp "$(ls companion/app/build/outputs/apk/release/*.apk | head -1)" module/etc/companion.apk
           rm -f companion/release.keystore
 
       - name: Bump version

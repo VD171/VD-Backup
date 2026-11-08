@@ -6,6 +6,29 @@
 
 VDBackup'taki tüm kayda değer değişiklikler burada belgelenir. Yalnızca İngilizce.
 
+## v1.03.2
+
+Düzeltmeler:
+
+- Cihazdaki bulut oturum açma sayfası, oturum açma başarılı olsa bile her zaman "Sign-in failed"
+  gösteriyordu. Artık gerçek sonucu gösteriyor.
+- Kaydedilen yedekler artık bir dosya yöneticisiyle açılabilir: uygulama başına yedek
+  klasörleri yalnızca sahibine açıktı, bu yüzden root bir dosya yöneticisi bile giremiyordu;
+  artık /sdcard/VDBackup'ın geri kalanı gibi erişilebilir.
+
+Bulut hedefleri:
+
+- İsteğe bağlı Google Drive companion uygulaması artık derlenip paketleniyor, böylece Google
+  Drive, rclone'a ek olarak cihazdaki companion üzerinden çalışır (cihaz hesabınız, elle
+  token yapıştırmak yok).
+
+Arayüz:
+
+- Yedekleme iletişim kutusunda bir hedef seçici var; böylece bir yedek, önce Ayarlar'daki varsayılan
+  hedefi değiştirmeden seçilen bir bulut veya uzak hedefe gidebilir.
+- Uygulama açılışta daha yeni bir sürüm olup olmadığını denetler (saatte en fazla bir kez) ve
+  güncelleme afişini yalnızca varsa gösterir; güncel veya çevrimdışıysa sessiz kalır.
+
 ## v1.03.1
 
 Yeni yedek kapsamı:

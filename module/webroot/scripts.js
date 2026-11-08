@@ -928,15 +928,18 @@ function delRemote(name) {
     helper("remote-del", { name: name }).then(loadRemotes);
   });
 }
-function fillDestSelect() {
-  var sel = $("#set-dest"); if (!sel) return; sel.innerHTML = "";
+// Populate a <select> with every destination (local + configured) and preselect
+// `value`. Shared by the Settings default-destination and the per-backup picker.
+function fillDestOptions(sel, value) {
+  if (!sel) return; sel.innerHTML = "";
   var o0 = document.createElement("option"); o0.value = "local"; o0.textContent = "local"; sel.appendChild(o0);
   DESTS.forEach(function (d) {
     if (d.id === "local") return;
-    var o = document.createElement("option"); o.value = d.id; o.textContent = d.id; sel.appendChild(o);
+    var o = document.createElement("option"); o.value = d.id; o.textContent = d.id + " (" + d.type + ")"; sel.appendChild(o);
   });
-  sel.value = CFG.default_dest || "local";
+  sel.value = value || "local";
 }
+function fillDestSelect() { fillDestOptions($("#set-dest"), CFG.default_dest); }
 function syncDestFields() {
   var type = $("#d-type").value;
   var set = function (sel, on) { var e = $(sel); if (e) e.style.display = on ? "" : "none"; };
@@ -1071,6 +1074,7 @@ function openBackupModal(pkg, label) {
     var enc = !!(CFG.encrypt_data || CFG.encrypt_apk);   // encryption needs a passphrase
     $("#backup-title").textContent = label || pkg;
     pass.value = ""; pass.hidden = !enc;
+    fillDestOptions($("#backup-dest"), CFG.default_dest);   // per-backup destination, defaults to the default
     m.hidden = false;
     function done(res) {
       m.hidden = true; pass.value = ""; $("#backup-ok").onclick = null; $("#backup-cancel").onclick = null;
@@ -1082,7 +1086,8 @@ function openBackupModal(pkg, label) {
       });
       if (!items.length) return done(null);          // nothing ticked = nothing to do
       if (enc && !pass.value) { pass.focus(); return; }   // encryption on, require a passphrase
-      done({ items: items, password: enc ? pass.value : null,
+      var destSel = $("#backup-dest");
+      done({ items: items, password: enc ? pass.value : null, dest: destSel ? destSel.value : null,
              verify: $("#bi-verify").checked, dry_run: $("#bi-dryrun").checked });
     };
     $("#backup-cancel").onclick = function () { done(null); };
@@ -1091,7 +1096,7 @@ function openBackupModal(pkg, label) {
 function backupArgs(pkg, res) {
   var args = {
     package: pkg, user: activeUser,
-    mode: CFG.default_mode || "full", dest: CFG.default_dest || "local",
+    mode: CFG.default_mode || "full", dest: res.dest || CFG.default_dest || "local",
     items: res.items, ssaid: !!CFG.ssaid, verify: res.verify, dry_run: res.dry_run
   };
   if (res.password) args.password = res.password;

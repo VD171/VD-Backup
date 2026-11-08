@@ -16,6 +16,7 @@
   "settings_language": "Dil",
   "settings_mode": "Varsayılan yedekleme modu",
   "settings_dest": "Varsayılan hedef",
+  "ui_backup_dest": "Hedef",
   "settings_network": "Bulut aktarımları şu bağlantıyla",
   "opt_net_any": "Wi-Fi ve mobil veri",
   "opt_net_wifi": "Yalnızca Wi-Fi",

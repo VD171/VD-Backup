@@ -140,6 +140,8 @@ WebUI diatur dalam beberapa tab:
   yang dikecualikan, opsi sumber pemasangan, kunci enkripsi, dan penjadwalan. Pengaturan aktif/mati memakai sakelar bergaya Android.
 - **About** - versi, tautan, proyek saudara (See also), manifest audit biner yang dibundel, dan aksi **Check for updates** yang melaporkan apakah versi yang lebih baru telah dirilis (beserta catatan rilisnya). Anda memasang pembaruan apa pun melalui manajer root Anda, sama seperti saat Anda mem-flash modul.
 
+Aplikasi juga memeriksa sendiri versi yang lebih baru setiap kali kamu membukanya (paling banyak sekali per jam) dan menampilkan banner pembaruan hanya ketika ada; tetap diam jika sudah terbaru atau luring.
+
 Konfirmasi dan pesan memakai dialog dalam-aplikasi (bukan pop-up sistem lama), dan sebuah
 restore atau impor meminta Anda mengakui bahwa ia menimpa data aplikasi saat ini sebelum
 melanjutkan.
@@ -157,6 +159,8 @@ mulai dan selesai; bagaimanapun kartu kemajuan dalam-aplikasi adalah indikator y
 Alur dasar: buka **Apps**, pilih sebuah aplikasi, pilih apa yang disertakan, pilih mode,
 setel kompresi dan (opsional) enkripsi, lalu jalankan. Kemajuan muncul live dan sebuah
 notifikasi memberi tahu Anda saat selesai.
+
+Pada dialog pencadangan kamu juga bisa memilih **tujuan** cadangan ini - penyimpanan lokal atau tujuan cloud/jarak jauh mana pun yang kamu tambahkan - tanpa mengubah tujuan default di Pengaturan terlebih dahulu.
 
 ### 5.1 Memilih apa yang dibackup
 

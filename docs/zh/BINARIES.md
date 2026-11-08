@@ -26,7 +26,7 @@
 | `bin/<abi>/` 原生工具（`tar`、`zstd`、`gzip`、`lz4`、`jq`、`rclone`、`restic`、`rsync`、`ssh`/`scp`/`sftp`、`age`、`age-keygen`、`script`、`sqlite3`）及其 `lib/` 依赖闭包 | 官方 **Termux** apt 仓库（`packages.termux.dev/apt`），官方 `.deb` 软件包 | `.github/scripts/build_bin.sh` 下载 `.deb` 文件及其传递依赖，解包，并只复制二进制文件以及每个文件所需的共享库 |
 | `bin/<abi>/abx2xml`、`bin/<abi>/xml2abx`（ABX 转换器回退） | **rhythmcache/android-xml-converter** GitHub 发行版（`ABX_RELEASE`，静态 ELF） | 由 `build_bin.sh` 从固定的发行版下载 |
 | `companion.apk`（可选的 Google Drive 伴生程序） | **本仓库**，`companion/`（Gradle/Kotlin） | 由 CI 从源代码构建并用项目密钥（`VD_Key`）签名；不是预构建的二进制块 |
-| `vdbhelper.dex`（框架辅助程序） | **本仓库**，`dex/src/`（Java） | 由 CI 使用 `javac` + `d8` 从源代码编译 |
+| `vdbackup_helper.dex`（框架辅助程序） | **本仓库**，`dex/src/`（Java） | 由 CI 使用 `javac` + `d8` 从源代码编译 |
 
 只有前两行是预构建的第三方二进制文件；后两者是从本仓库内的源代码构建的，可供阅读和重新构建。
 

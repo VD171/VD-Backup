@@ -29,7 +29,7 @@ root บนข้อมูลส่วนตัวที่สุดของค
 | เครื่องมือเนทีฟ `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) และคลอเชอร์ `lib/` ของมัน | คลัง apt **Termux** อย่างเป็นทางการ (`packages.termux.dev/apt`), แพ็กเกจ `.deb` อย่างเป็นทางการ | `.github/scripts/build_bin.sh` ดาวน์โหลดไฟล์ `.deb` พร้อมทั้ง dependency แบบส่งผ่าน แตกไฟล์ออกมา และคัดลอกเฉพาะไบนารีกับไลบรารีที่ใช้ร่วมกันซึ่งแต่ละตัวต้องการเท่านั้น |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ตัวแปลง ABX สำรอง) | GitHub release ของ **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF แบบ static) | ดาวน์โหลดจาก release ที่ตรึงไว้โดย `build_bin.sh` |
 | `companion.apk` (คอมแพเนียน Google Drive เสริม) | **ที่เก็บนี้**, `companion/` (Gradle/Kotlin) | สร้างจากซอร์สโดย CI และลงนามด้วยคีย์ของโครงการ (`VD_Key`) ไม่ใช่บล็อบที่สร้างไว้ล่วงหน้า |
-| `vdbhelper.dex` (ตัวช่วยเฟรมเวิร์ก) | **ที่เก็บนี้**, `dex/src/` (Java) | คอมไพล์จากซอร์สโดย CI ด้วย `javac` + `d8` |
+| `vdbackup_helper.dex` (ตัวช่วยเฟรมเวิร์ก) | **ที่เก็บนี้**, `dex/src/` (Java) | คอมไพล์จากซอร์สโดย CI ด้วย `javac` + `d8` |
 
 มีเพียงสองแถวแรกเท่านั้นที่เป็นไบนารีจากบุคคลที่สามที่สร้างไว้ล่วงหน้า สองรายการหลังสร้างจากซอร์ส
 ที่อยู่ในที่เก็บนี้ ซึ่งสามารถอ่านและสร้างใหม่ได้

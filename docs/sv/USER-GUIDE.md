@@ -159,6 +159,8 @@ WebUI är organiserat i några flikar:
   nyckeln, och schemaläggning. Av/på-inställningar använder växlingsbrytare i Android-stil.
 - **About** - version, länkar, systerprojekten (See also), granskningsmanifestet för de medföljande binärfilerna, och en **Check for updates**-åtgärd som rapporterar om en nyare version har publicerats (med dess versionsanteckningar). Du installerar alla uppdateringar via din root-hanterare, på samma sätt som du flashade modulen.
 
+Appen söker också själv efter en nyare version varje gång du öppnar den (högst en gång i timmen) och visar uppdateringsbannern bara när en finns; tyst när uppdaterad eller offline.
+
 Bekräftelser och meddelanden använder dialoger i appen (inte de gamla systempopuperna), och en
 återställning eller import ber dig bekräfta att den skriver över den aktuella appdatan innan
 den fortsätter.
@@ -177,6 +179,8 @@ startar och slutar; i vilket fall som helst är förloppskortet i appen den till
 Det grundläggande flödet: öppna **Apps**, välj en app, välj vad som ska inkluderas, välj ett läge,
 ställ in komprimering och (valfritt) kryptering, kör sedan. Förloppet visas live och en
 notis talar om när det är klart.
+
+I säkerhetskopieringsdialogen kan du även välja **mål** för denna kopia - lokal lagring eller valfritt tillagt moln-/fjärrmål - utan att först ändra standardmålet i Inställningar.
 
 ### 5.1 Välja vad som ska säkerhetskopieras
 

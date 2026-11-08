@@ -31,7 +31,7 @@ sokulmadığını nasıl doğrulayacağınızı belgeler.
 | `bin/<abi>/` yerel araçlar (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + bunların `lib/` kapanışı | Resmi **Termux** apt deposu (`packages.termux.dev/apt`), resmi `.deb` paketleri | `.github/scripts/build_bin.sh` `.deb` dosyalarını + geçişli bağımlılıklarını indirir, onları çıkarır ve ikili dosyaların yanı sıra her birinin ihtiyaç duyduğu yalnızca paylaşılan kütüphaneleri kopyalar |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX dönüştürücü yedeği) | **rhythmcache/android-xml-converter** GitHub sürümü (`ABX_RELEASE`, statik ELF) | `build_bin.sh` tarafından sabitlenmiş sürümden indirilir |
 | `companion.apk` (isteğe bağlı Google Drive yardımcısı) | **Bu depo**, `companion/` (Gradle/Kotlin) | CI tarafından kaynaktan derlenir ve proje anahtarıyla (`VD_Key`) imzalanır; önceden derlenmiş bir blob değil |
-| `vdbhelper.dex` (çerçeve yardımcısı) | **Bu depo**, `dex/src/` (Java) | CI tarafından `javac` + `d8` ile kaynaktan derlenir |
+| `vdbackup_helper.dex` (çerçeve yardımcısı) | **Bu depo**, `dex/src/` (Java) | CI tarafından `javac` + `d8` ile kaynaktan derlenir |
 
 Yalnızca ilk iki satır önceden derlenmiş üçüncü taraf ikili dosyalardır; son ikisi bu
 depoda bulunan ve okunup yeniden derlenebilen kaynaktan derlenir.

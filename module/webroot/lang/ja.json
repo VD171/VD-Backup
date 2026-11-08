@@ -16,6 +16,7 @@
   "settings_language": "言語",
   "settings_mode": "既定のバックアップモード",
   "settings_dest": "既定の保存先",
+  "ui_backup_dest": "保存先",
   "settings_network": "クラウド転送の接続",
   "opt_net_any": "Wi-Fiとモバイルデータ",
   "opt_net_wifi": "Wi-Fiのみ",

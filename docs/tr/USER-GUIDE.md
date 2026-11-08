@@ -164,6 +164,8 @@ WebUI birkaç sekmeye düzenlenmiştir:
   birlikte) bildiren bir **Check for updates** eylemi. Her güncellemeyi, modülü flaşladığınız gibi
   root yöneticiniz üzerinden kurarsınız.
 
+Uygulama ayrıca her açılışında kendisi daha yeni bir sürüm olup olmadığını denetler (saatte en fazla bir kez) ve güncelleme afişini yalnızca varsa gösterir; güncel veya çevrimdışıysa sessiz kalır.
+
 Onaylar ve mesajlar, uygulama içi diyalogları kullanır (eski sistem açılır pencereleri
 değil) ve bir geri yükleme veya içe aktarma, ilerlemeden önce mevcut uygulama verilerinin
 üzerine yazdığını kabul etmenizi ister.
@@ -182,6 +184,8 @@ göstergedir.
 Temel akış: **Apps**'i açın, bir uygulama seçin, neyi dahil edeceğinizi seçin, bir mod
 seçin, sıkıştırmayı ve (isteğe bağlı olarak) şifrelemeyi ayarlayın, sonra çalıştırın.
 İlerleme canlı olarak görünür ve bir bildirim bittiğinde size haber verir.
+
+Yedekleme iletişim kutusunda bu yedeğin **hedefini** de seçebilirsin - yerel depolama ya da eklediğin herhangi bir bulut/uzak hedef - önce Ayarlar'daki varsayılan hedefi değiştirmeden.
 
 ### 5.1 Neyi yedekleyeceğinizi seçme
 

@@ -16,6 +16,7 @@
   "settings_language": "Sprache",
   "settings_mode": "Standard-Backup-Modus",
   "settings_dest": "Standardziel",
+  "ui_backup_dest": "Ziel",
   "settings_network": "Cloud-Übertragungen über",
   "opt_net_any": "WLAN und mobile Daten",
   "opt_net_wifi": "Nur WLAN",

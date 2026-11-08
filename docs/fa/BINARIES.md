@@ -31,7 +31,7 @@
 | `bin/<abi>/` ابزارهای بومی (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + بستارِ `lib/` آن‌ها | مخزن apt رسمی **Termux** (`packages.termux.dev/apt`)، بسته‌های `.deb` رسمی | `.github/scripts/build_bin.sh` فایل‌های `.deb` + وابستگی‌های گذرای آن‌ها را دانلود می‌کند، استخراج‌شان می‌کند، و باینری‌ها را به‌علاوهٔ فقط کتابخانه‌های مشترکی که هر کدام نیاز دارد کپی می‌کند |
 | `bin/<abi>/abx2xml`، `bin/<abi>/xml2abx` (مبدل یدکیِ ABX) | نسخهٔ **rhythmcache/android-xml-converter** در GitHub (`ABX_RELEASE`، ELF ایستا) | توسط `build_bin.sh` از نسخهٔ تثبیت‌شده دانلود می‌شود |
 | `companion.apk` (همدمِ اختیاریِ Google Drive) | **این مخزن**، `companion/` (Gradle/Kotlin) | توسط CI از منبع ساخته و با کلید پروژه (`VD_Key`) امضا می‌شود؛ یک بلابِ از پیش‌ساخته نیست |
-| `vdbhelper.dex` (یاورِ فریم‌ورک) | **این مخزن**، `dex/src/` (Java) | توسط CI از منبع با `javac` + `d8` کامپایل می‌شود |
+| `vdbackup_helper.dex` (یاورِ فریم‌ورک) | **این مخزن**، `dex/src/` (Java) | توسط CI از منبع با `javac` + `d8` کامپایل می‌شود |
 
 فقط دو ردیف نخست باینری‌های از پیش‌ساختهٔ شخص‌ثالث هستند؛ دو ردیف آخر از منبعی که
 در این مخزن قرار دارد ساخته می‌شوند و می‌توان آن‌ها را خواند و بازساخت.

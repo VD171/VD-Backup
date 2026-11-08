@@ -16,6 +16,7 @@
   "settings_language": "زبان",
   "settings_mode": "حالت پیش‌فرض پشتیبان‌گیری",
   "settings_dest": "مقصد پیش‌فرض",
+  "ui_backup_dest": "مقصد",
   "settings_network": "انتقال‌های ابری از طریق",
   "opt_net_any": "Wi-Fi و داده تلفن همراه",
   "opt_net_wifi": "فقط Wi-Fi",

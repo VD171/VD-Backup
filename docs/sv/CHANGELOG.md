@@ -6,6 +6,28 @@
 
 Alla noterbara ändringar i VDBackup dokumenteras här. Endast engelska.
 
+## v1.03.2
+
+Rättningar:
+
+- Molninloggningssidan på enheten visade alltid "Sign-in failed", även när inloggningen hade
+  lyckats. Nu visar den det verkliga resultatet.
+- Sparade säkerhetskopior kan nu öppnas med en filhanterare: säkerhetskopiemapparna per app
+  var endast för ägaren, så inte ens en root-filhanterare kom in; de är nu åtkomliga som
+  resten av /sdcard/VDBackup.
+
+Molndestinationer:
+
+- Den valfria Google Drive-companion-appen byggs och paketeras nu, så Google Drive fungerar
+  via companion på enheten (ditt enhetskonto, ingen manuell token) utöver rclone.
+
+Gränssnitt:
+
+- Säkerhetskopieringsdialogen har en målväljare, så en säkerhetskopia kan gå till ett valt moln-
+  eller fjärrmål utan att först ändra standardmålet i Inställningar.
+- Appen söker efter en nyare version när den öppnas (högst en gång i timmen) och visar
+  uppdateringsbannern bara när en finns; tyst när uppdaterad eller offline.
+
 ## v1.03.1
 
 Ny säkerhetskopieomfattning:

@@ -16,6 +16,7 @@
   "settings_language": "Język",
   "settings_mode": "Domyślny tryb kopii",
   "settings_dest": "Domyślny cel",
+  "ui_backup_dest": "Cel",
   "settings_network": "Transfery do chmury przez",
   "opt_net_any": "Wi-Fi i dane mobilne",
   "opt_net_wifi": "Tylko Wi-Fi",

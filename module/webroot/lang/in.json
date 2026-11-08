@@ -16,6 +16,7 @@
   "settings_language": "Bahasa",
   "settings_mode": "Mode cadangan default",
   "settings_dest": "Tujuan default",
+  "ui_backup_dest": "Tujuan",
   "settings_network": "Transfer cloud melalui",
   "opt_net_any": "Wi-Fi dan data seluler",
   "opt_net_wifi": "Hanya Wi-Fi",

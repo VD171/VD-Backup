@@ -22,7 +22,7 @@
 # ======================================================================
 #
 #  Build the framework helper dex (javac + d8). Arch-independent: one
-#  vdbhelper.dex serves every ABI. Output -> module/vdbhelper.dex.
+#  vdbackup_helper.dex serves every ABI. Output -> module/etc/vdbackup_helper.dex.
 #  Requires an Android SDK (platform android.jar + build-tools/d8) and a JDK.
 
 set -euo pipefail
@@ -38,6 +38,6 @@ OUT="$ROOT/dex/out"; rm -rf "$OUT"; mkdir -p "$OUT"
 javac --release 11 -cp "$AJ" -d "$OUT" $(find "$ROOT/dex/src" -name '*.java')
 # shellcheck disable=SC2046
 "$D8" --min-api 26 --lib "$AJ" --output "$ROOT/dex" $(find "$OUT" -name '*.class')
-mv "$ROOT/dex/classes.dex" "$ROOT/module/vdbhelper.dex"
+mv "$ROOT/dex/classes.dex" "$ROOT/module/etc/vdbackup_helper.dex"
 rm -rf "$OUT"
-echo "built module/vdbhelper.dex ($(wc -c < "$ROOT/module/vdbhelper.dex") bytes)"
+echo "built module/etc/vdbackup_helper.dex ($(wc -c < "$ROOT/module/etc/vdbackup_helper.dex") bytes)"

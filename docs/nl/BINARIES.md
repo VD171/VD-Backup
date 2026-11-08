@@ -30,7 +30,7 @@ vandaan komt en hoe je kunt verifiëren dat er niets ondoorzichtigs is binnenges
 | `bin/<abi>/` native tools (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + hun `lib/`-closure | Officiële **Termux** apt-repo (`packages.termux.dev/apt`), officiële `.deb`-pakketten | `.github/scripts/build_bin.sh` downloadt de `.deb`-bestanden + hun transitieve afhankelijkheden, pakt ze uit en kopieert de binaries plus alleen de gedeelde bibliotheken die elk nodig heeft |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX-converter-terugval) | GitHub-release van **rhythmcache/android-xml-converter** (`ABX_RELEASE`, statische ELF) | gedownload van de vastgezette release door `build_bin.sh` |
 | `companion.apk` (optionele Google Drive-metgezel) | **Deze repository**, `companion/` (Gradle/Kotlin) | gebouwd vanuit de bron door de CI en ondertekend met de projectsleutel (`VD_Key`); geen voorgebouwde blob |
-| `vdbhelper.dex` (framework-helper) | **Deze repository**, `dex/src/` (Java) | gecompileerd vanuit de bron door de CI met `javac` + `d8` |
+| `vdbackup_helper.dex` (framework-helper) | **Deze repository**, `dex/src/` (Java) | gecompileerd vanuit de bron door de CI met `javac` + `d8` |
 
 Alleen de eerste twee rijen zijn voorgebouwde binaries van derden; de laatste twee worden gebouwd
 vanuit broncode die in deze repository leeft en gelezen en herbouwd kan worden.

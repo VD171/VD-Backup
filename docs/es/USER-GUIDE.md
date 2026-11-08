@@ -141,6 +141,8 @@ La WebUI está organizada en unas cuantas pestañas:
   y la programación. Los ajustes de activado/desactivado usan interruptores de estilo Android.
 - **About** - versión, enlaces, los proyectos hermanos (Ver también), el manifiesto de auditoría de los binarios empaquetados, y una acción **Check for updates** que informa si se ha publicado una versión más nueva (con sus notas de versión). Instalas cualquier actualización a través de tu gestor root, igual que como instalaste el módulo.
 
+La app también busca por su cuenta una versión más nueva cada vez que la abres (como máximo una vez por hora) y muestra el aviso de actualización solo cuando hay una; permanece en silencio si está al día o sin conexión.
+
 Las confirmaciones y los mensajes usan diálogos en la app (no los viejos pop-ups del sistema), y un
 restore o import te pide que reconozcas que sobrescribe los datos actuales de la app antes
 de proceder.
@@ -159,6 +161,8 @@ empieza y termina; de cualquier forma el card de progreso en la app es el indica
 El flujo básico: abre **Apps**, elige una app, selecciona qué incluir, elige un modo,
 fija la compresión y (opcionalmente) el cifrado, luego ejecuta. El progreso aparece en vivo y una
 notificación te avisa cuando termina.
+
+En el diálogo de copia también puedes elegir el **destino** de esta copia - almacenamiento local o cualquier destino en la nube/remoto que hayas añadido - sin cambiar antes el destino predeterminado en Ajustes.
 
 ### 5.1 Elegir qué respaldar
 

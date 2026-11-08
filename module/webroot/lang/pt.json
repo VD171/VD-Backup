@@ -16,6 +16,7 @@
   "settings_language": "Idioma",
   "settings_mode": "Modo de backup padrão",
   "settings_dest": "Destino padrão",
+  "ui_backup_dest": "Destino",
   "settings_network": "Transferências de nuvem via",
   "opt_net_any": "Wi-Fi e dados móveis",
   "opt_net_wifi": "Somente Wi-Fi",
