@@ -3,7 +3,7 @@
   "versionCode": 10302,
   "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.03.2/VD-Backup-v1.03.2-universal-full.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "",
-  "size": 0,
-  "sha256": ""
+  "notes": "Fixes the on-device cloud sign-in page (it always showed Sign-in failed even on success), makes saved backups openable with a file manager, bundles the optional Google Drive companion app, adds a per-backup destination picker, and checks for updates on open (silent, hourly). See the changelog.",
+  "size": 241854464,
+  "sha256": "edf5ac8077a8bbc120d1711755f476ae7e059a08e264f1a02c4c17855a347190"
 }
