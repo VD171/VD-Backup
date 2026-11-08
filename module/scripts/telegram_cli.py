@@ -16,6 +16,7 @@ import secrets
 import argparse
 import hashlib
 import warnings
+import re
 from datetime import datetime, timezone
 
 warnings.filterwarnings("ignore")
@@ -100,12 +101,20 @@ def update_progress(opid, pct, phase, item=""):
     except Exception:
         pass
 
+def normalize_phone(phone):
+    s = str(phone or "").strip()
+    if s.startswith("00"):
+        s = "+" + s[2:]
+    digits = re.sub(r"\D", "", s)
+    return "+" + digits if digits else ""
+
 # --- Step 1: Send OTP to Phone ----------------------------------------
 async def cmd_send_code(phone):
     ensure_dirs()
-    phone = phone.strip().replace(" ", "").replace("-", "")
-    if not phone.startswith("+"):
-        phone = "+" + phone
+    phone = normalize_phone(phone)
+    if not phone:
+        print(json.dumps({"ok": False, "code": "ERR_INVALID_PHONE", "message": "Invalid phone number format"}))
+        return
 
     # Clean previous session DB for a fresh login
     session_db = SESSION_PATH + ".session"
@@ -142,10 +151,8 @@ async def cmd_send_code(phone):
 # --- Step 2: Sign in with OTP (and 2FA password if enabled) -----------
 async def cmd_sign_in(phone, code, password=None):
     ensure_dirs()
-    phone = phone.strip().replace(" ", "").replace("-", "")
-    if not phone.startswith("+"):
-        phone = "+" + phone
-    code = str(code).strip().replace(" ", "")
+    phone = normalize_phone(phone)
+    code = re.sub(r"\D", "", str(code or ""))
 
     if not os.path.isfile(AUTH_STATE_FILE):
         print(json.dumps({"ok": False, "code": "ERR_NO_AUTH_STATE", "message": "No pending login session. Please request code again."}))

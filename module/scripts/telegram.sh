@@ -21,6 +21,7 @@ case "$abi" in
   *)               BINABI=arm64-v8a ;;
 esac
 BIN="$MODDIR/bin/$BINABI"
+CLOUD="$STATE/bin"
 export VDBACKUP_STATE="$STATE"
 export PATH="$BIN:$CLOUD:$PATH"
 export LD_LIBRARY_PATH="$BIN/lib:$CLOUD/lib:${LD_LIBRARY_PATH:-}"

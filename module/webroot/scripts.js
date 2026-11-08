@@ -1218,13 +1218,20 @@ function openTelegramModal() {
 }
 
 function submitTelegramPhone() {
-  var phone = ($("#tg-phone-input").value || "").trim();
+  var raw = ($("#tg-phone-input").value || "").trim();
   var errEl = $("#tg-phone-err");
-  if (!phone) {
+  if (!raw) {
     errEl.textContent = I18N.t("tg_err_phone_required");
     errEl.hidden = false;
     return;
   }
+  var digits = raw.replace(/^00/, "").replace(/\D/g, "");
+  if (!digits) {
+    errEl.textContent = I18N.t("tg_err_phone_required");
+    errEl.hidden = false;
+    return;
+  }
+  var phone = "+" + digits;
   errEl.hidden = true;
   var btn = $("#tg-phone-next");
   btn.disabled = true;
@@ -1254,7 +1261,8 @@ function submitTelegramPhone() {
 }
 
 function submitTelegramCode() {
-  var code = ($("#tg-code-input").value || "").trim();
+  var rawCode = ($("#tg-code-input").value || "").trim();
+  var code = rawCode.replace(/\D/g, "");
   var pw = ($("#tg-pw-input").value || "").trim();
   var errEl = $("#tg-code-err");
 
