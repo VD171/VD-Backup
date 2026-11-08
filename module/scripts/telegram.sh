@@ -21,7 +21,7 @@ case "$abi" in
   *)               BINABI=arm64-v8a ;;
 esac
 BIN="$MODDIR/bin/$BINABI"
-CLOUD="$STATE/bin"
+export VDBACKUP_STATE="$STATE"
 export PATH="$BIN:$CLOUD:$PATH"
 export LD_LIBRARY_PATH="$BIN/lib:$CLOUD/lib:${LD_LIBRARY_PATH:-}"
 
@@ -78,7 +78,8 @@ case "${1:-}" in
     shift; dest="${1:-}"; ref="${2:-}"; out="${3:-}"; opid="${4:-}"
     "$PYTHON" "$CLI" download --dest "$dest" --ref "$ref" --out "$out" ${opid:+--opid "$opid"} ;;
   logout)
-    "$PYTHON" "$CLI" logout ;;
+    "$PYTHON" "$CLI" logout
+    rm -f "$STATE/dests/telegram.json" "$STATE/staging/tg_auth.json" "$STATE/telegram_index.json" "$STATE/creds/session"* 2>/dev/null ;;
   *)
     printf '{"ok":false,"code":"ERR_UNKNOWN_VERB","message":"Unknown verb for telegram.sh"}\n' ;;
 esac

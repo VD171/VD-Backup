@@ -1067,6 +1067,8 @@ function checkTelegramStatus() {
 
 function updateTelegramUI() {
   var isAuth = TG_STATE && TG_STATE.authorized;
+  var tgCard = $("#tg-card");
+  if (tgCard) tgCard.hidden = !isAuth;
   var linkBtn = $("#tg-link-btn");
   var browseBtn = $("#tg-browse-btn");
   var manageBtn = $("#tg-manage-btn");
@@ -1321,6 +1323,8 @@ function logoutTelegram() {
   modalConfirm(I18N.t("tg_confirm_logout")).then(function (ok) {
     if (!ok) return;
     helper("telegram-logout").then(function () {
+      TG_STATE = null;
+      updateTelegramUI();
       checkTelegramStatus();
       loadDests();
       $("#tg-modal").hidden = true;
@@ -2074,7 +2078,12 @@ function buildBlockPicker() {
   var ul = $("#block-applist"); if (!ul) return;
   if (iconObserver) _blockIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
   _blockIcons = []; ul.innerHTML = "";
-  visibleApps("").forEach(function (a) {
+  var all = (APPS || []).slice();
+  all.sort(function (x, y) {
+    var a = x.label || x.package || "", b = y.label || y.package || "";
+    return a.toLowerCase().localeCompare(b.toLowerCase());
+  });
+  all.forEach(function (a) {
     var li = el("li", "row tappable");
     var ic = el("div", "app-ic", (a.label || a.package).charAt(0).toUpperCase());
     ic.dataset.pkg = a.package;

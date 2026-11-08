@@ -447,7 +447,7 @@ window.__I18N_EN = {
   "tg_tag_unlimited": "Free Unlimited Cloud",
   "tg_tag_mtproto": "Client-Side MTProto",
   "tg_tag_granular": "Granular Restores",
-  "ui_dest_telegram": "Telegram (Cloud Storage)",
+  "ui_dest_telegram": "Telegram (unlimited storage)",
   "ui_tg_cloud_btn": "Telegram Cloud",
   "tg_login_title": "Log in to Telegram",
   "tg_phone_hint": "Please enter your phone number with your country code:",

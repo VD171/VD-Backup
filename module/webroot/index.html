@@ -148,8 +148,8 @@
     </section>
 
     <section id="dests" class="panel">
-      <!-- Telegram Cloud Storage Feature Card -->
-      <div class="tg-card" id="tg-card">
+      <!-- Telegram Cloud Storage Feature Card (only shown when connected) -->
+      <div class="tg-card" id="tg-card" hidden>
         <div class="tg-card-header">
           <div class="tg-icon-badge">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -182,7 +182,7 @@
         <input id="d-id" type="text" data-i18n-ph="ph_dest_id" placeholder="id (e.g. mynas)">
         <select id="d-type">
           <option value="local">local</option>
-          <option value="telegram" data-i18n="ui_dest_telegram">Telegram (Cloud Storage)</option>
+          <option value="telegram" data-i18n="ui_dest_telegram">Telegram (unlimited storage)</option>
           <option value="rclone">rclone (SFTP/SMB/WebDAV/Drive/S3/...)</option>
           <option value="restic">restic (snapshot repo)</option>
           <option value="gdrive" data-i18n="ui_dest_gdrive">Google Drive (companion)</option>
