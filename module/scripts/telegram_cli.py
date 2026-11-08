@@ -28,7 +28,6 @@ if os.path.isdir(LIB_DIR) and LIB_DIR not in sys.path:
 
 try:
     from telethon import TelegramClient
-    from telethon.sessions import StringSession
     from telethon.tl.functions.channels import CreateChannelRequest
     from telethon.tl.types import InputPeerChannel
     from telethon.errors import (
@@ -48,24 +47,13 @@ DEVICE_MODEL = "Desktop"
 SYSTEM_VERSION = "Windows 10"
 APP_VERSION = "5.0.1 x64"
 
-def create_client(session_str=None):
-    session = StringSession(session_str) if session_str else StringSession()
-    return TelegramClient(
-        session,
-        API_ID,
-        API_HASH,
-        device_model=DEVICE_MODEL,
-        system_version=SYSTEM_VERSION,
-        app_version=APP_VERSION
-    )
-
 STATE_DIR = os.environ.get("VDBACKUP_STATE", "/data/adb/vdbackup")
 CREDS_DIR = os.path.join(STATE_DIR, "creds")
 DESTS_DIR = os.path.join(STATE_DIR, "dests")
 STAGING_DIR = os.path.join(STATE_DIR, "staging")
 LOGS_DIR = os.path.join(STATE_DIR, "logs")
 
-SESSION_FILE = os.path.join(CREDS_DIR, "telegram.session")
+SESSION_PATH = os.path.join(CREDS_DIR, "session")
 AUTH_STATE_FILE = os.path.join(STAGING_DIR, "tg_auth.json")
 DEST_FILE = os.path.join(DESTS_DIR, "telegram.json")
 INDEX_CACHE_FILE = os.path.join(STATE_DIR, "telegram_index.json")
@@ -74,20 +62,19 @@ def ensure_dirs():
     for d in [CREDS_DIR, DESTS_DIR, STAGING_DIR, LOGS_DIR]:
         os.makedirs(d, mode=0o700, exist_ok=True)
 
-def load_saved_session():
-    if os.path.isfile(SESSION_FILE):
-        try:
-            with open(SESSION_FILE, "r") as f:
-                return f.read().strip()
-        except Exception:
-            pass
-    return ""
+def has_saved_session():
+    return os.path.isfile(SESSION_PATH + ".session")
 
-def save_session(session_str):
+def create_client():
     ensure_dirs()
-    with open(SESSION_FILE, "w") as f:
-        f.write(session_str)
-    os.chmod(SESSION_FILE, 0o600)
+    return TelegramClient(
+        SESSION_PATH,
+        API_ID,
+        API_HASH,
+        device_model=DEVICE_MODEL,
+        system_version=SYSTEM_VERSION,
+        app_version=APP_VERSION
+    )
 
 def sha256_file(filepath):
     h = hashlib.sha256()
@@ -120,15 +107,21 @@ async def cmd_send_code(phone):
     if not phone.startswith("+"):
         phone = "+" + phone
 
+    # Clean previous session DB for a fresh login
+    session_db = SESSION_PATH + ".session"
+    if os.path.isfile(session_db):
+        try:
+            os.remove(session_db)
+        except Exception:
+            pass
+
     client = create_client()
     await client.connect()
     try:
         res = await client.send_code_request(phone)
-        temp_session = client.session.save()
         auth_data = {
             "phone": phone,
             "phone_code_hash": res.phone_code_hash,
-            "session": temp_session,
             "timestamp": int(time.time())
         }
         with open(AUTH_STATE_FILE, "w") as f:
@@ -166,9 +159,8 @@ async def cmd_sign_in(phone, code, password=None):
         return
 
     phone_code_hash = auth_data.get("phone_code_hash", "")
-    session_str = auth_data.get("session", "")
 
-    client = create_client(session_str)
+    client = create_client()
     await client.connect()
 
     try:
@@ -178,10 +170,6 @@ async def cmd_sign_in(phone, code, password=None):
             if password:
                 user = await client.sign_in(password=password)
             else:
-                # Update auth state to keep the session alive for 2FA password entry
-                auth_data["session"] = client.session.save()
-                with open(AUTH_STATE_FILE, "w") as f:
-                    json.dump(auth_data, f)
                 print(json.dumps({
                     "ok": False,
                     "code": "ERR_NEED_PASSWORD",
@@ -189,9 +177,6 @@ async def cmd_sign_in(phone, code, password=None):
                     "message": "Two-step verification is enabled on your account. Please enter your cloud password."
                 }))
                 return
-
-        final_session = client.session.save()
-        save_session(final_session)
 
         # Cleanup staging auth state
         try:
@@ -219,12 +204,11 @@ async def cmd_sign_in(phone, code, password=None):
 
 # --- Step 3: Create private storage channel starting with VD ----------
 async def cmd_init_storage(title=None):
-    session_str = load_saved_session()
-    if not session_str:
+    if not has_saved_session():
         print(json.dumps({"ok": False, "code": "ERR_NO_SESSION", "message": "Not logged in to Telegram."}))
         return
 
-    client = create_client(session_str)
+    client = create_client()
     await client.connect()
 
     if not await client.is_user_authorized():
@@ -311,12 +295,11 @@ async def cmd_init_storage(title=None):
 
 # --- Check connection & status -----------------------------------------
 async def cmd_check_auth():
-    session_str = load_saved_session()
-    if not session_str:
+    if not has_saved_session():
         print(json.dumps({"ok": True, "authorized": False, "dest_exists": False}))
         return
 
-    client = create_client(session_str)
+    client = create_client()
     await client.connect()
 
     try:
@@ -351,8 +334,7 @@ async def cmd_check_auth():
 
 # --- Upload backup to channel ------------------------------------------
 async def cmd_upload(channel_id, backup_dir, opid=None):
-    session_str = load_saved_session()
-    if not session_str:
+    if not has_saved_session():
         print(json.dumps({"ok": False, "code": "ERR_NO_SESSION", "message": "Not logged in to Telegram."}))
         return
 
@@ -375,7 +357,7 @@ async def cmd_upload(channel_id, backup_dir, opid=None):
     ts_vc = os.path.basename(backup_dir)
     ref = f"{pkg}/{ts_vc}"
 
-    client = create_client(session_str)
+    client = create_client()
     await client.connect()
 
     try:
@@ -502,12 +484,11 @@ async def cmd_upload(channel_id, backup_dir, opid=None):
 
 # --- List remote backups in channel -------------------------------------
 async def cmd_list_backups(channel_id):
-    session_str = load_saved_session()
-    if not session_str:
+    if not has_saved_session():
         print(json.dumps({"ok": False, "code": "ERR_NO_SESSION", "message": "Not logged in to Telegram."}))
         return
 
-    client = create_client(session_str)
+    client = create_client()
     await client.connect()
 
     try:
@@ -558,15 +539,14 @@ async def cmd_list_backups(channel_id):
 
 # --- Download backup from channel ---------------------------------------
 async def cmd_download(channel_id, ref, target_dir, opid=None):
-    session_str = load_saved_session()
-    if not session_str:
+    if not has_saved_session():
         print(json.dumps({"ok": False, "code": "ERR_NO_SESSION", "message": "Not logged in to Telegram."}))
         return
 
     os.makedirs(target_dir, exist_ok=True)
     update_progress(opid, 5, "connecting to telegram")
 
-    client = create_client(session_str)
+    client = create_client()
     await client.connect()
 
     try:
@@ -659,10 +639,9 @@ async def cmd_download(channel_id, ref, target_dir, opid=None):
 
 # --- Logout -------------------------------------------------------------
 async def cmd_logout():
-    session_str = load_saved_session()
-    if session_str:
+    if has_saved_session():
         try:
-            client = create_client(session_str)
+            client = create_client()
             await client.connect()
             if await client.is_user_authorized():
                 await client.log_out()
@@ -670,7 +649,7 @@ async def cmd_logout():
         except Exception:
             pass
 
-    for f in [SESSION_FILE, AUTH_STATE_FILE, DEST_FILE, INDEX_CACHE_FILE]:
+    for f in [SESSION_PATH + ".session", AUTH_STATE_FILE, DEST_FILE, INDEX_CACHE_FILE]:
         if os.path.isfile(f):
             try:
                 os.remove(f)
