@@ -17,6 +17,7 @@ import argparse
 import hashlib
 import warnings
 import re
+import random
 from datetime import datetime, timezone
 
 warnings.filterwarnings("ignore")
@@ -209,20 +210,54 @@ async def cmd_sign_in(phone, code, password=None):
     finally:
         await client.disconnect()
 
+ADJECTIVES_AND_NOUNS = [
+    ("Cat", "meow"), ("Dog", "bark"), ("Blue", "sky"), ("Neon", "wave"),
+    ("Star", "orbit"), ("Moon", "glow"), ("Silent", "storm"), ("Cosmic", "ray"),
+    ("Silver", "hawk"), ("Cyber", "pulse"), ("Shadow", "stride"), ("Echo", "drift"),
+    ("Pixel", "spark"), ("Swift", "stream"), ("Iron", "vault"), ("Ruby", "crest"),
+    ("Quantum", "core"), ("Apex", "haven"), ("Solar", "flare"), ("Alpha", "cloud")
+]
+
+def generate_random_channel_name():
+    style = random.choice(["words", "digits", "letters", "mixed"])
+    if style == "words":
+        w1, w2 = random.choice(ADJECTIVES_AND_NOUNS)
+        return f"{w1}_{w2}_VDB"
+    elif style == "digits":
+        digits = "".join(random.choices("0123456789", k=random.randint(6, 8)))
+        return f"{digits}_VDB"
+    elif style == "letters":
+        letters = "".join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=random.randint(5, 7)))
+        sep = random.choice(["-", "_"])
+        return f"{letters}{sep}VDB"
+    else:
+        token = secrets.token_hex(3).upper()
+        return f"{token}_VDB"
+
+def is_vdb_channel(title):
+    if not title:
+        return False
+    t = str(title).strip()
+    # "last VDB should be used to detect"
+    if t.upper().endswith("VDB"):
+        return True
+    # Backward compatibility with existing channels (e.g. VD_Backup_7ECC)
+    if t.startswith("VD_Backup") or t.startswith("VD_") or "VD-Backup" in t or "VDBackup" in t:
+        return True
+    return False
+
 async def find_existing_storage_channel(client):
     """Scan user's dialogs for an existing VD-Backup storage channel."""
     try:
         async for dialog in client.iter_dialogs():
             if dialog.is_channel:
-                title = dialog.title or ""
-                if (title.startswith("VD_Backup") or title.startswith("VD_") or
-                        "VD-Backup" in title or "VDBackup" in title):
+                if is_vdb_channel(dialog.title):
                     return dialog
     except Exception:
         pass
     return None
 
-# --- Step 3: Create private storage channel starting with VD ----------
+# --- Step 3: Create private storage channel ending with VDB ----------
 async def cmd_init_storage(title=None):
     if not has_saved_session():
         print(json.dumps({"ok": False, "code": "ERR_NO_SESSION", "message": "Not logged in to Telegram."}))
@@ -273,12 +308,11 @@ async def cmd_init_storage(title=None):
             }))
             return
 
-        # 2. Only if no existing channel exists, attempt to create one
+        # 2. Only if no existing channel exists, attempt to create one with random style ending in VDB
         if not title:
-            random_tag = secrets.token_hex(2).upper()
-            title = f"VD_Backup_{random_tag}"
-        elif not title.startswith("VD_"):
-            title = f"VD_{title}"
+            title = generate_random_channel_name()
+        elif not is_vdb_channel(title):
+            title = f"{title}_VDB"
 
         try:
             created = await client(CreateChannelRequest(
