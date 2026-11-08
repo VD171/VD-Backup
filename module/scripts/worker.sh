@@ -412,11 +412,16 @@ resolve_dest() {
   DESTID="$(jget "$ARGS" '.dest')"; { [ -z "$DESTID" ] || [ "$DESTID" = null ]; } && DESTID=local
   DJSON="$STATE/dests/$DESTID.json"
   DTYPE=local; DREMOTE=""; DPATH=""; DREPO=""
+  DTOKEN=""; DCHAT=""; DAPI=""; DCHUNK=""
   if [ -f "$DJSON" ]; then
     DTYPE="$("$JQ" -r '.type // "local"' "$DJSON")"
     DREMOTE="$("$JQ" -r '.remote // empty' "$DJSON")"
     DPATH="$("$JQ" -r '.path // empty'   "$DJSON")"
     DREPO="$("$JQ" -r '.repo // empty'   "$DJSON")"
+    DTOKEN="$("$JQ" -r '.tg_token // empty' "$DJSON")"
+    [ -z "$DTOKEN" ] && [ -f "$STATE/creds/$DESTID.pass" ] && DTOKEN="$(cat "$STATE/creds/$DESTID.pass" 2>/dev/null)"
+    DCHAT="$("$JQ" -r '.channel_id // .tg_chat // empty' "$DJSON")"
+    [ -z "$DCHAT" ] && [ -f "$STATE/dests/telegram.json" ] && DCHAT="$("$JQ" -r '.channel_id // empty' "$STATE/dests/telegram.json" 2>/dev/null)"
   fi
 }
 
@@ -502,7 +507,7 @@ rclone_check_seal() {   # <localdir> <remote:path>; 0 = verified or skipped, 1 =
 
 # Full mode: ship the just-built local backup dir to a remote destination
 transfer_full() {
-  case "$DTYPE" in rclone|gdrive) net_guard || return 1 ;; esac
+  case "$DTYPE" in rclone|gdrive|telegram) net_guard || return 1 ;; esac
   case "$DTYPE" in
     rclone) [ -n "$DREMOTE" ] || { audit "rclone dest without remote $PKG"; finish false ERR_NO_DEST; return 1; }
             _tneed="$(du -s -B1 "$DEST" 2>/dev/null | cut -f1)"; _tneed="${_tneed:-0}"
@@ -532,6 +537,10 @@ transfer_full() {
               exec_ns rm -f "$_sf"
             done
             exec_ns rm -rf "$_stg" ;;
+    telegram)
+            [ -n "$DCHAT" ] || { audit "telegram dest without channel $PKG"; finish false ERR_TG_CHAT; return 1; }
+            "$MODDIR/scripts/telegram.sh" upload "$DCHAT" "$DEST" "$OPID" \
+              || { audit "telegram transfer failed $PKG"; finish false ERR_TRANSFER; return 1; } ;;
     local)  if [ -n "$DPATH" ] && [ "$DPATH" != "$BACKUPS" ]; then
               mkdir -p "$(remote_pfx)/$PKG" && cp -a "$DEST" "$(remote_pfx)/$PKG/" \
                 || { audit "local transfer failed $PKG"; finish false ERR_TRANSFER; return 1; }; fi ;;
@@ -1696,17 +1705,42 @@ do_path_restore() {
   finish true ERR_NONE
 }
 
+do_telegram_download() {
+  DESTID="$(jget "$ARGS" '.dest')"; { [ -z "$DESTID" ] || [ "$DESTID" = null ]; } && DESTID=telegram
+  resolve_dest
+  REF="$(jget "$ARGS" '.ref')"
+  case "$REF" in ''|*..*|*/*/*) : ;; esac
+  PKG="$(jget "$ARGS" '.package')"
+  U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
+  [ -n "$REF" ] || { finish false ERR_BAD_REF; return; }
+  TARGET="$(backups_dir "$U")/$REF"
+  prog 5 downloading "telegram"
+  audit "telegram-download start $REF -> $TARGET"
+  "$MODDIR/scripts/telegram.sh" download "$DCHAT" "$REF" "$TARGET" "$OPID" \
+    || { audit "telegram-download failed $REF"; finish false ERR_TG_DOWNLOAD; return; }
+  media_own -R "$TARGET" 2>/dev/null
+  audit "telegram-download done $REF"
+  if [ "$(jget "$ARGS" '.auto_restore // false')" = true ]; then
+    # update ARGS ref to local target and run restore
+    ARGS="$(printf '%s' "$ARGS" | "$JQ" -c --arg target "$TARGET" '.ref = $target')"
+    restore
+  else
+    finish true ERR_NONE
+  fi
+}
+
 # mark the operation live immediately, before any (possibly slow) validation, so the
 # UI never sits on a stale "starting" while the first guard/dumpsys runs.
-case "$VERB" in backup|restore|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore) prog 2 preparing "" ;; esac
+case "$VERB" in backup|restore|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore|telegram-download) prog 2 preparing "" ;; esac
 case "$VERB" in
-  backup)          backup ;;
-  restore)         restore ;;
-  import)          do_import ;;
-  special-backup)  do_special_backup ;;
-  special-restore) do_special_restore ;;
-  cloud-fetch)     do_cloud_fetch ;;
-  path-backup)     do_path_backup ;;
-  path-restore)    do_path_restore ;;
-  *)               finish false ERR_UNKNOWN_VERB ;;
+  backup)            backup ;;
+  restore)           restore ;;
+  import)            do_import ;;
+  special-backup)    do_special_backup ;;
+  special-restore)   do_special_restore ;;
+  cloud-fetch)       do_cloud_fetch ;;
+  path-backup)       do_path_backup ;;
+  path-restore)      do_path_restore ;;
+  telegram-download) do_telegram_download ;;
+  *)                 finish false ERR_UNKNOWN_VERB ;;
 esac

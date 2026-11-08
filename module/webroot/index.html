@@ -86,6 +86,7 @@
 
     <section id="backups" class="panel">
       <div class="toolbar">
+        <button id="bk-tg-cloud" class="btn" type="button" data-i18n="ui_tg_cloud_btn">Telegram Cloud</button>
         <span class="grow"></span>
         <button id="bk-select" class="btn" data-i18n="ui_select">Select</button>
       </div>
@@ -142,12 +143,30 @@
     </section>
 
     <section id="dests" class="panel">
+      <!-- Telegram Cloud Storage Card -->
+      <div class="card" id="tg-card" style="margin-bottom: 16px; border: 1px solid rgba(34, 158, 217, 0.4);">
+        <div class="row align-center">
+          <div class="app-ic" style="background:#229ED9; color:#fff; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px; margin-right:12px;">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+            </svg>
+          </div>
+          <div class="grow">
+            <div class="name" style="font-weight:600;" data-i18n="tg_storage_title">Telegram Storage</div>
+            <div class="sub" id="tg-card-sub" data-i18n="tg_storage_sub">Private cloud backups in your Telegram account</div>
+          </div>
+          <button id="tg-link-btn" class="btn go small" type="button" data-i18n="tg_link_btn">Link Telegram</button>
+          <button id="tg-manage-btn" class="btn small" type="button" data-i18n="tg_manage_btn" hidden>Manage</button>
+        </div>
+      </div>
+
       <ul id="destlist" class="list"></ul>
       <h2 class="section-head"><span class="sh-ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="13" width="16" height="7" rx="2"/><path d="M8 7.5h.01"/><path d="M8 16.5h.01"/></svg></span><span class="sh-t" data-i18n="dest_add">Add destination</span></h2>
       <div class="field">
         <input id="d-id" type="text" data-i18n-ph="ph_dest_id" placeholder="id (e.g. mynas)">
         <select id="d-type">
           <option value="local">local</option>
+          <option value="telegram" data-i18n="ui_dest_telegram">Telegram (Cloud Storage)</option>
           <option value="rclone">rclone (SFTP/SMB/WebDAV/Drive/S3/...)</option>
           <option value="restic">restic (snapshot repo)</option>
           <option value="gdrive" data-i18n="ui_dest_gdrive">Google Drive (companion)</option>
@@ -703,6 +722,92 @@
       <div class="modal-actions">
         <button class="btn" id="pb-cancel" data-i18n="ui_import_cancel">Cancel</button>
         <button class="btn go" id="pb-ok" data-i18n="ui_pathbk_do">Back up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Telegram Authentication & Storage Setup Modal -->
+  <div id="tg-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="row align-center mb-sm">
+        <div class="app-ic" style="background:#229ED9; color:#fff; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:10px; margin-right:10px;">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+          </svg>
+        </div>
+        <div class="modal-title" id="tg-modal-title" data-i18n="tg_login_title">Log in to Telegram</div>
+      </div>
+
+      <!-- Step 1: Phone input -->
+      <div id="tg-step-phone">
+        <div class="modal-msg" data-i18n="tg_phone_hint">Please enter your phone number with your country code:</div>
+        <input id="tg-phone-input" type="tel" autocomplete="tel" placeholder="+1 234 567 8900" class="mb-sm">
+        <div id="tg-phone-err" class="modal-err" hidden style="color:var(--err); margin-bottom:8px;"></div>
+        <div class="modal-actions">
+          <button class="btn" id="tg-phone-cancel" type="button" data-i18n="ui_cancel">Cancel</button>
+          <button class="btn go" id="tg-phone-next" type="button" data-i18n="tg_send_code">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 2: OTP Code input -->
+      <div id="tg-step-code" hidden>
+        <div class="modal-msg" id="tg-code-hint" data-i18n="tg_code_hint">We've sent a login code to your Telegram app. Please enter it below:</div>
+        <input id="tg-code-input" type="text" autocomplete="one-time-code" placeholder="12345" class="mb-sm">
+        <div id="tg-pw-box" hidden>
+          <div class="modal-msg mt-sm" data-i18n="tg_pw_hint">2FA Cloud Password (if enabled on your account):</div>
+          <input id="tg-pw-input" type="password" placeholder="Cloud Password" class="mb-sm">
+        </div>
+        <div id="tg-code-err" class="modal-err" hidden style="color:var(--err); margin-bottom:8px;"></div>
+        <div class="modal-actions">
+          <button class="btn" id="tg-code-back" type="button" data-i18n="ui_back">Back</button>
+          <button class="btn go" id="tg-code-verify" type="button" data-i18n="tg_verify_login">Verify & Log In</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Storage Channel Notice & Creation -->
+      <div id="tg-step-notice" hidden>
+        <div class="notice warn" style="margin-bottom:12px;">
+          <div class="notice-msg" data-i18n="tg_channel_notice">
+            A private channel starting with <b>VD_</b> (e.g. <code>VD_Backup_4F2A</code>) will now be created on your Telegram account. Don't worry, it's your dedicated private storage for this app.
+            <br><br>
+            ⚠️ <b>Be aware:</b> Do not delete this channel, otherwise you will lose your cloud backups!
+          </div>
+        </div>
+        <div id="tg-create-err" class="modal-err" hidden style="color:var(--err); margin-bottom:8px;"></div>
+        <div class="modal-actions">
+          <button class="btn" id="tg-notice-cancel" type="button" data-i18n="ui_cancel">Cancel</button>
+          <button class="btn go" id="tg-create-channel-btn" type="button" data-i18n="tg_create_storage">Create Storage & Finish</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Storage Active / Manage -->
+      <div id="tg-step-active" hidden>
+        <div class="notice ok mb-sm" style="margin-bottom:14px;">
+          <div class="notice-msg">
+            <span data-i18n="tg_connected_as">Connected as:</span> <b id="tg-active-user"></b><br>
+            <span data-i18n="tg_channel_label">Storage Channel:</span> <b id="tg-active-channel"></b>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn danger" id="tg-logout-btn" type="button" data-i18n="tg_disconnect">Disconnect</button>
+          <button class="btn go" id="tg-view-backups-btn" type="button" data-i18n="tg_view_backups">View Backups</button>
+          <button class="btn" id="tg-active-close" type="button" data-i18n="ui_close">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Telegram Cloud Backups Modal -->
+  <div id="tg-backups-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="ui_tg_cloud_backups">Telegram Cloud Backups</div>
+      <div class="modal-msg" data-i18n="ui_tg_backups_sub">Backups stored in your private Telegram storage channel:</div>
+      <ul id="tg-bk-list" class="list" style="max-height: 50vh; overflow-y: auto; margin-bottom:12px;"></ul>
+      <p id="tg-bk-empty" class="muted" data-i18n="ui_tg_no_backups" hidden>No backups found on Telegram.</p>
+      <div class="modal-actions">
+        <button class="btn" id="tg-bk-refresh" type="button" data-i18n="refresh">Refresh</button>
+        <button class="btn" id="tg-bk-close" type="button" data-i18n="ui_close">Close</button>
       </div>
     </div>
   </div>

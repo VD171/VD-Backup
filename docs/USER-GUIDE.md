@@ -401,6 +401,17 @@ automatically, so **no PC is needed** (pasting a token by hand still works as a 
 The remote then appears in the destination's remote list. Passwords are stored obscured,
 never in clear text. You can list and delete your remotes from the same place.
 
+### Telegram Cloud Storage
+
+You can back up directly to your personal Telegram account as private cloud storage:
+
+1. In the **Destinations** tab, tap **Link Telegram**.
+2. Enter your phone number with country code (e.g. `+1 234 567 8900`).
+3. Enter the login verification code (OTP) sent to your Telegram app (and your 2FA cloud password if enabled).
+4. A dedicated private channel starting with `VD_` (e.g. `VD_Backup_4F2A`) is automatically created in your Telegram account to serve as your private storage.
+5. Backups targeting the Telegram destination upload directly to this channel.
+6. In the **Backups** tab, tap **Telegram Cloud** to browse, download, and restore backups directly from your Telegram channel.
+
 Two rules keep remote use safe:
 
 - **Credentials are stored encrypted** at rest in the module's state directory, never

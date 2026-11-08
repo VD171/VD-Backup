@@ -95,6 +95,8 @@ set_perm_recursive "$MODPATH" 0 0 0755 0644
 set_perm_recursive "$MODPATH/bin" 0 0 0755 0755
 set_perm "$MODPATH/scripts/helper.sh" 0 0 0755
 set_perm "$MODPATH/scripts/worker.sh" 0 0 0755
+set_perm "$MODPATH/scripts/telegram.sh" 0 0 0755
+set_perm "$MODPATH/scripts/telegram_cli.py" 0 0 0755
 set_perm "$MODPATH/service.sh" 0 0 0755
 [ -f "$MODPATH/uninstall.sh" ] && set_perm "$MODPATH/uninstall.sh" 0 0 0755
 
@@ -109,7 +111,7 @@ if [ "$BOOTMODE" = "true" ] && [ "$MODPATH" != "$ACTIVE" ]; then
   ui_print "- Activating without reboot"
   mkdir -p "$ACTIVE"
   cp -afT "$MODPATH" "$ACTIVE" 2>/dev/null || cp -af "$MODPATH"/. "$ACTIVE"/ 2>/dev/null
-  chmod 0755 "$ACTIVE"/*.sh "$ACTIVE"/scripts/*.sh "$ACTIVE"/bin/*/* 2>/dev/null
+  chmod 0755 "$ACTIVE"/*.sh "$ACTIVE"/scripts/*.sh "$ACTIVE"/scripts/*.py "$ACTIVE"/bin/*/* 2>/dev/null
   # the manager writes an "update" marker AFTER customize.sh returns; clear it (and
   # kick the scheduler) from a detached job so the module shows as active, not pending.
   setsid sh -c "sleep 4; rm -f '$ACTIVE/update' '$ACTIVE/remove' '$ACTIVE/disable'; '$ACTIVE/scripts/helper.sh' scheduler-tick" >/dev/null 2>&1 &

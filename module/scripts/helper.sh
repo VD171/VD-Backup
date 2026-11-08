@@ -384,7 +384,7 @@ case "$verb" in
     done
     printf '}}\n' ;;
 
-  backup|restore|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore)
+  backup|restore|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore|telegram-download)
     opid="$(new_opid)"
     detach "$opid" "$verb" "$ARGS_B64"
     ok "\"opid\":\"$opid\"" ;;
@@ -731,8 +731,53 @@ case "$verb" in
         i=0; while [ ! -f "$res.done" ] && [ "$i" -lt 30 ]; do sleep 1; i=$((i+1)); done
         if [ -f "$res.done" ] && "$JQ" -e '.ok==true' "$res" >/dev/null 2>&1; then rm -f "$res" "$res.done"; ok '"reachable":true'
         else c="$("$JQ" -r '.code // "ERR_DRIVE_TIMEOUT"' "$res" 2>/dev/null)"; rm -f "$res" "$res.done"; err "${c:-ERR_DRIVE}" "Drive not reachable - authorize consent"; fi ;;
+      telegram)
+        st="$("$MODDIR/scripts/telegram.sh" check-auth 2>/dev/null)"
+        if printf '%s' "$st" | "$JQ" -e '.authorized == true' >/dev/null 2>&1; then
+          ok '"reachable":true'
+        else
+          err ERR_DEST_AUTH "Telegram not connected. Please link your Telegram account."
+        fi ;;
       *) err ERR_DEST_TYPE "unknown type" ;;
     esac ;;
+
+  telegram-status)
+    "$MODDIR/scripts/telegram.sh" check-auth ;;
+
+  telegram-send-code)
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    phone="$(printf '%s' "$j" | "$JQ" -r '.phone // empty' 2>/dev/null)"
+    [ -n "$phone" ] || { err ERR_TG_PHONE "Phone number is required"; exit 0; }
+    "$MODDIR/scripts/telegram.sh" send-code "$phone" ;;
+
+  telegram-sign-in)
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    phone="$(printf '%s' "$j" | "$JQ" -r '.phone // empty' 2>/dev/null)"
+    code="$(printf '%s' "$j" | "$JQ" -r '.code // empty' 2>/dev/null)"
+    pw="$(printf '%s' "$j" | "$JQ" -r '.password // empty' 2>/dev/null)"
+    [ -n "$phone" ] && [ -n "$code" ] || { err ERR_TG_CODE "Phone and verification code are required"; exit 0; }
+    "$MODDIR/scripts/telegram.sh" sign-in "$phone" "$code" "$pw" ;;
+
+  telegram-init-storage)
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    title="$(printf '%s' "$j" | "$JQ" -r '.title // empty' 2>/dev/null)"
+    "$MODDIR/scripts/telegram.sh" init-storage "$title" ;;
+
+  telegram-list-remote)
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    cid="$(printf '%s' "$j" | "$JQ" -r '.channel_id // empty' 2>/dev/null)"
+    if [ -z "$cid" ] && [ -f "$STATE/dests/telegram.json" ]; then
+      cid="$("$JQ" -r '.channel_id // empty' "$STATE/dests/telegram.json" 2>/dev/null)"
+    fi
+    [ -n "$cid" ] || { err ERR_TG_NO_CHANNEL "No storage channel configured"; exit 0; }
+    "$MODDIR/scripts/telegram.sh" list-remote "$cid" ;;
+
+  telegram-logout)
+    "$MODDIR/scripts/telegram.sh" logout ;;
 
   schedule-set)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
