@@ -10,11 +10,15 @@
 import sys
 import os
 import json
+import time
 import asyncio
 import secrets
 import argparse
 import hashlib
-from datetime import datetime
+import warnings
+from datetime import datetime, timezone
+
+warnings.filterwarnings("ignore")
 
 # Ensure vendored libraries in module/scripts/lib are importable
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -38,8 +42,22 @@ except ImportError as e:
     sys.exit(1)
 
 # Built-in official Telegram application credentials (no client secrets needed from user)
-API_ID = 6
-API_HASH = "eb0663abfb5223e4885f40e00878b252"
+API_ID = 2040
+API_HASH = "b18441a1ff607e10a989891a5462e627"
+DEVICE_MODEL = "Desktop"
+SYSTEM_VERSION = "Windows 10"
+APP_VERSION = "5.0.1 x64"
+
+def create_client(session_str=None):
+    session = StringSession(session_str) if session_str else StringSession()
+    return TelegramClient(
+        session,
+        API_ID,
+        API_HASH,
+        device_model=DEVICE_MODEL,
+        system_version=SYSTEM_VERSION,
+        app_version=APP_VERSION
+    )
 
 STATE_DIR = os.environ.get("VDBACKUP_STATE", "/data/adb/vdbackup")
 CREDS_DIR = os.path.join(STATE_DIR, "creds")
@@ -102,7 +120,7 @@ async def cmd_send_code(phone):
     if not phone.startswith("+"):
         phone = "+" + phone
 
-    client = TelegramClient(StringSession(), API_ID, API_HASH)
+    client = create_client()
     await client.connect()
     try:
         res = await client.send_code_request(phone)
@@ -111,7 +129,7 @@ async def cmd_send_code(phone):
             "phone": phone,
             "phone_code_hash": res.phone_code_hash,
             "session": temp_session,
-            "timestamp": int(datetime.utcnow().timestamp())
+            "timestamp": int(time.time())
         }
         with open(AUTH_STATE_FILE, "w") as f:
             json.dump(auth_data, f)
@@ -150,7 +168,7 @@ async def cmd_sign_in(phone, code, password=None):
     phone_code_hash = auth_data.get("phone_code_hash", "")
     session_str = auth_data.get("session", "")
 
-    client = TelegramClient(StringSession(session_str), API_ID, API_HASH)
+    client = create_client(session_str)
     await client.connect()
 
     try:
@@ -206,7 +224,7 @@ async def cmd_init_storage(title=None):
         print(json.dumps({"ok": False, "code": "ERR_NO_SESSION", "message": "Not logged in to Telegram."}))
         return
 
-    client = TelegramClient(StringSession(session_str), API_ID, API_HASH)
+    client = create_client(session_str)
     await client.connect()
 
     if not await client.is_user_authorized():
@@ -258,7 +276,7 @@ async def cmd_init_storage(title=None):
             "user_id": me.id,
             "user_name": me.first_name or "",
             "user_phone": getattr(me, "phone", ""),
-            "created_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         }
 
         with open(DEST_FILE, "w") as f:
@@ -270,7 +288,7 @@ async def cmd_init_storage(title=None):
             "version": 1,
             "channel_id": channel_id,
             "channel_title": title,
-            "updated_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "backups": []
         }
         with open(INDEX_CACHE_FILE, "w") as f:
@@ -298,7 +316,7 @@ async def cmd_check_auth():
         print(json.dumps({"ok": True, "authorized": False, "dest_exists": False}))
         return
 
-    client = TelegramClient(StringSession(session_str), API_ID, API_HASH)
+    client = create_client(session_str)
     await client.connect()
 
     try:
@@ -357,7 +375,7 @@ async def cmd_upload(channel_id, backup_dir, opid=None):
     ts_vc = os.path.basename(backup_dir)
     ref = f"{pkg}/{ts_vc}"
 
-    client = TelegramClient(StringSession(session_str), API_ID, API_HASH)
+    client = create_client(session_str)
     await client.connect()
 
     try:
@@ -449,7 +467,7 @@ async def cmd_upload(channel_id, backup_dir, opid=None):
         # Prepend new backup (latest first) and deduplicate
         existing = [b for b in index_data.get("backups", []) if b.get("ref") != ref]
         index_data["backups"] = [new_backup_entry] + existing
-        index_data["updated_at"] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        index_data["updated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         # Save local cache
         with open(INDEX_CACHE_FILE, "w") as f:
@@ -489,7 +507,7 @@ async def cmd_list_backups(channel_id):
         print(json.dumps({"ok": False, "code": "ERR_NO_SESSION", "message": "Not logged in to Telegram."}))
         return
 
-    client = TelegramClient(StringSession(session_str), API_ID, API_HASH)
+    client = create_client(session_str)
     await client.connect()
 
     try:
@@ -548,7 +566,7 @@ async def cmd_download(channel_id, ref, target_dir, opid=None):
     os.makedirs(target_dir, exist_ok=True)
     update_progress(opid, 5, "connecting to telegram")
 
-    client = TelegramClient(StringSession(session_str), API_ID, API_HASH)
+    client = create_client(session_str)
     await client.connect()
 
     try:
@@ -644,7 +662,7 @@ async def cmd_logout():
     session_str = load_saved_session()
     if session_str:
         try:
-            client = TelegramClient(StringSession(session_str), API_ID, API_HASH)
+            client = create_client(session_str)
             await client.connect()
             if await client.is_user_authorized():
                 await client.log_out()
