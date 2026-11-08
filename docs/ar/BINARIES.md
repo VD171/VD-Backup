@@ -29,7 +29,7 @@
 | `bin/<abi>/` الأدوات الأصيلة (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + انغلاق `lib/` الخاص بها | مستودع apt الرسمي لـ**Termux** (`packages.termux.dev/apt`)، حزم `.deb` الرسمية | `.github/scripts/build_bin.sh` يُنزّل ملفات `.deb` + تبعيّاتها المتعدّية، ويستخرجها، وينسخ الملفات الثنائية إضافةً إلى المكتبات المشتركة التي يحتاجها كل منها فقط |
 | `bin/<abi>/abx2xml`، `bin/<abi>/xml2abx` (محوّل ABX احتياطي) | إصدار **rhythmcache/android-xml-converter** على GitHub (`ABX_RELEASE`، ELF ساكن) | يُنزَّل من الإصدار المثبّت بواسطة `build_bin.sh` |
 | `companion.apk` (رفيق Google Drive اختياري) | **هذا المستودع**، `companion/` (Gradle/Kotlin) | يُبنى من المصدر بواسطة CI ويُوقَّع بمفتاح المشروع (`VD_Key`)؛ ليس كائناً ثنائياً مبنياً مسبقاً |
-| `vdbhelper.dex` (مساعد إطار العمل) | **هذا المستودع**، `dex/src/` (Java) | يُصرَّف من المصدر بواسطة CI باستخدام `javac` + `d8` |
+| `vdbackup_helper.dex` (مساعد إطار العمل) | **هذا المستودع**، `dex/src/` (Java) | يُصرَّف من المصدر بواسطة CI باستخدام `javac` + `d8` |
 
 الصفّان الأولان فقط هما ملفات ثنائية مبنية مسبقاً من طرف ثالث؛ أما الأخيران فيُبنيان
 من مصدر يوجد في هذا المستودع ويمكن قراءته وإعادة بنائه.

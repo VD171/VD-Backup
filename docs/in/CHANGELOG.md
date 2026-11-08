@@ -6,6 +6,29 @@
 
 Semua perubahan penting pada VDBackup didokumentasikan di sini. Hanya dalam bahasa Inggris.
 
+## v1.03.2
+
+Perbaikan:
+
+- Halaman masuk cloud di perangkat selalu menampilkan "Sign-in failed", bahkan ketika masuk sudah
+  berhasil. Sekarang menampilkan hasil yang sebenarnya.
+- Cadangan yang tersimpan kini bisa dibuka dengan pengelola berkas: folder cadangan per
+  aplikasi hanya untuk pemilik, jadi pengelola berkas root pun tidak bisa masuk; kini dapat
+  diakses seperti sisa /sdcard/VDBackup.
+
+Tujuan cloud:
+
+- Aplikasi companion Google Drive opsional kini dibangun dan disertakan, jadi Google Drive
+  berfungsi melalui companion di perangkat (akun perangkat Anda, tanpa menempel token
+  manual) selain rclone.
+
+Antarmuka:
+
+- Dialog pencadangan memiliki pemilih tujuan, sehingga sebuah cadangan bisa menuju tujuan cloud
+  atau jarak jauh yang dipilih tanpa mengubah tujuan default di Pengaturan terlebih dahulu.
+- Aplikasi memeriksa versi yang lebih baru saat dibuka (paling banyak sekali per jam) dan menampilkan
+  banner pembaruan hanya ketika ada; tetap diam jika sudah terbaru atau luring.
+
 ## v1.03.1
 
 Cakupan backup baru:

@@ -16,6 +16,7 @@
   "settings_language": "ภาษา",
   "settings_mode": "โหมดสำรองข้อมูลเริ่มต้น",
   "settings_dest": "ปลายทางเริ่มต้น",
+  "ui_backup_dest": "ปลายทาง",
   "settings_network": "การถ่ายโอนบนคลาวด์ผ่าน",
   "opt_net_any": "Wi-Fi และเน็ตมือถือ",
   "opt_net_wifi": "Wi-Fi เท่านั้น",

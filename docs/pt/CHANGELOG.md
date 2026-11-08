@@ -6,6 +6,29 @@
 
 Todas as mudanças relevantes do VDBackup estão documentadas aqui. Apenas em inglês.
 
+## v1.03.2
+
+Correções:
+
+- A página de login de nuvem no aparelho sempre mostrava "Sign-in failed", mesmo quando o login
+  tinha dado certo. Agora mostra o resultado real.
+- Backups salvos agora podem ser abertos num gerenciador de arquivos: as pastas de backup
+  por app ficavam só para o dono, então nem um gerenciador root entrava; agora são
+  acessíveis como o resto de /sdcard/VDBackup.
+
+Destinos de nuvem:
+
+- O app companion opcional do Google Drive agora é compilado e embarcado, então o Google
+  Drive funciona pelo companion no aparelho (a conta do aparelho, sem colar token na mão)
+  além do rclone.
+
+Interface:
+
+- O diálogo de backup tem um seletor de destino, então um backup pode ir para um destino de nuvem
+  ou remoto escolhido sem precisar mudar antes o destino padrão nas Configurações.
+- O app verifica se há uma versão mais nova ao abrir (no máximo 1 vez por hora) e mostra o aviso
+  de atualização só quando há uma; fica silencioso se estiver atualizado ou offline.
+
 ## v1.03.1
 
 Novo escopo de backup:

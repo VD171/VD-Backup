@@ -42,6 +42,7 @@ window.__I18N_EN = {
   "settings_language": "Language",
   "settings_mode": "Default backup mode",
   "settings_dest": "Default destination",
+  "ui_backup_dest": "Destination",
   "settings_network": "Cloud transfers over",
   "opt_net_any": "Wi-Fi and mobile data",
   "opt_net_wifi": "Wi-Fi only",

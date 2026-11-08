@@ -159,6 +159,8 @@ De WebUI is georganiseerd in enkele tabbladen:
   versleutelingssleutel en het inplannen. Aan/uit-instellingen gebruiken schakelaars in Android-stijl.
 - **Over** - versie, links, de zusterprojecten (Zie ook), het auditmanifest van de gebundelde binaries, en een actie **Check for updates** die meldt of er een nieuwere versie is gepubliceerd (met de bijbehorende release-notes). Elke update installeer je via je root-manager, net zoals je de module hebt geflasht.
 
+De app controleert ook zelf op een nieuwere versie telkens als je hem opent (hooguit eens per uur) en toont de updatebanner alleen als er een is; blijft stil als up-to-date of offline.
+
 Bevestigingen en meldingen gebruiken in-app-dialogen (niet de oude systeem-pop-ups), en een
 herstel of import vraagt je te erkennen dat het de huidige app-gegevens overschrijft voordat
 het doorgaat.
@@ -176,6 +178,8 @@ en eindigt; hoe dan ook is de in-app-voortgangskaart de betrouwbare indicator.
 De basisstroom: open **Apps**, kies een app, selecteer wat je wilt opnemen, kies een modus,
 stel compressie en (optioneel) versleuteling in, voer dan uit. De voortgang verschijnt live en
 een melding vertelt je wanneer het klaar is.
+
+In het back-updialoogvenster kun je ook de **bestemming** voor deze back-up kiezen - lokale opslag of een toegevoegde cloud-/externe bestemming - zonder eerst de standaardbestemming in Instellingen te wijzigen.
 
 ### 5.1 Kiezen wat je back-upt
 

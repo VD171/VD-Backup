@@ -16,6 +16,7 @@
   "settings_language": "语言",
   "settings_mode": "默认备份模式",
   "settings_dest": "默认目标",
+  "ui_backup_dest": "目标",
   "settings_network": "云传输通过",
   "opt_net_any": "Wi-Fi 和移动数据",
   "opt_net_wifi": "仅 Wi-Fi",

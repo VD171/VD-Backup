@@ -16,6 +16,7 @@
   "settings_language": "Язык",
   "settings_mode": "Режим копирования по умолчанию",
   "settings_dest": "Назначение по умолчанию",
+  "ui_backup_dest": "Назначение",
   "settings_network": "Передача в облако через",
   "opt_net_any": "Wi-Fi и мобильные данные",
   "opt_net_wifi": "Только Wi-Fi",

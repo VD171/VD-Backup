@@ -67,9 +67,11 @@ settings_ssaid*
 .gradle/
 local.properties
 /dex/out/
-/module/vdbhelper.dex
+/module/etc/vdbackup_helper.dex
+/module/*.dex
 # companion APK is built from companion/ by CI and bundled on demand
-/module/companion.apk
+/module/etc/companion.apk
+/module/*.apk
 # bundled per-ABI binaries are build artifacts (CI/build_bin.sh rebuilds them)
 /module/bin/*/*
 !/module/bin/*/.gitkeep

@@ -16,6 +16,7 @@
   "settings_language": "اللغة",
   "settings_mode": "وضع النسخ الاحتياطي الافتراضي",
   "settings_dest": "الوجهة الافتراضية",
+  "ui_backup_dest": "الوجهة",
   "settings_network": "عمليات النقل السحابي عبر",
   "opt_net_any": "Wi-Fi وبيانات الجوال",
   "opt_net_wifi": "Wi-Fi فقط",

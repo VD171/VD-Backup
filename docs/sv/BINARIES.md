@@ -30,7 +30,7 @@ och hur du verifierar att inget ogenomskinligt har smugits in.
 | nativa verktyg i `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + deras `lib/`-slutenhet | **Termux** officiella apt-förråd (`packages.termux.dev/apt`), officiella `.deb`-paket | `.github/scripts/build_bin.sh` laddar ner `.deb`-filerna + deras transitiva beroenden, extraherar dem och kopierar binärerna plus endast de delade bibliotek som var och en behöver |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX-konverterare, reserv) | **rhythmcache/android-xml-converter** GitHub-utgåva (`ABX_RELEASE`, statisk ELF) | laddas ner från den fastnålade utgåvan av `build_bin.sh` |
 | `companion.apk` (valfri Google Drive-companion) | **Detta repository**, `companion/` (Gradle/Kotlin) | byggd från källkod av CI och signerad med projektnyckeln (`VD_Key`); inte en förbyggd blob |
-| `vdbhelper.dex` (framework-hjälpare) | **Detta repository**, `dex/src/` (Java) | kompilerad från källkod av CI med `javac` + `d8` |
+| `vdbackup_helper.dex` (framework-hjälpare) | **Detta repository**, `dex/src/` (Java) | kompilerad från källkod av CI med `javac` + `d8` |
 
 Endast de två första raderna är förbyggda tredjepartsbinärer; de två sista byggs från
 källkod som finns i detta repository och kan läsas och byggas om.

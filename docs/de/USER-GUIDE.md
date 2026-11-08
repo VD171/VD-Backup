@@ -147,6 +147,8 @@ Die WebUI ist in einige wenige Tabs gegliedert:
   Version veröffentlicht wurde (mit ihren Release-Notes). Jedes Update installierst du über deinen
   Root-Manager, genauso wie du das Modul geflasht hast.
 
+Die App sucht außerdem bei jedem Öffnen von selbst nach einer neueren Version (höchstens einmal pro Stunde) und zeigt das Update-Banner nur, wenn es eine gibt; sie bleibt still, wenn aktuell oder offline.
+
 Bestätigungen und Meldungen nutzen App-interne Dialoge (nicht die alten System-Pop-ups), und
 eine Wiederherstellung oder ein Import bittet dich zu bestätigen, dass die aktuellen App-Daten
 überschrieben werden, bevor er fortfährt.
@@ -166,6 +168,8 @@ die App-interne Fortschrittskarte der verlässliche Indikator.
 Der grundlegende Ablauf: öffne **Apps**, wähle eine App, wähle aus, was einbezogen werden soll,
 wähle einen Modus, stelle Komprimierung und (optional) Verschlüsselung ein, dann führe aus. Der
 Fortschritt erscheint live, und eine Benachrichtigung sagt dir, wann er fertig ist.
+
+Im Backup-Dialog kannst du auch das **Ziel** dieses Backups wählen - lokaler Speicher oder ein von dir hinzugefügtes Cloud-/Remote-Ziel - ohne vorher das Standardziel in den Einstellungen zu ändern.
 
 ### 5.1 Auswählen, was gesichert werden soll
 

@@ -159,6 +159,8 @@ WebUI jest zorganizowane w kilka zakładek:
   szyfrowania oraz planowanie. Ustawienia wł/wył używają przełączników w stylu Androida.
 - **About** - wersja, linki, projekty siostrzane (See also), manifest audytu dołączonych plików binarnych oraz akcja **Check for updates**, która zgłasza, czy opublikowano nowszą wersję (wraz z jej informacjami o wydaniu). Każdą aktualizację instalujesz przez swojego menedżera roota, tak samo jak flashowałeś moduł.
 
+Aplikacja sama też sprawdza nowszą wersję przy każdym otwarciu (najwyżej raz na godzinę) i pokazuje baner aktualizacji tylko, gdy jest dostępna; milczy, gdy jest aktualna lub offline.
+
 Potwierdzenia i komunikaty używają dialogów w aplikacji (nie starych systemowych wyskakujących okien), a
 przywracanie lub import prosi cię o potwierdzenie, że nadpisuje bieżące dane aplikacji, zanim
 kontynuuje.
@@ -176,6 +178,8 @@ się rozpocznie i zakończy; tak czy inaczej karta postępu w aplikacji jest nie
 Podstawowy przepływ: otwórz **Apps**, wybierz aplikację, zaznacz, co dołączyć, wybierz tryb,
 ustaw kompresję i (opcjonalnie) szyfrowanie, a następnie uruchom. Postęp pojawia się na żywo, a
 powiadomienie mówi ci, kiedy jest gotowe.
+
+W oknie kopii zapasowej możesz też wybrać **miejsce docelowe** tej kopii - pamięć lokalną lub dowolne dodane miejsce w chmurze/zdalne - bez wcześniejszej zmiany domyślnego miejsca w Ustawieniach.
 
 ### 5.1 Wybór tego, co kopiować
 

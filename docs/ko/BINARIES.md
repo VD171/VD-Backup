@@ -29,7 +29,7 @@ VDBackup에서 프라이버시와 보안은 선택 사항이 아닙니다. 백�
 | `bin/<abi>/` 네이티브 도구 (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) 및 그 `lib/` 의존 클로저 | 공식 **Termux** apt 저장소 (`packages.termux.dev/apt`), 공식 `.deb` 패키지 | `.github/scripts/build_bin.sh`가 `.deb` 파일과 그 전이적 의존성을 다운로드하여 추출하고, 바이너리와 각각이 필요로 하는 공유 라이브러리만 복사합니다 |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX 변환기 폴백) | **rhythmcache/android-xml-converter** GitHub 릴리스 (`ABX_RELEASE`, 정적 ELF) | `build_bin.sh`가 고정된 릴리스에서 다운로드합니다 |
 | `companion.apk` (선택적 Google Drive 컴패니언) | **이 저장소**, `companion/` (Gradle/Kotlin) | CI가 소스에서 빌드하고 프로젝트 키 (`VD_Key`)로 서명합니다. 사전 빌드된 블롭이 아닙니다 |
-| `vdbhelper.dex` (프레임워크 헬퍼) | **이 저장소**, `dex/src/` (Java) | CI가 `javac` + `d8`로 소스에서 컴파일합니다 |
+| `vdbackup_helper.dex` (프레임워크 헬퍼) | **이 저장소**, `dex/src/` (Java) | CI가 `javac` + `d8`로 소스에서 컴파일합니다 |
 
 사전 빌드된 서드파티 바이너리는 처음 두 행뿐입니다. 나머지 둘은 이 저장소에 있는 소스에서
 빌드되며, 읽고 다시 빌드할 수 있습니다.

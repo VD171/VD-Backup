@@ -31,7 +31,7 @@ buram yang diselipkan.
 | `bin/<abi>/` alat native (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + penutupan `lib/` miliknya | Repo apt **Termux** resmi (`packages.termux.dev/apt`), paket `.deb` resmi | `.github/scripts/build_bin.sh` mengunduh berkas `.deb` + dependensi transitifnya, mengekstraknya, dan menyalin biner beserta hanya pustaka bersama yang dibutuhkan masing-masing |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (fallback konverter ABX) | Rilis GitHub **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF statis) | diunduh dari rilis yang disematkan oleh `build_bin.sh` |
 | `companion.apk` (pendamping Google Drive opsional) | **Repositori ini**, `companion/` (Gradle/Kotlin) | dibangun dari sumber oleh CI dan ditandatangani dengan kunci proyek (`VD_Key`); bukan blob prabangun |
-| `vdbhelper.dex` (helper framework) | **Repositori ini**, `dex/src/` (Java) | dikompilasi dari sumber oleh CI dengan `javac` + `d8` |
+| `vdbackup_helper.dex` (helper framework) | **Repositori ini**, `dex/src/` (Java) | dikompilasi dari sumber oleh CI dengan `javac` + `d8` |
 
 Hanya dua baris pertama yang merupakan biner pihak ketiga prabangun; dua terakhir dibangun
 dari sumber yang berada di repositori ini dan dapat dibaca serta dibangun ulang.

@@ -16,6 +16,7 @@
   "settings_language": "언어",
   "settings_mode": "기본 백업 모드",
   "settings_dest": "기본 대상",
+  "ui_backup_dest": "대상",
   "settings_network": "클라우드 전송 연결",
   "opt_net_any": "Wi-Fi 및 모바일 데이터",
   "opt_net_wifi": "Wi-Fi만",

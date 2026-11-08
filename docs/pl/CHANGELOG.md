@@ -6,6 +6,29 @@
 
 Wszystkie istotne zmiany w VDBackup są udokumentowane tutaj. Tylko po angielsku.
 
+## v1.03.2
+
+Poprawki:
+
+- Strona logowania do chmury na urządzeniu zawsze pokazywała "Sign-in failed", nawet gdy logowanie
+  się powiodło. Teraz pokazuje prawdziwy wynik.
+- Zapisane kopie można teraz otworzyć menedżerem plików: foldery kopii na aplikację były
+  dostępne tylko dla właściciela, więc nawet menedżer z rootem nie wchodził; teraz są
+  dostępne jak reszta /sdcard/VDBackup.
+
+Cele w chmurze:
+
+- Opcjonalna aplikacja towarzysząca Google Drive jest teraz budowana i dołączana, więc
+  Google Drive działa przez towarzysza na urządzeniu (konto urządzenia, bez ręcznego
+  wklejania tokenu) oprócz rclone.
+
+Interfejs:
+
+- Okno kopii zapasowej ma wybór miejsca docelowego, więc kopia może trafić do wybranego miejsca
+  w chmurze lub zdalnego bez wcześniejszej zmiany domyślnego miejsca w Ustawieniach.
+- Aplikacja sprawdza nowszą wersję przy otwarciu (najwyżej raz na godzinę) i pokazuje baner
+  aktualizacji tylko, gdy jest dostępna; milczy, gdy jest aktualna lub offline.
+
 ## v1.03.1
 
 Nowy zakres kopii:

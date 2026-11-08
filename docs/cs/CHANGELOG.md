@@ -6,6 +6,29 @@
 
 Všechny podstatné změny ve VDBackup jsou zdokumentovány zde. Pouze anglicky.
 
+## v1.03.2
+
+Opravy:
+
+- Stránka přihlášení ke cloudu v zařízení vždy zobrazovala "Sign-in failed", i když přihlášení
+  uspělo. Nyní zobrazuje skutečný výsledek.
+- Uložené zálohy lze nyní otevřít správcem souborů: složky záloh podle aplikace byly jen pro
+  vlastníka, takže ani root správce do nich nevešel; nyní jsou přístupné jako zbytek
+  /sdcard/VDBackup.
+
+Cloudové cíle:
+
+- Volitelná companion aplikace Google Drive se nyní sestavuje a přibaluje, takže Google
+  Drive funguje přes companion v zařízení (účet zařízení, bez ručního vkládání tokenu) vedle
+  rclone.
+
+Rozhraní:
+
+- Dialog zálohy má výběr cíle, takže záloha může jít do zvoleného cloudového nebo vzdáleného cíle
+  bez předchozí změny výchozího cíle v Nastavení.
+- Aplikace při otevření zkontroluje novější verzi (nejvýše jednou za hodinu) a banner aktualizace
+  zobrazí jen když nějaká je; mlčí, když je aktuální nebo offline.
+
 ## v1.03.1
 
 Nový rozsah zálohování:

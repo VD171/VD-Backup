@@ -22,7 +22,7 @@
  * ======================================================================
  *
  *  Framework helper run as root via app_process (no installed app):
- *     app_process -Djava.class.path=vdbhelper.dex /system/bin \
+ *     app_process -Djava.class.path=vdbackup_helper.dex /system/bin \
  *         ru.vd171.vdbackup.Helper <verb> [args...]
  *  Verbs: list-apps | label <pkg> | icon <pkg> <out.png> | notify <title> <text>
  *  Gives the engine real app labels/icons and reliable notifications. It is the

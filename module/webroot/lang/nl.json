@@ -16,6 +16,7 @@
   "settings_language": "Taal",
   "settings_mode": "Standaard back-upmodus",
   "settings_dest": "Standaardbestemming",
+  "ui_backup_dest": "Bestemming",
   "settings_network": "Cloudoverdrachten via",
   "opt_net_any": "Wi-Fi en mobiele data",
   "opt_net_wifi": "Alleen Wi-Fi",

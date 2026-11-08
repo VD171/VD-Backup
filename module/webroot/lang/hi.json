@@ -16,6 +16,7 @@
   "settings_language": "भाषा",
   "settings_mode": "डिफ़ॉल्ट बैकअप मोड",
   "settings_dest": "डिफ़ॉल्ट गंतव्य",
+  "ui_backup_dest": "गंतव्य",
   "settings_network": "क्लाउड स्थानांतरण इसके द्वारा",
   "opt_net_any": "Wi-Fi और मोबाइल डेटा",
   "opt_net_wifi": "केवल Wi-Fi",

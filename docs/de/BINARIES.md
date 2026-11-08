@@ -31,7 +31,7 @@ eingeschleust wurde.
 | `bin/<abi>/` native Werkzeuge (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + ihre `lib/`-Closure | Offizielles **Termux**-apt-Repo (`packages.termux.dev/apt`), offizielle `.deb`-Pakete | `.github/scripts/build_bin.sh` lädt die `.deb`-Dateien + ihre transitiven Abhängigkeiten herunter, extrahiert sie und kopiert die Binärdateien sowie nur die gemeinsam genutzten Bibliotheken, die jede benötigt |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX-Konverter-Fallback) | **rhythmcache/android-xml-converter** GitHub-Release (`ABX_RELEASE`, statisches ELF) | von `build_bin.sh` aus dem fixierten Release heruntergeladen |
 | `companion.apk` (optionaler Google-Drive-Begleiter) | **Dieses Repository**, `companion/` (Gradle/Kotlin) | von der CI aus dem Quellcode gebaut und mit dem Projektschlüssel (`VD_Key`) signiert; kein vorgebauter Blob |
-| `vdbhelper.dex` (Framework-Helfer) | **Dieses Repository**, `dex/src/` (Java) | von der CI aus dem Quellcode mit `javac` + `d8` kompiliert |
+| `vdbackup_helper.dex` (Framework-Helfer) | **Dieses Repository**, `dex/src/` (Java) | von der CI aus dem Quellcode mit `javac` + `d8` kompiliert |
 
 Nur die ersten beiden Zeilen sind vorgebaute Drittanbieter-Binärdateien; die letzten beiden
 werden aus Quellcode gebaut, der in diesem Repository liegt und gelesen und neu gebaut werden

@@ -6,6 +6,29 @@
 
 Mọi thay đổi đáng chú ý của VDBackup được ghi lại ở đây. Chỉ bằng tiếng Anh.
 
+## v1.03.2
+
+Sửa lỗi:
+
+- Trang đăng nhập đám mây trên thiết bị luôn hiển thị "Sign-in failed", ngay cả khi đăng nhập đã
+  thành công. Giờ nó hiển thị kết quả thật.
+- Bản sao lưu đã lưu giờ có thể mở bằng trình quản lý tệp: các thư mục sao lưu theo ứng dụng
+  chỉ dành cho chủ sở hữu, nên ngay cả trình quản lý tệp root cũng không vào được; giờ chúng
+  truy cập được như phần còn lại của /sdcard/VDBackup.
+
+Đích đám mây:
+
+- Ứng dụng companion Google Drive tùy chọn giờ đã được build và đóng gói, nên Google Drive
+  hoạt động qua companion trên thiết bị (tài khoản thiết bị của bạn, không cần dán token thủ
+  công) bên cạnh rclone.
+
+Giao diện:
+
+- Hộp thoại sao lưu có bộ chọn đích, nên một bản sao lưu có thể đến một đích đám mây hoặc từ xa
+  đã chọn mà không cần đổi đích mặc định trong Cài đặt trước.
+- Ứng dụng kiểm tra phiên bản mới hơn khi mở (nhiều nhất một lần mỗi giờ) và chỉ hiển thị biểu ngữ
+  cập nhật khi có; im lặng khi đã mới nhất hoặc ngoại tuyến.
+
 ## v1.03.1
 
 Phạm vi sao lưu mới:

@@ -155,6 +155,8 @@ WebUI được tổ chức thành một vài tab:
   và danh sách ứng dụng loại trừ, tùy chọn nguồn cài đặt, khóa mã hóa, và lập lịch. Các thiết lập bật/tắt dùng công tắc gạt kiểu Android.
 - **About** - phiên bản, liên kết, các dự án anh em (See also), tệp kê khai kiểm toán nhị phân đi kèm, và một hành động **Check for updates** báo cáo liệu một phiên bản mới hơn đã được phát hành hay chưa (cùng với ghi chú phát hành của nó). Bạn cài đặt mọi bản cập nhật thông qua trình quản lý root của mình, giống như cách bạn đã flash mô-đun.
 
+Ứng dụng cũng tự kiểm tra phiên bản mới hơn mỗi khi bạn mở (nhiều nhất một lần mỗi giờ) và chỉ hiển thị biểu ngữ cập nhật khi có; im lặng khi đã mới nhất hoặc ngoại tuyến.
+
 Các xác nhận và thông báo dùng hộp thoại trong ứng dụng (không phải các cửa sổ bật lên của
 hệ thống kiểu cũ), và một lần khôi phục hoặc nhập sẽ yêu cầu bạn thừa nhận rằng nó ghi đè
 dữ liệu ứng dụng hiện tại trước khi tiến hành.
@@ -172,6 +174,8 @@ hiển thị thông báo shell, bạn cũng nhận được một thông báo An
 Luồng cơ bản: mở **Apps**, chọn một ứng dụng, chọn những gì để bao gồm, chọn một chế độ,
 đặt nén và (tùy chọn) mã hóa, rồi chạy. Tiến trình xuất hiện trực tiếp và một thông báo cho
 bạn biết khi nó xong.
+
+Trong hộp thoại sao lưu, bạn cũng có thể chọn **đích** cho bản sao lưu này - bộ nhớ cục bộ hoặc bất kỳ đích đám mây/từ xa nào bạn đã thêm - mà không cần đổi đích mặc định trong Cài đặt trước.
 
 ### 5.1 Chọn những gì để sao lưu
 

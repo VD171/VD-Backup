@@ -30,7 +30,7 @@ from, and how to verify that nothing opaque was slipped in.
 | `bin/<abi>/` native tools (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + their `lib/` closure | Official **Termux** apt repo (`packages.termux.dev/apt`), official `.deb` packages | `.github/scripts/build_bin.sh` downloads the `.deb` files + their transitive dependencies, extracts them, and copies the binaries plus only the shared libraries each one needs |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX converter fallback) | **rhythmcache/android-xml-converter** GitHub release (`ABX_RELEASE`, static ELF) | downloaded from the pinned release by `build_bin.sh` |
 | `companion.apk` (optional Google Drive companion) | **This repository**, `companion/` (Gradle/Kotlin) | built from source by CI and signed with the project key (`VD_Key`); not a prebuilt blob |
-| `vdbhelper.dex` (framework helper) | **This repository**, `dex/src/` (Java) | compiled from source by CI with `javac` + `d8` |
+| `vdbackup_helper.dex` (framework helper) | **This repository**, `dex/src/` (Java) | compiled from source by CI with `javac` + `d8` |
 
 Only the first two rows are prebuilt third-party binaries; the last two are built from
 source that lives in this repository and can be read and rebuilt.

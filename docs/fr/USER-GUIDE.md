@@ -141,6 +141,8 @@ La WebUI est organisée en quelques onglets :
   et la planification. Les réglages activé/désactivé utilisent des interrupteurs à bascule de style Android.
 - **About** - version, liens, les projets frères (Voir aussi), le manifeste d'audit des binaires empaquetés, et une action **Check for updates** qui indique si une version plus récente a été publiée (avec ses notes de version). Vous installez toute mise à jour via votre gestionnaire root, de la même façon que vous avez flashé le module.
 
+L'app vérifie aussi d'elle-même s'il existe une version plus récente à chaque ouverture (au plus une fois par heure) et n'affiche la bannière de mise à jour que s'il y en a une ; elle reste silencieuse si à jour ou hors ligne.
+
 Les confirmations et messages utilisent des boîtes de dialogue intégrées à l'app (pas les anciens pop-ups système), et une
 restauration ou un import vous demande de reconnaître qu'il écrase les données actuelles de l'app avant
 de continuer.
@@ -159,6 +161,8 @@ démarre et se termine ; dans tous les cas, la carte de progression intégrée �
 Le flux de base : ouvrez **Apps**, choisissez une app, sélectionnez ce qu'il faut inclure, choisissez un mode,
 réglez la compression et (optionnellement) le chiffrement, puis lancez. La progression apparaît en direct et une
 notification vous indique quand c'est terminé.
+
+Dans la boîte de dialogue de sauvegarde, tu peux aussi choisir la **destination** de cette sauvegarde - stockage local ou toute destination cloud/distante ajoutée - sans d'abord changer la destination par défaut dans les Paramètres.
 
 ### 5.1 Choisir ce qu'il faut sauvegarder
 

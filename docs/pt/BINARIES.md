@@ -30,7 +30,7 @@ e como verificar que nada opaco foi inserido às escondidas.
 | ferramentas nativas em `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + a closure de `lib/` delas | Repositório apt oficial do **Termux** (`packages.termux.dev/apt`), pacotes `.deb` oficiais | `.github/scripts/build_bin.sh` baixa os arquivos `.deb` + suas dependências transitivas, extrai-os, e copia os binários mais apenas as bibliotecas compartilhadas de que cada um precisa |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (fallback do conversor ABX) | Release do GitHub **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF estático) | baixado da release fixada pelo `build_bin.sh` |
 | `companion.apk` (companion opcional do Google Drive) | **Este repositório**, `companion/` (Gradle/Kotlin) | construído a partir do código pela CI e assinado com a chave do projeto (`VD_Key`); não é um blob pré-compilado |
-| `vdbhelper.dex` (helper de framework) | **Este repositório**, `dex/src/` (Java) | compilado a partir do código pela CI com `javac` + `d8` |
+| `vdbackup_helper.dex` (helper de framework) | **Este repositório**, `dex/src/` (Java) | compilado a partir do código pela CI com `javac` + `d8` |
 
 Apenas as duas primeiras linhas são binários de terceiros pré-compilados; as duas últimas são
 construídas a partir do código que vive neste repositório e pode ser lido e reconstruído.

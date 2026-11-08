@@ -141,6 +141,8 @@ WebUI je uspořádáno do několika záložek:
   klíč, a plánování. Nastavení zapnuto/vypnuto používají přepínače ve stylu Androidu.
 - **About** - verze, odkazy, příbuzné projekty (See also), auditní manifest přibalených binárních souborů a akce **Check for updates**, která hlásí, zda byla zveřejněna novější verze (s jejími poznámkami k vydání). Jakoukoli aktualizaci nainstalujete přes svého root manažera, stejně jako jste flashovali modul.
 
+Aplikace také sama při každém otevření zkontroluje novější verzi (nejvýše jednou za hodinu) a banner aktualizace zobrazí jen když nějaká je; mlčí, když je aktuální nebo offline.
+
 Potvrzení a zprávy používají dialogy v aplikaci (ne stará systémová vyskakovací okna), a
 obnova nebo import vás požádá o potvrzení, že přepíše aktuální data aplikace, než
 pokračuje.
@@ -158,6 +160,8 @@ začne a skončí; tak či tak je karta průběhu v aplikaci spolehlivým ukazat
 Základní tok: otevřete **Apps**, vyberte aplikaci, zvolte, co zahrnout, vyberte režim,
 nastavte kompresi a (volitelně) šifrování, poté spusťte. Průběh se objevuje živě a
 notifikace vám řekne, až je hotovo.
+
+V dialogu zálohy můžeš také zvolit **cíl** této zálohy - místní úložiště nebo libovolný přidaný cloudový/vzdálený cíl - bez předchozí změny výchozího cíle v Nastavení.
 
 ### 5.1 Výběr toho, co zálohovat
 
