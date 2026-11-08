@@ -209,6 +209,19 @@ async def cmd_sign_in(phone, code, password=None):
     finally:
         await client.disconnect()
 
+async def find_existing_storage_channel(client):
+    """Scan user's dialogs for an existing VD-Backup storage channel."""
+    try:
+        async for dialog in client.iter_dialogs():
+            if dialog.is_channel:
+                title = dialog.title or ""
+                if (title.startswith("VD_Backup") or title.startswith("VD_") or
+                        "VD-Backup" in title or "VDBackup" in title):
+                    return dialog
+    except Exception:
+        pass
+    return None
+
 # --- Step 3: Create private storage channel starting with VD ----------
 async def cmd_init_storage(title=None):
     if not has_saved_session():
@@ -224,40 +237,77 @@ async def cmd_init_storage(title=None):
         return
 
     try:
-        # Channel name strictly starts with VD_ as specified
+        me = await client.get_me()
+
+        # 1. First check if an existing storage channel is already present in dialogs
+        existing = await find_existing_storage_channel(client)
+        if existing:
+            cid = str(existing.id)
+            title = existing.title
+            dest_data = {
+                "id": "telegram",
+                "type": "telegram",
+                "title": "Telegram Storage",
+                "channel_id": cid,
+                "channel_title": title,
+                "user_id": me.id,
+                "user_name": me.first_name or "",
+                "user_phone": getattr(me, "phone", ""),
+                "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            }
+            ensure_dirs()
+            with open(DEST_FILE, "w") as f:
+                json.dump(dest_data, f, indent=2)
+            os.chmod(DEST_FILE, 0o600)
+
+            print(json.dumps({
+                "ok": True,
+                "reused": True,
+                "channel_id": cid,
+                "channel_title": title,
+                "user": {
+                    "id": me.id,
+                    "first_name": me.first_name or "",
+                    "username": me.username or ""
+                }
+            }))
+            return
+
+        # 2. Only if no existing channel exists, attempt to create one
         if not title:
             random_tag = secrets.token_hex(2).upper()
             title = f"VD_Backup_{random_tag}"
         elif not title.startswith("VD_"):
             title = f"VD_{title}"
 
-        # Create private channel (megagroup=False creates a channel, not a supergroup)
-        created = await client(CreateChannelRequest(
-            title=title,
-            about="VD-Backup Private Cloud Storage. Do not delete this channel!",
-            megagroup=False
-        ))
-
-        channel = created.chats[0]
-        # In Telegram MTProto, channel IDs are prefixed with -100 for standard format
-        channel_id = f"-100{channel.id}"
-
-        # Send introductory pinned message in channel
-        welcome_text = (
-            "🛡️ **VD-Backup Cloud Storage**\n\n"
-            "This private channel is your dedicated cloud storage for Android backups created with VD-Backup.\n\n"
-            "⚠️ **IMPORTANT NOTICE:**\n"
-            "Do **NOT** delete this channel! All your uploaded backups are stored here. "
-            "Deleting this channel will result in the loss of your cloud backups."
-        )
-        msg = await client.send_message(channel, welcome_text)
         try:
-            await client.pin_message(channel, msg, notify=False)
-        except Exception:
-            pass
+            created = await client(CreateChannelRequest(
+                title=title,
+                about="VD-Backup Private Cloud Storage. Do not delete this channel!",
+                megagroup=False
+            ))
+            channel = created.chats[0]
+            channel_id = f"-100{channel.id}"
+            welcome_text = (
+                "🛡️ **VD-Backup Cloud Storage**\n\n"
+                "This private channel is your dedicated cloud storage for Android backups created with VD-Backup.\n\n"
+                "⚠️ **IMPORTANT NOTICE:**\n"
+                "Do **NOT** delete this channel! All your uploaded backups are stored here. "
+                "Deleting this channel will result in the loss of your cloud backups."
+            )
+            msg = await client.send_message(channel, welcome_text)
+            try:
+                await client.pin_message(channel, msg, notify=False)
+            except Exception:
+                pass
+        except Exception as ce:
+            err_str = str(ce)
+            if "spamreport" in err_str.lower() or "can't create" in err_str.lower():
+                channel_id = "me"
+                title = "Saved Messages (Cloud Storage)"
+            else:
+                raise ce
 
-        # Save destination configuration
-        me = await client.get_me()
         dest_data = {
             "id": "telegram",
             "type": "telegram",
@@ -274,7 +324,6 @@ async def cmd_init_storage(title=None):
             json.dump(dest_data, f, indent=2)
         os.chmod(DEST_FILE, 0o600)
 
-        # Initialize empty index
         init_index = {
             "version": 1,
             "channel_id": channel_id,
@@ -322,6 +371,27 @@ async def cmd_check_auth():
                     dest_info = json.load(f)
             except Exception:
                 pass
+
+        # If dest file doesn't exist yet, auto-detect existing VD storage channel in user's dialogs
+        if not dest_info:
+            existing = await find_existing_storage_channel(client)
+            if existing:
+                cid = str(existing.id)
+                dest_info = {
+                    "id": "telegram",
+                    "type": "telegram",
+                    "title": "Telegram Storage",
+                    "channel_id": cid,
+                    "channel_title": existing.title,
+                    "user_id": me.id,
+                    "user_name": me.first_name or "",
+                    "user_phone": getattr(me, "phone", ""),
+                    "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+                }
+                ensure_dirs()
+                with open(DEST_FILE, "w") as f:
+                    json.dump(dest_info, f, indent=2)
+                os.chmod(DEST_FILE, 0o600)
 
         print(json.dumps({
             "ok": True,

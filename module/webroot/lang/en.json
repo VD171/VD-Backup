@@ -253,6 +253,7 @@
   "opt_sort_pkg": "Package",
   "ui_select": "Select",
   "ui_cancel": "Cancel",
+  "ui_back": "Back",
   "ui_select_all": "All",
   "ui_select_none": "None",
   "ui_backup_selected": "Back up",

@@ -1330,7 +1330,14 @@ function submitTelegramCode() {
     }
 
     if (r && r.ok) {
-      showTgStep("notice");
+      checkTelegramStatus().then(function (st) {
+        if (st && st.dest && st.dest.channel_id) {
+          showTgStep("active");
+          loadDests();
+        } else {
+          showTgStep("notice");
+        }
+      });
     } else {
       errEl.textContent = errMsg(r);
       errEl.hidden = false;
