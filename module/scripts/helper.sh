@@ -45,6 +45,11 @@ BIN="$MODDIR/bin/$BINABI"
 export PATH="$BIN:$PATH"
 export LD_LIBRARY_PATH="$BIN/lib:${LD_LIBRARY_PATH:-}"
 
+HELPER_DEX="$MODDIR/etc/vdbackup_helper.dex"
+[ -f "$HELPER_DEX" ] || HELPER_DEX="$MODDIR/vdbhelper.dex"
+COMPANION_APK="$MODDIR/etc/companion.apk"
+[ -f "$COMPANION_APK" ] || COMPANION_APK="$MODDIR/companion.apk"
+
 mkdir -p "$LOGS"
 
 # --- tiny JSON helpers (no jq dependency) -------------------------------
@@ -133,8 +138,8 @@ auto_backup_scan() {                              # <jq> <now>; echoes detached 
   _seen="$STATE/autobackup_seen.json"
   _cur="$STATE/staging/autobackup_cur.$$.json"; mkdir -p "$STATE/staging"
   # current user apps as {pkg:vc}; dex gives versionCode, pm fallback gives vc=0
-  if [ -f "$MODDIR/etc/vdbackup_helper.dex" ]; then
-    LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" /system/bin \
+  if [ -f "$HELPER_DEX" ]; then
+    LD_LIBRARY_PATH= app_process -Djava.class.path="$HELPER_DEX" /system/bin \
       ru.vd171.vdbackup.Helper list-apps "$_u" 2>/dev/null \
       | "$_jq" -c '[.apps[]? | select(.system|not) | {(.package): (.versionCode // 0)}] | add // {}' > "$_cur" 2>/dev/null
   else
@@ -313,8 +318,8 @@ case "$verb" in
          "$(command -v "$BIN/jq" 2>/dev/null || echo jq)" -r '.user // 0' 2>/dev/null)"
     case "$u" in ''|*[!0-9]*) u=0 ;; esac
     # delegates to the dex framework helper when available, else pm fallback
-    if [ -f "$MODDIR/etc/vdbackup_helper.dex" ]; then
-      LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" /system/bin \
+    if [ -f "$HELPER_DEX" ]; then
+      LD_LIBRARY_PATH= app_process -Djava.class.path="$HELPER_DEX" /system/bin \
         ru.vd171.vdbackup.Helper list-apps "$u" 2>/dev/null && exit 0
     fi
     # shell fallback: package name + apk path
@@ -343,8 +348,8 @@ case "$verb" in
         [ -e "$old" ] && [ "$old" != "$png" ] && rm -f "$old"
       done
     fi
-    if [ ! -s "$png" ] && [ -f "$MODDIR/etc/vdbackup_helper.dex" ]; then
-      LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" /system/bin \
+    if [ ! -s "$png" ] && [ -f "$HELPER_DEX" ]; then
+      LD_LIBRARY_PATH= app_process -Djava.class.path="$HELPER_DEX" /system/bin \
         ru.vd171.vdbackup.Helper icon "$pkg" "$png" "$u" >/dev/null 2>&1
     fi
     if [ -s "$png" ]; then ok "\"package\":\"$(jstr "$pkg")\",\"icon\":\"$(base64 -w0 < "$png")\""
@@ -368,8 +373,8 @@ case "$verb" in
         printf '%s\t%s\n' "$pkg" "$png" >> "$lst"
       fi
     done
-    if [ -s "$lst" ] && [ -f "$MODDIR/etc/vdbackup_helper.dex" ]; then
-      LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" /system/bin \
+    if [ -s "$lst" ] && [ -f "$HELPER_DEX" ]; then
+      LD_LIBRARY_PATH= app_process -Djava.class.path="$HELPER_DEX" /system/bin \
         ru.vd171.vdbackup.Helper icons "$u" "$lst" >/dev/null 2>&1
     fi
     rm -f "$lst"
@@ -901,16 +906,16 @@ case "$verb" in
   companion-status)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
     inst=false; pm path ru.vd171.vdbackup >/dev/null 2>&1 && inst=true
-    bundled=false; [ -f "$MODDIR/etc/companion.apk" ] && bundled=true
+    bundled=false; [ -f "$COMPANION_APK" ] && bundled=true
     vc="$(dumpsys package ru.vd171.vdbackup 2>/dev/null | sed -n 's/.*versionCode=\([0-9]*\).*/\1/p' | head -1)"
     "$JQ" -nc --argjson installed "$inst" --argjson bundled "$bundled" --arg vc "${vc:-}" \
       '{ok:true,installed:$installed,bundled:$bundled,versionCode:$vc}' ;;
 
   companion-install)
     # optional + on-demand: only ever called when the user picks Google Drive.
-    [ -f "$MODDIR/etc/companion.apk" ] || { err ERR_COMPANION "companion APK not bundled in this build"; exit 0; }
+    [ -f "$COMPANION_APK" ] || { err ERR_COMPANION "companion APK not bundled in this build"; exit 0; }
     # system_server cannot read /data/adb (adb_data_file); stage under /data/local/tmp
-    capk=/data/local/tmp/vdbackup-companion.apk; cp "$MODDIR/etc/companion.apk" "$capk"; chmod 644 "$capk"
+    capk=/data/local/tmp/vdbackup-companion.apk; cp "$COMPANION_APK" "$capk"; chmod 644 "$capk"
     if pm install -r "$capk" >/dev/null 2>&1; then rm -f "$capk"; ok '"installed":true,"hma":true'
     else rm -f "$capk"; err ERR_COMPANION_INSTALL "could not install companion"; fi ;;
 

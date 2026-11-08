@@ -55,6 +55,11 @@ export PATH="$BIN:$CLOUD:$PATH"
 # $CLOUD/lib holds the libs of any on-demand-fetched binaries (the lite edition).
 export LD_LIBRARY_PATH="$BIN/lib:$CLOUD/lib:${LD_LIBRARY_PATH:-}"
 
+HELPER_DEX="$MODDIR/etc/vdbackup_helper.dex"
+[ -f "$HELPER_DEX" ] || HELPER_DEX="$MODDIR/vdbhelper.dex"
+COMPANION_APK="$MODDIR/etc/companion.apk"
+[ -f "$COMPANION_APK" ] || COMPANION_APK="$MODDIR/companion.apk"
+
 # the state dirs must exist for every op: a missing staging dir would make the
 # dumpsys redirect (and metadata: versionName/Code, perms) silently fail.
 mkdir -p "$STATE/staging" "$STATE/logs" 2>/dev/null
@@ -173,7 +178,7 @@ notify() {
   _nl="$(cfg .language)"; case "$_nl" in ""|null|auto) _nl=en ;; esac
   if command -v vdb_notify_msg >/dev/null 2>&1; then _nm="$(vdb_notify_msg "$_nl" "$1" "$2")"; else _nm="$2"; fi
   cmd notification post -t "VDBackup" "vdbackup_$OPID" "$_nm" >/dev/null 2>&1 && return 0
-  [ -f "$MODDIR/etc/vdbackup_helper.dex" ] && LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" \
+  [ -f "$HELPER_DEX" ] && LD_LIBRARY_PATH= app_process -Djava.class.path="$HELPER_DEX" \
       /system/bin ru.vd171.vdbackup.Helper notify "VDBackup" "$_nm" >/dev/null 2>&1; }
 
 jget() { printf '%s' "$1" | "$JQ" -r "$2" 2>/dev/null; }
@@ -382,10 +387,10 @@ COMPANION_PKG=ru.vd171.vdbackup
 companion_installed() { exec_ns pm path "$COMPANION_PKG" >/dev/null 2>&1; }
 companion_ensure() {
   companion_installed && return 0
-  [ -f "$MODDIR/etc/companion.apk" ] || return 1
+  [ -f "$COMPANION_APK" ] || return 1
   # system_server cannot read /data/adb (adb_data_file); stage the APK in a
   # location the installer can read, then install from there.
-  _capk=/data/local/tmp/vdbackup-companion.apk; cp "$MODDIR/etc/companion.apk" "$_capk"; chmod 644 "$_capk"
+  _capk=/data/local/tmp/vdbackup-companion.apk; cp "$COMPANION_APK" "$_capk"; chmod 644 "$_capk"
   exec_ns pm install -r "$_capk" >/dev/null 2>&1
   rm -f "$_capk"
   companion_installed
@@ -684,15 +689,15 @@ backup() {
   # app label (localized), stored in the manifest so the UI can show the real name
   # even after the app is uninstalled; falls back to the package name.
   LABEL=""
-  [ -f "$MODDIR/etc/vdbackup_helper.dex" ] && LABEL="$(LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" \
+  [ -f "$HELPER_DEX" ] && LABEL="$(LD_LIBRARY_PATH= app_process -Djava.class.path="$HELPER_DEX" \
       /system/bin ru.vd171.vdbackup.Helper label "$PKG" "$U" 2>/dev/null | "$JQ" -r '.label // empty' 2>/dev/null)"
   [ -n "$LABEL" ] || LABEL="$PKG"
   # app icon (base64 PNG) stored in the manifest too, so the Backups list shows the
   # icon even when the app is no longer installed.
   ICON_B64=""
-  if [ -f "$MODDIR/etc/vdbackup_helper.dex" ]; then
+  if [ -f "$HELPER_DEX" ]; then
     _ic="$STATE/staging/ic.$OPID.png"
-    LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" /system/bin \
+    LD_LIBRARY_PATH= app_process -Djava.class.path="$HELPER_DEX" /system/bin \
       ru.vd171.vdbackup.Helper icon "$PKG" "$_ic" "$U" >/dev/null 2>&1
     [ -s "$_ic" ] && ICON_B64="$(base64 -w0 < "$_ic")"
     rm -f "$_ic"
@@ -1225,12 +1230,12 @@ do_import_neo() {
     PASS="$(jget "$ARGS" '.password')"; [ "$PASS" = null ] && PASS=""
     SALT="$(jget "$ARGS" '.salt')"; { [ -z "$SALT" ] || [ "$SALT" = null ]; } && SALT="oandbackupx"
     IV="$("$JQ" -c '.iv' "$PROP" 2>/dev/null)"
-    { [ -n "$PASS" ] && [ -f "$MODDIR/etc/vdbackup_helper.dex" ] && [ -n "$IV" ]; } \
+    { [ -n "$PASS" ] && [ -f "$HELPER_DEX" ] && [ -n "$IV" ]; } \
       || { finish false ERR_IMPORT_ENCRYPTED; return; }
   fi
   # decrypt a Neo .enc archive to stdout-equivalent temp (plaintext = compressed tar)
   neo_decrypt_to() { # <enc-file> <out-file>  -> 0 on success
-    VDB_NEO_PASS="$PASS" LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" \
+    VDB_NEO_PASS="$PASS" LD_LIBRARY_PATH= app_process -Djava.class.path="$HELPER_DEX" \
       /system/bin ru.vd171.vdbackup.Helper neo-decrypt "$1" "$2" - "$SALT" "$IV" 2>/dev/null \
       | grep -q '"ok":true'
   }

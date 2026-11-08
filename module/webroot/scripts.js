@@ -269,6 +269,7 @@ function renderApps(filter) {
   var ul = $("#applist"); ul.innerHTML = "";
   _iconQ = [];   // drop icon requests for the previous (now-removed) rows
   if (iconObserver) iconObserver.disconnect();   // drop the now-detached rows before re-observing
+  var frag = document.createDocumentFragment();
   visibleApps(filter).forEach(function (a) {
     var li = el("li", "row");
     var ic = el("div", "app-ic", (a.label || a.package).charAt(0).toUpperCase());
@@ -290,9 +291,10 @@ function renderApps(filter) {
       li.classList.add("tappable");
       li.onclick = function () { openAppBackups(a.package, a.label || a.package); };
     }
-    ul.appendChild(li);
+    frag.appendChild(li);
     if (iconObserver) iconObserver.observe(ic); else loadIcon(ic);
   });
+  ul.appendChild(frag);
 }
 function toggleSel(a, on) {
   if (on) selected[a.package] = { package: a.package, label: a.label };
@@ -316,7 +318,7 @@ function loadApps() {
   helper("list-apps", { user: activeUser }).then(function (r) {
     APPS = (r && r.apps) ? r.apps : [];
     renderApps($("#search").value);
-    buildBlockPicker();   // keep the Settings "Excluded apps" picker in sync with APPS
+    setTimeout(buildBlockPicker, 80);   // keep the Settings "Excluded apps" picker in sync without blocking UI
   });
 }
 
@@ -2088,6 +2090,7 @@ function buildBlockPicker() {
     var a = x.label || x.package || "", b = y.label || y.package || "";
     return a.toLowerCase().localeCompare(b.toLowerCase());
   });
+  var frag = document.createDocumentFragment();
   all.forEach(function (a) {
     var li = el("li", "row tappable");
     var ic = el("div", "app-ic", (a.label || a.package).charAt(0).toUpperCase());
@@ -2102,9 +2105,10 @@ function buildBlockPicker() {
     if (isBlocked(a.package)) li.classList.add("sel");
     li.dataset.hay = ((a.label || "") + " " + a.package).toLowerCase();
     li.onclick = function () { cb.checked = !cb.checked; setBlock(a.package, cb.checked); li.classList.toggle("sel", cb.checked); };
-    ul.appendChild(li); _blockIcons.push(ic);
-    if (iconObserver) iconObserver.observe(ic); else loadIcon(ic);
+    frag.appendChild(li); _blockIcons.push(ic);
+    if (iconObserver) iconObserver.observe(ic);
   });
+  ul.appendChild(frag);
   filterBlockPicker($("#block-app-search") ? $("#block-app-search").value : "");
   updateBlockCount();
 }
