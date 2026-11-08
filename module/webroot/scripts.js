@@ -313,13 +313,52 @@ function setSelectMode(on) {
   updateSelCount();
   renderApps($("#search").value);
 }
-function loadApps() {
-  $("#applist").innerHTML = "<li class='muted'>" + I18N.t("apps_loading") + "</li>";
-  helper("list-apps", { user: activeUser }).then(function (r) {
-    APPS = (r && r.apps) ? r.apps : [];
-    renderApps($("#search").value);
-    setTimeout(buildBlockPicker, 80);   // keep the Settings "Excluded apps" picker in sync without blocking UI
-  });
+var APPS_CACHE_PREFIX = "vdb_apps_cache_v2_";
+function appsSig(list) {
+  if (!list || !list.length) return "";
+  return list.length + ":" + list.map(function (a) { return a.package + "@" + (a.versionCode || 0); }).join(",");
+}
+
+function loadApps(forceRefresh) {
+  var user = (activeUser != null) ? (activeUser | 0) : 0;
+  var key = APPS_CACHE_PREFIX + user;
+  var hadCache = false;
+
+  if (!forceRefresh && (!APPS || !APPS.length)) {
+    try {
+      var raw = localStorage.getItem(key);
+      if (raw) {
+        var cached = JSON.parse(raw);
+        if (Array.isArray(cached) && cached.length) {
+          APPS = cached;
+          hadCache = true;
+          renderApps($("#search") ? $("#search").value : "");
+          setTimeout(buildBlockPicker, 120);
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (!hadCache && (!APPS || !APPS.length)) {
+    $("#applist").innerHTML = "<li class='muted'>" + I18N.t("apps_loading") + "</li>";
+  }
+
+  // Always fetch fresh data from PackageManager so newly installed/uninstalled apps appear
+  return helper("list-apps", { user: user }).then(function (r) {
+    if ((activeUser | 0) !== user) return;
+    if (r && Array.isArray(r.apps)) {
+      var fresh = r.apps;
+      var changed = !hadCache || appsSig(fresh) !== appsSig(APPS);
+      APPS = fresh;
+      try {
+        localStorage.setItem(key, JSON.stringify(fresh));
+      } catch (e) {}
+      if (changed || forceRefresh || !hadCache) {
+        renderApps($("#search") ? $("#search").value : "");
+        setTimeout(buildBlockPicker, 80);
+      }
+    }
+  }).catch(function () {});
 }
 
 // --- backups ------------------------------------------------------------
@@ -2466,7 +2505,7 @@ function boot() {
   document.querySelectorAll(".tab").forEach(function (t) {
     t.onclick = function () { navTab(t.dataset.tab); };
   });
-  $("#refresh").onclick = loadApps;
+  $("#refresh").onclick = function () { loadApps(true); };
   $("#search").oninput = function () { renderApps(this.value); };
   $("#app-filter").onchange = function () { renderApps($("#search").value); };
   $("#app-sort").onchange = function () { renderApps($("#search").value); };
@@ -2489,7 +2528,7 @@ function boot() {
   if ($("#prov-open")) $("#prov-open").onclick = openProvenance;
   if ($("#update-check")) $("#update-check").onclick = checkForUpdates;
   if ($("#update-banner-x")) $("#update-banner-x").onclick = function () { $("#update-banner").classList.remove("show"); };
-  $("#user-sel").onchange = function () { activeUser = this.value | 0; CFG.user = activeUser; loadApps(); loadOverview(); };
+  $("#user-sel").onchange = function () { activeUser = this.value | 0; CFG.user = activeUser; loadApps(true); loadOverview(); };
   $("#set-save").onclick = saveSettings;
   $("#d-save").onclick = addDest;
   $("#d-type").onchange = syncDestFields;
@@ -2535,6 +2574,8 @@ function boot() {
   if ($("#bk-tg-cloud")) $("#bk-tg-cloud").onclick = openTelegramBackupsModal;
   if ($("#tg-bk-refresh")) $("#tg-bk-refresh").onclick = loadTelegramBackups;
   if ($("#tg-bk-close")) $("#tg-bk-close").onclick = function () { $("#tg-backups-modal").hidden = true; };
+
+  loadApps();
 
   helper("config-get").then(function (c) { CFG = c || {}; activeUser = (CFG.user != null) ? (CFG.user | 0) : 0; return I18N.init(CFG.language || "auto"); })
     .then(function () { I18N.apply(); loadDests(); loadSettings(); loadUsers(); loadOverview(); reattachOps(); recoverPendingAuth(); autoCheckUpdates(); });
