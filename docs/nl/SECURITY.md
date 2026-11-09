@@ -11,7 +11,7 @@ versleutelingswachtwoordzinnen. We nemen beveiliging serieus.
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (alleen niet-beveiligingsmeldingen)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA-thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ snel als we kunnen en vermelden je als je dat wilt.
   platte tekst geschreven. Backups worden nooit gekoppeld aan apparaatgebonden hardwaresleutels (zodat ze
   draagbaar blijven), wat ook betekent dat de wachtwoordzin is wat een versleutelde backup beschermt -
   kies een sterke.
-- De optionele Google Drive-begeleidende app moet altijd verborgen worden met HMA-OSS zodat hij
+- De optionele Google Drive-begeleidende app moet altijd verborgen worden met [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) zodat hij
   geen root of een ontgrendelde bootloader onthult.
 - Herstel draait als root, dus elk archief wordt gecontroleerd voordat er iets wordt geschreven:
   een backup waarvan de inhoud buiten het doel wijst (een absoluut pad of een `..`-component)

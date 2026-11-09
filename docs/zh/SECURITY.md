@@ -11,7 +11,7 @@ VDBackup 以 root 身份运行，并处理你的数据，以及（可选的）�
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues （仅限非安全类报告）
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -28,7 +28,7 @@ VDBackup 以 root 身份运行，并处理你的数据，以及（可选的）�
 - 凭据和口令在静态存储时均加密，绝不以明文写入。备份绝不
   与设备绑定的硬件密钥关联（因此它们保持可移植），这也意味着
   口令是保护加密备份的东西 - 请选择一个强口令。
-- 可选的 Google Drive 配套应用应始终用 HMA-OSS 隐藏，以免它
+- 可选的 Google Drive 配套应用应始终用 [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) 隐藏，以免它
   暴露 root 或已解锁的 bootloader。
 - 恢复以 root 身份运行，因此在写入任何内容之前都会检查每个归档：内容指向其目标之外的备份
   （绝对路径或 `..` 组件）会被拒绝，并且在整个归档通过检查之前不会解压任何文件。

@@ -435,8 +435,8 @@ Lokale backups worden nooit beïnvloed.
    expliciet de Google Drive-begeleidingsbestemming kiest**, nooit standaard, en het wordt
    verwijderd wanneer je het uitschakelt. Het eenmalige Google-toestemmingsscherm is de enige
    stap die buiten de WebUI gebeurt. Wanneer de begeleider is geïnstalleerd, herinnert VDBackup
-   je eraan hem **altijd te verbergen met HMA-OSS** zodat zijn aanwezigheid geen root of een
-   ontgrendelde bootloader verraadt, en het biedt aan hem voor je aan de HMA-OSS-lijst toe te voegen.
+   je eraan hem **altijd te verbergen met [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** zodat zijn aanwezigheid geen root of een
+   ontgrendelde bootloader verraadt, en het biedt aan hem voor je aan de HMA-OSS-lijst toe te voegen. VDBackup herinnert je er ook aan, wanneer je lokale back-ups hebt, om de back-upmap (/sdcard/VDBackup) om dezelfde reden met SUSFS te verbergen.
 
 ## 8. Inplannen en retentie
 
@@ -480,6 +480,12 @@ er geïnstalleerd is, zodat het inschakelen nooit je hele apparaat in één keer
 **Uitgesloten apps (blocklist).** Ook in Instellingen kun je apps uitsluiten waarvan je nooit
 wilt dat ze automatisch of volgens een schema geback-upt worden; je kunt er meerdere tegelijk
 toevoegen (multiselectie), en uitgesloten apps worden door beide overgeslagen.
+
+**Back-upvoorinstellingen.** Ook in Instellingen kun je benoemde voorinstellingen opslaan - sets van op te nemen items, zoals alleen APK of APK + OBB - en er een kiezen in het back-updialoog om de itemkeuzes in één keer te vullen.
+
+**Back-upitems per app.** Ook in Instellingen kun je precies kiezen welke items elke app back-upt in bulk-, automatische en geplande back-ups - bijvoorbeeld alleen APK, of APK + OBB. Bij een losse handmatige back-up kun je nog steeds kiezen, uitgaand van de set van de app. Apps die je hier niet instelt, back-uppen alles.
+
+**App-tags.** Tik op een app in Instellingen (Items en tags per app) om deze vrije labels te geven - bijvoorbeeld games of work. Boven de app-lijst verschijnt dan een tagkiezer: kies een tag om alleen die apps te tonen en back-up de hele groep in één keer. Je kunt het ook openen via het tabblad Apps: tik op een app en dan op Items en tags.
 
 **Activiteitenlogboek.** Het Schema-tabblad heeft een knop **Activiteitenlogboek bekijken** die
 een volledig scherm (direct) opent met het lokale auditspoor - backups, herstelbewerkingen,

@@ -412,8 +412,8 @@ Les sauvegardes locales ne sont jamais affectées.
    la destination compagnon Google Drive**, jamais par défaut, et elle est retirée quand
    vous la désactivez. L'écran de consentement Google unique est la seule étape qui se passe
    hors de la WebUI. Quand le compagnon est installé, VDBackup vous rappelle de
-   **toujours le masquer avec HMA-OSS** afin que sa présence ne révèle ni root ni
-   un bootloader déverrouillé, et il propose de l'ajouter à la liste HMA-OSS pour vous.
+   **toujours le masquer avec [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** afin que sa présence ne révèle ni root ni
+   un bootloader déverrouillé, et il propose de l'ajouter à la liste HMA-OSS pour vous. VDBackup vous rappelle aussi, lorsque vous avez des sauvegardes locales, de masquer le dossier de sauvegarde (/sdcard/VDBackup) avec SUSFS pour la même raison.
 
 ## 8. Planification et rétention
 
@@ -456,6 +456,12 @@ est installé, de sorte que l'activer ne sauvegarde jamais tout votre appareil d
 
 **Apps exclues (liste de blocage).** Toujours dans Settings, vous pouvez exclure les apps que vous ne voulez
 jamais voir sauvegardées automatiquement ou selon une planification ; vous pouvez en ajouter plusieurs à la fois (sélection multiple), et les apps exclues sont ignorées par les deux.
+
+**Préréglages de sauvegarde.** Également dans les Réglages, vous pouvez enregistrer des préréglages nommés - des ensembles d'éléments à inclure, comme APK seul ou APK + OBB - et en choisir un dans la boîte de sauvegarde pour remplir les choix d'un coup.
+
+**Éléments de sauvegarde par app.** Également dans les Réglages, vous pouvez choisir exactement quels éléments chaque app sauvegarde dans les sauvegardes en masse, automatiques et planifiées - par exemple APK seul, ou APK + OBB. Une sauvegarde manuelle individuelle vous laisse toujours choisir sur le moment, à partir de l'ensemble de l'app. Les apps que vous ne réglez pas ici sauvegardent tout.
+
+**Étiquettes d'applications.** Touchez une application dans les Réglages (Éléments et étiquettes par application) pour lui donner des libellés libres - par exemple games ou work. Un sélecteur d'étiquettes apparaît alors au-dessus de la liste : choisissez une étiquette pour n'afficher que ses applications, et sauvegardez tout le groupe d'un coup. Vous pouvez aussi y accéder depuis l'onglet Applications : touchez une application, puis Éléments et étiquettes.
 
 **Journal d'activité.** L'onglet Schedule dispose d'un bouton **View activity log** qui ouvre un écran complet
 (instantanément) affichant la piste d'audit locale - sauvegardes, restaurations, suppressions, exécutions planifiées et automatiques, et élagages -

@@ -6,6 +6,27 @@
 
 Alle nennenswerten Änderungen an VDBackup werden hier dokumentiert. Nur auf Englisch.
 
+## v1.04
+
+Fehlerbehebungen:
+
+- Backup-Ordner bleiben jetzt automatisch im Dateimanager zu öffnen: ihre Berechtigungen werden bei der Installation, bei jedem Start und bei jedem Öffnen der WebUI neu gesetzt, sodass ein nur dem Eigentümer zugänglicher Ordner (etwa ein Backup von vor v1.03.2) sich ohne manuellen Schritt selbst repariert.
+
+Privatsphäre:
+
+- Wenn du lokale Backups hast, erinnert dich der Tab Backups jetzt daran, den Backup-Ordner mit SUSFS zu verbergen, genau wie die Begleit-App: seine Anwesenheit kann sonst root oder einen entsperrten Bootloader verraten. SUSFS verbirgt; die Erinnerung weist dich nur darauf hin.
+
+Backups:
+
+- Du kannst jetzt festlegen, welche Elemente jede App sichert - zum Beispiel nur APK oder APK + OBB - angewendet in Massen-, automatischen und geplanten Backups. Ein einzelnes manuelles Backup lässt dich weiterhin wählen, vorausgefüllt aus der App-Auswahl. Stelle es in den Einstellungen ein, neben der Liste ausgeschlossener Apps.
+
+- Backup-Voreinstellungen: speichere benannte Sätze dessen, was enthalten sein soll, und wende sie im Backup-Dialog mit einem Klick an.
+- Mehrbenutzer: App-Backups, spezielle Backups und Wiederherstellungen folgen jetzt alle dem gewählten Android-Benutzer.
+- Apps kommen wärmer und vollständiger zurück: ihre ART-Kompilierungsprofile sowie die Berechtigungen für Benachrichtigungszugriff, Bedienungshilfen und Doze-Akku-Ausnahme werden gesichert und wiederhergestellt.
+- Zuverlässigere Wiederherstellung: Dateibesitz und SELinux-Kontext werden auf dem Zielgerät neu abgeleitet, sodass eine Wiederherstellung über Geräte und Benutzer hinweg korrekt funktioniert.
+- Sicherere Wiederherstellung: Play Protect und der Installationsprüfer werden nur während der Installation stummgeschaltet und exakt wiederhergestellt; der Root-Manager wird nie gesichert oder wiederhergestellt; und die Installationsquelle wird geprüft und protokolliert.
+- App-Tags: Gib Apps freie Labels wie games oder work, filtere die App-Liste nach einem Tag und sichere eine ganze getaggte Gruppe auf einmal.
+
 ## v1.03.2
 
 Fehlerbehebungen:
@@ -128,7 +149,7 @@ Ziele und Cloud:
   Cloud-Backend (SFTP, SMB, WebDAV, FTP, S3, Google Drive und mehr) erreichbar ist, ohne `rclone.conf`
   von Hand zu bearbeiten.
 - Google Drive auf zwei Wegen: über rclone (ohne Google-Cloud-Konto) oder die optionale, kopflose
-  Begleit-App (`ru.vd171.vdbackup`), die einen verpflichtenden HMA-OSS-Verbergen-Hinweis trägt.
+  Begleit-App (`ru.vd171.vdbackup`), die einen verpflichtenden [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)-Verbergen-Hinweis trägt.
 - Netzwerkrichtlinie: wählen, ob Cloud-Übertragungen jede Verbindung, nur WLAN oder nur Mobilfunkdaten
   nutzen dürfen; durchgesetzt für manuelle und geplante Aufträge. Lokale Ziele sind ausgenommen.
 

@@ -6,6 +6,27 @@
 
 Wszystkie istotne zmiany w VDBackup są udokumentowane tutaj. Tylko po angielsku.
 
+## v1.04
+
+Poprawki:
+
+- Foldery kopii zapasowych pozostają teraz automatycznie otwieralne w menedżerze plików: ich uprawnienia są ponownie ustawiane przy instalacji, przy każdym starcie i za każdym razem, gdy otwiera się WebUI, więc folder pozostawiony tylko dla właściciela (na przykład kopia sprzed v1.03.2) naprawia się sam bez ręcznego kroku.
+
+Prywatność:
+
+- Gdy masz lokalne kopie, karta Kopie zapasowe przypomina teraz o ukryciu folderu kopii za pomocą SUSFS, tak jak aplikacji towarzyszącej: jego obecność może inaczej ujawnić root lub odblokowany bootloader. Ukrywa SUSFS; przypomnienie tylko kieruje Cię we właściwe miejsce.
+
+Kopie zapasowe:
+
+- Możesz teraz ustawić, które elementy każda aplikacja kopiuje - na przykład tylko APK lub APK + OBB - stosowane w kopiach zbiorczych, automatycznych i zaplanowanych. Pojedyncza ręczna kopia nadal pozwala wybrać na miejscu, z wartościami wstępnie wypełnionymi z zestawu aplikacji. Ustaw to w Ustawieniach, obok listy wykluczonych aplikacji.
+
+- Ustawienia kopii: zapisz nazwane zestawy tego, co uwzględnić, i zastosuj je jednym wyborem w oknie kopii.
+- Wielu użytkowników: kopie aplikacji, kopie specjalne i przywracanie podążają teraz za wybranym użytkownikiem Androida.
+- Aplikacje wracają pełniejsze: ich profile kompilacji ART oraz uprawnienia nasłuchiwania powiadomień, dostępności i wyłączenia z Doze są kopiowane i przywracane.
+- Bardziej niezawodne przywracanie: własność plików i kontekst SELinux są ponownie wyprowadzane na urządzeniu docelowym, więc przywracanie działa poprawnie między urządzeniami i użytkownikami.
+- Bezpieczniejsze przywracanie: Play Protect i weryfikator instalacji są wyciszane tylko podczas instalacji i przywracane dokładnie; menedżer roota nigdy nie jest kopiowany ani przywracany; a źródło instalacji jest weryfikowane i zapisywane.
+- Tagi aplikacji: nadaj aplikacjom swobodne etykiety jak games czy work, filtruj listę aplikacji według tagu i utwórz kopię całej otagowanej grupy naraz.
+
 ## v1.03.2
 
 Poprawki:
@@ -122,7 +143,7 @@ Cele i chmura:
   dowolny backend chmurowy (SFTP, SMB, WebDAV, FTP, S3, Google Drive i inne) był osiągalny bez ręcznej
   edycji `rclone.conf`.
 - Google Drive na dwa sposoby: przez rclone (bez konta Google Cloud) lub opcjonalną bezgłową aplikację
-  towarzyszącą (`ru.vd171.vdbackup`), która niesie obowiązkowe powiadomienie o ukryciu przez HMA-OSS.
+  towarzyszącą (`ru.vd171.vdbackup`), która niesie obowiązkowe powiadomienie o ukryciu przez [HMA-OSS](https://github.com/frknkrc44/HMA-OSS).
 - Polityka sieci: wybierz, czy transfery do chmury mogą używać dowolnego połączenia, tylko Wi-Fi lub
   tylko danych komórkowych; egzekwowane dla zadań ręcznych i zaplanowanych. Cele lokalne są wyłączone.
 

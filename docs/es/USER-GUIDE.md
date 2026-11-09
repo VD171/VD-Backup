@@ -407,8 +407,8 @@ Los backups locales nunca se ven afectados.
    el destino companero de Google Drive**, nunca por defecto, y se remueve cuando
    lo deshabilitas. La pantalla de consentimiento de Google de una sola vez es el único paso que ocurre
    fuera de la WebUI. Cuando el companero está instalado, VDBackup te recuerda
-   **ocultarlo siempre con HMA-OSS** para que su presencia no revele root o
-   un bootloader desbloqueado, y se ofrece a agregarlo a la lista de HMA-OSS por ti.
+   **ocultarlo siempre con [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** para que su presencia no revele root o
+   un bootloader desbloqueado, y se ofrece a agregarlo a la lista de HMA-OSS por ti. VDBackup también te recuerda, cuando tienes copias locales, ocultar la carpeta de copias (/sdcard/VDBackup) con SUSFS por la misma razón.
 
 ## 8. Programación y retención
 
@@ -452,6 +452,12 @@ activarlo nunca respalda todo tu dispositivo de una vez.
 
 **Apps excluidas (lista de bloqueo).** También en Settings, puedes excluir apps que nunca quieres
 respaldar automáticamente o según una programación; puedes añadir varias a la vez (selección múltiple), y las apps excluidas son omitidas por ambos.
+
+**Ajustes de copia predefinidos.** También en Ajustes puedes guardar presets con nombre - conjuntos de elementos a incluir, como solo APK o APK + OBB - y elegir uno en el diálogo de copia para rellenar los elementos de una vez.
+
+**Elementos de copia por app.** También en Ajustes puedes elegir exactamente qué elementos respalda cada app en copias masivas, automáticas y programadas - por ejemplo solo APK, o APK + OBB. Una copia manual individual te sigue dejando elegir, partiendo del conjunto de la app. Las apps que no configures aquí respaldan todo.
+
+**Etiquetas de apps.** Toca una app en Ajustes (Elementos y etiquetas por app) para darle nombres libres - por ejemplo games o work. Encima de la lista de apps aparece entonces un selector de etiquetas: elige una etiqueta para mostrar solo sus apps y respalda todo el grupo a la vez. También puedes acceder desde la pestaña Apps: toca una app y luego Elementos y etiquetas.
 
 **Registro de actividad.** La pestaña Schedule tiene un botón **View activity log** que abre una
 pantalla completa (al instante) que muestra la traza de auditoría local - backups, restauraciones,

@@ -27,7 +27,7 @@
 #  data), then captures the six documented screens in each of the 21
 #  languages (dark theme, 412x915 @ 3x). Output: docs/screenshots/<lang>/.
 #
-#  Durability (why this lives in the repo, not a scratch dir):
+#  Why this lives in the repo:
 #   - the version badge, the app list, every label and the RTL mirroring
 #     come from the live webroot + lang/*.json, so a UI or string change is
 #     reflected on the next run with no edit here;

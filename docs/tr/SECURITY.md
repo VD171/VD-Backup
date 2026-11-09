@@ -11,7 +11,7 @@ bilgilerinizi ve şifreleme parolalarınızı işler. Güvenliği ciddiye alıyo
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (yalnızca güvenlik dışı raporlar)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -30,7 +30,7 @@ Açık bir açıklama ve mümkünse yeniden üretme adımlarını ekleyin. Elimi
   taşınabilir kalırlar), bu da şifreli bir yedeği parolanın koruduğu anlamına gelir -
   güçlü bir parola seçin.
 - İsteğe bağlı Google Drive yardımcı uygulaması, root'u veya kilidi açılmış bir
-  önyükleyiciyi ifşa etmemesi için her zaman HMA-OSS ile gizlenmelidir.
+  önyükleyiciyi ifşa etmemesi için her zaman [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) ile gizlenmelidir.
 - Geri yükleme root olarak çalışır, bu yüzden herhangi bir şey yazılmadan önce her arşiv
   denetlenir: içeriği hedefinin dışını gösteren bir yedek (mutlak bir yol veya bir `..`
   bileşeni) reddedilir ve arşivin tamamı onaylanana kadar hiçbir dosya çıkarılmaz.

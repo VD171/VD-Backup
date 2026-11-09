@@ -11,7 +11,7 @@ frasa-sandi enkripsi Anda. Kami menanggapi keamanan dengan serius.
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (hanya laporan non-keamanan)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ secepat mungkin dan memberi Anda kredit jika Anda menginginkannya.
   teks jelas. Backup tidak pernah terikat ke kunci perangkat keras yang terikat-perangkat (sehingga tetap
   portabel), yang juga berarti frasa-sandi adalah yang melindungi backup terenkripsi -
   pilihlah yang kuat.
-- Aplikasi pendamping Google Drive opsional sebaiknya selalu disembunyikan dengan HMA-OSS agar
+- Aplikasi pendamping Google Drive opsional sebaiknya selalu disembunyikan dengan [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) agar
   tidak mengungkap root atau bootloader yang tidak terkunci.
 - Pemulihan berjalan sebagai root, jadi setiap arsip diperiksa sebelum apa pun ditulis: sebuah
   backup yang isinya menunjuk ke luar targetnya (sebuah path absolut atau komponen `..`) akan

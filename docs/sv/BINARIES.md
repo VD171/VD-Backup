@@ -12,14 +12,14 @@ och hur du verifierar att inget ogenomskinligt har smugits in.
 ## Principer
 
 - **Inget ogenomskinligt.** Varje levererad binär och bibliotek kan spåras till en namngiven, publik
-  uppström på en fastnålad version, med en registrerad SHA-256. Ingen blob medföljer utan en
+   uppström på en fastnålad version, med en registrerad SHA-256. Ingen blob medföljer utan en
   post som du kan kontrollera.
 - **Hämtas från uppströms, aldrig från en enhet.** Nativa verktyg kommer från Termux officiella
   paketförråd (de signerade `.deb`-filerna på `packages.termux.dev/apt`), aldrig
   kopierade ur en Termux installerad på någon telefon. Bygget misslyckas högljutt, det improviserar
   aldrig.
 - **Reproducerbart.** Kör bygget igen och du får samma filer; hämta de fastnålade
-  källorna på nytt och SHA-256-värdena stämmer.
+   källorna på nytt och SHA-256-värdena stämmer.
 - **Granskningsspåret följer med modulen.** Det finns inte bara på webbplatsen - det följer
   med inuti den installerade modulen, på din enhet, så att du kan granska offline.
 
@@ -29,7 +29,7 @@ och hur du verifierar att inget ogenomskinligt har smugits in.
 |---|---|---|
 | nativa verktyg i `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + deras `lib/`-slutenhet | **Termux** officiella apt-förråd (`packages.termux.dev/apt`), officiella `.deb`-paket | `.github/scripts/build_bin.sh` laddar ner `.deb`-filerna + deras transitiva beroenden, extraherar dem och kopierar binärerna plus endast de delade bibliotek som var och en behöver |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX-konverterare, reserv) | **rhythmcache/android-xml-converter** GitHub-utgåva (`ABX_RELEASE`, statisk ELF) | laddas ner från den fastnålade utgåvan av `build_bin.sh` |
-| `companion.apk` (valfri Google Drive-companion) | **Detta repository**, `companion/` (Gradle/Kotlin) | byggd från källkod av CI och signerad med projektnyckeln (`VD_Key`); inte en förbyggd blob |
+| `companion.apk` (valfri Google Drive-companion) | **Detta repository**, `companion/` (Gradle/Kotlin) | byggd från källkod av CI och signerad med projektnyckeln; inte en förbyggd blob |
 | `vdbackup_helper.dex` (framework-hjälpare) | **Detta repository**, `dex/src/` (Java) | kompilerad från källkod av CI med `javac` + `d8` |
 
 Endast de två första raderna är förbyggda tredjepartsbinärer; de två sista byggs från
@@ -49,7 +49,7 @@ endast din enhets ABI, så att filen stannar på enheten på
 `/data/adb/modules/vdbackup/bin/<abi>/PROVENANCE.json`. Den registrerar:
 
 - `sources`: varje uppströms `.deb` (paket, version, fullständig URL, SHA-256 för `.deb`-filen) och
-  ABX-utgåvan (URL, SHA-256 för arkivet).
+   ABX-utgåvan (URL, SHA-256 för arkivet).
 - `files`: varje fil som faktiskt levereras under `bin/<abi>/` (sökväg, storlek, SHA-256).
 
 Du kan läsa den i WebUI (fliken **Om** länkar till den) eller via agent-API:et:
@@ -73,7 +73,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 3. **Bygg om från grunden.** Kör `.github/scripts/build_bin.sh` själv (behöver bara
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`) och jämför utdata med det som levererades.
 4. **Companion och dex.** Bygg om `companion/` och `dex/` från källkod; companionens
-   signatur är projektnyckeln `VD_Key` (SHA-256
+   signatur är projektnyckeln (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
 ## Rapportering

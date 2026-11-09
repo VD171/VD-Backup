@@ -33,6 +33,10 @@ sleep 5
 
 mkdir -p "$LOGS"
 
+# self-heal backup-folder perms every boot (independent of the scheduler), so
+# folders stay openable by a file manager under /sdcard/VDBackup.
+"$MODDIR/scripts/helper.sh" sanitize >/dev/null 2>&1
+
 # honour the skip flag
 [ -f "$MODDIR/.scheduler.skip" ] && exit 0
 

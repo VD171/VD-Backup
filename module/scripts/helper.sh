@@ -243,6 +243,24 @@ case "$verb" in
   ping)
     ok "\"version\":\"$(sed -n 's/^version=//p' "$MODDIR/module.prop")\",\"abi\":\"$abi\"" ;;
 
+  sanitize)
+    # Re-assert backup-folder visibility across every Android user. A raw root copy
+    # (or a backup made before v1.03.2) can leave 0700 dirs that a file manager cannot
+    # open under /sdcard/VDBackup; restore the media owner/context and grant the group
+    # access. Metadata-only chmod, so it is cheap even over many backups. Called on
+    # install, on boot, and once per WebUI load.
+    _n=0
+    for _bd in /data/media/*/VDBackup; do
+      [ -d "$_bd" ] || continue
+      _u="${_bd#/data/media/}"; _u="${_u%/VDBackup}"
+      _mo="$(stat -c '%u:%g' "/data/media/$_u" 2>/dev/null)"
+      case "$_mo" in *[0-9]:*[0-9]) chown -R "$_mo" "$_bd" 2>/dev/null ;; esac
+      restorecon -R "$_bd" 2>/dev/null
+      chmod -R ug+rwX "$_bd" 2>/dev/null
+      _n=$(( _n + 1 ))
+    done
+    ok "\"sanitized\":$_n" ;;
+
   update-check)
     # fetch the published update manifest (module.prop updateJson) and compare its
     # versionCode with the installed one. Runs outside the webview (no CSP), on explicit
@@ -409,20 +427,25 @@ case "$verb" in
     # available special-backup categories + whether each has data on this device.
     # dns/system_settings are settings-based (not path-based); system_settings is
     # opt-in (it overwrites device settings on restore, gated by .system_settings).
+    u="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | \
+         "$(command -v "$BIN/jq" 2>/dev/null || echo jq)" -r '.user // 0' 2>/dev/null)"
+    case "$u" in ''|*[!0-9]*) u=0 ;; esac
     avail() { for p in "$@"; do [ -e "$p" ] && { echo true; return; }; done; echo false; }
-    m="$(avail /data/data/com.android.providers.telephony /data/user_de/0/com.android.providers.telephony)"
-    c="$(avail /data/data/com.android.providers.contacts /data/user_de/0/com.android.providers.contacts)"
+    m="$(avail "/data/user/$u/com.android.providers.telephony" "/data/user_de/$u/com.android.providers.telephony")"
+    c="$(avail "/data/user/$u/com.android.providers.contacts" "/data/user_de/$u/com.android.providers.contacts")"
     w="$(avail /data/misc/wifi /data/misc/apexdata/com.android.wifi)"
-    b="$(avail /data/misc/bluedroid /data/misc/bluetooth /data/data/com.android.bluetooth)"
-    cal="$(avail /data/data/com.android.providers.calendar /data/user_de/0/com.android.providers.calendar)"
-    wp="$(avail /data/system/users/0/wallpaper /data/system/users/0/wallpaper_lock /data/system/users/0/wallpaper_info.xml)"
+    b="$(avail /data/misc/bluedroid /data/misc/bluetooth "/data/user/$u/com.android.bluetooth")"
+    cal="$(avail "/data/user/$u/com.android.providers.calendar" "/data/user_de/$u/com.android.providers.calendar")"
+    wp="$(avail "/data/system/users/$u/wallpaper" "/data/system/users/$u/wallpaper_lock" "/data/system/users/$u/wallpaper_info.xml")"
     dnsmode="$(env -u LD_LIBRARY_PATH /system/bin/settings get global private_dns_mode 2>/dev/null)"
     dns=false; case "$dnsmode" in ''|null) ;; *) dns=true ;; esac
     printf '{"ok":true,"categories":[{"id":"messages","available":%s},{"id":"contacts","available":%s},{"id":"wifi","available":%s},{"id":"bluetooth","available":%s},{"id":"calendar","available":%s},{"id":"wallpaper","available":%s},{"id":"dns","available":%s},{"id":"system_settings","available":true,"opt_in":true}]}\n' "$m" "$c" "$w" "$b" "$cal" "$wp" "$dns" ;;
 
   special-list)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
-    _bk="$(bdir 0)/.special"
+    u="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.user // 0' 2>/dev/null)"
+    case "$u" in ''|*[!0-9]*) u=0 ;; esac
+    _bk="$(bdir "$u")/.special"
     printf '{"ok":true,"backups":['
     first=1
     for m in "$_bk"/*/manifest.json; do

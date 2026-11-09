@@ -401,8 +401,8 @@ Backup lokal tidak pernah terpengaruh.
    tujuan pendamping Google Drive**, tidak pernah secara default, dan ia dihapus saat
    Anda menonaktifkannya. Layar persetujuan Google satu kali adalah satu-satunya langkah yang terjadi
    di luar WebUI. Saat pendamping terpasang, VDBackup mengingatkan Anda untuk
-   **selalu menyembunyikannya dengan HMA-OSS** agar keberadaannya tidak mengungkap root atau
-   bootloader yang tidak terkunci, dan ia menawarkan untuk menambahkannya ke daftar HMA-OSS untuk Anda.
+   **selalu menyembunyikannya dengan [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** agar keberadaannya tidak mengungkap root atau
+   bootloader yang tidak terkunci, dan ia menawarkan untuk menambahkannya ke daftar HMA-OSS untuk Anda. VDBackup juga mengingatkan Anda, saat punya cadangan lokal, untuk menyembunyikan folder cadangan (/sdcard/VDBackup) dengan SUSFS karena alasan yang sama.
 
 ## 8. Penjadwalan dan retensi
 
@@ -444,6 +444,12 @@ sehingga mengaktifkannya tidak pernah membackup seluruh perangkat Anda sekaligus
 
 **Aplikasi yang dikecualikan (blocklist).** Juga di Settings, Anda bisa mengecualikan aplikasi yang
 tidak pernah ingin dibackup secara otomatis atau sesuai jadwal; Anda bisa menambahkan beberapa sekaligus (pilih-banyak), dan aplikasi yang dikecualikan dilewati oleh keduanya.
+
+**Praset cadangan.** Juga di Pengaturan, Anda bisa menyimpan praset bernama - kumpulan item yang disertakan, seperti hanya APK atau APK + OBB - dan memilih satu di dialog cadangan untuk mengisi pilihan item sekaligus.
+
+**Item cadangan per aplikasi.** Juga di Pengaturan, Anda bisa memilih persis item mana yang dicadangkan setiap aplikasi dalam cadangan massal, otomatis, dan terjadwal - misalnya hanya APK, atau APK + OBB. Cadangan manual tunggal tetap membiarkan Anda memilih saat itu, dimulai dari set aplikasi. Aplikasi yang tidak Anda atur di sini mencadangkan semuanya.
+
+**Tag aplikasi.** Ketuk aplikasi di Pengaturan (Item dan tag per aplikasi) untuk memberinya label bebas - misalnya games atau work. Pemilih tag lalu muncul di atas daftar aplikasi: pilih tag untuk menampilkan hanya aplikasinya, dan cadangkan seluruh grup sekaligus. Anda juga bisa membukanya dari tab Apl: ketuk aplikasi, lalu Item dan tag.
 
 **Log aktivitas.** Tab Schedule punya tombol **View activity log** yang membuka layar penuh (seketika) menampilkan jejak audit lokal -
 backup, restore, penghapusan, jalankan terjadwal dan otomatis, serta pemangkasan - terbaru lebih dahulu. Aksi **Export logs** menyimpan berkas log (di dalam folder backup) yang bisa Anda lampirkan ke laporan umpan balik atau bug.

@@ -6,6 +6,27 @@
 
 All notable changes to VDBackup are documented here. English only.
 
+## v1.04
+
+Fixes:
+
+- Backup folders now stay openable by a file manager automatically: their permissions are re-asserted on install, on every boot, and each time the WebUI opens, so a folder left owner-only (for example a backup made before v1.03.2) heals itself with no manual step.
+
+Privacy:
+
+- When you have local backups, the Backups tab now reminds you to hide the backup folder with SUSFS, just like the companion app: its presence can otherwise reveal root or an unlocked bootloader. SUSFS does the hiding; the reminder only points you there.
+
+Backups:
+
+- You can now set which items each app backs up - for example APK only, or APK + OBB - applied in bulk, automatic and scheduled backups. A single manual backup still lets you pick at the time, pre-filled from the app's set. Set it in Settings, next to the excluded-apps list.
+
+- Backup presets: save named sets of what to include and apply them with one pick in the backup dialog.
+- Multi-user: app backups, special backups and restores now all follow the Android user you select.
+- Apps come back warmer and more complete: their ART compilation profiles, and their notification-listener, accessibility and Doze battery-exemption grants, are backed up and restored.
+- More reliable restores: file ownership and SELinux context are re-derived on the target device, so a restore works correctly across devices and users.
+- Safer restores: Play Protect and the install verifier are silenced only during the install and restored exactly; the root manager is never backed up or restored; and the install source is verified and logged.
+- App tags: give apps free labels like games or work, filter the app list by a tag, and back up a whole tagged group at once.
+
 ## v1.03.2
 
 Fixes:
@@ -116,7 +137,7 @@ Destinations and cloud:
   cloud backend (SFTP, SMB, WebDAV, FTP, S3, Google Drive, and more) is reachable without
   editing `rclone.conf` by hand.
 - Google Drive two ways: via rclone (no Google Cloud account) or the opt-in headless
-  companion app (`ru.vd171.vdbackup`), which carries a mandatory HMA-OSS hide notice.
+  companion app (`ru.vd171.vdbackup`), which carries a mandatory [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) hide notice.
 - Network policy: choose whether cloud transfers may use any connection, Wi-Fi only, or
   mobile data only; enforced for manual and scheduled jobs. Local destinations are exempt.
 

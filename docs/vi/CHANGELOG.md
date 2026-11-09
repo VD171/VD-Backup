@@ -6,6 +6,27 @@
 
 Mọi thay đổi đáng chú ý của VDBackup được ghi lại ở đây. Chỉ bằng tiếng Anh.
 
+## v1.04
+
+Sửa lỗi:
+
+- Thư mục sao lưu giờ tự động vẫn mở được bằng trình quản lý tệp: quyền của chúng được áp dụng lại khi cài đặt, mỗi lần khởi động, và mỗi khi mở WebUI, nên một thư mục bị để riêng cho chủ sở hữu (ví dụ bản sao lưu tạo trước v1.03.2) tự sửa mà không cần thao tác thủ công.
+
+Quyền riêng tư:
+
+- Khi bạn có bản sao lưu cục bộ, thẻ Sao lưu giờ nhắc bạn ẩn thư mục sao lưu bằng SUSFS, giống như ứng dụng đồng hành: nếu không, sự hiện diện của nó có thể tiết lộ root hoặc bootloader đã mở khóa. SUSFS thực hiện việc ẩn; lời nhắc chỉ chỉ đường cho bạn.
+
+Sao lưu:
+
+- Giờ bạn có thể đặt những mục nào mỗi ứng dụng sao lưu - ví dụ chỉ APK, hoặc APK + OBB - được áp dụng trong sao lưu hàng loạt, tự động và theo lịch. Một bản sao lưu thủ công đơn lẻ vẫn cho bạn chọn lúc đó, điền sẵn từ bộ của ứng dụng. Đặt trong Cài đặt, cạnh danh sách ứng dụng loại trừ.
+
+- Cấu hình sao lưu: lưu các bộ có tên về nội dung cần sao lưu và áp dụng bằng một lựa chọn trong hộp thoại sao lưu.
+- Đa người dùng: sao lưu ứng dụng, sao lưu đặc biệt và khôi phục giờ đều theo người dùng Android bạn chọn.
+- Ứng dụng trở lại đầy đủ hơn: hồ sơ biên dịch ART cùng quyền trình nghe thông báo, trợ năng và miễn trừ pin Doze được sao lưu và khôi phục.
+- Khôi phục đáng tin cậy hơn: quyền sở hữu tệp và ngữ cảnh SELinux được suy ra lại trên thiết bị đích, nên khôi phục hoạt động đúng giữa các thiết bị và người dùng.
+- Khôi phục an toàn hơn: Play Protect và trình xác minh cài đặt chỉ bị tắt trong lúc cài rồi khôi phục y nguyên; trình quản lý root không bao giờ được sao lưu hay khôi phục; và nguồn cài đặt được xác minh và ghi nhật ký.
+- Thẻ ứng dụng: gán cho ứng dụng các nhãn tự do như games hoặc work, lọc danh sách ứng dụng theo thẻ và sao lưu cả một nhóm được gắn thẻ cùng lúc.
+
 ## v1.03.2
 
 Sửa lỗi:
@@ -118,7 +139,7 @@ dụng cùng dữ liệu của chúng hoàn toàn với quyền root, không có
   mây nào (SFTP, SMB, WebDAV, FTP, S3, Google Drive, và nhiều hơn nữa) đều có thể truy cập mà không cần
   chỉnh sửa `rclone.conf` thủ công.
 - Google Drive theo hai cách: qua rclone (không cần tài khoản Google Cloud) hoặc ứng dụng đồng hành không
-  giao diện tùy chọn (`ru.vd171.vdbackup`), vốn mang theo một thông báo ẩn bằng HMA-OSS bắt buộc.
+  giao diện tùy chọn (`ru.vd171.vdbackup`), vốn mang theo một thông báo ẩn bằng [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) bắt buộc.
 - Chính sách mạng: chọn xem các lần truyền đám mây có thể dùng bất kỳ kết nối nào, chỉ Wi-Fi, hay chỉ dữ
   liệu di động; được áp dụng cho cả tác vụ thủ công và tác vụ theo lịch. Các đích đến cục bộ được miễn trừ.
 

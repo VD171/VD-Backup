@@ -11,7 +11,7 @@ VDBackup běží jako root a pracuje s vašimi daty a (volitelně) s vašimi př
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (pouze nebezpečnostní hlášení)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ a připíšeme vám zásluhy, pokud si to budete přát.
   v otevřeném textu. Zálohy nikdy nejsou vázány na hardwarové klíče zařízení (takže zůstávají
   přenositelné), což také znamená, že právě heslová fráze chrání šifrovanou zálohu -
   zvolte silnou.
-- Volitelná doprovodná aplikace Google Drive by měla být vždy skryta pomocí HMA-OSS, aby
+- Volitelná doprovodná aplikace Google Drive by měla být vždy skryta pomocí [HMA-OSS](https://github.com/frknkrc44/HMA-OSS), aby
   neodhalila root ani odemčený bootloader.
 - Obnovení běží jako root, takže každý archiv je zkontrolován, než se cokoli zapíše:
   záloha, jejíž obsah ukazuje mimo svůj cíl (absolutní cesta nebo komponenta `..`), je

@@ -11,7 +11,7 @@ encryption passphrases को संभालता है। हम सुर�
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (केवल non-security reports)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ encryption passphrases को संभालता है। हम सुर�
   लिखे जाते। Backups कभी device-bound hardware keys से बंधे नहीं होते (ताकि वे portable
   रहें), जिसका यह भी मतलब है कि passphrase ही है जो एक encrypted backup की रक्षा करता है -
   एक मजबूत चुनें।
-- वैकल्पिक Google Drive companion app को हमेशा HMA-OSS के साथ छिपाया जाना चाहिए ताकि
+- वैकल्पिक Google Drive companion app को हमेशा [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) के साथ छिपाया जाना चाहिए ताकि
   यह root या एक unlocked bootloader को प्रकट न करे।
 - Restore root के रूप में चलता है, इसलिए कुछ भी लिखे जाने से पहले हर archive की जाँच होती है:
   ऐसा कोई भी backup जिसकी सामग्री अपने target से बाहर की ओर इंगित करती है (एक absolute path

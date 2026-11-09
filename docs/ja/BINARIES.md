@@ -13,7 +13,7 @@ VDBackup において、プライバシーとセキュリティは任意では�
 ## 原則
 
 - **不透明なものはない。** 同梱されるすべてのバイナリとライブラリは、固定されたバージョンの
-  名前付きの公開アップストリームまで辿ることができ、SHA-256 が記録されています。確認できる
+   名前付きの公開アップストリームまで辿ることができ、SHA-256 が記録されています。確認できる
   エントリなしに同梱されるブロブはありません。
 - **アップストリームから取得し、デバイスからは決して取得しない。** ネイティブツールは公式の
   Termux パッケージリポジトリ (`packages.termux.dev/apt` にある署名済みの `.deb` ファイル) から
@@ -31,7 +31,7 @@ VDBackup において、プライバシーとセキュリティは任意では�
 |---|---|---|
 | `bin/<abi>/` のネイティブツール (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) とその `lib/` 依存閉包 | 公式の **Termux** apt リポジトリ (`packages.termux.dev/apt`)、公式の `.deb` パッケージ | `.github/scripts/build_bin.sh` が `.deb` ファイルとその推移的依存関係をダウンロードして展開し、バイナリと各自が必要とする共有ライブラリのみをコピーします |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX コンバーターのフォールバック) | **rhythmcache/android-xml-converter** の GitHub リリース (`ABX_RELEASE`、静的 ELF) | `build_bin.sh` が固定されたリリースからダウンロードします |
-| `companion.apk` (任意の Google Drive コンパニオン) | **このリポジトリ**、`companion/` (Gradle/Kotlin) | CI によってソースからビルドされ、プロジェクトキー (`VD_Key`) で署名されます。ビルド済みブロブではありません |
+| `companion.apk` (任意の Google Drive コンパニオン) | **このリポジトリ**、`companion/` (Gradle/Kotlin) | CI によってソースからビルドされ、プロジェクトキー で署名されます。ビルド済みブロブではありません |
 | `vdbackup_helper.dex` (フレームワークヘルパー) | **このリポジトリ**、`dex/src/` (Java) | CI によって `javac` + `d8` でソースからコンパイルされます |
 
 ビルド済みのサードパーティバイナリは最初の 2 行だけです。残りの 2 つはこのリポジトリ内にある
@@ -46,7 +46,7 @@ VDBackup において、プライバシーとセキュリティは任意では�
 `/data/adb/modules/vdbackup/bin/<abi>/PROVENANCE.json` に残ります。これは以下を記録します:
 
 - `sources`: すべてのアップストリームの `.deb` (パッケージ、バージョン、完全な URL、`.deb` の SHA-256) と
-  ABX リリース (URL、アーカイブの SHA-256)。
+   ABX リリース (URL、アーカイブの SHA-256)。
 - `files`: `bin/<abi>/` の下に実際に同梱されたすべてのファイル (パス、サイズ、SHA-256)。
 
 これは WebUI (**About** タブからリンクされています) またはエージェント API 経由で読むことができます:
@@ -70,7 +70,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 3. **ゼロから再ビルドする。** `.github/scripts/build_bin.sh` を自分で実行し (必要なのは
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf` だけ)、出力を同梱されたものと比較します。
 4. **コンパニオンと dex。** `companion/` と `dex/` をソースから再ビルドします。コンパニオンの
-   署名はプロジェクトキー `VD_Key` (SHA-256
+   署名はプロジェクトキー (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`) です。
 
 ## 報告

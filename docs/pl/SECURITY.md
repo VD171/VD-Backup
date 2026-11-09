@@ -11,7 +11,7 @@ hasła szyfrujące. Traktujemy bezpieczeństwo poważnie.
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (tylko zgłoszenia niezwiązane z bezpieczeństwem)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ szybko, jak zdołamy, i wymienimy Cię w podziękowaniach, jeśli sobie tego ży
   jawnym tekstem. Kopie zapasowe nigdy nie są powiązane z kluczami sprzętowymi urządzenia (więc pozostają
   przenośne), co oznacza również, że to hasło chroni zaszyfrowaną kopię zapasową -
   wybierz silne.
-- Opcjonalna aplikacja towarzysząca Google Drive powinna być zawsze ukryta za pomocą HMA-OSS, aby nie
+- Opcjonalna aplikacja towarzysząca Google Drive powinna być zawsze ukryta za pomocą [HMA-OSS](https://github.com/frknkrc44/HMA-OSS), aby nie
   ujawniała roota ani odblokowanego bootloadera.
 - Przywracanie działa jako root, więc każde archiwum jest sprawdzane, zanim cokolwiek zostanie
   zapisane: kopia zapasowa, której zawartość wskazuje poza swój cel (ścieżka bezwzględna lub

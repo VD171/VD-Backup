@@ -149,6 +149,17 @@ main { padding: var(--pad-main); max-width: 760px; margin: 0 auto; }
 .badge.err { --bc: var(--err); }
 .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--bc); flex: none; }
 .row .badge { margin-bottom: 5px; }
+.tags-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags-add { display: flex; gap: 8px; margin-top: 8px; }
+.tags-add input { flex: 1 1 auto; min-width: 0; }
+.tag-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700;
+  line-height: 1.5; color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+  border-radius: var(--r-pill); padding: 1px 4px 1px 9px; background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.tag-chip button { border: 0; background: none; color: inherit; cursor: pointer; font-size: 15px;
+  line-height: 1; padding: 0 3px; border-radius: 50%; opacity: .75; }
+.tag-chip button:hover { opacity: 1; }
+.row .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.row .tags .tag-chip { padding: 0 8px; }
 .checks { display: flex; flex-direction: column; gap: 2px; }
 .checks label { display: flex; align-items: center; gap: 12px; padding: 11px 4px; font-size: 16px; cursor: pointer; }
 .checks label + label { border-top: 1px solid var(--line); }
@@ -271,14 +282,17 @@ button { cursor: pointer; font-family: inherit; }
 
 /* ---- modal (floating, centered) ---- */
 .modal { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center;
-  justify-content: center; padding: 20px; background: rgba(2,6,16,.66);
-  backdrop-filter: blur(2px); }
+  justify-content: center; background: rgba(2,6,16,.66); backdrop-filter: blur(2px);
+  padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); }
 .modal[hidden] { display: none; }
 /* the generic confirm/alert always opens on top of another modal (e.g. delete from
    the backup-info dialog), so it must stack above every other modal. */
 #msg-modal { z-index: 70; }
 .modal-card {
-  width: 100%; max-width: 440px; max-height: calc(100vh - 40px); overflow: auto;
+  width: 100%; max-width: 440px; overflow: auto;
+  /* 86vh is a hard fallback so the card fits even where the webview reports no
+     safe-area insets; the inset calc tightens it further where they are reported. */
+  max-height: min(86vh, calc(100vh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
   display: flex; flex-direction: column; gap: 12px;
   background: var(--surface); border: 1px solid var(--line);
   border-radius: 20px; padding: 20px;
@@ -290,8 +304,13 @@ button { cursor: pointer; font-family: inherit; }
 .modal-card .modal-msg { color: var(--muted); font-size: 14px; }
 .modal-card .modal-err { color: var(--restore); font-size: 14px; }
 .modal-card .modal-err:empty { display: none; }
-.modal-actions { display: flex; gap: 10px; justify-content: stretch; margin-top: 2px; }
-.modal-actions .btn { flex: 1; }
+.modal-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: stretch; margin-top: 2px; }
+.modal-actions .btn { flex: 1 1 auto; min-width: 0; }
+/* the per-app items + tags dialog is the tallest; its title and actions stay put while
+   the middle (items + tag editor) scrolls, so the dialog never grows past the screen. */
+#appitems-modal .modal-card { overflow: hidden; }
+#appitems-modal .modal-scroll { display: flex; flex-direction: column; gap: 12px;
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 
 /* ---- about ---- */
 .about-hero { display: flex; align-items: center; gap: 14px; margin: 6px 0 18px; }

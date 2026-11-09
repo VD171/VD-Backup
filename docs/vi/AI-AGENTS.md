@@ -132,7 +132,10 @@ Các lần truyền đám mây điền `rate`/`eta` (percent đến từ rclone)
   "dest": "local",                // local | <destination id>
   "verify": true,                 // băm lại mỗi kho lưu trữ so với manifest (mặc định bật cho Full)
   "dry_run": false,               // true = báo cáo kế hoạch kích thước, không ghi gì cả
-  "ssaid": false                  // OPT-IN, xem bên dưới
+  "ssaid": false,                  // OPT-IN, xem bên dưới
+  "manual": false                 // true = single interactive backup, keeps these exact items;
+                                  // omit/false lets config.app_items (a per-app item map) override
+                                  // the set on bulk, auto and scheduled runs
 }
 ```
 

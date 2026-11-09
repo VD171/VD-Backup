@@ -407,8 +407,8 @@ I backup locali non sono mai interessati.
    la destinazione compagna Google Drive**, mai per default, e viene rimossa quando
    la disabiliti. La schermata di consenso Google una tantum è l'unico passo che avviene
    fuori dalla WebUI. Quando il compagno è installato, VDBackup ti ricorda di
-   **nasconderlo sempre con HMA-OSS** così che la sua presenza non riveli né root né
-   un bootloader sbloccato, e si offre di aggiungerlo alla lista HMA-OSS per te.
+   **nasconderlo sempre con [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** così che la sua presenza non riveli né root né
+   un bootloader sbloccato, e si offre di aggiungerlo alla lista HMA-OSS per te. VDBackup ti ricorda anche, quando hai backup locali, di nascondere la cartella dei backup (/sdcard/VDBackup) con SUSFS per lo stesso motivo.
 
 ## 8. Pianificazione e ritenzione
 
@@ -451,6 +451,12 @@ installato, così abilitarlo non esegue mai il backup dell'intero dispositivo tu
 
 **App escluse (blocklist).** Sempre in Settings, puoi escludere le app di cui non vuoi mai eseguire
 il backup automaticamente o su pianificazione ; puoi aggiungerne diverse in una volta (selezione multipla), e le app escluse vengono saltate da entrambi.
+
+**Preset di backup.** Anche nelle Impostazioni puoi salvare preset con nome - insiemi di elementi da includere, come solo APK o APK + OBB - e sceglierne uno nel dialogo di backup per riempire le scelte in una volta.
+
+**Elementi di backup per app.** Anche nelle Impostazioni puoi scegliere esattamente quali elementi ogni app salva nei backup di massa, automatici e pianificati - per esempio solo APK, o APK + OBB. Un singolo backup manuale ti lascia comunque scegliere sul momento, partendo dal set dell'app. Le app che non imposti qui salvano tutto.
+
+**Tag delle app.** Tocca un'app nelle Impostazioni (Elementi e tag per app) per darle etichette libere - ad esempio games o work. Sopra l'elenco delle app compare allora un selettore di tag: scegli un tag per mostrare solo le sue app e salva l'intero gruppo in una volta. Puoi raggiungerlo anche dalla scheda App: tocca un'app, poi Elementi e tag.
 
 **Log di attività.** La scheda Schedule ha un pulsante **View activity log** che apre una schermata completa
 (istantaneamente) che mostra la traccia di audit locale - backup, ripristini, eliminazioni, esecuzioni pianificate e automatiche, e potature -

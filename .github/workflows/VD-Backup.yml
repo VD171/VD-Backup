@@ -100,6 +100,16 @@ jobs:
         id: v
         run: echo "name=$(sed -n 's/^version=//p' module/module.prop)" >> "$GITHUB_OUTPUT"
 
+      # Regenerate the documentation screenshots from the just-bumped WebUI, so the
+      # version badge and any UI/string change land in docs/screenshots/ on release.
+      # channel="chrome" uses the runner's preinstalled Google Chrome; no network. The
+      # updated PNGs are tracked, so the "Commit version bump" step below carries them.
+      - name: Regenerate documentation screenshots
+        if: ${{ inputs.bump != 'none' }}
+        run: |
+          pip install --quiet playwright
+          python3 tools/screenshots/shoot.py
+
       # version.sh writes update.json with the single-zip URL; point it at the
       # full asset (superset: every ABI + every binary). Runs on both the
       # bump and no-bump paths so the committed/zipped update.json is correct.

@@ -11,7 +11,7 @@ frases de cifrado. Nos tomamos la seguridad en serio.
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (solo reportes que no sean de seguridad)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ pronto como podamos y te daremos crédito si lo deseas.
   texto claro. Los backups nunca se atan a claves de hardware ligadas al dispositivo (así que se mantienen
   portables), lo que también significa que la frase de cifrado es lo que protege un backup cifrado -
   elige una fuerte.
-- La aplicación complementaria opcional de Google Drive siempre debe ocultarse con HMA-OSS para que no
+- La aplicación complementaria opcional de Google Drive siempre debe ocultarse con [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) para que no
   revele root ni un bootloader desbloqueado.
 - La restauración se ejecuta como root, así que cada archivo comprimido se verifica antes de
   escribir nada: un backup cuyo contenido apunte fuera de su destino (una ruta absoluta o un

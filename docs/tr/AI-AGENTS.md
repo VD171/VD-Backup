@@ -132,7 +132,10 @@ içerir.
   "dest": "local",                // local | <destination id>
   "verify": true,                 // her arşivi manifeste karşı yeniden hashler (Full için varsayılan açık)
   "dry_run": false,               // true = boyut planı bildirir, hiçbir şey yazmaz
-  "ssaid": false                  // KATILIMLI, aşağıya bakın
+  "ssaid": false,                  // KATILIMLI, aşağıya bakın
+  "manual": false                 // true = single interactive backup, keeps these exact items;
+                                  // omit/false lets config.app_items (a per-app item map) override
+                                  // the set on bulk, auto and scheduled runs
 }
 ```
 

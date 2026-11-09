@@ -11,7 +11,7 @@ le passphrase di cifratura. Prendiamo la sicurezza sul serio.
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (solo segnalazioni non di sicurezza)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ prima possibile e ti daremo credito se lo desideri.
   chiaro. I backup non sono mai legati a chiavi hardware vincolate al dispositivo (così da restare
   portabili), il che significa anche che la passphrase è ciò che protegge un backup cifrato -
   scegline una robusta.
-- L'app companion opzionale per Google Drive dovrebbe sempre essere nascosta con HMA-OSS così da non
+- L'app companion opzionale per Google Drive dovrebbe sempre essere nascosta con [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) così da non
   rivelare il root o un bootloader sbloccato.
 - Il ripristino viene eseguito come root, quindi ogni archivio viene controllato prima di
   scrivere qualsiasi cosa: un backup il cui contenuto punti al di fuori della sua destinazione

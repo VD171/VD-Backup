@@ -132,7 +132,10 @@ e, per i trasferimenti cloud, **`transfer`** e **`mirror <item>`**.
   "dest": "local",                // local | <destination id>
   "verify": true,                 // ri-calcola l'hash di ogni archivio vs il manifesto (attivo per default per Full)
   "dry_run": false,               // true = riporta un piano di dimensioni, non scrive nulla
-  "ssaid": false                  // OPT-IN, vedi sotto
+  "ssaid": false,                  // OPT-IN, vedi sotto
+  "manual": false                 // true = single interactive backup, keeps these exact items;
+                                  // omit/false lets config.app_items (a per-app item map) override
+                                  // the set on bulk, auto and scheduled runs
 }
 ```
 

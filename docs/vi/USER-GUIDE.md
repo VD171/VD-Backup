@@ -421,9 +421,9 @@ bao giờ tiêu dữ liệu di động. Các bản sao lưu cục bộ không ba
    nhập Google và tải lên Drive. Nó được cài **chỉ khi bạn chọn một cách rõ ràng đích đồng
    hành Google Drive**, không bao giờ theo mặc định, và nó bị gỡ khi bạn tắt nó. Màn hình
    đồng ý Google một lần là bước duy nhất diễn ra bên ngoài WebUI. Khi ứng dụng đồng hành
-   được cài, VDBackup nhắc bạn **luôn ẩn nó với HMA-OSS** để sự hiện diện của nó không làm
+   được cài, VDBackup nhắc bạn **luôn ẩn nó với [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** để sự hiện diện của nó không làm
    lộ root hoặc một bootloader đã mở khóa, và nó đề nghị thêm nó vào danh sách HMA-OSS giúp
-   bạn.
+   bạn. VDBackup cũng nhắc bạn, khi có bản sao lưu cục bộ, ẩn thư mục sao lưu (/sdcard/VDBackup) bằng SUSFS vì cùng lý do.
 
 ## 8. Lập lịch và lưu giữ
 
@@ -468,6 +468,12 @@ nó không bao giờ sao lưu toàn bộ thiết bị của bạn cùng một l�
 **Ứng dụng loại trừ (danh sách chặn).** Cũng trong Settings, bạn có thể loại trừ các ứng dụng
 mà bạn không bao giờ muốn được sao lưu tự động hoặc theo lịch; bạn có thể thêm nhiều ứng dụng cùng
 lúc (chọn nhiều), và các ứng dụng bị loại trừ được cả hai bỏ qua.
+
+**Cấu hình sao lưu sẵn.** Cũng trong Cài đặt, bạn có thể lưu các cấu hình có tên - bộ mục cần sao lưu, như chỉ APK hoặc APK + OBB - và chọn một trong hộp thoại sao lưu để điền lựa chọn mục cùng lúc.
+
+**Mục sao lưu theo ứng dụng.** Cũng trong Cài đặt, bạn có thể chọn chính xác những mục nào mỗi ứng dụng sao lưu trong sao lưu hàng loạt, tự động và theo lịch - ví dụ chỉ APK, hoặc APK + OBB. Một bản sao lưu thủ công đơn lẻ vẫn cho bạn chọn lúc đó, bắt đầu từ bộ của ứng dụng. Ứng dụng bạn không đặt ở đây sẽ sao lưu mọi thứ.
+
+**Thẻ ứng dụng.** Chạm vào một ứng dụng trong Cài đặt (Mục và thẻ theo ứng dụng) để gán cho nó các nhãn tự do - ví dụ games hoặc work. Một bộ chọn thẻ sẽ xuất hiện phía trên danh sách ứng dụng: chọn một thẻ để chỉ hiện ứng dụng của nó, và sao lưu cả nhóm cùng lúc. Bạn cũng có thể mở nó từ tab Ứng dụng: chạm vào một ứng dụng, rồi chọn Mục và thẻ.
 
 **Nhật ký hoạt động.** Tab Schedule có một nút **View activity log** mở ra một màn hình đầy đủ (ngay
 lập tức) hiển thị dấu vết kiểm toán cục bộ - sao lưu, khôi phục, xóa, các lần chạy theo lịch và tự

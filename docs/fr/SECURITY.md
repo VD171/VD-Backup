@@ -11,7 +11,7 @@ phrases de passe de chiffrement. Nous prenons la sécurité au sérieux.
 
 - **Site :** https://vd171.ru
 - **Site :** https://vd.priv8.ru
-- **Issues :** https://github.com/VD171/VD-Backup/issues (signalements non liés à la sécurité uniquement)
+- **Issues :** https://github.com/VD171/VD-Backup/issues
 - **GitHub :** [@VD171](https://github.com/VD171)
 - **XDA-Developers :** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **Fil XDA :** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ que possible et vous créditerons si vous le souhaitez.
   clair. Les backups ne sont jamais liés à des clés matérielles propres à l'appareil (afin de rester
   portables), ce qui signifie aussi que la phrase de passe est ce qui protège un backup chiffré -
   choisissez-en une solide.
-- L'application compagnon Google Drive optionnelle devrait toujours être masquée avec HMA-OSS afin qu'elle ne
+- L'application compagnon Google Drive optionnelle devrait toujours être masquée avec [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) afin qu'elle ne
   révèle ni le root ni un bootloader déverrouillé.
 - La restauration s'exécute en tant que root, donc chaque archive est vérifiée avant toute
   écriture : un backup dont le contenu pointe en dehors de sa cible (un chemin absolu ou un

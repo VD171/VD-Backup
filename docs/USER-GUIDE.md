@@ -430,8 +430,8 @@ Local backups are never affected.
    the Google Drive companion destination**, never by default, and it is removed when
    you disable it. The one-time Google consent screen is the only step that happens
    outside the WebUI. When the companion is installed, VDBackup reminds you to
-   **always hide it with HMA-OSS** so that having it present does not reveal root or
-   an unlocked bootloader, and it offers to add it to the HMA-OSS list for you.
+   **always hide it with [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** so that having it present does not reveal root or
+   an unlocked bootloader, and it offers to add it to the HMA-OSS list for you. VDBackup also reminds you, when you have local backups, to hide the backup folder (/sdcard/VDBackup) with SUSFS for the same reason.
 
 ## 8. Scheduling and retention
 
@@ -474,6 +474,12 @@ enabling it never backs up your whole device at once.
 **Excluded apps (blocklist).** Also in Settings, you can exclude apps you never want
 backed up automatically or on a schedule; you can add several at once (multi-select), and
 excluded apps are skipped by both.
+
+**Backup presets.** Also in Settings, you can save named presets - sets of items to include, like APK only or APK + OBB - and pick one in the backup dialog to fill the item choices at once.
+
+**Per-app backup items.** Also in Settings, you can choose exactly which items each app backs up in bulk, automatic and scheduled backups - for example APK only, or APK + OBB. A single manual backup still lets you pick at the time, starting from the app's set. Apps you do not set here back up everything.
+
+**App tags.** Tap an app in Settings (Per-app items and tags) to give it free labels - for example games or work. A tag picker then appears above the app list: pick a tag to show only its apps, and back up the whole group at once. You can also reach it from the Apps tab: tap an app, then Items and tags.
 
 **Activity log.** The Schedule tab has a **View activity log** button that opens a full
 screen (instantly) showing the local audit trail - backups, restores, deletions, scheduled

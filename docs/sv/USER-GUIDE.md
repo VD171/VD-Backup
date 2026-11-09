@@ -428,8 +428,8 @@ Lokala säkerhetskopior påverkas aldrig.
    Google Drive-följeslagardestinationen**, aldrig som standard, och den tas bort när
    du inaktiverar den. Den engångs Google-samtyckesskärmen är det enda steget som händer
    utanför WebUI. När följeslagaren är installerad påminner VDBackup dig om att
-   **alltid dölja den med HMA-OSS** så att dess närvaro inte avslöjar root eller
-   en upplåst bootloader, och den erbjuder att lägga till den i HMA-OSS-listan åt dig.
+   **alltid dölja den med [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** så att dess närvaro inte avslöjar root eller
+   en upplåst bootloader, och den erbjuder att lägga till den i HMA-OSS-listan åt dig. VDBackup påminner dig också, när du har lokala säkerhetskopior, om att dölja säkerhetskopiemappen (/sdcard/VDBackup) med SUSFS av samma skäl.
 
 ## 8. Schemaläggning och kvarhållning
 
@@ -473,6 +473,12 @@ en gång.
 **Uteslutna appar (blocklist).** Även i Settings kan du utesluta appar som du aldrig vill
 säkerhetskopiera automatiskt eller enligt schema; du kan lägga till flera samtidigt (flerval), och
 uteslutna appar hoppas över av båda.
+
+**Säkerhetskopieförval.** Även i Inställningar kan du spara namngivna förval - uppsättningar av poster att inkludera, som bara APK eller APK + OBB - och välja ett i säkerhetskopieringsdialogen för att fylla valen på en gång.
+
+**Säkerhetskopieposter per app.** Även i Inställningar kan du välja exakt vilka poster varje app säkerhetskopierar i bulk-, automatiska och schemalagda säkerhetskopior - till exempel bara APK, eller APK + OBB. En enskild manuell säkerhetskopia låter dig fortfarande välja då, med appens uppsättning som utgångspunkt. Appar du inte ställer in här säkerhetskopierar allt.
+
+**App-taggar.** Tryck på en app i Inställningar (Objekt och taggar per app) för att ge den fria etiketter - till exempel games eller work. Ovanför applistan visas då en taggväljare: välj en tagg för att visa bara dess appar och säkerhetskopiera hela gruppen på en gång. Du kan också nå det från fliken Appar: tryck på en app och sedan på Objekt och taggar.
 
 **Aktivitetslogg.** Fliken Schedule har en knapp **View activity log** som öppnar en helskärm (direkt)
 och visar den lokala revisionsloggen - säkerhetskopior, återställningar, raderingar, schemalagda och

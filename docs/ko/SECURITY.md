@@ -11,7 +11,7 @@ VDBackup은 root로 실행되며 사용자의 데이터와 (선택적으로) 자
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (보안 외 신고만)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -30,7 +30,7 @@ VDBackup은 root로 실행되며 사용자의 데이터와 (선택적으로) 자
   유지됨), 이는 곧 암호화된 백업을 보호하는 것이 암호문구라는 뜻입니다 -
   강력한 것을 선택하세요.
 - 선택적 Google Drive 동반 앱은 root나 잠금 해제된 부트로더를 드러내지 않도록
-  항상 HMA-OSS로 숨겨야 합니다.
+  항상 [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)로 숨겨야 합니다.
 - 복원은 root로 실행되므로, 무언가가 기록되기 전에 모든 아카이브가 검사됩니다. 내용이
   대상 밖을 가리키는 백업(절대 경로나 `..` 구성 요소)은 거부되며, 전체 아카이브가 통과될
   때까지 어떤 파일도 추출되지 않습니다.

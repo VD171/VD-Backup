@@ -6,6 +6,27 @@
 
 Všechny podstatné změny ve VDBackup jsou zdokumentovány zde. Pouze anglicky.
 
+## v1.04
+
+Opravy:
+
+- Složky se zálohami teď zůstávají automaticky otevíratelné ve správci souborů: jejich oprávnění se znovu nastaví při instalaci, při každém startu a při každém otevření WebUI, takže složka, která zůstala jen pro vlastníka (například záloha z doby před v1.03.2), se opraví sama bez ručního kroku.
+
+Soukromí:
+
+- Když máte místní zálohy, karta Zálohy vám teď připomene skrýt složku se zálohami pomocí SUSFS, stejně jako doprovodnou aplikaci: její přítomnost jinak může prozradit root nebo odemčený bootloader. Skrývá SUSFS; připomenutí vás jen nasměruje.
+
+Zálohy:
+
+- Teď můžete nastavit, které položky každá aplikace zálohuje - například jen APK, nebo APK + OBB - a to se použije v hromadných, automatických a naplánovaných zálohách. Jednotlivá ruční záloha vám stále umožní výběr, předvyplněný podle sady aplikace. Nastavíte to v Nastavení, vedle seznamu vyloučených aplikací.
+
+- Předvolby zálohy: uložte pojmenované sady toho, co zahrnout, a použijte je jedním výběrem v dialogu zálohy.
+- Více uživatelů: zálohy aplikací, speciální zálohy i obnovení nyní sledují zvoleného uživatele Androidu.
+- Aplikace se vrací připravenější a úplnější: zálohují a obnovují se jejich kompilační profily ART a oprávnění pro posluchače oznámení, přístupnost a výjimku Doze.
+- Spolehlivější obnovení: vlastnictví souborů a kontext SELinux se znovu odvodí na cílovém zařízení, takže obnovení funguje správně napříč zařízeními a uživateli.
+- Bezpečnější obnovení: Play Protect a ověřovatel instalace se ztlumí jen během instalace a přesně obnoví; správce rootu se nikdy nezálohuje ani neobnovuje; a zdroj instalace se ověří a zapíše.
+- Štítky aplikací: přidělte aplikacím volné popisky jako games nebo work, filtrujte seznam aplikací podle štítku a zálohujte celou označenou skupinu najednou.
+
 ## v1.03.2
 
 Opravy:
@@ -116,7 +137,7 @@ Cíle a cloud:
   backend (SFTP, SMB, WebDAV, FTP, S3, Google Drive a další) je dosažitelný bez ručních úprav
   `rclone.conf`.
 - Google Drive dvěma způsoby: přes rclone (bez účtu Google Cloud) nebo volitelnou bezhlavou doprovodnou
-  aplikaci (`ru.vd171.vdbackup`), která nese povinné upozornění na skrytí přes HMA-OSS.
+  aplikaci (`ru.vd171.vdbackup`), která nese povinné upozornění na skrytí přes [HMA-OSS](https://github.com/frknkrc44/HMA-OSS).
 - Síťová politika: zvolte, zda smí cloudové přenosy používat libovolné připojení, pouze Wi-Fi nebo pouze
   mobilní data; vynucováno pro ruční i naplánované úlohy. Místní cíle jsou vyňaty.
 

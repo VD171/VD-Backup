@@ -12,14 +12,14 @@ e como verificar que nada opaco foi inserido às escondidas.
 ## Princípios
 
 - **Nada opaco.** Cada binário e biblioteca distribuído é rastreável até um upstream público e
-  nomeado, numa versão fixada, com um SHA-256 registrado. Nenhum blob é embarcado sem uma
+   nomeado, numa versão fixada, com um SHA-256 registrado. Nenhum blob é embarcado sem uma
   entrada que você possa conferir.
 - **Buscado do upstream, nunca de um dispositivo.** As ferramentas nativas vêm do repositório
   oficial de pacotes do Termux (os arquivos `.deb` assinados em `packages.termux.dev/apt`), nunca
   copiadas de um Termux instalado em algum telefone. O build falha de forma ruidosa, ele nunca
   improvisa.
 - **Reproduzível.** Refaça o build e você obtém os mesmos arquivos; rebusque as fontes fixadas
-  e os valores de SHA-256 batem.
+   e os valores de SHA-256 batem.
 - **A trilha de auditoria viaja com o módulo.** Ela não está apenas no site - ela viaja
   dentro do módulo instalado, no seu dispositivo, para que você possa auditar offline.
 
@@ -29,7 +29,7 @@ e como verificar que nada opaco foi inserido às escondidas.
 |---|---|---|
 | ferramentas nativas em `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + a closure de `lib/` delas | Repositório apt oficial do **Termux** (`packages.termux.dev/apt`), pacotes `.deb` oficiais | `.github/scripts/build_bin.sh` baixa os arquivos `.deb` + suas dependências transitivas, extrai-os, e copia os binários mais apenas as bibliotecas compartilhadas de que cada um precisa |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (fallback do conversor ABX) | Release do GitHub **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF estático) | baixado da release fixada pelo `build_bin.sh` |
-| `companion.apk` (companion opcional do Google Drive) | **Este repositório**, `companion/` (Gradle/Kotlin) | construído a partir do código pela CI e assinado com a chave do projeto (`VD_Key`); não é um blob pré-compilado |
+| `companion.apk` (companion opcional do Google Drive) | **Este repositório**, `companion/` (Gradle/Kotlin) | construído a partir do código pela CI e assinado com a chave do projeto; não é um blob pré-compilado |
 | `vdbackup_helper.dex` (helper de framework) | **Este repositório**, `dex/src/` (Java) | compilado a partir do código pela CI com `javac` + `d8` |
 
 Apenas as duas primeiras linhas são binários de terceiros pré-compilados; as duas últimas são
@@ -49,7 +49,7 @@ mantém apenas a ABI do seu dispositivo, de modo que esse arquivo permanece no d
 `/data/adb/modules/vdbackup/bin/<abi>/PROVENANCE.json`. Ele registra:
 
 - `sources`: cada `.deb` upstream (pacote, versão, URL completa, SHA-256 do `.deb`) e
-  a release do ABX (URL, SHA-256 do arquivo).
+   a release do ABX (URL, SHA-256 do arquivo).
 - `files`: cada arquivo efetivamente distribuído sob `bin/<abi>/` (caminho, tamanho, SHA-256).
 
 Você pode lê-lo na WebUI (a aba **Sobre** aponta para ele) ou pela API do agente:
@@ -73,7 +73,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 3. **Reconstrua do zero.** Rode você mesmo o `.github/scripts/build_bin.sh` (precisa apenas de
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`) e compare a saída com o que foi distribuído.
 4. **Companion e dex.** Reconstrua `companion/` e `dex/` a partir do código; a assinatura do
-   companion é a chave do projeto `VD_Key` (SHA-256
+   companion é a chave do projeto (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
 ## Reportando

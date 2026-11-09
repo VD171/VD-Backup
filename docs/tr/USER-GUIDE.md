@@ -436,8 +436,8 @@ Wi-Fi politikası asla mobil veri harcamaz. Yerel yedekler asla etkilenmez.
    Google Drive eşlik eden hedefi seçtiğinizde** kurulur, asla varsayılan olarak değil ve
    onu devre dışı bıraktığınızda kaldırılır. Tek seferlik Google onay ekranı, WebUI
    dışında gerçekleşen tek adımdır. Eşlik eden uygulama kuruluyken, VDBackup, varlığının
-   root'u veya kilitsiz bir önyükleyiciyi açığa çıkarmaması için onu **her zaman HMA-OSS
-   ile gizlemenizi** hatırlatır ve sizin için HMA-OSS listesine eklemeyi teklif eder.
+   root'u veya kilitsiz bir önyükleyiciyi açığa çıkarmaması için onu **her zaman [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)
+   ile gizlemenizi** hatırlatır ve sizin için HMA-OSS listesine eklemeyi teklif eder. VDBackup ayrıca, yerel yedekleriniz olduğunda, aynı nedenle yedek klasörünü (/sdcard/VDBackup) SUSFS ile gizlemenizi hatırlatır.
 
 ## 8. Zamanlama ve saklama
 
@@ -483,6 +483,12 @@ yedeklemez.
 **Hariç tutulan uygulamalar (engelleme listesi).** Yine Settings'te, otomatik olarak veya
 bir zamanlamayla asla yedeklenmesini istemediğiniz uygulamaları hariç tutabilirsiniz; aynı anda
 birkaçını ekleyebilirsiniz (çoklu seçim) ve hariç tutulan uygulamalar her ikisi tarafından da atlanır.
+
+**Yedek ön ayarları.** Yine Ayarlar'da, adlandırılmış ön ayarlar - dahil edilecek öğe kümeleri, yalnızca APK veya APK + OBB gibi - kaydedip yedek penceresinde birini seçerek öğe seçimlerini tek seferde doldurabilirsiniz.
+
+**Uygulama başına yedek öğeleri.** Yine Ayarlar'da, toplu, otomatik ve zamanlanmış yedeklerde her uygulamanın tam olarak hangi öğeleri yedekleyeceğini seçebilirsiniz - örneğin yalnızca APK veya APK + OBB. Tek bir elle yedekte, uygulamanın kümesinden başlayarak yine o anda seçebilirsiniz. Burada ayarlamadığınız uygulamalar her şeyi yedekler.
+
+**Uygulama etiketleri.** Serbest etiketler vermek için Ayarlar'da (Uygulama başına öğeler ve etiketler) bir uygulamaya dokunun - örneğin games veya work. Ardından uygulama listesinin üstünde bir etiket seçici belirir: yalnızca o uygulamaları göstermek için bir etiket seçin ve grubun tamamını tek seferde yedekleyin. Buna Uygulamalar sekmesinden de ulaşabilirsiniz: bir uygulamaya dokunun, sonra Öğeler ve etiketler.
 
 **Etkinlik günlüğü.** Schedule sekmesinde, yerel denetim izini - yedekler, geri
 yüklemeler, silmeler, zamanlanmış ve otomatik çalıştırmalar ve budamalar - en yeni önce

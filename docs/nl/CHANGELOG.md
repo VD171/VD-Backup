@@ -6,6 +6,27 @@
 
 Alle noemenswaardige wijzigingen aan VDBackup worden hier gedocumenteerd. Alleen in het Engels.
 
+## v1.04
+
+Oplossingen:
+
+- Back-upmappen blijven nu automatisch te openen met een bestandsbeheerder: hun rechten worden opnieuw ingesteld bij installatie, bij elke boot en telkens als de WebUI opent, zodat een map die alleen voor de eigenaar toegankelijk bleef (bijvoorbeeld een back-up van vóór v1.03.2) zichzelf herstelt zonder handmatige stap.
+
+Privacy:
+
+- Wanneer je lokale back-ups hebt, herinnert het tabblad Back-ups je er nu aan om de back-upmap met SUSFS te verbergen, net als de begeleidende app: de aanwezigheid ervan kan anders root of een ontgrendelde bootloader verraden. SUSFS verbergt; de herinnering wijst je alleen de weg.
+
+Back-ups:
+
+- Je kunt nu instellen welke items elke app back-upt - bijvoorbeeld alleen APK, of APK + OBB - toegepast in bulk-, automatische en geplande back-ups. Bij een losse handmatige back-up kun je nog steeds kiezen, vooraf ingevuld vanuit de set van de app. Stel het in bij Instellingen, naast de lijst met uitgesloten apps.
+
+- Back-upvoorinstellingen: bewaar benoemde sets van wat op te nemen en pas ze toe met één keuze in het back-updialoog.
+- Multi-user: app-back-ups, speciale back-ups en herstel volgen nu allemaal de gekozen Android-gebruiker.
+- Apps komen vollediger terug: hun ART-compilatieprofielen en hun rechten voor meldingsluisteraar, toegankelijkheid en Doze-batterijvrijstelling worden geback-upt en hersteld.
+- Betrouwbaarder herstel: bestandseigendom en SELinux-context worden opnieuw afgeleid op het doelapparaat, zodat herstel correct werkt tussen apparaten en gebruikers.
+- Veiliger herstel: Play Protect en de installatieverificatie worden alleen tijdens de installatie gedempt en exact hersteld; de root-manager wordt nooit geback-upt of hersteld; en de installatiebron wordt geverifieerd en gelogd.
+- App-tags: geef apps vrije labels zoals games of work, filter de app-lijst op een tag en back-up een hele getagde groep in één keer.
+
 ## v1.03.2
 
 Oplossingen:
@@ -124,7 +145,7 @@ Bestemmingen en cloud:
   cloud-backend (SFTP, SMB, WebDAV, FTP, S3, Google Drive en meer) bereikbaar is zonder `rclone.conf`
   handmatig te bewerken.
 - Google Drive op twee manieren: via rclone (geen Google Cloud-account) of de optionele headless
-  begeleidende app (`ru.vd171.vdbackup`), die een verplichte HMA-OSS-verbergmelding draagt.
+  begeleidende app (`ru.vd171.vdbackup`), die een verplichte [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)-verbergmelding draagt.
 - Netwerkbeleid: kies of cloudoverdrachten elke verbinding, alleen wifi of alleen mobiele data mogen
   gebruiken; afgedwongen voor handmatige en geplande taken. Lokale bestemmingen zijn vrijgesteld.
 

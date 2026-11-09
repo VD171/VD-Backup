@@ -6,6 +6,27 @@
 
 Semua perubahan penting pada VDBackup didokumentasikan di sini. Hanya dalam bahasa Inggris.
 
+## v1.04
+
+Perbaikan:
+
+- Folder cadangan kini otomatis tetap bisa dibuka oleh pengelola berkas: izinnya diterapkan ulang saat pemasangan, setiap boot, dan setiap kali WebUI dibuka, sehingga folder yang tertinggal hanya untuk pemilik (misalnya cadangan yang dibuat sebelum v1.03.2) memperbaiki dirinya sendiri tanpa langkah manual.
+
+Privasi:
+
+- Saat Anda punya cadangan lokal, tab Cadangan kini mengingatkan Anda menyembunyikan folder cadangan dengan SUSFS, sama seperti aplikasi pendamping: jika tidak, keberadaannya bisa mengungkap root atau bootloader yang tidak terkunci. SUSFS yang menyembunyikan; pengingat ini hanya menunjukkan arahnya.
+
+Cadangan:
+
+- Anda kini bisa menentukan item mana yang dicadangkan setiap aplikasi - misalnya hanya APK, atau APK + OBB - yang diterapkan di cadangan massal, otomatis, dan terjadwal. Cadangan manual tunggal tetap membiarkan Anda memilih saat itu, terisi otomatis dari set aplikasi. Aturlah di Pengaturan, di samping daftar aplikasi yang dikecualikan.
+
+- Praset cadangan: simpan kumpulan bernama dari apa yang disertakan dan terapkan dengan satu pilihan di dialog cadangan.
+- Multi-pengguna: cadangan aplikasi, cadangan khusus, dan pemulihan kini semuanya mengikuti pengguna Android yang Anda pilih.
+- Aplikasi kembali lebih siap dan lengkap: profil kompilasi ART-nya, serta izin pendengar notifikasi, aksesibilitas, dan pengecualian baterai Doze, dicadangkan dan dipulihkan.
+- Pemulihan lebih andal: kepemilikan berkas dan konteks SELinux diturunkan ulang di perangkat tujuan, sehingga pemulihan bekerja benar di antar perangkat dan pengguna.
+- Pemulihan lebih aman: Play Protect dan pemverifikasi pemasangan dibungkam hanya selama pemasangan lalu dipulihkan persis; pengelola root tidak pernah dicadangkan atau dipulihkan; dan sumber pemasangan diverifikasi dan dicatat.
+- Tag aplikasi: beri aplikasi label bebas seperti games atau work, filter daftar aplikasi menurut tag, dan cadangkan seluruh grup bertag sekaligus.
+
 ## v1.03.2
 
 Perbaikan:
@@ -118,7 +139,7 @@ Tujuan dan cloud:
   backend cloud (SFTP, SMB, WebDAV, FTP, S3, Google Drive, dan lainnya) dapat dijangkau tanpa
   menyunting `rclone.conf` secara manual.
 - Google Drive dengan dua cara: melalui rclone (tanpa akun Google Cloud) atau aplikasi pendamping
-  headless yang bersifat opt-in (`ru.vd171.vdbackup`), yang memuat pemberitahuan wajib untuk menyembunyikan dengan HMA-OSS.
+  headless yang bersifat opt-in (`ru.vd171.vdbackup`), yang memuat pemberitahuan wajib untuk menyembunyikan dengan [HMA-OSS](https://github.com/frknkrc44/HMA-OSS).
 - Kebijakan jaringan: pilih apakah transfer cloud boleh menggunakan koneksi apa pun, hanya Wi-Fi, atau
   hanya data seluler; diberlakukan untuk job manual dan terjadwal. Tujuan lokal dikecualikan.
 

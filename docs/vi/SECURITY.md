@@ -11,7 +11,7 @@ cụm mật khẩu mã hóa của bạn. Chúng tôi coi trọng vấn đề b�
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (chỉ dành cho báo cáo không liên quan bảo mật)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ sớm nhất có thể và ghi công bạn nếu bạn muốn.
   dạng văn bản thuần. Các bản backup không bao giờ gắn với các khóa phần cứng gắn liền thiết bị (nên chúng vẫn
   có tính di động), điều này cũng có nghĩa cụm mật khẩu là thứ bảo vệ một bản backup đã mã hóa -
   hãy chọn một cụm mật khẩu mạnh.
-- Ứng dụng đồng hành Google Drive tùy chọn luôn phải được ẩn bằng HMA-OSS để nó không
+- Ứng dụng đồng hành Google Drive tùy chọn luôn phải được ẩn bằng [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) để nó không
   làm lộ root hay bootloader đã mở khóa.
 - Việc khôi phục chạy với quyền root, nên mọi kho lưu trữ đều được kiểm tra trước khi ghi bất
   cứ thứ gì: một bản backup có nội dung trỏ ra ngoài đích của nó (một đường dẫn tuyệt đối hoặc

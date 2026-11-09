@@ -12,14 +12,14 @@ vandaan komt en hoe je kunt verifiëren dat er niets ondoorzichtigs is binnenges
 ## Principes
 
 - **Niets ondoorzichtigs.** Elke meegeleverde binary en bibliotheek is te herleiden tot een
-  benoemde, publieke upstream op een vastgezette versie, met een vastgelegde SHA-256. Geen enkele
+   benoemde, publieke upstream op een vastgezette versie, met een vastgelegde SHA-256. Geen enkele
   blob wordt meegeleverd zonder een vermelding die je kunt controleren.
 - **Opgehaald van de upstream, nooit van een apparaat.** Native tools komen uit het officiële
   Termux-pakketrepository (de ondertekende `.deb`-bestanden op `packages.termux.dev/apt`), nooit
   gekopieerd uit een Termux die op een of andere telefoon is geïnstalleerd. De build faalt
   luidruchtig, hij improviseert nooit.
 - **Reproduceerbaar.** Voer de build opnieuw uit en je krijgt dezelfde bestanden; haal de
-  vastgezette bronnen opnieuw op en de SHA-256-waarden komen overeen.
+   vastgezette bronnen opnieuw op en de SHA-256-waarden komen overeen.
 - **Het auditspoor wordt met de module meegeleverd.** Het staat niet alleen op de website - het
   reist mee binnen de geïnstalleerde module, op je apparaat, zodat je offline kunt auditen.
 
@@ -29,7 +29,7 @@ vandaan komt en hoe je kunt verifiëren dat er niets ondoorzichtigs is binnenges
 |---|---|---|
 | `bin/<abi>/` native tools (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + hun `lib/`-closure | Officiële **Termux** apt-repo (`packages.termux.dev/apt`), officiële `.deb`-pakketten | `.github/scripts/build_bin.sh` downloadt de `.deb`-bestanden + hun transitieve afhankelijkheden, pakt ze uit en kopieert de binaries plus alleen de gedeelde bibliotheken die elk nodig heeft |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX-converter-terugval) | GitHub-release van **rhythmcache/android-xml-converter** (`ABX_RELEASE`, statische ELF) | gedownload van de vastgezette release door `build_bin.sh` |
-| `companion.apk` (optionele Google Drive-metgezel) | **Deze repository**, `companion/` (Gradle/Kotlin) | gebouwd vanuit de bron door de CI en ondertekend met de projectsleutel (`VD_Key`); geen voorgebouwde blob |
+| `companion.apk` (optionele Google Drive-metgezel) | **Deze repository**, `companion/` (Gradle/Kotlin) | gebouwd vanuit de bron door de CI en ondertekend met de projectsleutel; geen voorgebouwde blob |
 | `vdbackup_helper.dex` (framework-helper) | **Deze repository**, `dex/src/` (Java) | gecompileerd vanuit de bron door de CI met `javac` + `d8` |
 
 Alleen de eerste twee rijen zijn voorgebouwde binaries van derden; de laatste twee worden gebouwd
@@ -49,7 +49,7 @@ alleen de ABI van je apparaat, zodat dat bestand op het apparaat blijft op
 `/data/adb/modules/vdbackup/bin/<abi>/PROVENANCE.json`. Het legt vast:
 
 - `sources`: elke upstream-`.deb` (pakket, versie, volledige URL, SHA-256 van de `.deb`) en de
-  ABX-release (URL, SHA-256 van het archief).
+   ABX-release (URL, SHA-256 van het archief).
 - `files`: elk bestand dat daadwerkelijk onder `bin/<abi>/` wordt meegeleverd (pad, grootte, SHA-256).
 
 Je kunt het lezen in de WebUI (het tabblad **Over** linkt ernaar) of via de agent-API:
@@ -74,7 +74,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 3. **Herbouw vanaf nul.** Voer zelf `.github/scripts/build_bin.sh` uit (heeft alleen `curl`, `ar`,
    `tar`, `xz`, `zstd`, `readelf` nodig) en vergelijk de uitvoer met wat is meegeleverd.
 4. **Metgezel en dex.** Herbouw `companion/` en `dex/` vanuit de bron; de handtekening van de
-   metgezel is de projectsleutel `VD_Key` (SHA-256
+   metgezel is de projectsleutel (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
 ## Melden

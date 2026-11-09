@@ -402,8 +402,8 @@ Lokální zálohy nejsou nikdy ovlivněny.
    cíl Google Drive companion**, nikdy ve výchozím stavu, a odebere se, když
    ji zakážete. Jednorázová obrazovka Google souhlasu je jediný krok, který se děje
    mimo WebUI. Když je companion nainstalován, VDBackup vám připomíná, abyste jej
-   **vždy skryli pomocí HMA-OSS**, aby jeho přítomnost neprozradila root nebo
-   odemčený bootloader, a nabídne přidat jej do seznamu HMA-OSS za vás.
+   **vždy skryli pomocí [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)**, aby jeho přítomnost neprozradila root nebo
+   odemčený bootloader, a nabídne přidat jej do seznamu HMA-OSS za vás. VDBackup vám také, když máte místní zálohy, připomene skrýt složku se zálohami (/sdcard/VDBackup) pomocí SUSFS ze stejného důvodu.
 
 ## 8. Plánování a retence
 
@@ -445,6 +445,12 @@ nainstalováno, takže její zapnutí nikdy nezálohuje celé zařízení najedn
 
 **Vyloučené aplikace (blocklist).** Rovněž v Settings můžete vyloučit aplikace, které nikdy
 nechcete zálohovat automaticky nebo podle rozvrhu; můžete jich přidat několik najednou (vícenásobný výběr) a vyloučené aplikace jsou oběma přeskočeny.
+
+**Předvolby zálohy.** Také v Nastavení si můžete uložit pojmenované předvolby - sady položek k zahrnutí, třeba jen APK nebo APK + OBB - a jednu vybrat v dialogu zálohy, aby se výběr položek vyplnil najednou.
+
+**Položky zálohy pro aplikace.** Také v Nastavení můžete zvolit přesně, které položky každá aplikace zálohuje v hromadných, automatických a naplánovaných zálohách - například jen APK, nebo APK + OBB. Jednotlivá ruční záloha vám stále umožní výběr, počínaje sadou aplikace. Aplikace, které zde nenastavíte, zálohují vše.
+
+**Štítky aplikací.** Klepnutím na aplikaci v Nastavení (Položky a štítky podle aplikace) jí přidělíte volné popisky - například games nebo work. Nad seznamem aplikací se pak objeví výběr štítků: zvolte štítek pro zobrazení jen jeho aplikací a zálohujte celou skupinu najednou. Dostanete se k tomu i z karty Aplikace: klepněte na aplikaci a pak na Položky a štítky.
 
 **Protokol aktivity.** Záložka Schedule má tlačítko **View activity log**, které otevře celou
 obrazovku (okamžitě) zobrazující lokální auditní stopu - zálohy, obnovy, mazání, naplánované

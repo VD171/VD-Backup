@@ -11,7 +11,7 @@ senhas de criptografia. Levamos segurança a sério.
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (apenas reports não relacionados a segurança)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **Tópico XDA:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ que pudermos e daremos crédito a você se desejar.
   texto claro. Backups nunca são atrelados a chaves de hardware vinculadas ao dispositivo (para que permaneçam
   portáveis), o que também significa que a senha é o que protege um backup cifrado -
   escolha uma forte.
-- O app companheiro opcional do Google Drive deve sempre ser ocultado com o HMA-OSS para que ele não
+- O app companheiro opcional do Google Drive deve sempre ser ocultado com o [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) para que ele não
   revele root ou um bootloader desbloqueado.
 - A restauração roda como root, então todo pacote é verificado antes de qualquer coisa ser
   gravada: um backup cujo conteúdo aponte para fora do seu destino (um caminho absoluto ou

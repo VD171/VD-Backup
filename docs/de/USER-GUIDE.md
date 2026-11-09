@@ -428,8 +428,8 @@ verbraucht. Lokale Backups sind nie betroffen.
    Drive-Begleitziel wählst**, nie standardmäßig, und sie wird entfernt, wenn du sie
    deaktivierst. Der einmalige Google-Zustimmungsbildschirm ist der einzige Schritt, der
    außerhalb der WebUI geschieht. Wenn der Begleiter installiert ist, erinnert VDBackup dich
-   daran, ihn **immer mit HMA-OSS zu verbergen**, damit seine Anwesenheit nicht root oder einen
-   entsperrten Bootloader verrät, und es bietet an, ihn für dich zur HMA-OSS-Liste hinzuzufügen.
+   daran, ihn **immer mit [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) zu verbergen**, damit seine Anwesenheit nicht root oder einen
+   entsperrten Bootloader verrät, und es bietet an, ihn für dich zur HMA-OSS-Liste hinzuzufügen. VDBackup erinnert dich außerdem, wenn du lokale Backups hast, den Backup-Ordner (/sdcard/VDBackup) aus demselben Grund mit SUSFS zu verbergen.
 
 ## 8. Planung und Aufbewahrung
 
@@ -475,6 +475,12 @@ sodass das Aktivieren nie dein ganzes Gerät auf einmal sichert.
 **Ausgeschlossene Apps (Sperrliste).** Ebenfalls in den Einstellungen kannst du Apps ausschließen,
 die du nie automatisch oder nach Zeitplan gesichert haben möchtest; du kannst mehrere auf einmal hinzufügen (Mehrfachauswahl), und ausgeschlossene Apps werden
 von beiden übersprungen.
+
+**Backup-Voreinstellungen.** Ebenfalls in den Einstellungen kannst du benannte Voreinstellungen speichern - Sätze von Elementen wie nur APK oder APK + OBB - und eine im Backup-Dialog wählen, um die Elementauswahl auf einmal zu füllen.
+
+**Backup-Elemente pro App.** Ebenfalls in den Einstellungen kannst du genau wählen, welche Elemente jede App in Massen-, automatischen und geplanten Backups sichert - zum Beispiel nur APK oder APK + OBB. Ein einzelnes manuelles Backup lässt dich weiterhin wählen, ausgehend von der App-Auswahl. Apps, die du hier nicht festlegst, sichern alles.
+
+**App-Tags.** Tippe in den Einstellungen (Elemente und Tags pro App) auf eine App, um ihr freie Labels zu geben - zum Beispiel games oder work. Über der App-Liste erscheint dann eine Tag-Auswahl: Wähle einen Tag, um nur dessen Apps zu zeigen, und sichere die ganze Gruppe auf einmal. Du erreichst es auch über den Tab Apps: Tippe auf eine App und dann auf Elemente und Tags.
 
 **Aktivitätsprotokoll.** Der Zeitplan-Tab hat eine Schaltfläche **Aktivitätsprotokoll anzeigen**,
 die einen ganzen Bildschirm (sofort) öffnet und den lokalen Audit-Trail zeigt - Backups,

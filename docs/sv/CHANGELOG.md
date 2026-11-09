@@ -6,6 +6,27 @@
 
 Alla noterbara ändringar i VDBackup dokumenteras här. Endast engelska.
 
+## v1.04
+
+Korrigeringar:
+
+- Säkerhetskopiemappar går nu att öppna i en filhanterare automatiskt: deras behörigheter sätts om vid installation, vid varje start och varje gång WebUI öppnas, så en mapp som blivit enbart för ägaren (till exempel en säkerhetskopia gjord före v1.03.2) läker sig själv utan något manuellt steg.
+
+Integritet:
+
+- När du har lokala säkerhetskopior påminner fliken Säkerhetskopior dig nu om att dölja säkerhetskopiemappen med SUSFS, precis som följeslagarappen: dess närvaro kan annars avslöja root eller en olåst bootloader. SUSFS döljer; påminnelsen pekar bara ut vägen.
+
+Säkerhetskopior:
+
+- Du kan nu ange vilka poster varje app säkerhetskopierar - till exempel bara APK, eller APK + OBB - vilket tillämpas i bulk-, automatiska och schemalagda säkerhetskopior. En enskild manuell säkerhetskopia låter dig fortfarande välja då, förifylld från appens uppsättning. Ställ in det i Inställningar, bredvid listan över uteslutna appar.
+
+- Säkerhetskopieförval: spara namngivna uppsättningar av vad som ska ingå och använd dem med ett val i säkerhetskopieringsdialogen.
+- Fleranvändare: appsäkerhetskopior, specialsäkerhetskopior och återställningar följer nu alla den valda Android-användaren.
+- Appar kommer tillbaka mer kompletta: deras ART-kompileringsprofiler och deras behörigheter för aviseringslyssnare, tillgänglighet och Doze-batteriundantag säkerhetskopieras och återställs.
+- Pålitligare återställning: filägande och SELinux-kontext härleds om på målenheten, så en återställning fungerar korrekt mellan enheter och användare.
+- Säkrare återställning: Play Protect och installationsverifieraren tystas bara under installationen och återställs exakt; root-hanteraren säkerhetskopieras eller återställs aldrig; och installationskällan verifieras och loggas.
+- App-taggar: ge appar fria etiketter som games eller work, filtrera applistan efter en tagg och säkerhetskopiera en hel taggad grupp på en gång.
+
 ## v1.03.2
 
 Rättningar:
@@ -121,7 +142,7 @@ Destinationer och moln:
   molnbackend som helst (SFTP, SMB, WebDAV, FTP, S3, Google Drive med flera) är nåbar utan att behöva
   redigera `rclone.conf` för hand.
 - Google Drive på två sätt: via rclone (inget Google Cloud-konto) eller den valfria huvudlösa
-  följeslagarappen (`ru.vd171.vdbackup`), som bär en obligatorisk HMA-OSS-döljanotis.
+  följeslagarappen (`ru.vd171.vdbackup`), som bär en obligatorisk [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)-döljanotis.
 - Nätverkspolicy: välj om molnöverföringar får använda vilken anslutning som helst, endast Wi-Fi eller
   endast mobildata; tillämpas för manuella och schemalagda jobb. Lokala destinationer är undantagna.
 

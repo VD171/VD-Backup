@@ -33,9 +33,10 @@ VD-Backup/
 ├── README.md + README.<code>.md    # English + the 21 standard languages
 ├── CHANGELOG.md                    # English only
 ├── CONTRIBUTING.md                 # how to contribute
-├── CODE_OF_CONDUCT.md  SECURITY.md
+├── CODE_OF_CONDUCT.md              # contributor code of conduct
+├── SECURITY.md                     # security policy + how to report
 ├── LICENSE                         # GNU AGPL-3.0-or-later
-├── docs/                           # public docs (this file)
+├── docs/                           # all public docs (expanded below)
 ├── tools/screenshots/              # dev harness: renders the WebUI -> docs/screenshots (not shipped)
 └── .github/
     ├── workflows/ci.yml            # build/sanity on every push & PR
@@ -51,6 +52,22 @@ VD-Backup/
 - **WebUI/UX 또는 번역:** `module/webroot/` (그리고 `lang/`).
 - **백업/복원 로직:** `module/scripts/helper.sh`와 `module/scripts/worker.sh`.
 - **패키징/CI:** `.github/`.
+
+## 문서 (docs/)
+
+```
+docs/                               # all public documentation
+├── USER-GUIDE.md                   # end-user guide
+├── ARCHITECTURE.md                 # how VDBackup works internally
+├── FILE-STRUCTURE.md               # this file
+├── BINARIES.md                     # bundled binaries: origin, version, sha256
+├── AI-AGENTS.md                    # notes for AI agents working on the repo
+├── <code>/                         # 20 translations (ar cs de es fa fr hi in it ja ko nl pl pt ru sv th tr vi zh)
+│   ├── USER-GUIDE.md  ARCHITECTURE.md  FILE-STRUCTURE.md  BINARIES.md  AI-AGENTS.md
+│   ├── CHANGELOG.md  SECURITY.md  CODE_OF_CONDUCT.md  CONTRIBUTING.md
+│   └── RECOVERY.md  bug_report.md  feature_request.md  PULL_REQUEST_TEMPLATE.md
+└── screenshots/<code>/             # generated WebUI screenshots, per language
+```
 
 ---
 

@@ -11,7 +11,7 @@ VDBackup はルートとして動作し、あなたのデータ、そして（�
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (セキュリティ以外の報告のみ)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -30,7 +30,7 @@ VDBackup はルートとして動作し、あなたのデータ、そして（�
   保ちます）ため、暗号化されたバックアップを保護するのはパスフレーズです。強いものを
   選んでください。
 - 任意の Google Drive コンパニオンアプリは、ルートやアンロックされたブートローダーを
-  露呈しないよう、常に HMA-OSS で隠すべきです。
+  露呈しないよう、常に [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) で隠すべきです。
 - 復元はルートとして実行されるため、何かが書き込まれる前にすべてのアーカイブが検査されます。
   内容が対象の外を指すバックアップ（絶対パスや `..` コンポーネント）は拒否され、アーカイブ
   全体が問題なしと確認されるまで、いかなるファイルも展開されません。

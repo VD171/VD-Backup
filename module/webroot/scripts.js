@@ -251,11 +251,12 @@ var selectMode = false;
 var selected = {};   // package -> {package,label} while in select mode
 function appFilter() { var e = $("#app-filter"); return e ? e.value : "user"; }
 function appSort() { var e = $("#app-sort"); return e ? e.value : "name"; }
-function visibleApps(filter) {
+function visibleApps(filter, ignoreTag) {
   var q = (filter || "").toLowerCase(), f = appFilter();
   var list = APPS.filter(function (a) {
     if (f === "user" && a.system) return false;
     if (f === "system" && !a.system) return false;
+    if (!ignoreTag && tagFilter && appTags(a.package).indexOf(tagFilter) < 0) return false;
     return !q || a.package.toLowerCase().indexOf(q) >= 0 || (a.label || "").toLowerCase().indexOf(q) >= 0;
   });
   var byName = appSort() === "name";
@@ -277,6 +278,8 @@ function renderApps(filter) {
     var grow = el("div", "grow");
     grow.appendChild(el("div", "name", a.label || a.package));
     grow.appendChild(el("div", "pkg", a.package));
+    var _ts = appTags(a.package);
+    if (_ts.length) { var tb = el("div", "tags"); _ts.forEach(function (t) { tb.appendChild(tagChip(t)); }); grow.appendChild(tb); }
     if (selectMode) {
       var cb = el("input", "selbox"); cb.type = "checkbox"; cb.checked = !!selected[a.package];
       cb.onclick = function (e) { e.stopPropagation(); toggleSel(a, cb.checked); li.classList.toggle("sel", cb.checked); };
@@ -293,6 +296,10 @@ function renderApps(filter) {
     ul.appendChild(li);
     if (iconObserver) iconObserver.observe(ic); else loadIcon(ic);
   });
+  // "Back up tag" is offered only when a tag is active, we are not in select mode, and the
+  // tag actually matches apps in the current (user/system) view - so it never dead-ends.
+  var tb = $("#app-backuptag");
+  if (tb) tb.hidden = !(tagFilter && !selectMode && tagFilterApps().length);
 }
 function toggleSel(a, on) {
   if (on) selected[a.package] = { package: a.package, label: a.label };
@@ -315,18 +322,22 @@ function loadApps() {
   $("#applist").innerHTML = "<li class='muted'>" + I18N.t("apps_loading") + "</li>";
   helper("list-apps", { user: activeUser }).then(function (r) {
     APPS = (r && r.apps) ? r.apps : [];
+    fillTagFilter();
     renderApps($("#search").value);
     buildBlockPicker();   // keep the Settings "Excluded apps" picker in sync with APPS
+    buildAppItemsPicker(); // and the "Per-app items and tags" picker
   });
 }
 
 // --- backups ------------------------------------------------------------
 var BACKUPS = [];
+var SUSFS_DISMISSED = false;
 var bkSelectMode = false, bkSelected = {};   // ref -> {ref,package,items} while selecting
 function renderBackups(list) {
   var ul = $("#backuplist"); ul.innerHTML = "";
   BACKUPS = list || [];
   $("#backups-empty").style.display = (list && list.length) ? "none" : "";
+  if (list && list.length) showSusfsNotice(); else { var sb = $("#susfs-notice"); if (sb) sb.hidden = true; }
   (list || []).forEach(function (b) {
     var li = el("li", "row tappable");
     var ic = el("div", "app-ic", (b.label || b.package).charAt(0).toUpperCase());
@@ -664,6 +675,7 @@ function openAppBackups(pkg, label) {
   m.hidden = false;
   $("#appbk-close").onclick = function () { m.hidden = true; };
   $("#appbk-backup").onclick = function () { m.hidden = true; startBackup(pkg, label); };
+  $("#appbk-items").onclick = function () { m.hidden = true; openAppItemsModal(pkg, label); };
   $("#appbk-sysmount").onclick = function () { m.hidden = true; openSysmount(pkg, label); };
   helper("list-backups").then(function (r) {
     var all = (r && r.backups) ? r.backups : [];
@@ -1026,6 +1038,15 @@ function showCompanionHma() {
   box.hidden = false;
   if (box.scrollIntoView) box.scrollIntoView({ block: "center" });
 }
+// SUSFS reminder: shown on the Backups tab when local backups exist, nudging the
+// user to hide the backup folder with SUSFS (its presence can reveal root, just like
+// the companion app). SUSFS does the hiding; this only points there. Session dismiss.
+function showSusfsNotice() {
+  var box = $("#susfs-notice"); if (!box || SUSFS_DISMISSED) return;
+  var p = $("#susfs-notice-path");
+  if (p) p.textContent = I18N.t("susfs_notice_path", { path: "/sdcard/VDBackup" });
+  box.hidden = false;
+}
 function openHmaList() {
   var cmd = "monkey -p " + shq(HMA_OSS_PKG) + " -c android.intent.category.LAUNCHER 1";
   execCommand(cmd).then(function (r) {
@@ -1075,6 +1096,13 @@ function openBackupModal(pkg, label) {
     $("#backup-title").textContent = label || pkg;
     pass.value = ""; pass.hidden = !enc;
     fillDestOptions($("#backup-dest"), CFG.default_dest);   // per-backup destination, defaults to the default
+    // pre-fill the item ticks: a per-app override (set in Settings) is the default here;
+    // a single backup stays editable. Reset to full, then apply the app's override if any.
+    var _ov = (CFG.app_items || {})[pkg];
+    ["apk", "data", "data_de", "obb", "external", "media"].forEach(function (k) {
+      var e = $("#bi-" + k); if (e) e.checked = _ov ? (_ov.indexOf(k) >= 0) : true;
+    });
+    fillPresetSelect();   // preset picker (pre-fills the item ticks); hidden when no presets exist
     m.hidden = false;
     function done(res) {
       m.hidden = true; pass.value = ""; $("#backup-ok").onclick = null; $("#backup-cancel").onclick = null;
@@ -1093,19 +1121,20 @@ function openBackupModal(pkg, label) {
     $("#backup-cancel").onclick = function () { done(null); };
   });
 }
-function backupArgs(pkg, res) {
+function backupArgs(pkg, res, manual) {
   var args = {
     package: pkg, user: activeUser,
     mode: CFG.default_mode || "full", dest: res.dest || CFG.default_dest || "local",
     items: res.items, ssaid: !!CFG.ssaid, verify: res.verify, dry_run: res.dry_run
   };
+  if (manual) args.manual = true;   // single interactive backup: keep the user's exact ticks (skip per-app override)
   if (res.password) args.password = res.password;
   return args;
 }
 function startBackup(pkg, label) {
   openBackupModal(pkg, label).then(function (res) {
     if (!res) return;
-    var args = backupArgs(pkg, res);
+    var args = backupArgs(pkg, res, true);
     var run = function () { helper("backup", args).then(function (r) { if (r && r.opid) trackOp(r.opid, { retry: run }); }); };
     run();
   });
@@ -1276,7 +1305,7 @@ function buildJobPicker() {
   var ul = $("#job-applist"); if (!ul) return;
   if (iconObserver) _jobIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
   _jobIcons = []; ul.innerHTML = "";
-  visibleApps("").forEach(function (a) {
+  visibleApps("", true).forEach(function (a) {
     var li = el("li", "row tappable");
     var ic = el("div", "app-ic", (a.label || a.package).charAt(0).toUpperCase());
     ic.dataset.pkg = a.package;
@@ -1503,6 +1532,9 @@ function setupSwipe() {
   function order() { return Array.prototype.map.call(document.querySelectorAll(".tab"), function (t) { return t.dataset.tab; }); }
   document.addEventListener("touchstart", function (e) {
     if (e.touches.length !== 1) { x0 = null; return; }
+    // a horizontally scrollable strip (the tab bar, the accent swatches) handles its own
+    // sideways drag; starting a gesture there must not also flip tabs.
+    if (e.target.closest && e.target.closest(".tabs, .swatches, [data-noswipe]")) { x0 = null; return; }
     x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now(); moved = false;
   }, { passive: true });
   document.addEventListener("touchmove", function () { moved = true; }, { passive: true });
@@ -1582,7 +1614,10 @@ function loadSettings() {
   if ($("#set-auto-keep")) $("#set-auto-keep").value = CFG.auto_backup_keep || 5;
   if ($("#set-spoof"))    $("#set-spoof").checked = (CFG.spoof_installer !== false);
   var bs = $("#block-app-search"); if (bs) bs.value = "";
+  var as = $("#ai-app-search"); if (as) as.value = "";
   buildBlockPicker();
+  buildAppItemsPicker();
+  buildPresetsList();
   fillDestSelect();
   if (sel)                sel.value = CFG.language || "auto";
   if ($("#set-theme"))    $("#set-theme").value = getTheme();
@@ -1631,7 +1666,7 @@ function buildBlockPicker() {
   var ul = $("#block-applist"); if (!ul) return;
   if (iconObserver) _blockIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
   _blockIcons = []; ul.innerHTML = "";
-  visibleApps("").forEach(function (a) {
+  visibleApps("", true).forEach(function (a) {
     var li = el("li", "row tappable");
     var ic = el("div", "app-ic", (a.label || a.package).charAt(0).toUpperCase());
     ic.dataset.pkg = a.package;
@@ -1662,10 +1697,190 @@ function filterBlockPicker(q) {
   var nm = $("#block-app-nomatch"); if (nm) nm.hidden = shown > 0;
 }
 
+// --- per-app backup item sets (an app's items for bulk/auto/scheduled backups) -------
+// Store is CFG.app_items (package -> item list). Tapping an app opens a small modal to
+// pick its items; no override (or all items) = the app backs up everything. The worker
+// applies the set on bulk, auto and scheduled runs; a single manual backup keeps the
+// user's modal choice (which is pre-filled from the set). Same searchable app picker.
+var _aiIcons = [];
+var AI_ITEMS = ["apk", "data", "data_de", "obb", "external", "media"];
+var _aiPkg = null;
+function hasAppItems(pkg) { var ov = (CFG.app_items || {})[pkg]; return !!(ov && ov.length && ov.length < AI_ITEMS.length); }
+function appItemsSummary(pkg) {
+  var ov = (CFG.app_items || {})[pkg];
+  if (!hasAppItems(pkg)) return I18N.t("appitems_default");
+  return ov.map(function (k) { return I18N.t("item_" + k); }).join(" + ");
+}
+function updateAiCount() {
+  var n = 0, m = CFG.app_items || {};
+  Object.keys(m).forEach(function (p) { if (hasAppItems(p)) n++; });
+  var c = $("#ai-app-count"); if (c) c.textContent = I18N.t("ui_app_items_count", { n: n });
+}
+function setAppItems(pkg, items) {
+  CFG.app_items = CFG.app_items || {};
+  if (!items || !items.length || items.length === AI_ITEMS.length) delete CFG.app_items[pkg];
+  else CFG.app_items[pkg] = items;
+  helper("config-set", CFG).then(function () {});
+  updateAiCount();
+}
+function openAppItemsModal(pkg, label) {
+  _aiPkg = pkg;
+  if ($("#appitems-title")) $("#appitems-title").textContent = label || pkg;
+  var ov = (CFG.app_items || {})[pkg];
+  AI_ITEMS.forEach(function (k) {
+    var e = $("#ai-" + k);
+    if (e) e.checked = (ov && ov.length) ? (ov.indexOf(k) >= 0) : true;   // default: everything ticked
+  });
+  buildAiTags();
+  var ti = $("#ai-tag-input"); if (ti) ti.value = "";
+  $("#appitems-modal").hidden = false;
+}
+function closeAppItemsModal() { $("#appitems-modal").hidden = true; _aiPkg = null; }
+function buildAppItemsPicker() {
+  var ul = $("#ai-applist"); if (!ul) return;
+  if (iconObserver) _aiIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
+  _aiIcons = []; ul.innerHTML = "";
+  visibleApps("", true).forEach(function (a) {
+    var li = el("li", "row tappable");
+    var ic = el("div", "app-ic", (a.label || a.package).charAt(0).toUpperCase());
+    ic.dataset.pkg = a.package;
+    ic.dataset.vc = (a.versionCode != null) ? String(a.versionCode) : "0";
+    var grow = el("div", "grow");
+    grow.appendChild(el("div", "name", a.label || a.package));
+    grow.appendChild(el("div", "pkg", a.package));
+    grow.appendChild(el("div", "sub", appItemsSummary(a.package)));
+    li.appendChild(ic); li.appendChild(grow);
+    if (hasAppItems(a.package)) li.classList.add("sel");
+    li.dataset.hay = ((a.label || "") + " " + a.package).toLowerCase();
+    li.onclick = function () { openAppItemsModal(a.package, a.label || a.package); };
+    ul.appendChild(li); _aiIcons.push(ic);
+    if (iconObserver) iconObserver.observe(ic); else loadIcon(ic);
+  });
+  filterAppItemsPicker($("#ai-app-search") ? $("#ai-app-search").value : "");
+  updateAiCount();
+}
+function filterAppItemsPicker(q) {
+  q = (q || "").toLowerCase();
+  var ul = $("#ai-applist"); if (!ul) return;
+  var rows = ul.children, shown = 0, i;
+  for (i = 0; i < rows.length; i++) {
+    var hit = !q || rows[i].dataset.hay.indexOf(q) >= 0;
+    rows[i].hidden = !hit; if (hit) shown++;
+  }
+  var nm = $("#ai-app-nomatch"); if (nm) nm.hidden = shown > 0;
+}
+
+// --- app tags (free labels to group apps; filter the list + back up a whole group) -----
+// Store is CFG.app_tags (package -> [labels]). Pure client-side organization: the batch
+// path reuses the normal per-app backup, so the worker needs no change.
+function appTags(pkg) { return (CFG.app_tags || {})[pkg] || []; }
+function allTags() {   // only tags carried by a currently-listed app, so uninstalled /
+  var set = {};         // other-user packages never ghost into the filter dropdown
+  APPS.forEach(function (a) { appTags(a.package).forEach(function (t) { set[t] = 1; }); });
+  return Object.keys(set).sort(function (a, b) { return a.toLowerCase().localeCompare(b.toLowerCase()); });
+}
+function setAppTagList(pkg, tags) {
+  CFG.app_tags = CFG.app_tags || {};
+  if (!tags || !tags.length) delete CFG.app_tags[pkg]; else CFG.app_tags[pkg] = tags;
+  helper("config-set", CFG).then(function () {});
+}
+function addAppTag(pkg, t) {
+  t = (t || "").trim(); if (!t || !pkg) return;
+  var cur = appTags(pkg).slice(); if (cur.indexOf(t) < 0) { cur.push(t); setAppTagList(pkg, cur); }
+}
+function removeAppTag(pkg, t) { setAppTagList(pkg, appTags(pkg).filter(function (x) { return x !== t; })); }
+function tagChip(text, onRemove) {
+  var c = el("span", "tag-chip"); c.appendChild(el("span", null, text));
+  if (onRemove) {
+    var x = el("button", null, "×"); x.type = "button"; x.setAttribute("aria-label", "remove");
+    x.onclick = function (e) { e.stopPropagation(); onRemove(); };
+    c.appendChild(x);
+  }
+  return c;
+}
+function buildAiTags() {
+  var box = $("#ai-tags"); if (!box) return;
+  box.innerHTML = ""; var pkg = _aiPkg; if (!pkg) return;
+  var ts = appTags(pkg);
+  if (!ts.length) { box.appendChild(el("span", "muted", I18N.t("ui_tag_none"))); return; }
+  ts.forEach(function (t) {
+    box.appendChild(tagChip(t, function () { removeAppTag(pkg, t); buildAiTags(); fillTagFilter(); renderApps($("#search").value); }));
+  });
+}
+var tagFilter = "";
+function fillTagFilter() {   // (re)build the dropdown; renderApps owns the button visibility
+  var sel = $("#app-tag"); if (!sel) return;
+  var ts = allTags();
+  if (!ts.length) { sel.hidden = true; tagFilter = ""; return; }
+  if (ts.indexOf(tagFilter) < 0) tagFilter = "";
+  sel.innerHTML = "";
+  var o0 = document.createElement("option"); o0.value = ""; o0.textContent = I18N.t("ui_tag_filter_all"); sel.appendChild(o0);
+  ts.forEach(function (t) { var o = document.createElement("option"); o.value = t; o.textContent = t; sel.appendChild(o); });
+  sel.value = tagFilter; sel.hidden = false;
+}
+// the apps a tag backup would act on: respects the user/system filter, ignores the search box
+function tagFilterApps() { return tagFilter ? visibleApps("") : []; }
+function startTagBackup() {
+  var pkgs = tagFilterApps().map(function (a) { return a.package; });
+  if (!pkgs.length) return;
+  openBackupModal(I18N.t("ui_tag_backup_title", { tag: tagFilter, n: pkgs.length }), "").then(function (res) {
+    if (!res) return;
+    setSelectMode(false);
+    runBatch(pkgs.slice(), res);
+  });
+}
+
+// --- backup presets (named item-sets; create in Settings, apply in the backup dialog) --
+// Store is CFG.presets = [{id,name,items[]}]. No worker change: a preset just pre-fills the
+// item checkboxes of the backup dialog, which already drives the per-op items.
+function persistPresets() { helper("config-set", CFG).then(function () {}); }
+function presetById(id) { return (CFG.presets || []).filter(function (p) { return p.id === id; })[0]; }
+function buildPresetsList() {
+  var ul = $("#presets-list"); if (!ul) return;
+  var ps = CFG.presets || []; ul.innerHTML = "";
+  var em = $("#presets-empty"); if (em) em.style.display = ps.length ? "none" : "";
+  ps.forEach(function (p) {
+    var li = el("li", "row");
+    var grow = el("div", "grow");
+    grow.appendChild(el("div", "name", p.name));
+    grow.appendChild(el("div", "sub", (p.items || []).map(function (k) { return I18N.t("item_" + k); }).join(" + ")));
+    var del = el("button", "btn small", I18N.t("delete"));
+    del.onclick = function () { CFG.presets = (CFG.presets || []).filter(function (x) { return x.id !== p.id; }); persistPresets(); buildPresetsList(); };
+    li.appendChild(grow); li.appendChild(del);
+    ul.appendChild(li);
+  });
+}
+function addPreset() {
+  var nm = $("#preset-name"); var name = ((nm && nm.value) || "").trim();
+  if (!name) { if (nm) nm.focus(); return; }
+  var items = ["apk", "data", "data_de", "obb", "external", "media"].filter(function (k) { var e = $("#pi-" + k); return e && e.checked; });
+  if (!items.length) return;
+  CFG.presets = CFG.presets || [];
+  CFG.presets.push({ id: "p" + Date.now(), name: name, items: items });
+  persistPresets();
+  if (nm) nm.value = "";
+  buildPresetsList();
+}
+function fillPresetSelect() {
+  var sel = $("#backup-preset"), row = $("#backup-preset-row"); if (!sel || !row) return;
+  var ps = CFG.presets || [];
+  if (!ps.length) { row.hidden = true; return; }
+  sel.innerHTML = "";
+  var o0 = document.createElement("option"); o0.value = ""; o0.textContent = I18N.t("ui_preset_none"); sel.appendChild(o0);
+  ps.forEach(function (p) { var o = document.createElement("option"); o.value = p.id; o.textContent = p.name; sel.appendChild(o); });
+  sel.value = ""; row.hidden = false;
+  sel.onchange = function () {
+    var p = presetById(sel.value); if (!p) return;
+    ["apk", "data", "data_de", "obb", "external", "media"].forEach(function (k) {
+      var e = $("#bi-" + k); if (e) e.checked = p.items.indexOf(k) >= 0;
+    });
+  };
+}
+
 // --- special (system-wide) backups --------------------------------------
 var SPECIAL_CATS = [];
 function loadSpecial() {
-  helper("special-categories").then(function (r) {
+  helper("special-categories", { user: activeUser }).then(function (r) {
     SPECIAL_CATS = (r && r.categories) ? r.categories : [];
     var box = $("#special-cats"); box.innerHTML = "";
     var ssNotice = $("#special-syssettings"), ssCb = $("#special-syssettings-cb");
@@ -1684,7 +1899,7 @@ function loadSpecial() {
       lab.appendChild(cb); lab.appendChild(sp); box.appendChild(lab);
     });
   });
-  helper("special-list").then(function (r) { renderSpecialList(r && r.backups ? r.backups : []); });
+  helper("special-list", { user: activeUser }).then(function (r) { renderSpecialList(r && r.backups ? r.backups : []); });
   loadPathBackups();
 }
 function renderSpecialList(list) {
@@ -1705,7 +1920,7 @@ function startSpecialBackup() {
   var ssCb = $("#special-syssettings-cb"), ssOn = !$("#special-syssettings").hidden && ssCb.checked;
   if (ssOn) cats.push(ssCb.dataset.cat || "system_settings");
   if (!cats.length) return;
-  var args = { categories: cats, mode: "full", dest: "local", portable: $("#special-portable").checked };
+  var args = { categories: cats, mode: "full", dest: "local", user: activeUser, portable: $("#special-portable").checked };
   if (ssOn) args.system_settings = true;   // opt-in: only sent when explicitly enabled
   var enc = !!CFG.encrypt_data;
   var go = function (pw) {
@@ -2001,6 +2216,11 @@ function boot() {
   $("#search").oninput = function () { renderApps(this.value); };
   $("#app-filter").onchange = function () { renderApps($("#search").value); };
   $("#app-sort").onchange = function () { renderApps($("#search").value); };
+  if ($("#app-tag")) $("#app-tag").onchange = function () {
+    tagFilter = this.value || "";
+    renderApps($("#search").value);   // renderApps toggles the "Back up tag" button
+  };
+  if ($("#app-backuptag")) $("#app-backuptag").onclick = startTagBackup;
   $("#app-select").onclick = function () { setSelectMode(!selectMode); };
   $("#app-selall").onclick = function () { visibleApps($("#search").value).forEach(function (a) { selected[a.package] = { package: a.package, label: a.label }; }); updateSelCount(); renderApps($("#search").value); };
   $("#app-selnone").onclick = function () { selected = {}; updateSelCount(); renderApps($("#search").value); };
@@ -2016,6 +2236,25 @@ function boot() {
   $("#log-open").onclick = function () { navTab("log"); };
   if ($("#log-export")) $("#log-export").onclick = exportLogs;
   $("#block-app-search").oninput = function () { filterBlockPicker(this.value); };
+  if ($("#ai-app-search")) $("#ai-app-search").oninput = function () { filterAppItemsPicker(this.value); };
+  if ($("#appitems-save")) $("#appitems-save").onclick = function () {
+    if (!_aiPkg) return;
+    var items = AI_ITEMS.filter(function (k) { var e = $("#ai-" + k); return e && e.checked; });
+    setAppItems(_aiPkg, items); closeAppItemsModal(); buildAppItemsPicker();
+  };
+  if ($("#appitems-clear")) $("#appitems-clear").onclick = function () {
+    if (_aiPkg) setAppItems(_aiPkg, null);
+    closeAppItemsModal(); buildAppItemsPicker();
+  };
+  if ($("#appitems-cancel")) $("#appitems-cancel").onclick = closeAppItemsModal;
+  var _aiTagCommit = function () {
+    var ti = $("#ai-tag-input"); if (!ti || !_aiPkg) return;
+    addAppTag(_aiPkg, ti.value); ti.value = ""; ti.focus();
+    buildAiTags(); fillTagFilter(); renderApps($("#search").value);
+  };
+  if ($("#ai-tag-add")) $("#ai-tag-add").onclick = _aiTagCommit;
+  if ($("#ai-tag-input")) $("#ai-tag-input").onkeydown = function (e) { if (e.key === "Enter") { e.preventDefault(); _aiTagCommit(); } };
+  if ($("#preset-add")) $("#preset-add").onclick = addPreset;
   $("#special-backup").onclick = startSpecialBackup;
   if ($("#prov-open")) $("#prov-open").onclick = openProvenance;
   if ($("#update-check")) $("#update-check").onclick = checkForUpdates;
@@ -2037,6 +2276,7 @@ function boot() {
   syncRemoteFields();
   $("#companion-hma-add").onclick = openHmaList;
   $("#companion-hma-dismiss").onclick = function () { $("#companion-hma").hidden = true; };
+  if ($("#susfs-notice-dismiss")) $("#susfs-notice-dismiss").onclick = function () { SUSFS_DISMISSED = true; $("#susfs-notice").hidden = true; };
   $("#import-scan").onclick = scanImports;
   $("#theme-btn").onclick = function () {
     applyTheme(effectiveTheme() === "light" ? "dark" : "light");
@@ -2056,5 +2296,8 @@ function boot() {
   helper("ping").then(function (r) {
     if (r && r.version) { $("#ver").textContent = r.version; if ($("#about-ver")) $("#about-ver").textContent = r.version + " - " + (r.abi || ""); }
   });
+
+  // self-heal backup-folder perms once per load (fire-and-forget, never blocks the UI).
+  helper("sanitize").catch(function () {});
 }
 document.addEventListener("DOMContentLoaded", boot);

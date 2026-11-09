@@ -248,6 +248,20 @@ installer_flag() {   # <captured-installer>; echoes "-i <pkg>" or nothing
   fi
   case "$1" in ''|null) ;; *) printf -- '-i %s' "$1" ;; esac
 }
+# After install (+ any spoof) read the LIVE install source back and record it, so the
+# activity log shows what actually stuck - and warn if the spoof did not take (Swift
+# Backup verifies getInstallSourceInfo the same way). Audit-only, never fails the restore.
+verify_install_source() {
+  _ivs="$(exec_ns dumpsys package "$PKG" 2>/dev/null)"
+  _inst="$(printf '%s' "$_ivs" | sed -n 's/.*installerPackageName=\([^ ,}]*\).*/\1/p' | head -1)"
+  _init="$(printf '%s' "$_ivs" | sed -n 's/.*[iI]nitiatingPackageName=\([^ ,}]*\).*/\1/p' | head -1)"
+  audit "install-source $PKG: installer=${_inst:-none} initiating=${_init:-none}"
+  _vsp="$(jget "$ARGS" '.spoof_installer')"; case "$_vsp" in true|false) ;; *) _vsp="$(cfg .spoof_installer)"; case "$_vsp" in true|false) ;; *) _vsp=true ;; esac ;; esac
+  if [ "$_vsp" = true ]; then
+    _vw="$(cfg .spoof_installer_pkg)"; { [ -z "$_vw" ] || [ "$_vw" = null ]; } && _vw=com.android.vending
+    [ "$_inst" = "$_vw" ] || audit "install-source WARN $PKG: installer=${_inst:-none} expected=$_vw (spoof did not stick)"
+  fi
+}
 # Deep install-source spoof (OPT-IN, explicit per-op): pm cannot set
 # initiatingPackageName / packageSource (only installerPackageName via -i), so a
 # fully Play-looking source needs editing /data/system/packages.xml. Mirrors the
@@ -299,13 +313,20 @@ deep_spoof_installer() {   # <pkg> <installer-pkg>
 # the APK install verifier can hang or prompt on pm install-commit; disable it for
 # the restore and put the previous value back afterwards (both upstreams do this).
 VERIFIER_OLD=""
+PKGVERIF_OLD=""
 verifier_off() {
   VERIFIER_OLD="$(exec_ns settings get global verifier_verify_adb_installs 2>/dev/null)"
   exec_ns settings put global verifier_verify_adb_installs 0 2>/dev/null
+  # also silence the Play Protect scan around the install (Swift Backup does both)
+  PKGVERIF_OLD="$(exec_ns settings get global package_verifier_enable 2>/dev/null)"
+  exec_ns settings put global package_verifier_enable 0 2>/dev/null
 }
 verifier_restore() {
+  # restore the EXACT prior state - including leaving it ABSENT when it was null/empty
+  # (a 0/1 where there was none is itself a tell on a stealth device).
   case "$VERIFIER_OLD" in ""|null|"null") : ;; *) exec_ns settings put global verifier_verify_adb_installs "$VERIFIER_OLD" 2>/dev/null ;; esac
-  VERIFIER_OLD=""
+  case "$PKGVERIF_OLD" in ""|null|"null") : ;; *) exec_ns settings put global package_verifier_enable "$PKGVERIF_OLD" 2>/dev/null ;; esac
+  VERIFIER_OLD=""; PKGVERIF_OLD=""
 }
 # wait for the freshly installed app's data dir to exist before chown (it may lag
 # a moment after install-commit; without this the chown is silently skipped).
@@ -378,6 +399,12 @@ media_own() {
 # uid, which cannot reach /data/adb (root-only, SELinux). So the result file must
 # live in the companion's own sandbox (/data/data/<pkg>/files): the app writes it
 # there natively and root reads it back. Nothing here needs the network but the app.
+# Never back up or restore the root manager itself: restoring its data desyncs the
+# superuser database and can brick root. Covers Magisk (+ common forks), KernelSU (+ Next),
+# APatch. Swift Backup skips its own root app for the same reason.
+ROOT_MANAGERS="com.topjohnwu.magisk io.github.vvb2060.magisk io.github.huskydg.magisk io.github.a13e300.ksuwebui me.weishu.kernelsu com.rifsxd.ksunext me.bmax.apatch"
+is_root_manager() { case " $ROOT_MANAGERS " in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
+
 COMPANION_PKG=ru.vd171.vdbackup
 companion_installed() { exec_ns pm path "$COMPANION_PKG" >/dev/null 2>&1; }
 companion_ensure() {
@@ -603,6 +630,7 @@ do_mirror() {
 backup() {
   PKG="$(jget "$ARGS" '.package')"
   case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  is_root_manager "$PKG" && { audit "refused root manager backup: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
   BACKUPS="$(backups_dir "$U")"
   if ! exec_ns pm path --user "$U" "$PKG" >/dev/null 2>&1 \
@@ -618,6 +646,14 @@ backup() {
   if { [ "$ENCDATA" = true ] || [ "$ENCAPK" = true ]; } && [ -z "$PW" ]; then
     finish false ERR_CRYPTO_PASS; return; fi
   ITEMS="$(jget "$ARGS" '.items | join(" ")')"; { [ -z "$ITEMS" ] || [ "$ITEMS" = "null" ]; } && ITEMS="apk data data_de obb external media"
+  # Per-app item-set override (action-mark): a marked app backs up its chosen set of
+  # items in bulk, auto and scheduled runs, so those paths honor the app's intent without
+  # per-app deselection. A single interactive backup sends manual:true and keeps whatever
+  # the user ticked in the modal. The marks live in config.app_items (package -> items).
+  if [ "$(jget "$ARGS" '.manual')" != "true" ] && [ -n "$PKG" ]; then
+    _ovr="$("$JQ" -r --arg p "$PKG" '(.app_items[$p] // []) | join(" ")' "$STATE/config.json" 2>/dev/null)"
+    [ -n "$_ovr" ] && ITEMS="$_ovr"
+  fi
   APKLEVEL=10
   use_data_age() { [ "$ENCDATA" = "true" ] && [ -n "$PW" ]; }
   use_apk_age()  { [ "$ENCAPK"  = "true" ] && [ -n "$PW" ]; }
@@ -738,6 +774,29 @@ backup() {
     emit_item "$typ" "$(basename "$out")" "$COMP" "$enc" "$orig" "$stored" "$sha" "${ctx:-}" "$uid" "$gid"
   }
 
+  # ART dexopt profiles: the app's compilation profiles (ref/<pkg> + cur/<u>/<pkg>) so a
+  # restored app keeps its warm/optimized state instead of recompiling cold. Optional and
+  # best-effort: a failure here never fails the backup (ART regenerates profiles anyway).
+  archive_profiles() {
+    _pr="/data/misc/profiles"; _mem=""
+    [ -e "$_pr/ref/$PKG" ]     && _mem="$_mem ref/$PKG"
+    [ -e "$_pr/cur/$U/$PKG" ]  && _mem="$_mem cur/$U/$PKG"
+    [ -n "$_mem" ] || return 0
+    ext="$(comp_ext "$COMP")"; out="$DEST/profiles.${ext}"; enc=none
+    if use_data_age; then out="$out.age"; enc=age
+      exec_ns "$TAR" $TARC -C "$_pr" -c $_mem 2>/dev/null | comp "$COMP" | enc_age "$out"
+    else
+      exec_ns "$TAR" $TARC -C "$_pr" -c $_mem 2>/dev/null | comp "$COMP" > "$out"
+    fi
+    if [ "$enc" = age ]; then
+      dec_age "$out" 2>/dev/null | { case "$COMP" in gzip) "$GZIP" -dc ;; lz4) "$ZSTD" -dq --format=lz4 -c ;; none) cat ;; *) "$ZSTD" -dqc ;; esac; } | exec_ns "$TAR" -t >/dev/null 2>&1 || { rm -f "$out"; return 0; }
+    else
+      decomp "$out" | exec_ns "$TAR" -t >/dev/null 2>&1 || { rm -f "$out"; return 0; }
+    fi
+    stored="$(stat -c %s "$out" 2>/dev/null || echo 0)"; sha="$(sha256sum "$out" 2>/dev/null | cut -d' ' -f1)"
+    emit_item profiles "$(basename "$out")" "$COMP" "$enc" 0 "$stored" "$sha" "" 0 0
+  }
+
   # count selected items for "N of M" progress (apk + the five data trees)
   ITEMN=0; ITEMOF=0
   for _cit in apk data data_de obb external media; do
@@ -766,6 +825,7 @@ backup() {
   echo " $ITEMS " | grep -q ' external ' && { ITEMN=$(( ITEMN + 1 )); progx 65 external "$PKG" "" "" "$ITEMN" "$ITEMOF" external; archive_dir external "/data/media/$U/Android/data/$PKG" || return; }
   echo " $ITEMS " | grep -q ' obb '      && { ITEMN=$(( ITEMN + 1 )); progx 72 obb      "$PKG" "" "" "$ITEMN" "$ITEMOF" obb;      archive_dir obb      "/data/media/$U/Android/obb/$PKG" || return; }
   echo " $ITEMS " | grep -q ' media '    && { ITEMN=$(( ITEMN + 1 )); progx 80 media    "$PKG" "" "" "$ITEMN" "$ITEMOF" media;    archive_dir media    "/data/media/$U/Android/media/$PKG" || return; }
+  echo " $ITEMS " | grep -q ' data '     && archive_profiles   # ART profiles ride along with app data (best-effort)
 
   # framework state (shell)
   prog 86 framework "$PKG"
@@ -785,6 +845,15 @@ backup() {
         |{op:(.|sub("^ +";"")|split(":")[0]), mode:(.|split(": ")[1]|split(";")[0])}
         |select(.op|test("^[A-Z][A-Z0-9_]*$")))')"
   [ -n "$APPOPS_JSON" ] || APPOPS_JSON='[]'
+  # Extra grants that reset on reinstall (captured as state, restored like appops so an
+  # automation/accessibility app works again right after restore - Swift Backup does this):
+  #   - Doze battery-exemption (deviceidle whitelist)
+  #   - notification-listener components this app has enabled
+  #   - accessibility-service components this app has enabled
+  _pe="$(printf '%s' "$PKG" | sed 's/\./\\./g')"
+  DOZE=false; exec_ns dumpsys deviceidle whitelist 2>/dev/null | grep -qE "(^|,)$_pe(,|\$)" && DOZE=true
+  NLJSON="$(exec_ns env -u LD_LIBRARY_PATH /system/bin/settings --user "$U" get secure enabled_notification_listeners 2>/dev/null | tr ':' '\n' | grep "^$PKG/" | "$JQ" -R -s 'split("\n")|map(select(length>0))')"; [ -n "$NLJSON" ] || NLJSON='[]'
+  ACCJSON="$(exec_ns env -u LD_LIBRARY_PATH /system/bin/settings --user "$U" get secure enabled_accessibility_services 2>/dev/null | tr ':' '\n' | grep "^$PKG/" | "$JQ" -R -s 'split("\n")|map(select(length>0))')"; [ -n "$ACCJSON" ] || ACCJSON='[]'
   # ssaid: OPT-IN only (.ssaid arg). The device ANDROID_ID is sensitive and its
   # restore rewrites a system file, so we never capture it unless asked.
   SSAID=""; SSF="/data/system/users/$U/settings_ssaid.xml"
@@ -814,14 +883,24 @@ backup() {
     --argjson user "$U" --arg pkg "$PKG" --arg label "$LABEL" --arg icon "$ICON_B64" --arg vn "${VN:-}" --argjson vc "${VC:-0}" \
     --argjson issys "$ISSYS" --argjson apks "$APKS" --slurpfile items "$IFILE" \
     --argjson perms "$PERMS_JSON" --argjson appops "$APPOPS_JSON" --arg ssaid "$SSAID" \
+    --argjson doze "$DOZE" --argjson nl "$NLJSON" --argjson acc "$ACCJSON" \
     --arg installer "$INSTALLER" --argjson enabled "$ENABLED" \
+    --argjson cache "$([ "$(cfg .include_cache)" = true ] && echo true || echo false)" \
     '{format_version:1, producer:$producer, created_at:$created, created_epoch:$epoch, mode:"full",
       device:{fingerprint:$fp, sdk:$sdk, abi:$abi, selinux:$sel, root:$root},
       user_id:$user,
       package:{name:$pkg, label:$label, icon:$icon, versionName:$vn, versionCode:$vc, isSystem:$issys,
                installer:$installer, enabled:$enabled, apk:{files:$apks}},
       preserve:{selinux:true, uid_gid:true, xattr:true, caps:true, modes:true},
-      permissions:{runtime:$perms, appops:$appops, ssaid:$ssaid},
+      permissions:{runtime:$perms, appops:$appops, ssaid:$ssaid,
+                   doze_whitelisted:$doze, notification_listeners:$nl, accessibility_services:$acc},
+      summary:{items:($items|length),
+               orig_bytes:(([$items[].orig_bytes//0]|add)//0),
+               stored_bytes:(([$items[].stored_bytes//0]|add)//0),
+               de_data_bytes:(([$items[]|select(.type=="data_de").orig_bytes//0]|add)//0),
+               encrypted:([$items[].encryption//"none"]|any(.!="none")),
+               cache_included:$cache,
+               types:[$items[].type]},
       items:$items}' > "$DEST/manifest.json"
   rm -f "$IFILE"
   sha256sum "$DEST/manifest.json" | cut -d' ' -f1 > "$DEST/manifest.json.sha256"
@@ -863,6 +942,7 @@ backup() {
 do_restore_snapshot() {
   DESTID="$(jget "$ARGS" '.dest')"; SNAP="$(jget "$ARGS" '.snapshot')"
   PKG="$(jget "$ARGS" '.package')"; U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
+  is_root_manager "$PKG" && { audit "refused root manager restore: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   { [ -z "$SNAP" ] || [ "$SNAP" = null ]; } && SNAP=latest
   resolve_dest
   [ -n "$DREPO" ] || { finish false ERR_NO_REPO; return; }
@@ -905,6 +985,7 @@ do_restore_snapshot() {
 # Restore from a Mirror: pm install the mirrored APKs, rsync the data dirs back, remap.
 do_restore_mirror() {
   DESTID="$(jget "$ARGS" '.dest')"; PKG="$(jget "$ARGS" '.package')"; U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
+  is_root_manager "$PKG" && { audit "refused root manager restore: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   resolve_dest
   transport_guard mirror || return
   [ "$DTYPE" = local ] || net_guard || return
@@ -963,6 +1044,7 @@ restore() {
     [ "$want" = "$got" ] || { finish false ERR_MANIFEST_SHA; return; }
   fi
   PKG="$("$JQ" -r '.package.name' "$M")"; U="$("$JQ" -r '.user_id // 0' "$M")"
+  is_root_manager "$PKG" && { audit "refused root manager restore: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   case "$U" in ""|*[!0-9]*) U=0 ;; esac
   case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
 
@@ -1054,6 +1136,7 @@ restore() {
       external) parent="/data/media/$U/Android/data"; target="/data/media/$U/Android/data/$PKG" ;;
       obb)      parent="/data/media/$U/Android/obb";  target="/data/media/$U/Android/obb/$PKG" ;;
       media)    parent="/data/media/$U/Android/media";target="/data/media/$U/Android/media/$PKG" ;;
+      profiles) parent="/data/misc/profiles"; target="/data/misc/profiles" ;;   # 2 members (ref+cur); never wiped as a whole
       *) i=$((i+1)); continue ;;
     esac
     mkdir -p "$parent"
@@ -1073,7 +1156,7 @@ restore() {
     # faithful restore: reproduce the backed-up state exactly (wipe then extract),
     # so files created after the backup do not linger. Extraction is checked; a
     # failure after the wipe is reported (never a silent success).
-    exec_ns rm -rf "$target" 2>/dev/null
+    [ "$typ" = profiles ] || exec_ns rm -rf "$target" 2>/dev/null   # profiles target is the shared dir; extract overwrites just its members
     if echo "$arc" | grep -q '\.age$'; then
       [ -n "$PW" ] || { finish false ERR_CRYPTO_PASS; return; }
       dec_age "$af" | { case "$arc" in
@@ -1083,12 +1166,27 @@ restore() {
       decomp "$af" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
     fi
     [ $? -eq 0 ] || { audit "restore extract failed $arc"; finish false ERR_RESTORE; return; }
-    # remap: app data dirs follow the live uid; media dirs just relabel
+    # Portability (universal restore): app-data ownership and SELinux context are
+    # re-derived from the TARGET, never copied from the source. chown to the freshly
+    # installed app's LIVE uid/gid (differs per device/user), and restorecon to re-derive
+    # the context from this device's policy - the stored context carries the source's
+    # per-install seinfo categories, which are wrong on another device/user and would stop
+    # the app reading its own data. (The stored root context $ctx is kept in the manifest
+    # for reference/audit only, not applied.)
     case "$typ" in
       data|data_de)
         [ "$LIVEU" != 0 ] && exec_ns chown -hR "$LIVEU:$LIVEG" "$target" 2>/dev/null
-        if [ -n "$ctx" ]; then exec_ns chcon -hR "$ctx" "$target" 2>/dev/null || exec_ns restorecon -R "$target" 2>/dev/null
-        else exec_ns restorecon -R "$target" 2>/dev/null; fi ;;
+        exec_ns restorecon -R "$target" 2>/dev/null ;;
+      profiles)
+        # ref/<pkg> is system(1000):<app shared gid>; cur/<u>/<pkg> is the app uid. The
+        # context (user_profile_data_file) carries no per-install category, so restorecon
+        # re-derives it portably. ART ignores a profile it cannot trust, so this is safe.
+        if [ "$LIVEU" != 0 ]; then
+          _sgid=$(( LIVEU - U * 100000 + 40000 ))   # app shared gid (50000 + appid)
+          exec_ns chown -R "1000:$_sgid" "/data/misc/profiles/ref/$PKG" 2>/dev/null
+          exec_ns chown -R "$LIVEU:$LIVEU" "/data/misc/profiles/cur/$U/$PKG" 2>/dev/null
+        fi
+        exec_ns restorecon -R "/data/misc/profiles/ref/$PKG" "/data/misc/profiles/cur/$U/$PKG" 2>/dev/null ;;
       *) exec_ns restorecon -R "$target" 2>/dev/null ;;
     esac
     i=$((i+1))
@@ -1108,6 +1206,22 @@ restore() {
     [ -n "$op" ] && [ "$op" != null ] && [ -n "$mode" ] || continue
     exec_ns cmd appops set --user "$U" "$PKG" "$op" "$mode" 2>/dev/null
   done
+  # extra grants captured at backup: Doze battery-exemption + notification-listener +
+  # accessibility components, re-applied so automation/accessibility apps work at once.
+  [ "$("$JQ" -r '.permissions.doze_whitelisted // false' "$M" 2>/dev/null)" = true ] && \
+    exec_ns dumpsys deviceidle whitelist "+$PKG" >/dev/null 2>&1
+  _secure_append() {   # <secure-key> <component>: append the component if not already listed
+    _cur="$(exec_ns env -u LD_LIBRARY_PATH /system/bin/settings --user "$U" get secure "$1" 2>/dev/null)"
+    case "$_cur" in null|"") _cur="" ;; esac
+    case ":$_cur:" in *":$2:"*) return 0 ;; esac
+    exec_ns env -u LD_LIBRARY_PATH /system/bin/settings --user "$U" put secure "$1" "${_cur:+$_cur:}$2" 2>/dev/null
+  }
+  "$JQ" -r '.permissions.notification_listeners[]?' "$M" 2>/dev/null | while IFS= read -r _c; do
+    [ -n "$_c" ] && _secure_append enabled_notification_listeners "$_c"; done
+  "$JQ" -r '.permissions.accessibility_services[]?' "$M" 2>/dev/null | while IFS= read -r _c; do
+    [ -n "$_c" ] && _secure_append enabled_accessibility_services "$_c"; done
+  [ -n "$("$JQ" -r '.permissions.accessibility_services[0]? // empty' "$M" 2>/dev/null)" ] && \
+    exec_ns env -u LD_LIBRARY_PATH /system/bin/settings --user "$U" put secure accessibility_enabled 1 2>/dev/null
   # install-source attribution is applied at install time via install-create -i (see
   # installer_flag); pm set-installer is rejected for uid 0, so nothing to do here.
   # enabled-state fidelity: an app disabled when it was backed up is disabled again.
@@ -1120,6 +1234,7 @@ restore() {
     DSP="$(cfg .spoof_installer_pkg)"; { [ -z "$DSP" ] || [ "$DSP" = null ]; } && DSP=com.android.vending
     deep_spoof_installer "$PKG" "$DSP" || true
   fi
+  want_item apk && verify_install_source   # record/verify the live install source post-install
   # ssaid: OPT-IN only (.ssaid arg). Rewrites the device ANDROID_ID file; applies
   # after the next reboot (the settings provider caches it). Edit is validated by a
   # decode round-trip before the live file is overwritten; any failure leaves it untouched.
@@ -1298,11 +1413,11 @@ do_import_neo() {
 # gated behind heavy UI friction (it overwrites live system state).
 special_paths() {   # <category>; echoes each existing owned path, one per line
   case "$1" in
-    messages)  set -- /data/data/com.android.providers.telephony /data/user_de/0/com.android.providers.telephony ;;
-    contacts)  set -- /data/data/com.android.providers.contacts  /data/user_de/0/com.android.providers.contacts ;;
-    wifi)      set -- /data/misc/wifi /data/misc/apexdata/com.android.wifi ;;
-    bluetooth) set -- /data/misc/bluedroid /data/misc/bluetooth /data/data/com.android.bluetooth ;;
-    calendar)  set -- /data/data/com.android.providers.calendar /data/user_de/0/com.android.providers.calendar ;;
+    messages)  set -- "/data/user/${U:-0}/com.android.providers.telephony" "/data/user_de/${U:-0}/com.android.providers.telephony" ;;
+    contacts)  set -- "/data/user/${U:-0}/com.android.providers.contacts"  "/data/user_de/${U:-0}/com.android.providers.contacts" ;;
+    wifi)      set -- /data/misc/wifi /data/misc/apexdata/com.android.wifi ;;          # device-level, not per-user
+    bluetooth) set -- /data/misc/bluedroid /data/misc/bluetooth "/data/user/${U:-0}/com.android.bluetooth" ;;
+    calendar)  set -- "/data/user/${U:-0}/com.android.providers.calendar" "/data/user_de/${U:-0}/com.android.providers.calendar" ;;
     wallpaper) set -- "/data/system/users/${U:-0}/wallpaper" "/data/system/users/${U:-0}/wallpaper_lock" "/data/system/users/${U:-0}/wallpaper_info.xml" ;;
     *) return 1 ;;
   esac
@@ -1421,7 +1536,7 @@ special_sys_restore() {   # <enc>; re-apply each namespace line by line (idempot
 }
 
 do_special_backup() {
-  U=0
+  U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac   # per-user providers (SMS/contacts/calendar/wallpaper); wifi/bluetooth are device-level
   CATS="$(jget "$ARGS" '.categories | join(" ")')"; { [ -z "$CATS" ] || [ "$CATS" = null ]; } && { finish false ERR_NO_CATEGORY; return; }
   COMP="$(jget "$ARGS" '.compression')"; { [ -z "$COMP" ] || [ "$COMP" = null ]; } && COMP="$(cfg .compression)"; [ -n "$COMP" ] || COMP="zstd:10"
   PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
@@ -1431,8 +1546,8 @@ do_special_backup() {
   SYSSET="$(jget "$ARGS" '.system_settings')"
   use_special_age() { [ -n "$PW" ]; }
   prog 2 preparing "special"; audit "special-backup start $CATS"; notify backup_start "special"
-  BK="$(backups_dir 0)/.special"; TS="$(date -u +%Y%m%dT%H%M%SZ)"; DEST="$BK/$TS"
-  media_own "$(backups_dir 0)"; media_own "$BK"; mkdir -p "$DEST"
+  BK="$(backups_dir "$U")/.special"; TS="$(date -u +%Y%m%dT%H%M%SZ)"; DEST="$BK/$TS"
+  media_own "$(backups_dir "$U")"; media_own "$BK"; mkdir -p "$DEST"
   IFILE="$DEST/.items.jsonl"; : > "$IFILE"
   emit_special() {  # <cat> <archive> <srcpath> <ctx> <sha>
     "$JQ" -n --arg category "$1" --arg archive "$2" --arg path "$3" --arg ctx "$4" --arg sha "$5" \
@@ -1491,6 +1606,7 @@ do_special_backup() {
 do_special_restore() {
   REF="$(jget "$ARGS" '.ref')"
   case "$REF" in /data/media/*/VDBackup/.special/*) : ;; *) finish false ERR_BAD_REF; return ;; esac
+  U="$(printf '%s' "$REF" | sed -n 's#^/data/media/\([0-9][0-9]*\)/VDBackup/.*#\1#p')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac   # restore to the user that owns this backup
   M="$REF/manifest.json"; [ -f "$M" ] || { finish false ERR_NO_BACKUP; return; }
   [ "$(jget "$ARGS" '.confirm')" = true ] || { finish false ERR_CONFIRM; return; }   # heavy-friction gate
   PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""

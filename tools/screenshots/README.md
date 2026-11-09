@@ -41,10 +41,15 @@ Requirements: `python3-playwright` (the Python package) and a system Google Chro
 Chromium. No network is used; a throwaway loopback HTTP server serves the webroot so
 the UI's `fetch` of `lang/<code>.json` works.
 
+The release ritual runs this automatically: the **Release** workflow regenerates all
+screenshots right after the version bump and commits them with the release, so
+`docs/screenshots/` always matches the shipped UI. Run it by hand only to preview a
+UI change before a release.
+
 ## Why it lives in the repo
 
-The harness used to live in a scratch directory and was lost twice. Keeping it versioned
-here makes the screenshots reproducible and keeps the harness in step with the UI:
+Keeping the harness versioned here makes the screenshots reproducible and keeps it in
+step with the UI:
 
 - the version badge, the app list, every label and the right-to-left mirroring come from
   the live webroot plus `lang/*.json`, so a UI or string change is reflected on the next

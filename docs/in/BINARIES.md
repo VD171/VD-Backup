@@ -13,14 +13,14 @@ buram yang diselipkan.
 ## Prinsip
 
 - **Tidak ada yang buram.** Setiap biner dan pustaka yang dikirim dapat dilacak ke sebuah
-  upstream publik bernama pada versi yang disematkan, dengan SHA-256 yang tercatat. Tidak
+   upstream publik bernama pada versi yang disematkan, dengan SHA-256 yang tercatat. Tidak
   ada blob yang dipaketkan tanpa entri yang dapat Anda periksa.
 - **Diambil dari upstream, tidak pernah dari sebuah perangkat.** Alat native berasal dari
   repositori paket Termux resmi (berkas `.deb` bertanda tangan di `packages.termux.dev/apt`),
   tidak pernah disalin dari sebuah Termux yang terpasang di suatu ponsel. Build gagal dengan
   lantang, ia tidak pernah berimprovisasi.
 - **Dapat direproduksi.** Jalankan ulang build dan Anda mendapatkan berkas yang sama; ambil
-  ulang sumber yang disematkan dan nilai SHA-256 cocok.
+   ulang sumber yang disematkan dan nilai SHA-256 cocok.
 - **Jejak audit dikirim bersama modul.** Bukan hanya di situs web - ia ikut bepergian di
   dalam modul yang terpasang, di perangkat Anda, sehingga Anda bisa mengaudit secara luring.
 
@@ -30,7 +30,7 @@ buram yang diselipkan.
 |---|---|---|
 | `bin/<abi>/` alat native (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + penutupan `lib/` miliknya | Repo apt **Termux** resmi (`packages.termux.dev/apt`), paket `.deb` resmi | `.github/scripts/build_bin.sh` mengunduh berkas `.deb` + dependensi transitifnya, mengekstraknya, dan menyalin biner beserta hanya pustaka bersama yang dibutuhkan masing-masing |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (fallback konverter ABX) | Rilis GitHub **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF statis) | diunduh dari rilis yang disematkan oleh `build_bin.sh` |
-| `companion.apk` (pendamping Google Drive opsional) | **Repositori ini**, `companion/` (Gradle/Kotlin) | dibangun dari sumber oleh CI dan ditandatangani dengan kunci proyek (`VD_Key`); bukan blob prabangun |
+| `companion.apk` (pendamping Google Drive opsional) | **Repositori ini**, `companion/` (Gradle/Kotlin) | dibangun dari sumber oleh CI dan ditandatangani dengan kunci proyek; bukan blob prabangun |
 | `vdbackup_helper.dex` (helper framework) | **Repositori ini**, `dex/src/` (Java) | dikompilasi dari sumber oleh CI dengan `javac` + `d8` |
 
 Hanya dua baris pertama yang merupakan biner pihak ketiga prabangun; dua terakhir dibangun
@@ -45,7 +45,7 @@ hanya menyimpan ABI perangkat Anda, jadi berkas itu tetap ada di perangkat pada
 `/data/adb/modules/vdbackup/bin/<abi>/PROVENANCE.json`. Ia mencatat:
 
 - `sources`: setiap `.deb` upstream (paket, versi, URL lengkap, SHA-256 dari `.deb`) dan
-  rilis ABX (URL, SHA-256 dari arsip).
+   rilis ABX (URL, SHA-256 dari arsip).
 - `files`: setiap berkas yang benar-benar dikirim di bawah `bin/<abi>/` (jalur, ukuran,
   SHA-256).
 
@@ -72,7 +72,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`) dan bandingkan keluarannya dengan yang
    dikirim.
 4. **Pendamping dan dex.** Bangun ulang `companion/` dan `dex/` dari sumber; tanda tangan
-   pendamping adalah kunci proyek `VD_Key` (SHA-256
+   pendamping adalah kunci proyek (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
 ## Pelaporan

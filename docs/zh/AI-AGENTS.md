@@ -125,7 +125,10 @@ SSH-to-root 配置）来执行该命令。模块附带捆绑的二进制文件�
   "dest": "local",                // local | <destination id>
   "verify": true,                 // re-hash each archive vs the manifest (default on for Full)
   "dry_run": false,               // true = report a size plan, write nothing
-  "ssaid": false                  // OPT-IN, see below
+  "ssaid": false,                 // OPT-IN, see below
+  "manual": false                 // true = single interactive backup, keeps these exact items;
+                                  // omit/false lets config.app_items (a per-app item map) override
+                                  // the set on bulk, auto and scheduled runs
 }
 ```
 

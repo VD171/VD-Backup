@@ -11,7 +11,7 @@ encryption passphrases. We take security seriously.
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (non-security reports only)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ soon as we can and credit you if you wish.
   clear text. Backups are never tied to device-bound hardware keys (so they stay
   portable), which also means the passphrase is what protects an encrypted backup -
   choose a strong one.
-- The optional Google Drive companion app should always be hidden with HMA-OSS so it
+- The optional Google Drive companion app should always be hidden with [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) so it
   does not reveal root or an unlocked bootloader.
 - Restore runs as root, so every archive is checked before anything is written: a
   backup whose contents point outside their target (an absolute path or a `..`

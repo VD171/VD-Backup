@@ -6,6 +6,27 @@
 
 Toutes les modifications notables de VDBackup sont documentées ici. En anglais uniquement.
 
+## v1.04
+
+Corrections:
+
+- Les dossiers de sauvegarde restent désormais ouvrables par un gestionnaire de fichiers automatiquement : leurs permissions sont réappliquées à l'installation, à chaque démarrage et à chaque ouverture de la WebUI, de sorte qu'un dossier resté réservé au propriétaire (par exemple une sauvegarde faite avant v1.03.2) se répare tout seul sans aucune étape manuelle.
+
+Confidentialité:
+
+- Lorsque vous avez des sauvegardes locales, l'onglet Sauvegardes vous rappelle désormais de masquer le dossier de sauvegarde avec SUSFS, comme l'app compagnon : sa présence peut sinon révéler le root ou un bootloader déverrouillé. C'est SUSFS qui masque ; le rappel ne fait que vous orienter.
+
+Sauvegardes:
+
+- Vous pouvez maintenant définir quels éléments chaque app sauvegarde - par exemple APK seul, ou APK + OBB - appliqué dans les sauvegardes en masse, automatiques et planifiées. Une sauvegarde manuelle individuelle vous laisse toujours choisir sur le moment, pré-rempli depuis l'ensemble de l'app. Réglez-le dans les Réglages, à côté de la liste des apps exclues.
+
+- Préréglages de sauvegarde : enregistrez des ensembles nommés de ce qu'il faut inclure et appliquez-les d'un choix dans la boîte de sauvegarde.
+- Multi-utilisateur : les sauvegardes d'apps, les sauvegardes spéciales et les restaurations suivent désormais l'utilisateur Android choisi.
+- Les apps reviennent plus prêtes et complètes : leurs profils de compilation ART et leurs autorisations d'écoute des notifications, d'accessibilité et d'exemption de batterie Doze sont sauvegardés et restaurés.
+- Restaurations plus fiables : la propriété des fichiers et le contexte SELinux sont redérivés sur l'appareil cible, donc une restauration fonctionne entre appareils et utilisateurs.
+- Restaurations plus sûres : Play Protect et le vérificateur d'installation ne sont désactivés que pendant l'installation puis restaurés à l'identique ; le gestionnaire root n'est jamais sauvegardé ni restauré ; et la source d'installation est vérifiée et journalisée.
+- Étiquettes d'applications : donnez aux applications des libellés libres comme games ou work, filtrez la liste par une étiquette et sauvegardez tout un groupe étiqueté d'un coup.
+
 ## v1.03.2
 
 Corrections:
@@ -126,7 +147,7 @@ Destinations et cloud :
   backend cloud (SFTP, SMB, WebDAV, FTP, S3, Google Drive et plus) soit accessible sans
   éditer `rclone.conf` à la main.
 - Google Drive de deux façons : via rclone (sans compte Google Cloud) ou via l'app companion headless
-  optionnelle (`ru.vd171.vdbackup`), qui porte un avis obligatoire de masquage avec HMA-OSS.
+  optionnelle (`ru.vd171.vdbackup`), qui porte un avis obligatoire de masquage avec [HMA-OSS](https://github.com/frknkrc44/HMA-OSS).
 - Politique réseau : choisir si les transferts cloud peuvent utiliser n'importe quelle connexion, le Wi-Fi uniquement ou
   les données mobiles uniquement ; appliquée aux tâches manuelles et planifiées. Les destinations locales sont exemptées.
 

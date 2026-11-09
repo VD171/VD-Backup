@@ -20,7 +20,7 @@ eingeschleust wurde.
   aus einem auf irgendeinem Telefon installierten Termux kopiert. Der Build schlägt laut fehl,
   er improvisiert nie.
 - **Reproduzierbar.** Führen Sie den Build erneut aus und Sie erhalten dieselben Dateien; holen
-  Sie die fixierten Quellen erneut und die SHA-256-Werte stimmen überein.
+   Sie die fixierten Quellen erneut und die SHA-256-Werte stimmen überein.
 - **Der Prüfpfad wird mit dem Modul mitgeliefert.** Er steht nicht nur auf der Website - er
   reist im installierten Modul mit, auf Ihrem Gerät, sodass Sie offline prüfen können.
 
@@ -30,7 +30,7 @@ eingeschleust wurde.
 |---|---|---|
 | `bin/<abi>/` native Werkzeuge (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + ihre `lib/`-Closure | Offizielles **Termux**-apt-Repo (`packages.termux.dev/apt`), offizielle `.deb`-Pakete | `.github/scripts/build_bin.sh` lädt die `.deb`-Dateien + ihre transitiven Abhängigkeiten herunter, extrahiert sie und kopiert die Binärdateien sowie nur die gemeinsam genutzten Bibliotheken, die jede benötigt |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX-Konverter-Fallback) | **rhythmcache/android-xml-converter** GitHub-Release (`ABX_RELEASE`, statisches ELF) | von `build_bin.sh` aus dem fixierten Release heruntergeladen |
-| `companion.apk` (optionaler Google-Drive-Begleiter) | **Dieses Repository**, `companion/` (Gradle/Kotlin) | von der CI aus dem Quellcode gebaut und mit dem Projektschlüssel (`VD_Key`) signiert; kein vorgebauter Blob |
+| `companion.apk` (optionaler Google-Drive-Begleiter) | **Dieses Repository**, `companion/` (Gradle/Kotlin) | von der CI aus dem Quellcode gebaut und mit dem Projektschlüssel signiert; kein vorgebauter Blob |
 | `vdbackup_helper.dex` (Framework-Helfer) | **Dieses Repository**, `dex/src/` (Java) | von der CI aus dem Quellcode mit `javac` + `d8` kompiliert |
 
 Nur die ersten beiden Zeilen sind vorgebaute Drittanbieter-Binärdateien; die letzten beiden
@@ -46,7 +46,7 @@ Modul nur die ABI Ihres Geräts, sodass diese Datei auf dem Gerät unter
 `/data/adb/modules/vdbackup/bin/<abi>/PROVENANCE.json` verbleibt. Sie erfasst:
 
 - `sources`: jedes Upstream-`.deb` (Paket, Version, vollständige URL, SHA-256 des `.deb`) und
-  das ABX-Release (URL, SHA-256 des Archivs).
+   das ABX-Release (URL, SHA-256 des Archivs).
 - `files`: jede tatsächlich unter `bin/<abi>/` mitgelieferte Datei (Pfad, Größe, SHA-256).
 
 Sie können es in der WebUI lesen (der Tab **Über** verlinkt darauf) oder über die Agent-API:
@@ -72,7 +72,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`) und vergleichen Sie die Ausgabe mit dem, was
    mitgeliefert wurde.
 4. **Begleiter und dex.** Bauen Sie `companion/` und `dex/` aus dem Quellcode neu; die Signatur des
-   Begleiters ist der Projektschlüssel `VD_Key` (SHA-256
+   Begleiters ist der Projektschlüssel (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
 ## Melden

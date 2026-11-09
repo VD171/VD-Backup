@@ -133,7 +133,10 @@ somme de contrôle **`verified`** et, pour les transferts cloud, **`transfer`** 
   "dest": "local",                // local | <destination id>
   "verify": true,                 // re-hache chaque archive vs le manifeste (activé par défaut pour Full)
   "dry_run": false,               // true = rapporte un plan de taille, n'écrit rien
-  "ssaid": false                  // OPT-IN, voir ci-dessous
+  "ssaid": false,                  // OPT-IN, voir ci-dessous
+  "manual": false                 // true = single interactive backup, keeps these exact items;
+                                  // omit/false lets config.app_items (a per-app item map) override
+                                  // the set on bulk, auto and scheduled runs
 }
 ```
 

@@ -425,8 +425,8 @@ Backups locais nunca são afetados.
    o destino companheiro do Google Drive**, nunca por padrão, e é removido quando
    você o desabilita. A tela de consentimento Google única é o único passo que acontece
    fora da WebUI. Quando o companheiro está instalado, o VDBackup te lembra de
-   **sempre ocultá-lo com o HMA-OSS** para que a presença dele não revele root ou
-   um bootloader desbloqueado, e ele se oferece para adicioná-lo à lista do HMA-OSS para você.
+   **sempre ocultá-lo com o [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** para que a presença dele não revele root ou
+   um bootloader desbloqueado, e ele se oferece para adicioná-lo à lista do HMA-OSS para você. O VDBackup também te lembra, quando você tem backups locais, de ocultar a pasta de backups (/sdcard/VDBackup) com o SUSFS pelo mesmo motivo.
 
 ## 8. Agendamento e retenção
 
@@ -470,6 +470,12 @@ então habilitá-lo nunca faz backup do seu dispositivo inteiro de uma vez.
 **Apps excluídos (blocklist).** Também em Settings, você pode excluir apps dos quais nunca quer
 backup automático ou agendado; você pode adicionar vários de uma vez (seleção múltipla), e apps
 excluídos são pulados por ambos.
+
+**Presets de backup.** Também em Ajustes, você pode salvar presets nomeados - conjuntos de itens a incluir, como só APK ou APK + OBB - e escolher um no diálogo de backup para preencher os itens de uma vez.
+
+**Itens de backup por app.** Também em Ajustes, você pode escolher exatamente quais itens cada app faz backup em backups em massa, automáticos e agendados - por exemplo só APK, ou APK + OBB. Um backup manual individual ainda te deixa escolher na hora, partindo do conjunto do app. Apps que você não configurar aqui fazem backup de tudo.
+
+**Tags de app.** Toque num app em Ajustes (Itens e tags por app) para dar a ele rótulos livres - por exemplo games ou work. Um seletor de tags então aparece acima da lista de apps: escolha uma tag para mostrar só os apps dela e faça backup do grupo inteiro de uma vez. Você também chega nele pela aba Apps: toque num app e depois em Itens e tags.
 
 **Log de atividade.** A aba Schedule tem um botão **View activity log** que abre uma tela cheia
 (instantaneamente) mostrando a trilha de auditoria local - backups, restaurações, exclusões,

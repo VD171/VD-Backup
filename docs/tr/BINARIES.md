@@ -13,14 +13,14 @@ sokulmadığını nasıl doğrulayacağınızı belgeler.
 ## İlkeler
 
 - **Opak hiçbir şey yok.** Sevk edilen her ikili dosya ve kütüphane, sabitlenmiş bir
-  sürümde, adı belli ve herkese açık bir üst kaynağa, kayıtlı bir SHA-256 ile izlenebilir.
+   sürümde, adı belli ve herkese açık bir üst kaynağa, kayıtlı bir SHA-256 ile izlenebilir.
   Denetleyebileceğiniz bir kayıt olmadan hiçbir blob paketlenmez.
 - **Üst kaynaktan çekilir, asla bir cihazdan değil.** Yerel araçlar resmi Termux paket
   deposundan gelir (`packages.termux.dev/apt` adresindeki imzalı `.deb` dosyaları), asla
   bir telefona kurulu bir Termux'tan kopyalanmaz. Derleme yüksek sesle başarısız olur,
   asla doğaçlama yapmaz.
 - **Yeniden üretilebilir.** Derlemeyi tekrar çalıştırın, aynı dosyaları alırsınız;
-  sabitlenmiş kaynakları tekrar çekin, SHA-256 değerleri eşleşir.
+   sabitlenmiş kaynakları tekrar çekin, SHA-256 değerleri eşleşir.
 - **Denetim izi modülle birlikte gelir.** Sadece web sitesinde değil - kurulu modülün
   içinde, cihazınızda yolculuk eder, böylece çevrimdışı denetim yapabilirsiniz.
 
@@ -30,7 +30,7 @@ sokulmadığını nasıl doğrulayacağınızı belgeler.
 |---|---|---|
 | `bin/<abi>/` yerel araçlar (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + bunların `lib/` kapanışı | Resmi **Termux** apt deposu (`packages.termux.dev/apt`), resmi `.deb` paketleri | `.github/scripts/build_bin.sh` `.deb` dosyalarını + geçişli bağımlılıklarını indirir, onları çıkarır ve ikili dosyaların yanı sıra her birinin ihtiyaç duyduğu yalnızca paylaşılan kütüphaneleri kopyalar |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX dönüştürücü yedeği) | **rhythmcache/android-xml-converter** GitHub sürümü (`ABX_RELEASE`, statik ELF) | `build_bin.sh` tarafından sabitlenmiş sürümden indirilir |
-| `companion.apk` (isteğe bağlı Google Drive yardımcısı) | **Bu depo**, `companion/` (Gradle/Kotlin) | CI tarafından kaynaktan derlenir ve proje anahtarıyla (`VD_Key`) imzalanır; önceden derlenmiş bir blob değil |
+| `companion.apk` (isteğe bağlı Google Drive yardımcısı) | **Bu depo**, `companion/` (Gradle/Kotlin) | CI tarafından kaynaktan derlenir ve proje anahtarıyla imzalanır; önceden derlenmiş bir blob değil |
 | `vdbackup_helper.dex` (çerçeve yardımcısı) | **Bu depo**, `dex/src/` (Java) | CI tarafından `javac` + `d8` ile kaynaktan derlenir |
 
 Yalnızca ilk iki satır önceden derlenmiş üçüncü taraf ikili dosyalardır; son ikisi bu
@@ -50,7 +50,7 @@ yalnızca cihazınızın ABI'sini tutar, bu yüzden o dosya cihazda
 `/data/adb/modules/vdbackup/bin/<abi>/PROVENANCE.json` konumunda kalır. Şunları kaydeder:
 
 - `sources`: her üst kaynak `.deb` (paket, sürüm, tam URL, `.deb` dosyasının SHA-256'sı)
-  ve ABX sürümü (URL, arşivin SHA-256'sı).
+   ve ABX sürümü (URL, arşivin SHA-256'sı).
 - `files`: `bin/<abi>/` altında gerçekten sevk edilen her dosya (yol, boyut, SHA-256).
 
 Bunu WebUI'de okuyabilirsiniz (**About** sekmesi ona bağlantı verir) veya ajan API'si
@@ -77,7 +77,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
    çalıştırın (yalnızca `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf` gerekir) ve çıktıyı
    sevk edilenle karşılaştırın.
 4. **Yardımcı ve dex.** `companion/` ve `dex/` dizinlerini kaynaktan yeniden derleyin;
-   yardımcının imzası proje anahtarı `VD_Key`'dir (SHA-256
+   yardımcının imzası proje anahtarı 'dir (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
 ## Raporlama

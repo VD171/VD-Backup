@@ -11,7 +11,7 @@ krypteringslösenfraser. Vi tar säkerheten på allvar.
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (endast icke-säkerhetsrapporter)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ snart vi kan och ger dig erkännande om du vill.
   klartext. Säkerhetskopior binds aldrig till enhetsbundna hårdvarunycklar (så att de förblir
   portabla), vilket också betyder att lösenfrasen är det som skyddar en krypterad säkerhetskopia -
   välj en stark. 
-- Den valfria Google Drive-följeslagar-appen bör alltid döljas med HMA-OSS så att den
+- Den valfria Google Drive-följeslagar-appen bör alltid döljas med [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) så att den
   inte avslöjar root eller en upplåst bootloader.
 - Återställning körs som root, så varje arkiv kontrolleras innan något skrivs: en
   säkerhetskopia vars innehåll pekar utanför sitt mål (en absolut sökväg eller en `..`-komponent)

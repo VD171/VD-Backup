@@ -427,8 +427,8 @@ Kopie lokalne nigdy nie są dotknięte.
    cel companion Google Drive**, nigdy domyślnie, i jest usuwana, gdy
    ją wyłączysz. Jednorazowy ekran zgody Google to jedyny krok, który dzieje się
    poza WebUI. Gdy companion jest zainstalowany, VDBackup przypomina ci, by
-   **zawsze ukrywać go za pomocą HMA-OSS**, aby jego obecność nie ujawniała roota lub
-   odblokowanego bootloadera, i oferuje dodanie go do listy HMA-OSS za ciebie.
+   **zawsze ukrywać go za pomocą [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)**, aby jego obecność nie ujawniała roota lub
+   odblokowanego bootloadera, i oferuje dodanie go do listy HMA-OSS za ciebie. VDBackup przypomina też, gdy masz lokalne kopie, aby z tego samego powodu ukryć folder kopii (/sdcard/VDBackup) za pomocą SUSFS.
 
 ## 8. Planowanie i retencja
 
@@ -473,6 +473,12 @@ urządzenia naraz.
 **Wykluczone aplikacje (blocklist).** Również w Settings możesz wykluczyć aplikacje, których
 nigdy nie chcesz kopiować automatycznie ani według harmonogramu; możesz dodać kilka naraz
 (wielokrotny wybór), a wykluczone aplikacje są pomijane przez oba mechanizmy.
+
+**Ustawienia predefiniowane kopii.** Również w Ustawieniach możesz zapisać nazwane ustawienia - zestawy elementów do uwzględnienia, np. tylko APK lub APK + OBB - i wybrać jedno w oknie kopii, aby wypełnić wybór elementów naraz.
+
+**Elementy kopii dla aplikacji.** Również w Ustawieniach możesz wybrać dokładnie, które elementy każda aplikacja kopiuje w kopiach zbiorczych, automatycznych i zaplanowanych - na przykład tylko APK lub APK + OBB. Pojedyncza ręczna kopia nadal pozwala wybrać na miejscu, zaczynając od zestawu aplikacji. Aplikacje, których tu nie ustawisz, kopiują wszystko.
+
+**Tagi aplikacji.** Dotknij aplikacji w Ustawieniach (Elementy i tagi dla aplikacji), aby nadać jej swobodne etykiety - na przykład games lub work. Nad listą aplikacji pojawi się wtedy wybór tagów: wybierz tag, aby pokazać tylko jego aplikacje, i utwórz kopię całej grupy naraz. Możesz też otworzyć to z karty Aplikacje: dotknij aplikacji, a potem Elementy i tagi.
 
 **Dziennik aktywności.** Zakładka Schedule ma przycisk **View activity log**, który otwiera pełny
 ekran (natychmiast) pokazujący lokalny ślad audytu - kopie, przywracania, usunięcia, zaplanowane i

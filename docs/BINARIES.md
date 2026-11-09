@@ -12,14 +12,14 @@ from, and how to verify that nothing opaque was slipped in.
 ## Principles
 
 - **Nothing opaque.** Every shipped binary and library is traceable to a named, public
-  upstream at a pinned version, with a recorded SHA-256. No blob is bundled without an
+   upstream at a pinned version, with a recorded SHA-256. No blob is bundled without an
   entry you can check.
 - **Fetched from upstream, never from a device.** Native tools come from the official
   Termux package repository (the signed `.deb` files at `packages.termux.dev/apt`), never
   copied out of a Termux installed on some phone. The build fails loudly, it never
   improvises.
 - **Reproducible.** Re-run the build and you get the same files; re-fetch the pinned
-  sources and the SHA-256 values match.
+   sources and the SHA-256 values match.
 - **The audit trail ships with the module.** It is not just on the website - it travels
   inside the installed module, on your device, so you can audit offline.
 
@@ -29,7 +29,7 @@ from, and how to verify that nothing opaque was slipped in.
 |---|---|---|
 | `bin/<abi>/` native tools (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + their `lib/` closure | Official **Termux** apt repo (`packages.termux.dev/apt`), official `.deb` packages | `.github/scripts/build_bin.sh` downloads the `.deb` files + their transitive dependencies, extracts them, and copies the binaries plus only the shared libraries each one needs |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX converter fallback) | **rhythmcache/android-xml-converter** GitHub release (`ABX_RELEASE`, static ELF) | downloaded from the pinned release by `build_bin.sh` |
-| `companion.apk` (optional Google Drive companion) | **This repository**, `companion/` (Gradle/Kotlin) | built from source by CI and signed with the project key (`VD_Key`); not a prebuilt blob |
+| `companion.apk` (optional Google Drive companion) | **This repository**, `companion/` (Gradle/Kotlin) | built from source by CI and signed with the project key; not a prebuilt blob |
 | `vdbackup_helper.dex` (framework helper) | **This repository**, `dex/src/` (Java) | compiled from source by CI with `javac` + `d8` |
 
 Only the first two rows are prebuilt third-party binaries; the last two are built from
@@ -49,7 +49,7 @@ keeps only your device's ABI, so that file stays on the device at
 `/data/adb/modules/vdbackup/bin/<abi>/PROVENANCE.json`. It records:
 
 - `sources`: every upstream `.deb` (package, version, full URL, SHA-256 of the `.deb`) and
-  the ABX release (URL, SHA-256 of the archive).
+   the ABX release (URL, SHA-256 of the archive).
 - `files`: every file actually shipped under `bin/<abi>/` (path, size, SHA-256).
 
 You can read it in the WebUI (the **About** tab links to it) or over the agent API:
@@ -73,7 +73,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 3. **Rebuild from scratch.** Run `.github/scripts/build_bin.sh` yourself (needs only
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`) and compare the output to what shipped.
 4. **Companion and dex.** Rebuild `companion/` and `dex/` from source; the companion's
-   signature is the project key `VD_Key` (SHA-256
+   signature is the project key (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
 ## Reporting

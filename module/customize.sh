@@ -112,7 +112,10 @@ if [ "$BOOTMODE" = "true" ] && [ "$MODPATH" != "$ACTIVE" ]; then
   chmod 0755 "$ACTIVE"/*.sh "$ACTIVE"/scripts/*.sh "$ACTIVE"/bin/*/* 2>/dev/null
   # the manager writes an "update" marker AFTER customize.sh returns; clear it (and
   # kick the scheduler) from a detached job so the module shows as active, not pending.
-  setsid sh -c "sleep 4; rm -f '$ACTIVE/update' '$ACTIVE/remove' '$ACTIVE/disable'; '$ACTIVE/scripts/helper.sh' scheduler-tick" >/dev/null 2>&1 &
+  setsid sh -c "sleep 4; rm -f '$ACTIVE/update' '$ACTIVE/remove' '$ACTIVE/disable'; '$ACTIVE/scripts/helper.sh' sanitize; '$ACTIVE/scripts/helper.sh' scheduler-tick" >/dev/null 2>&1 &
+else
+  # reboot-flashed (no reboot-free activation): heal existing backup perms now.
+  "$MODPATH/scripts/helper.sh" sanitize >/dev/null 2>&1
 fi
 
 ui_print ""

@@ -12,7 +12,7 @@ VDBackup에서 프라이버시와 보안은 선택 사항이 아닙니다. 백�
 ## 원칙
 
 - **불투명한 것은 없다.** 포함된 모든 바이너리와 라이브러리는 고정된 버전의 이름 있는 공개
-  업스트림까지 추적할 수 있으며, SHA-256이 기록되어 있습니다. 확인할 수 있는 항목 없이 번들되는
+   업스트림까지 추적할 수 있으며, SHA-256이 기록되어 있습니다. 확인할 수 있는 항목 없이 번들되는
   블롭은 없습니다.
 - **업스트림에서 가져오며, 기기에서는 절대 가져오지 않는다.** 네이티브 도구는 공식 Termux 패키지
   저장소 (`packages.termux.dev/apt`에 있는 서명된 `.deb` 파일)에서 가져오며, 어떤 휴대폰에 설치된
@@ -28,7 +28,7 @@ VDBackup에서 프라이버시와 보안은 선택 사항이 아닙니다. 백�
 |---|---|---|
 | `bin/<abi>/` 네이티브 도구 (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) 및 그 `lib/` 의존 클로저 | 공식 **Termux** apt 저장소 (`packages.termux.dev/apt`), 공식 `.deb` 패키지 | `.github/scripts/build_bin.sh`가 `.deb` 파일과 그 전이적 의존성을 다운로드하여 추출하고, 바이너리와 각각이 필요로 하는 공유 라이브러리만 복사합니다 |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX 변환기 폴백) | **rhythmcache/android-xml-converter** GitHub 릴리스 (`ABX_RELEASE`, 정적 ELF) | `build_bin.sh`가 고정된 릴리스에서 다운로드합니다 |
-| `companion.apk` (선택적 Google Drive 컴패니언) | **이 저장소**, `companion/` (Gradle/Kotlin) | CI가 소스에서 빌드하고 프로젝트 키 (`VD_Key`)로 서명합니다. 사전 빌드된 블롭이 아닙니다 |
+| `companion.apk` (선택적 Google Drive 컴패니언) | **이 저장소**, `companion/` (Gradle/Kotlin) | CI가 소스에서 빌드하고 프로젝트 키로 서명합니다. 사전 빌드된 블롭이 아닙니다 |
 | `vdbackup_helper.dex` (프레임워크 헬퍼) | **이 저장소**, `dex/src/` (Java) | CI가 `javac` + `d8`로 소스에서 컴파일합니다 |
 
 사전 빌드된 서드파티 바이너리는 처음 두 행뿐입니다. 나머지 둘은 이 저장소에 있는 소스에서
@@ -47,7 +47,7 @@ ABI만 남기므로, 그 파일은 기기의 `/data/adb/modules/vdbackup/bin/<ab
 남습니다. 다음을 기록합니다:
 
 - `sources`: 모든 업스트림 `.deb` (패키지, 버전, 전체 URL, `.deb`의 SHA-256) 및 ABX 릴리스
-  (URL, 아카이브의 SHA-256).
+   (URL, 아카이브의 SHA-256).
 - `files`: `bin/<abi>/` 아래에 실제로 제공된 모든 파일 (경로, 크기, SHA-256).
 
 WebUI (**About** 탭에서 링크됨) 또는 에이전트 API를 통해 읽을 수 있습니다:
@@ -71,7 +71,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 3. **처음부터 다시 빌드한다.** `.github/scripts/build_bin.sh`를 직접 실행하고 (필요한 것은
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`뿐), 그 출력을 제공된 것과 비교합니다.
 4. **컴패니언과 dex.** `companion/`와 `dex/`를 소스에서 다시 빌드합니다. 컴패니언의 서명은
-   프로젝트 키 `VD_Key` (SHA-256
+   프로젝트 키 (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`)입니다.
 
 ## 신고

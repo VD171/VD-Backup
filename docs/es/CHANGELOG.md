@@ -6,6 +6,27 @@
 
 Todos los cambios relevantes de VDBackup están documentados aquí. Solo en inglés.
 
+## v1.04
+
+Correcciones:
+
+- Las carpetas de copias ahora se mantienen abribles con un gestor de archivos de forma automática: sus permisos se vuelven a aplicar en la instalación, en cada arranque y cada vez que se abre la WebUI, así que una carpeta que quedó solo para el propietario (por ejemplo una copia hecha antes de v1.03.2) se repara sola sin ningún paso manual.
+
+Privacidad:
+
+- Cuando tienes copias locales, la pestaña Copias ahora te recuerda ocultar la carpeta de copias con SUSFS, igual que la app companion: su presencia puede revelar el root o un bootloader desbloqueado. SUSFS oculta; el recordatorio solo te indica dónde.
+
+Copias:
+
+- Ahora puedes definir qué elementos respalda cada app - por ejemplo solo APK, o APK + OBB - y se aplica en copias masivas, automáticas y programadas. Una copia manual individual te sigue dejando elegir, con los elementos de la app preseleccionados. Configúralo en Ajustes, junto a la lista de apps excluidas.
+
+- Presets de copia: guarda conjuntos con nombre de qué incluir y aplícalos con una sola elección en el diálogo de copia.
+- Multiusuario: las copias de apps, las especiales y las restauraciones ahora siguen el usuario de Android que elijas.
+- Las apps vuelven más listas y completas: se respaldan y restauran sus perfiles de compilación ART y sus permisos de escucha de notificaciones, accesibilidad y exención de batería Doze.
+- Restauraciones más fiables: la propiedad de archivos y el contexto SELinux se vuelven a derivar en el dispositivo destino, así la restauración funciona entre dispositivos y usuarios.
+- Restauraciones más seguras: Play Protect y el verificador de instalación se silencian solo durante la instalación y se restauran exactamente; el gestor de root nunca se respalda ni restaura; y la fuente de instalación se verifica y registra.
+- Etiquetas de apps: da a las apps nombres libres como games o work, filtra la lista de apps por una etiqueta y respalda todo un grupo etiquetado a la vez.
+
 ## v1.03.2
 
 Correcciones:
@@ -124,7 +145,7 @@ Destinos y nube:
   backend de nube (SFTP, SMB, WebDAV, FTP, S3, Google Drive y más) sea accesible sin
   editar `rclone.conf` a mano.
 - Google Drive de dos maneras: vía rclone (sin cuenta de Google Cloud) o mediante el app companion headless
-  opcional (`ru.vd171.vdbackup`), que lleva un aviso obligatorio de ocultación con HMA-OSS.
+  opcional (`ru.vd171.vdbackup`), que lleva un aviso obligatorio de ocultación con [HMA-OSS](https://github.com/frknkrc44/HMA-OSS).
 - Política de red: elegir si las transferencias a la nube pueden usar cualquier conexión, solo Wi-Fi o
   solo datos móviles; se aplica a trabajos manuales y programados. Los destinos locales están exentos.
 

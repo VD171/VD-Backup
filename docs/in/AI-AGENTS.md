@@ -132,7 +132,10 @@ Transfer cloud mengisi `rate`/`eta` (percent berasal dari rclone); backup Full l
   "dest": "local",                // local | <destination id>
   "verify": true,                 // re-hash each archive vs the manifest (default on for Full)
   "dry_run": false,               // true = report a size plan, write nothing
-  "ssaid": false                  // OPT-IN, see below
+  "ssaid": false,                 // OPT-IN, see below
+  "manual": false                 // true = single interactive backup, keeps these exact items;
+                                  // omit/false lets config.app_items (a per-app item map) override
+                                  // the set on bulk, auto and scheduled runs
 }
 ```
 

@@ -11,7 +11,7 @@ Verschlüsselungspassphrasen. Wir nehmen Sicherheit ernst.
 
 - **Site:** https://vd171.ru
 - **Site:** https://vd.priv8.ru
-- **Issues:** https://github.com/VD171/VD-Backup/issues (nur Nicht-Sicherheitsmeldungen)
+- **Issues:** https://github.com/VD171/VD-Backup/issues
 - **GitHub:** [@VD171](https://github.com/VD171)
 - **XDA-Developers:** [@VD171](https://xdaforums.com/m/vd171.4699873/)
 - **XDA-Thread:** https://xdaforums.com/t/VD-Backup.4807267/
@@ -29,7 +29,7 @@ schnell wir können und nennen dich, wenn du möchtest.
   Klartext geschrieben. Backups sind niemals an geräteabhängige Hardware-Schlüssel gebunden (damit sie
   portabel bleiben), was auch bedeutet, dass die Passphrase das ist, was ein verschlüsseltes Backup schützt -
   wähle eine starke.
-- Die optionale Google-Drive-Begleit-App sollte immer mit HMA-OSS versteckt werden, damit sie
+- Die optionale Google-Drive-Begleit-App sollte immer mit [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) versteckt werden, damit sie
   weder Root noch einen entsperrten Bootloader verrät.
 - Die Wiederherstellung läuft als Root, daher wird jedes Archiv geprüft, bevor irgendetwas
   geschrieben wird: ein Backup, dessen Inhalte außerhalb ihres Ziels zeigen (ein absoluter

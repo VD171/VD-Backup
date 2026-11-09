@@ -12,14 +12,14 @@ oraz jak zweryfikować, że nie podrzucono niczego nieprzejrzystego.
 ## Zasady
 
 - **Nic nieprzejrzystego.** Każdy dostarczany plik binarny i biblioteka jest możliwy do prześledzenia do nazwanego, publicznego
-  upstreamu na przypiętej wersji, z zapisanym SHA-256. Żaden blob nie jest dołączany bez
+   upstreamu na przypiętej wersji, z zapisanym SHA-256. Żaden blob nie jest dołączany bez
   wpisu, który możesz sprawdzić.
 - **Pobierane z upstreamu, nigdy z urządzenia.** Narzędzia natywne pochodzą z oficjalnego
   repozytorium pakietów Termux (podpisane pliki `.deb` pod `packages.termux.dev/apt`), nigdy
   nie są kopiowane z Termuksa zainstalowanego na jakimś telefonie. Build zawodzi głośno, nigdy
   nie improwizuje.
 - **Odtwarzalne.** Uruchom build ponownie, a otrzymasz te same pliki; pobierz ponownie przypięte
-  źródła, a wartości SHA-256 będą się zgadzać.
+   źródła, a wartości SHA-256 będą się zgadzać.
 - **Ścieżka audytu podróżuje z modułem.** Nie jest tylko na stronie - podróżuje
   wewnątrz zainstalowanego modułu, na Twoim urządzeniu, więc możesz przeprowadzić audyt offline.
 
@@ -29,7 +29,7 @@ oraz jak zweryfikować, że nie podrzucono niczego nieprzejrzystego.
 |---|---|---|
 | narzędzia natywne w `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + ich domknięcie `lib/` | Oficjalne repozytorium apt **Termux** (`packages.termux.dev/apt`), oficjalne pakiety `.deb` | `.github/scripts/build_bin.sh` pobiera pliki `.deb` + ich zależności przechodnie, rozpakowuje je i kopiuje pliki binarne wraz z tylko tymi bibliotekami współdzielonymi, których każdy potrzebuje |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (zapasowy konwerter ABX) | Wydanie na GitHubie **rhythmcache/android-xml-converter** (`ABX_RELEASE`, statyczny ELF) | pobierane z przypiętego wydania przez `build_bin.sh` |
-| `companion.apk` (opcjonalny companion Google Drive) | **To repozytorium**, `companion/` (Gradle/Kotlin) | budowane ze źródeł przez CI i podpisane kluczem projektu (`VD_Key`); nie jest prekompilowanym blobem |
+| `companion.apk` (opcjonalny companion Google Drive) | **To repozytorium**, `companion/` (Gradle/Kotlin) | budowane ze źródeł przez CI i podpisane kluczem projektu; nie jest prekompilowanym blobem |
 | `vdbackup_helper.dex` (pomocnik framework) | **To repozytorium**, `dex/src/` (Java) | kompilowane ze źródeł przez CI za pomocą `javac` + `d8` |
 
 Tylko dwa pierwsze wiersze to prekompilowane pliki binarne osób trzecich; dwa ostatnie są budowane ze
@@ -49,7 +49,7 @@ zachowuje tylko ABI Twojego urządzenia, więc ten plik pozostaje na urządzeniu
 `/data/adb/modules/vdbackup/bin/<abi>/PROVENANCE.json`. Zapisuje on:
 
 - `sources`: każdy upstreamowy `.deb` (pakiet, wersja, pełny URL, SHA-256 pliku `.deb`) oraz
-  wydanie ABX (URL, SHA-256 archiwum).
+   wydanie ABX (URL, SHA-256 archiwum).
 - `files`: każdy plik faktycznie dostarczony w `bin/<abi>/` (ścieżka, rozmiar, SHA-256).
 
 Możesz go odczytać w WebUI (zakładka **O aplikacji** do niego linkuje) lub przez API agenta:
@@ -73,7 +73,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 3. **Zbuduj od zera.** Uruchom samodzielnie `.github/scripts/build_bin.sh` (potrzebuje tylko
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`) i porównaj wynik z tym, co dostarczono.
 4. **Companion i dex.** Zbuduj ponownie `companion/` i `dex/` ze źródeł; podpisem
-   companion jest klucz projektu `VD_Key` (SHA-256
+   companion jest klucz projektu (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
 ## Zgłaszanie

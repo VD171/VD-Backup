@@ -6,6 +6,27 @@
 
 VDBackup'taki tüm kayda değer değişiklikler burada belgelenir. Yalnızca İngilizce.
 
+## v1.04
+
+Düzeltmeler:
+
+- Yedek klasörleri artık bir dosya yöneticisiyle otomatik olarak açılabilir kalıyor: izinleri kurulumda, her açılışta ve WebUI her açıldığında yeniden uygulanır, böylece yalnızca sahibine kalmış bir klasör (örneğin v1.03.2 öncesi alınmış bir yedek) elle hiçbir adım gerektirmeden kendini onarır.
+
+Gizlilik:
+
+- Yerel yedekleriniz olduğunda, Yedekler sekmesi artık tıpkı yardımcı uygulama gibi yedek klasörünü SUSFS ile gizlemenizi hatırlatır: aksi hâlde varlığı root'u veya kilidi açık bir önyükleyiciyi açığa çıkarabilir. Gizlemeyi SUSFS yapar; hatırlatma yalnızca yolu gösterir.
+
+Yedekler:
+
+- Artık her uygulamanın hangi öğeleri yedekleyeceğini ayarlayabilirsiniz - örneğin yalnızca APK veya APK + OBB - bu toplu, otomatik ve zamanlanmış yedeklere uygulanır. Tek bir elle yedekte yine o anda seçebilirsiniz, uygulamanın kümesinden önceden doldurulmuş olarak. Ayarlar'da, hariç tutulan uygulamalar listesinin yanında ayarlayın.
+
+- Yedek ön ayarları: neyin dahil edileceğine dair adlandırılmış kümeleri kaydedin ve yedek penceresinde tek seçimle uygulayın.
+- Çoklu kullanıcı: uygulama yedekleri, özel yedekler ve geri yüklemeler artık seçtiğiniz Android kullanıcısını izler.
+- Uygulamalar daha hazır ve eksiksiz döner: ART derleme profilleri ile bildirim dinleyici, erişilebilirlik ve Doze pil muafiyeti izinleri yedeklenir ve geri yüklenir.
+- Daha güvenilir geri yükleme: dosya sahipliği ve SELinux bağlamı hedef cihazda yeniden türetilir, böylece geri yükleme cihazlar ve kullanıcılar arasında doğru çalışır.
+- Daha güvenli geri yükleme: Play Protect ve kurulum doğrulayıcı yalnızca kurulum sırasında susturulur ve aynen geri alınır; root yöneticisi asla yedeklenmez veya geri yüklenmez; ve kurulum kaynağı doğrulanıp kaydedilir.
+- Uygulama etiketleri: uygulamalara games veya work gibi serbest etiketler verin, uygulama listesini etikete göre filtreleyin ve etiketli bir grubun tamamını tek seferde yedekleyin.
+
 ## v1.03.2
 
 Düzeltmeler:
@@ -119,7 +140,7 @@ Hedefler ve bulut:
   herhangi bir bulut arka ucu (SFTP, SMB, WebDAV, FTP, S3, Google Drive ve daha fazlası) `rclone.conf`
   dosyasını elle düzenlemeden erişilebilir olur.
 - Google Drive iki yolla: rclone aracılığıyla (Google Cloud hesabı gerekmez) ya da isteğe bağlı başsız
-  eşlikçi uygulama (`ru.vd171.vdbackup`) aracılığıyla; bu uygulama zorunlu bir HMA-OSS gizleme uyarısı
+  eşlikçi uygulama (`ru.vd171.vdbackup`) aracılığıyla; bu uygulama zorunlu bir [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) gizleme uyarısı
   taşır.
 - Ağ ilkesi: bulut aktarımlarının herhangi bir bağlantıyı mı, yalnızca Wi-Fi'yi mi yoksa yalnızca mobil
   veriyi mi kullanabileceğini seçin; manuel ve zamanlanmış işler için uygulanır. Yerel hedefler muaftır.

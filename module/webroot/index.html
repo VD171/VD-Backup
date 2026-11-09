@@ -73,6 +73,10 @@
           <option value="name" data-i18n="opt_sort_name">Name</option>
           <option value="package" data-i18n="opt_sort_pkg">Package</option>
         </select>
+        <select id="app-tag" hidden>
+          <option value="" data-i18n="ui_tag_filter_all">All tags</option>
+        </select>
+        <button id="app-backuptag" class="btn go" hidden data-i18n="ui_backup_tag">Back up tag</button>
         <button id="app-select" class="btn" data-i18n="ui_select">Select</button>
       </div>
       <div id="app-batchbar" class="toolbar batchbar" hidden>
@@ -85,6 +89,18 @@
     </section>
 
     <section id="backups" class="panel">
+      <div id="susfs-notice" class="notice" hidden>
+        <div class="notice-toggle">
+          <span data-i18n="susfs_notice_title">Hide the backup folder</span>
+          <span class="tag" data-i18n="susfs_notice_badge">Recommended</span>
+        </div>
+        <div class="notice-msg" data-i18n="susfs_notice_body">You have local backups in /sdcard/VDBackup. Hide this folder with SUSFS so its presence does not reveal root or an unlocked bootloader - just as the companion app would.</div>
+        <div class="notice-msg" data-i18n="susfs_notice_howto">Add the backup folder as a SUSFS hidden path (sus_path) in your root manager or SUSFS module. SUSFS does the hiding; this just reminds you.</div>
+        <div class="pkg" id="susfs-notice-path"></div>
+        <div class="modal-actions">
+          <button class="btn small" id="susfs-notice-dismiss" data-i18n="susfs_notice_dismiss">Got it</button>
+        </div>
+      </div>
       <div class="toolbar">
         <span class="grow"></span>
         <button id="bk-select" class="btn" data-i18n="ui_select">Select</button>
@@ -319,6 +335,34 @@
         <div id="block-app-count" class="muted picker-count"></div>
         <ul id="block-applist" class="list picker-list"></ul>
         <p id="block-app-nomatch" class="muted" data-i18n="ui_job_no_match" hidden>No apps match your search</p>
+      </div>
+
+      <div class="card">
+        <h2 class="section-head"><span class="sh-ic"><svg viewBox="0 0 24 24"><path d="M21 8v8a2 2 0 0 1-1 1.73l-7 4a2 2 0 0 1-2 0l-7-4A2 2 0 0 1 3 16V8a2 2 0 0 1 1-1.73l7-4a2 2 0 0 1 2 0l7 4A2 2 0 0 1 21 8z"/><path d="M3.3 7L12 12l8.7-5"/><path d="M12 22V12"/></svg></span><span class="sh-t" data-i18n="settings_app_items">Per-app items and tags</span></h2>
+        <div class="muted" data-i18n="settings_app_items_hint">Choose exactly which items each app backs up in bulk, automatic and scheduled backups - for example APK only, or APK + OBB. A single manual backup still lets you pick at the time. Apps you do not set here back up everything. Tap an app to also give it tags: free labels to group apps, filter the list, and back up a whole group at once.</div>
+        <input id="ai-app-search" type="search" class="picker-search" data-i18n-ph="ui_job_search" placeholder="Search apps by name or package" autocomplete="off">
+        <div id="ai-app-count" class="muted picker-count"></div>
+        <ul id="ai-applist" class="list picker-list"></ul>
+        <p id="ai-app-nomatch" class="muted" data-i18n="ui_job_no_match" hidden>No apps match your search</p>
+      </div>
+
+      <div class="card">
+        <h2 class="section-head"><span class="sh-ic"><svg viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h10"/></svg></span><span class="sh-t" data-i18n="settings_presets">Backup presets</span></h2>
+        <div class="muted" data-i18n="settings_presets_hint">Named sets of items to include. Pick a preset in the backup dialog to fill the item choices at once.</div>
+        <ul id="presets-list" class="list"></ul>
+        <p id="presets-empty" class="muted" data-i18n="presets_empty">No presets yet.</p>
+        <div class="field">
+          <input id="preset-name" type="text" autocomplete="off" data-i18n-ph="ui_preset_name" placeholder="Preset name">
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="pi-apk" checked><span data-i18n="item_apk">APK (app)</span></label>
+          <label><input type="checkbox" id="pi-data" checked><span data-i18n="item_data">App data</span></label>
+          <label><input type="checkbox" id="pi-data_de" checked><span data-i18n="item_data_de">Protected data</span></label>
+          <label><input type="checkbox" id="pi-obb" checked><span data-i18n="item_obb">OBB</span></label>
+          <label><input type="checkbox" id="pi-external" checked><span data-i18n="item_external">External data</span></label>
+          <label><input type="checkbox" id="pi-media" checked><span data-i18n="item_media">Media</span></label>
+        </div>
+        <button id="preset-add" class="btn go block" data-i18n="ui_preset_add">Add preset</button>
       </div>
 
       <div class="card">
@@ -570,6 +614,7 @@
       <div id="appbk-empty" class="muted" data-i18n="appbk_empty" hidden>No backups yet.</div>
       <div class="modal-actions">
         <button class="btn" id="appbk-close" data-i18n="ui_close">Close</button>
+        <button class="btn" id="appbk-items" data-i18n="appbk_items">Items and tags</button>
         <button class="btn" id="appbk-sysmount" data-i18n="ui_sysmount">Mount as system</button>
         <button class="btn go" id="appbk-backup" data-i18n="backup">Back up</button>
       </div>
@@ -580,6 +625,10 @@
   <div id="backup-modal" class="modal" hidden role="dialog" aria-modal="true">
     <div class="modal-card">
       <div class="modal-title" id="backup-title"></div>
+      <div class="field" id="backup-preset-row" hidden>
+        <label for="backup-preset" data-i18n="ui_preset">Preset</label>
+        <select id="backup-preset"></select>
+      </div>
       <div class="modal-msg" data-i18n="backup_what">What to include in this backup</div>
       <div class="checks">
         <label><input type="checkbox" id="bi-apk" checked><span data-i18n="item_apk">APK (app)</span></label>
@@ -602,6 +651,38 @@
       <div class="modal-actions">
         <button class="btn" id="backup-cancel" data-i18n="ui_import_cancel">Cancel</button>
         <button class="btn go" id="backup-ok" data-i18n="backup">Back up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- per-app backup item set (Settings): what a given app backs up in bulk/auto/scheduled -->
+  <div id="appitems-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="appitems-title"></div>
+      <div class="modal-scroll">
+        <div class="modal-msg" data-i18n="appitems_msg">Items to back up for this app in bulk, automatic and scheduled backups</div>
+        <div class="checks">
+          <label><input type="checkbox" id="ai-apk"><span data-i18n="item_apk">APK (app)</span></label>
+          <label><input type="checkbox" id="ai-data"><span data-i18n="item_data">App data</span></label>
+          <label><input type="checkbox" id="ai-data_de"><span data-i18n="item_data_de">Protected data</span></label>
+          <label><input type="checkbox" id="ai-obb"><span data-i18n="item_obb">OBB</span></label>
+          <label><input type="checkbox" id="ai-external"><span data-i18n="item_external">External data</span></label>
+          <label><input type="checkbox" id="ai-media"><span data-i18n="item_media">Media</span></label>
+        </div>
+        <div class="field">
+          <label data-i18n="appitems_tags">Tags</label>
+          <div class="modal-msg" data-i18n="appitems_tags_msg">Free labels to group apps. Filter the app list by a tag and back up the whole group at once.</div>
+          <div id="ai-tags" class="tags-chips"></div>
+          <div class="tags-add">
+            <input id="ai-tag-input" type="text" data-i18n-ph="ui_tag_add_ph" placeholder="New tag" autocomplete="off">
+            <button class="btn small" id="ai-tag-add" data-i18n="ui_tag_add">Add</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="appitems-clear" data-i18n="appitems_clear">Use default (everything)</button>
+        <button class="btn" id="appitems-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="appitems-save" data-i18n="save">Save</button>
       </div>
     </div>
   </div>
