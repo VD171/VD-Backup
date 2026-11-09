@@ -3,7 +3,7 @@
   "versionCode": 10400,
   "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.04/VD-Backup-v1.04-universal-full.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "",
-  "size": 0,
-  "sha256": ""
+  "notes": "App tags, per-app item sets, presets and multi-user. Backups now carry ART profiles and app grants; restores are safer and portable across devices.",
+  "size": 241877605,
+  "sha256": "c6e3c6adfc47ae58ea30a653404500c1207d43566466b133ab82361038126f58"
 }
