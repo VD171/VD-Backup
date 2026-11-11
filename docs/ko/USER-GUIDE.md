@@ -386,7 +386,7 @@ Wi-Fi 전용 정책은 결코 모바일 데이터를 쓰지 않습니다. 로컬
    컴패니언 앱. **Google Drive 컴패니언 대상을 명시적으로 고를 때만** 설치되며, 결코 기본으로
    설치되지 않고, 비활성화하면 제거됩니다. 일회성 Google 동의 화면이 WebUI 바깥에서 일어나는
    유일한 단계입니다. 컴패니언이 설치되면, VDBackup은 그 존재가 root나 잠금 해제된
-   부트로더를 드러내지 않도록 **항상 [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)로 숨기라고** 상기시켜 주며, 대신 HMA-OSS
+   부트로더를 드러내지 않도록 **항상 [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)로 숨기라고** 상기시켜 주며, 대신 [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)
    목록에 추가해 주겠다고 제안합니다. 또한 VDBackup은 로컬 백업이 있을 때 같은 이유로 백업 폴더(/sdcard/VDBackup)를 SUSFS로 숨기라고 알려줍니다.
 
 ### 7.1 설정 백업

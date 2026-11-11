@@ -378,7 +378,7 @@ obscured で保存され、決して平文ではありません。remote の一�
    トールされ、決してデフォルトではなく、無効にすると削除されます。一度きりの Google 同意画面が、
    WebUI の外で起こる唯一のステップです。コンパニオンがインストールされると、VDBackup は、それが
    存在することで root やアンロックされた bootloader を露呈しないよう **常に [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) で隠す** よう
-   念を押し、HMA-OSS の一覧に追加することを申し出ます。 また VDBackup は、ローカルバックアップがあるとき、同じ理由でバックアップフォルダ（/sdcard/VDBackup）を SUSFS で隠すよう促します。
+   念を押し、[HMA-OSS](https://github.com/frknkrc44/HMA-OSS) の一覧に追加することを申し出ます。 また VDBackup は、ローカルバックアップがあるとき、同じ理由でバックアップフォルダ（/sdcard/VDBackup）を SUSFS で隠すよう促します。
 
 ### 7.1 設定のバックアップ
 

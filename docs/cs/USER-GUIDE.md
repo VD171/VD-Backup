@@ -404,7 +404,7 @@ Lokální zálohy nejsou nikdy ovlivněny.
    ji zakážete. Jednorázová obrazovka Google souhlasu je jediný krok, který se děje
    mimo WebUI. Když je companion nainstalován, VDBackup vám připomíná, abyste jej
    **vždy skryli pomocí [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)**, aby jeho přítomnost neprozradila root nebo
-   odemčený bootloader, a nabídne přidat jej do seznamu HMA-OSS za vás. VDBackup vám také, když máte místní zálohy, připomene skrýt složku se zálohami (/sdcard/VDBackup) pomocí SUSFS ze stejného důvodu.
+   odemčený bootloader, a nabídne přidat jej do seznamu [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) za vás. VDBackup vám také, když máte místní zálohy, připomene skrýt složku se zálohami (/sdcard/VDBackup) pomocí SUSFS ze stejného důvodu.
 
 ### 7.1 Záloha vašich nastavení
 

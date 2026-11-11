@@ -414,7 +414,7 @@ Les sauvegardes locales ne sont jamais affectées.
    vous la désactivez. L'écran de consentement Google unique est la seule étape qui se passe
    hors de la WebUI. Quand le compagnon est installé, VDBackup vous rappelle de
    **toujours le masquer avec [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** afin que sa présence ne révèle ni root ni
-   un bootloader déverrouillé, et il propose de l'ajouter à la liste HMA-OSS pour vous. VDBackup vous rappelle aussi, lorsque vous avez des sauvegardes locales, de masquer le dossier de sauvegarde (/sdcard/VDBackup) avec SUSFS pour la même raison.
+   un bootloader déverrouillé, et il propose de l'ajouter à la liste [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) pour vous. VDBackup vous rappelle aussi, lorsque vous avez des sauvegardes locales, de masquer le dossier de sauvegarde (/sdcard/VDBackup) avec SUSFS pour la même raison.
 
 ### 7.1 Sauvegarder vos réglages
 

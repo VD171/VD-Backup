@@ -423,7 +423,7 @@ bao giờ tiêu dữ liệu di động. Các bản sao lưu cục bộ không ba
    hành Google Drive**, không bao giờ theo mặc định, và nó bị gỡ khi bạn tắt nó. Màn hình
    đồng ý Google một lần là bước duy nhất diễn ra bên ngoài WebUI. Khi ứng dụng đồng hành
    được cài, VDBackup nhắc bạn **luôn ẩn nó với [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** để sự hiện diện của nó không làm
-   lộ root hoặc một bootloader đã mở khóa, và nó đề nghị thêm nó vào danh sách HMA-OSS giúp
+   lộ root hoặc một bootloader đã mở khóa, và nó đề nghị thêm nó vào danh sách [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) giúp
    bạn. VDBackup cũng nhắc bạn, khi có bản sao lưu cục bộ, ẩn thư mục sao lưu (/sdcard/VDBackup) bằng SUSFS vì cùng lý do.
 
 ### 7.1 Sao lưu cài đặt của bạn

@@ -429,7 +429,7 @@ Kopie lokalne nigdy nie są dotknięte.
    ją wyłączysz. Jednorazowy ekran zgody Google to jedyny krok, który dzieje się
    poza WebUI. Gdy companion jest zainstalowany, VDBackup przypomina ci, by
    **zawsze ukrywać go za pomocą [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)**, aby jego obecność nie ujawniała roota lub
-   odblokowanego bootloadera, i oferuje dodanie go do listy HMA-OSS za ciebie. VDBackup przypomina też, gdy masz lokalne kopie, aby z tego samego powodu ukryć folder kopii (/sdcard/VDBackup) za pomocą SUSFS.
+   odblokowanego bootloadera, i oferuje dodanie go do listy [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) za ciebie. VDBackup przypomina też, gdy masz lokalne kopie, aby z tego samego powodu ukryć folder kopii (/sdcard/VDBackup) za pomocą SUSFS.
 
 ### 7.1 Kopia twoich ustawień
 

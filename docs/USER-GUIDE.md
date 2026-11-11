@@ -434,7 +434,7 @@ Local backups are never affected.
    you disable it. The one-time Google consent screen is the only step that happens
    outside the WebUI. When the companion is installed, VDBackup reminds you to
    **always hide it with [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** so that having it present does not reveal root or
-   an unlocked bootloader, and it offers to add it to the HMA-OSS list for you. VDBackup also reminds you, when you have local backups, to hide the backup folder (/sdcard/VDBackup) with SUSFS for the same reason.
+   an unlocked bootloader, and it offers to add it to the [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) list for you. VDBackup also reminds you, when you have local backups, to hide the backup folder (/sdcard/VDBackup) with SUSFS for the same reason.
 
 ### 7.1 Backing up your settings
 

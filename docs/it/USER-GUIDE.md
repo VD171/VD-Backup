@@ -409,7 +409,7 @@ I backup locali non sono mai interessati.
    la disabiliti. La schermata di consenso Google una tantum è l'unico passo che avviene
    fuori dalla WebUI. Quando il compagno è installato, VDBackup ti ricorda di
    **nasconderlo sempre con [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** così che la sua presenza non riveli né root né
-   un bootloader sbloccato, e si offre di aggiungerlo alla lista HMA-OSS per te. VDBackup ti ricorda anche, quando hai backup locali, di nascondere la cartella dei backup (/sdcard/VDBackup) con SUSFS per lo stesso motivo.
+   un bootloader sbloccato, e si offre di aggiungerlo alla lista [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) per te. VDBackup ti ricorda anche, quando hai backup locali, di nascondere la cartella dei backup (/sdcard/VDBackup) con SUSFS per lo stesso motivo.
 
 ### 7.1 Backup delle tue impostazioni
 

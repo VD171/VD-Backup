@@ -40,9 +40,9 @@ sync it to the module's `module.prop`. Bump it only when the companion itself ch
 ## Mandatory HMA-OSS hide step
 
 When the module installs this companion, the WebUI **must** show a mandatory alert: the companion must
-**always be hidden with HMA-OSS** so it does not expose root / an unlocked bootloader to apps that
-enumerate installed packages. Wording is always positive: HMA-OSS is the **solution**, never a
-"failure". The WebUI offers to add `ru.vd171.vdbackup` to the HMA-OSS hide list (strings `companion_hma_*`,
+**always be hidden with [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** so it does not expose root / an unlocked bootloader to apps that
+enumerate installed packages. Wording is always positive: [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) is the **solution**, never a
+"failure". The WebUI offers to add `ru.vd171.vdbackup` to the [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) hide list (strings `companion_hma_*`,
 owned by the module WebUI, not by this project).
 
 ## Shell <-> app command interface

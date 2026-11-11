@@ -438,7 +438,7 @@ Wi-Fi politikası asla mobil veri harcamaz. Yerel yedekler asla etkilenmez.
    onu devre dışı bıraktığınızda kaldırılır. Tek seferlik Google onay ekranı, WebUI
    dışında gerçekleşen tek adımdır. Eşlik eden uygulama kuruluyken, VDBackup, varlığının
    root'u veya kilitsiz bir önyükleyiciyi açığa çıkarmaması için onu **her zaman [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)
-   ile gizlemenizi** hatırlatır ve sizin için HMA-OSS listesine eklemeyi teklif eder. VDBackup ayrıca, yerel yedekleriniz olduğunda, aynı nedenle yedek klasörünü (/sdcard/VDBackup) SUSFS ile gizlemenizi hatırlatır.
+   ile gizlemenizi** hatırlatır ve sizin için [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) listesine eklemeyi teklif eder. VDBackup ayrıca, yerel yedekleriniz olduğunda, aynı nedenle yedek klasörünü (/sdcard/VDBackup) SUSFS ile gizlemenizi hatırlatır.
 
 ### 7.1 Ayarlarınızı yedekleme
 

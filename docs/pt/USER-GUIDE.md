@@ -427,7 +427,7 @@ Backups locais nunca são afetados.
    você o desabilita. A tela de consentimento Google única é o único passo que acontece
    fora da WebUI. Quando o companheiro está instalado, o VDBackup te lembra de
    **sempre ocultá-lo com o [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** para que a presença dele não revele root ou
-   um bootloader desbloqueado, e ele se oferece para adicioná-lo à lista do HMA-OSS para você. O VDBackup também te lembra, quando você tem backups locais, de ocultar a pasta de backups (/sdcard/VDBackup) com o SUSFS pelo mesmo motivo.
+   um bootloader desbloqueado, e ele se oferece para adicioná-lo à lista do [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) para você. O VDBackup também te lembra, quando você tem backups locais, de ocultar a pasta de backups (/sdcard/VDBackup) com o SUSFS pelo mesmo motivo.
 
 ### 7.1 Backup das suas configurações
 

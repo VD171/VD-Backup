@@ -403,7 +403,7 @@ Backup lokal tidak pernah terpengaruh.
    Anda menonaktifkannya. Layar persetujuan Google satu kali adalah satu-satunya langkah yang terjadi
    di luar WebUI. Saat pendamping terpasang, VDBackup mengingatkan Anda untuk
    **selalu menyembunyikannya dengan [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** agar keberadaannya tidak mengungkap root atau
-   bootloader yang tidak terkunci, dan ia menawarkan untuk menambahkannya ke daftar HMA-OSS untuk Anda. VDBackup juga mengingatkan Anda, saat punya cadangan lokal, untuk menyembunyikan folder cadangan (/sdcard/VDBackup) dengan SUSFS karena alasan yang sama.
+   bootloader yang tidak terkunci, dan ia menawarkan untuk menambahkannya ke daftar [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) untuk Anda. VDBackup juga mengingatkan Anda, saat punya cadangan lokal, untuk menyembunyikan folder cadangan (/sdcard/VDBackup) dengan SUSFS karena alasan yang sama.
 
 ### 7.1 Mencadangkan pengaturan Anda
 

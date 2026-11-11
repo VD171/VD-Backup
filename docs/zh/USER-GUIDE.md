@@ -342,7 +342,7 @@ OneDrive、Box、pCloud），请使用 **Authorize in browser** 按钮：它会�
    它**仅在你明确选择 Google Drive 配套目标时**才安装，绝不默认安装，并在你停用它时被移除。
    那个一次性的 Google 同意界面是唯一发生在 WebUI 之外的步骤。当配套应用安装后，VDBackup 会
    提醒你**始终用 [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) 隐藏它**，以免它的存在暴露 root 或已解锁的 bootloader，并主动提出
-   替你把它加入 HMA-OSS 列表。 当你有本地备份时，VDBackup 还会提醒你出于同样的原因用 SUSFS 隐藏备份文件夹（/sdcard/VDBackup）。
+   替你把它加入 [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) 列表。 当你有本地备份时，VDBackup 还会提醒你出于同样的原因用 SUSFS 隐藏备份文件夹（/sdcard/VDBackup）。
 
 ### 7.1 备份你的设置
 

@@ -430,7 +430,7 @@ verbraucht. Lokale Backups sind nie betroffen.
    deaktivierst. Der einmalige Google-Zustimmungsbildschirm ist der einzige Schritt, der
    außerhalb der WebUI geschieht. Wenn der Begleiter installiert ist, erinnert VDBackup dich
    daran, ihn **immer mit [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) zu verbergen**, damit seine Anwesenheit nicht root oder einen
-   entsperrten Bootloader verrät, und es bietet an, ihn für dich zur HMA-OSS-Liste hinzuzufügen. VDBackup erinnert dich außerdem, wenn du lokale Backups hast, den Backup-Ordner (/sdcard/VDBackup) aus demselben Grund mit SUSFS zu verbergen.
+   entsperrten Bootloader verrät, und es bietet an, ihn für dich zur [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)-Liste hinzuzufügen. VDBackup erinnert dich außerdem, wenn du lokale Backups hast, den Backup-Ordner (/sdcard/VDBackup) aus demselben Grund mit SUSFS zu verbergen.
 
 ### 7.1 Ihre Einstellungen sichern
 

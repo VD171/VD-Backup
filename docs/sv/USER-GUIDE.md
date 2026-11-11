@@ -430,7 +430,7 @@ Lokala säkerhetskopior påverkas aldrig.
    du inaktiverar den. Den engångs Google-samtyckesskärmen är det enda steget som händer
    utanför WebUI. När följeslagaren är installerad påminner VDBackup dig om att
    **alltid dölja den med [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** så att dess närvaro inte avslöjar root eller
-   en upplåst bootloader, och den erbjuder att lägga till den i HMA-OSS-listan åt dig. VDBackup påminner dig också, när du har lokala säkerhetskopior, om att dölja säkerhetskopiemappen (/sdcard/VDBackup) med SUSFS av samma skäl.
+   en upplåst bootloader, och den erbjuder att lägga till den i [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)-listan åt dig. VDBackup påminner dig också, när du har lokala säkerhetskopior, om att dölja säkerhetskopiemappen (/sdcard/VDBackup) med SUSFS av samma skäl.
 
 ### 7.1 Säkerhetskopiera dina inställningar
 
