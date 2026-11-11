@@ -26,5 +26,5 @@
     <!-- TODO: set your Google Cloud OAuth client id (Web OAuth client, Drive API enabled). -->
     <!-- Create it at https://console.cloud.google.com/apis/credentials and paste it here. -->
     <!-- Do NOT commit a real client id to a public repository. -->
-    <string name="oauth_client_id">234248603882-fr7rd8l49v1k6te1id82puuuah6c8jhf.apps.googleusercontent.com</string>
+    <string name="oauth_client_id">TODO_SET_YOUR_GOOGLE_CLOUD_OAUTH_CLIENT_ID.apps.googleusercontent.com</string>
 </resources>
