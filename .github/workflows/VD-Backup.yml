@@ -226,9 +226,12 @@ jobs:
           NOTES: ${{ inputs.notes }}
         run: |
           set -e
-          # Build notes: user-provided notes plus the asset legend.
+          # Build notes: user-provided notes, the asset legend, then the channel banner
+          # LAST (always). Strip any banner pasted into NOTES so it never duplicates nor
+          # lands mid-body.
+          notes_clean=$(printf '%s\n' "$NOTES" | grep -vi 't.me/Priv8_VD' || true)
           {
-            printf '%s\n\n' "$NOTES"
+            printf '%s\n\n' "$notes_clean"
             printf '### Assets\n\n'
             printf -- '- `VD-Backup-%s-universal-full.zip` - every architecture, every binary (incl. rclone for cloud providers and restic for snapshots). Works on any device.\n' "$VER"
             printf -- '- `VD-Backup-%s-universal-lite.zip` - every architecture, without the two largest binaries (rclone, restic). Smallest; local, SSH/SFTP and rsync backups.\n' "$VER"
@@ -237,6 +240,8 @@ jobs:
             printf 'lite = without the two largest binaries (rclone, restic); it fetches them on demand (verified by SHA-256) the first time you use a cloud or snapshot feature. Local, SSH/SFTP and rsync work without any download.\n'
             printf 'universal = every architecture; per-ABI = pick your device (arm64-v8a, armeabi-v7a, x86, x86_64).\n'
             printf '\nThe `assets-<abi>.tar.zst` files are the on-demand rclone+restic addons the lite edition downloads on first cloud use; they are not flashable builds, do not flash them.\n'
+            printf '\n---\n\n'
+            printf '📣 Join the channel for updates: @Priv8_VD https://t.me/Priv8_VD\n'
           } > release-notes.md
           # Idempotent: drop any existing release/tag for this version first.
           gh release delete "$VER" -y --cleanup-tag || true
