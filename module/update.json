@@ -1,9 +1,9 @@
 {
-  "version": "v1.05",
-  "versionCode": 10500,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.05/VD-Backup-v1.05-universal-full.zip",
+  "version": "v1.06",
+  "versionCode": 10600,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.06/VD-Backup-v1.06-universal-full.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "## What's new in v1.05\n\n**Reliability**\n- Batch backups no longer stop partway when you leave the app (issue #5): the whole selection, a tag group or a scheduled run is driven by one detached, memory-pressure-protected process, and the progress view reattaches when you come back.\n\n**Restore** (issue #7)\n- Restoring an app that is no longer installed now reinstalls its APK first, and the dialog offers the APK option whenever a backup has one.\n- A restore that cannot install the app reports the failure instead of claiming success.\n- App, permission and setting operations run in a clean environment, fixing \"Failed transaction\" errors on some ROMs.\n\n**Destinations**\n- Back up to an SD card or USB drive (issue #6): the folder picker shows a shortcut to each storage volume.\n\n**Settings**\n- Settings backup: export your destinations, schedules, presets and credentials to one encrypted file to carry to another device, and wipe stored credentials in one step.\n\n**Safety**\n- Backups can only be stored where they stay encrypted at rest; paths readable before first unlock (such as /data/adb or /data/system) and \"..\" traversals are refused. Removable SD/USB is not encrypted at rest, so you are warned.\n- Saved credentials, the rclone config and the age key now live on credential-encrypted storage, locked until the first unlock.\n- Backups check for free space before they start.\n\n📣 **Join the channel for updates:** @Priv8_VD https://t.me/Priv8_VD",
-  "size": 241906103,
-  "sha256": "63c28f346de0014c4db069dadd24d8e61c419239f5919ee071e709e8389e86a5"
+  "notes": "Restore fixes (issue #8): restoring an app over a fresh install now relabels its data for that install. Internal files get the new install's SELinux categories (fixes a crash where the app was denied its own data), and external files (Android/data, Android/obb, Android/media) are re-owned to the new app uid (fixes a startup hang). Full, snapshot and mirror restores.",
+  "size": 241906932,
+  "sha256": "45fd244ef7bc13c4b07c1bc89aafe48bf3a7ba08de2f81ddf80b0f62ea327802"
 }
