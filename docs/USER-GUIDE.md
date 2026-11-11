@@ -617,12 +617,7 @@ backdoor by design; the passphrase is what protects the backup. Keep it safe.
 
 ## 14. Uninstalling
 
-Uninstall VDBackup like any other module from your KernelSU / APatch / Magisk manager.
-Uninstalling **preserves your user configuration** and removes only transient state,
-so reinstalling later picks up your settings. Your actual backups live under
-`/data/adb/vdbackup/`, if you want to remove them too, delete that directory
-manually after uninstalling; otherwise they remain available (and, being standard
-formats, openable on a PC) even without the module.
+Uninstall VDBackup like any other module from your KernelSU / APatch / Magisk manager. Uninstalling **preserves your setup** and removes only transient state, so reinstalling later picks up your configuration, destinations and schedules. It keeps your backups under `/sdcard/VDBackup` (standard formats, openable on a PC without the module), your configuration under `/data/adb/vdbackup`, and your saved credentials, the rclone config and the age key under credential-encrypted `/data/misc_ce/0/vdbackup` (locked until the first unlock). To remove any of these too, delete that directory manually after uninstalling.
 
 ---
 

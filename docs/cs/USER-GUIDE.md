@@ -580,12 +580,7 @@ pro obnovu, záměrně; passphrase je to, co chrání zálohu. Uchovejte ji v be
 
 ## 14. Odinstalace
 
-Odinstalujte VDBackup jako jakýkoli jiný modul ze svého manažera KernelSU / APatch / Magisk.
-Odinstalace **zachová vaši uživatelskou konfiguraci** a odebere pouze přechodný stav,
-takže pozdější přeinstalace vyzvedne vaše nastavení. Vaše skutečné zálohy žijí pod
-`/data/adb/vdbackup/`, pokud je chcete také odebrat, smažte ten adresář
-ručně po odinstalaci; jinak zůstávají dostupné (a, protože jsou standardní
-formáty, otevíratelné na PC) i bez modulu.
+Odinstalujte VDBackup jako kterýkoli jiný modul ze správce KernelSU / APatch / Magisk. Odinstalace **zachová vaše nastavení** a odstraní jen přechodný stav, takže pozdější přeinstalace převezme vaši konfiguraci, cíle a plány. Ponechá vaše zálohy v `/sdcard/VDBackup` (standardní formáty, otevíratelné na PC bez modulu), vaši konfiguraci v `/data/adb/vdbackup` a vaše uložené přihlašovací údaje, rclone.conf a klíč age v úložišti šifrovaném přihlašovacími údaji `/data/misc_ce/0/vdbackup` (zamčeno až do prvního odemknutí). Chcete-li některý z nich také odstranit, smažte po odinstalaci příslušný adresář ručně.
 
 ---
 

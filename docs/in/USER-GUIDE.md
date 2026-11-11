@@ -577,12 +577,7 @@ pemulihan berdasarkan desain; passphrase itulah yang melindungi backup. Jaga aga
 
 ## 14. Menghapus instalasi
 
-Hapus instalasi VDBackup seperti modul lainnya dari manajer KernelSU / APatch / Magisk Anda.
-Menghapus instalasi **menjaga konfigurasi pengguna Anda** dan hanya menghapus state transien,
-jadi memasang ulang kemudian mengambil kembali pengaturan Anda. Backup aktual Anda berada di bawah
-`/data/adb/vdbackup/`, jika Anda ingin menghapusnya juga, hapus direktori itu
-secara manual setelah menghapus instalasi; jika tidak mereka tetap tersedia (dan, karena merupakan format
-standar, dapat dibuka di PC) bahkan tanpa modul.
+Copot VDBackup seperti modul lain dari pengelola KernelSU / APatch / Magisk Anda. Pencopotan **mempertahankan penyiapan Anda** dan hanya menghapus status sementara, jadi memasang ulang nanti mengambil kembali konfigurasi, tujuan, dan jadwal Anda. Ia menyimpan cadangan Anda di `/sdcard/VDBackup` (format standar, dapat dibuka di PC tanpa modul), konfigurasi Anda di `/data/adb/vdbackup`, dan kredensial tersimpan Anda, rclone.conf, serta kunci age di `/data/misc_ce/0/vdbackup` yang terenkripsi-kredensial (terkunci hingga pembukaan kunci pertama). Untuk menghapus salah satunya juga, hapus direktori itu secara manual setelah mencopot.
 
 ---
 

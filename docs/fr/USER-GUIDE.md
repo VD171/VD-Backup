@@ -591,12 +591,7 @@ par conception ; la phrase secrète est ce qui protège la sauvegarde. Gardez-la
 
 ## 14. Désinstallation
 
-Désinstallez VDBackup comme n'importe quel autre module depuis votre gestionnaire KernelSU / APatch / Magisk.
-La désinstallation **préserve votre configuration utilisateur** et ne retire que l'état transitoire,
-de sorte qu'une réinstallation ultérieure reprend vos réglages. Vos sauvegardes réelles vivent sous
-`/data/adb/vdbackup/`, si vous voulez les retirer elles aussi, supprimez ce répertoire
-manuellement après la désinstallation ; sinon elles restent disponibles (et, étant en formats
-standard, ouvrables sur un PC) même sans le module.
+Désinstallez VDBackup comme tout autre module depuis votre gestionnaire KernelSU / APatch / Magisk. La désinstallation **préserve votre configuration** et ne supprime que l'état transitoire, donc une réinstallation ultérieure reprend votre configuration, vos destinations et vos planifications. Elle conserve vos sauvegardes sous `/sdcard/VDBackup` (formats standard, ouvrables sur un PC sans le module), votre configuration sous `/data/adb/vdbackup`, et vos identifiants enregistrés, le rclone.conf et la clé age sous `/data/misc_ce/0/vdbackup` chiffré par identifiant (verrouillé jusqu'au premier déverrouillage). Pour supprimer l'un d'eux aussi, effacez ce répertoire manuellement après la désinstallation.
 
 ---
 

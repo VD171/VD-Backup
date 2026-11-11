@@ -621,12 +621,7 @@ ontwerp geen herstelachterdeur; de wachtwoordzin is wat de backup beschermt. Bew
 
 ## 14. Verwijderen
 
-Verwijder VDBackup zoals elke andere module uit je KernelSU-/APatch-/Magisk-beheerder. Het
-verwijderen **behoudt je gebruikersconfiguratie** en verwijdert alleen tijdelijke status, zodat
-een latere herinstallatie je instellingen oppikt. Je werkelijke backups leven onder
-`/data/adb/vdbackup/`, als je ze ook wilt verwijderen, verwijder die map dan handmatig na het
-verwijderen; anders blijven ze beschikbaar (en, omdat het standaardformaten zijn, te openen op
-een pc) ook zonder de module.
+Verwijder VDBackup zoals elke andere module via je KernelSU- / APatch- / Magisk-manager. Verwijderen **behoudt je opzet** en wist alleen tijdelijke status, dus later opnieuw installeren pakt je configuratie, bestemmingen en planningen weer op. Het behoudt je back-ups onder `/sdcard/VDBackup` (standaardformaten, op een pc te openen zonder de module), je configuratie onder `/data/adb/vdbackup`, en je opgeslagen inloggegevens, de rclone.conf en de age-sleutel onder credential-versleutelde `/data/misc_ce/0/vdbackup` (vergrendeld tot de eerste ontgrendeling). Om een hiervan ook te verwijderen, verwijder die map na het verwijderen handmatig.
 
 ---
 

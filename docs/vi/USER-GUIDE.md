@@ -609,12 +609,7 @@ khôi phục theo thiết kế; cụm mật khẩu là thứ bảo vệ bản sa
 
 ## 14. Gỡ cài đặt
 
-Gỡ VDBackup giống bất kỳ mô-đun nào khác từ trình quản lý KernelSU / APatch / Magisk của
-bạn. Gỡ cài đặt **giữ nguyên cấu hình người dùng của bạn** và chỉ loại bỏ trạng thái tạm
-thời, nên cài lại sau này sẽ nhặt lại các cài đặt của bạn. Các bản sao lưu thực của bạn nằm
-dưới `/data/adb/vdbackup/`, nếu bạn muốn loại bỏ chúng nữa, hãy xóa thư mục đó thủ công sau
-khi gỡ cài đặt; nếu không chúng vẫn còn khả dụng (và, là các định dạng chuẩn, mở được trên
-một PC) ngay cả khi không có mô-đun.
+Gỡ VDBackup như bất kỳ mô-đun nào khác từ trình quản lý KernelSU / APatch / Magisk của bạn. Việc gỡ **giữ nguyên thiết lập của bạn** và chỉ xóa trạng thái tạm thời, nên cài lại về sau sẽ tiếp nhận cấu hình, đích đến và lịch trình của bạn. Nó giữ các bản sao lưu của bạn tại `/sdcard/VDBackup` (định dạng chuẩn, mở được trên PC mà không cần mô-đun), cấu hình của bạn tại `/data/adb/vdbackup`, và thông tin xác thực đã lưu, rclone.conf cùng khóa age tại `/data/misc_ce/0/vdbackup` được mã hóa bằng thông tin xác thực (khóa cho đến lần mở khóa đầu tiên). Để xóa bất kỳ mục nào trong số này, hãy tự xóa thư mục đó sau khi gỡ.
 
 ---
 

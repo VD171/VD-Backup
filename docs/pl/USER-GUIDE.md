@@ -608,12 +608,7 @@ do odzyskiwania z założenia; passphrase jest tym, co chroni kopię. Trzymaj j�
 
 ## 14. Odinstalowanie
 
-Odinstaluj VDBackup jak każdy inny moduł ze swojego menedżera KernelSU / APatch / Magisk.
-Odinstalowanie **zachowuje twoją konfigurację użytkownika** i usuwa tylko stan przejściowy,
-więc późniejsza reinstalacja podejmuje twoje ustawienia. Twoje faktyczne kopie żyją pod
-`/data/adb/vdbackup/`, jeśli chcesz je też usunąć, skasuj ten katalog
-ręcznie po odinstalowaniu; w przeciwnym razie pozostają dostępne (i, będąc standardowymi
-formatami, otwieralne na PC) nawet bez modułu.
+Odinstaluj VDBackup jak każdy inny moduł z menedżera KernelSU / APatch / Magisk. Odinstalowanie **zachowuje twoją konfigurację** i usuwa tylko stan przejściowy, więc późniejsza ponowna instalacja przejmuje twoją konfigurację, miejsca docelowe i harmonogramy. Zachowuje twoje kopie w `/sdcard/VDBackup` (standardowe formaty, otwieralne na PC bez modułu), twoją konfigurację w `/data/adb/vdbackup` oraz zapisane poświadczenia, rclone.conf i klucz age w szyfrowanym poświadczeniami `/data/misc_ce/0/vdbackup` (zablokowane do pierwszego odblokowania). Aby usunąć też którekolwiek z nich, usuń ten katalog ręcznie po odinstalowaniu.
 
 ---
 
