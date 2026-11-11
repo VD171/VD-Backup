@@ -6,6 +6,12 @@
 
 Alle nennenswerten Änderungen an VDBackup werden hier dokumentiert. Nur auf Englisch.
 
+## v1.06
+
+Wiederherstellung:
+
+- Beim Wiederherstellen einer App über eine Neuinstallation werden ihre Daten jetzt für diese Installation neu etikettiert. Dateien, die in den internen Speicher wiederhergestellt werden, erhalten die SELinux-Kategorien der neuen Installation, was einen Absturz behebt, bei dem der App der Zugriff auf ihre eigenen Daten verweigert wurde. Dateien, die in den externen Speicher (Android/data, Android/obb, Android/media) wiederhergestellt werden, gehen in den Besitz der neuen App über, damit sie sie wieder lesen kann, statt beim Start hängenzubleiben. Gilt für Full-, Snapshot- und Mirror-Wiederherstellungen.
+
 ## v1.05
 
 Zuverlässigkeit:

@@ -6,6 +6,12 @@
 
 VDBackup'taki tüm kayda değer değişiklikler burada belgelenir. Yalnızca İngilizce.
 
+## v1.06
+
+Geri yükleme:
+
+- Bir uygulamayı yeni bir kurulumun üzerine geri yüklemek artık verilerini o kuruluma göre yeniden etiketliyor. İç depolamaya geri yüklenen dosyalara yeni kurulumun SELinux kategorileri verilir; bu da uygulamanın kendi verilerine erişiminin reddedildiği bir çökmeyi düzeltir. Dış depolamaya (Android/data, Android/obb, Android/media) geri yüklenen dosyalar yeni uygulamanın sahipliğine geçirilir; böylece uygulama başlangıçta takılmak yerine onları yeniden okuyabilir. Full, snapshot ve mirror geri yüklemelerinde geçerlidir.
+
 ## v1.05
 
 Güvenilirlik:

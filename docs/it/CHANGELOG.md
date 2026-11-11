@@ -6,6 +6,12 @@
 
 Tutte le modifiche rilevanti di VDBackup sono documentate qui. Solo in inglese.
 
+## v1.06
+
+Ripristino:
+
+- Ripristinare un'app sopra un'installazione nuova ora rietichetta i suoi dati per quell'installazione. I file ripristinati nell'archiviazione interna ricevono le categorie SELinux della nuova installazione, correggendo un crash in cui all'app veniva negato l'accesso ai propri dati. I file ripristinati nell'archiviazione esterna (Android/data, Android/obb, Android/media) passano alla nuova app così può leggerli di nuovo invece di bloccarsi all'avvio. Vale per i ripristini full, snapshot e mirror.
+
 ## v1.05
 
 Affidabilità:

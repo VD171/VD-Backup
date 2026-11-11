@@ -389,6 +389,33 @@ verifier_restore() {
 # a moment after install-commit; without this the chown is silently skipped).
 wait_datadir() { _w=0; while [ "$_w" -lt 25 ]; do [ -d "$1" ] && return 0; exec_ns sleep 0.2 2>/dev/null; _w=$((_w+1)); done; }
 
+# Re-map ownership + SELinux label of a restored tree onto the freshly installed app
+# (issue #8). Uses LIVEU/LIVEG/LIVECTX captured from the fresh install by the caller.
+#  - internal data (data/data_de): chown to the live uid/gid, then chcon the live context
+#    so THIS install's per-app MCS categories land on every file. restorecon only applies
+#    the base file_contexts label and does not recompute those categories on some ROMs, so
+#    the backup's stale categories would persist and the app gets EACCES on its own data.
+#  - external trees (external/obb/media on the emulated volume): the app reaches them via
+#    FUSE, which enforces uid/gid, so the backup's OLD uid must be remapped or the app
+#    cannot read its own files. Group differs per tree: Android/data=ext_data_rw(1078),
+#    Android/obb=ext_obb_rw(1079), Android/media=media_rw(1023). Their context carries no
+#    access-blocking category, so restorecon re-derives it portably.
+remap_restored() {   # <type> <target>
+  case "$1" in
+    data|data_de)
+      [ "${LIVEU:-0}" != 0 ] && exec_ns chown -hR "$LIVEU:$LIVEG" "$2" 2>/dev/null
+      case "$LIVECTX" in
+        *:object_r:*:c[0-9]*) exec_ns chcon -R "$LIVECTX" "$2" 2>/dev/null || exec_ns restorecon -R "$2" 2>/dev/null ;;
+        *) exec_ns restorecon -R "$2" 2>/dev/null ;;
+      esac ;;
+    external|obb|media)
+      case "$1" in external) _eg=1078 ;; obb) _eg=1079 ;; *) _eg=1023 ;; esac
+      [ "${LIVEU:-0}" != 0 ] && exec_ns chown -hR "$LIVEU:$_eg" "$2" 2>/dev/null
+      exec_ns restorecon -R "$2" 2>/dev/null ;;
+    *) exec_ns restorecon -R "$2" 2>/dev/null ;;
+  esac
+}
+
 # Encryption: age with a scrypt passphrase ($PW), so a backup decrypts on any PC
 # with just the passphrase (`age -d`) - no device keyfile needed. age reads the
 # passphrase from a controlling terminal, which a detached root process lacks, so it
@@ -1076,13 +1103,21 @@ do_restore_snapshot() {
   fi
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
+  LIVECTX="$(exec_ns ls -Zd "/data/user/$U/$PKG" 2>/dev/null | cut -d' ' -f1)"
   prog 75 extracting "$PKG"
   for rel in "data/user/$U/$PKG" "data/user_de/$U/$PKG" "data/media/$U/Android/data/$PKG" \
              "data/media/$U/Android/obb/$PKG" "data/media/$U/Android/media/$PKG"; do
     src="$ST/$rel"; dst="/$rel"; [ -d "$src" ] || continue
     rm -rf "$dst"; mkdir -p "$(dirname "$dst")"; cp -a "$src" "$dst"
-    case "$rel" in data/user/*|data/user_de/*) [ "$LIVEU" != 0 ] && exec_ns chown -hR "$LIVEU:$LIVEG" "$dst" 2>/dev/null ;; esac
-    exec_ns restorecon -R "$dst" 2>/dev/null
+    case "$rel" in
+      data/user/*)       _rt=data ;;
+      data/user_de/*)    _rt=data_de ;;
+      */Android/data/*)  _rt=external ;;
+      */Android/obb/*)   _rt=obb ;;
+      */Android/media/*) _rt=media ;;
+      *)                 _rt=other ;;
+    esac
+    remap_restored "$_rt" "$dst"
   done
   rm -rf "$ST"
   prog 97 framework "$PKG"; audit "restore-snapshot done $PKG"; notify restore_done "$PKG"
@@ -1114,12 +1149,12 @@ do_restore_mirror() {
   fi
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
+  LIVECTX="$(exec_ns ls -Zd "/data/user/$U/$PKG" 2>/dev/null | cut -d' ' -f1)"
   prog 70 extracting "$PKG"
   restore_one() { # <label> <dst>
     [ -d "$SRC/$1" ] || return 0
     mkdir -p "$2"; exec_ns "$RSYNC" -a --delete "$SRC/$1/" "$2/" >/dev/null 2>&1
-    case "$1" in data|data_de) [ "$LIVEU" != 0 ] && exec_ns chown -hR "$LIVEU:$LIVEG" "$2" 2>/dev/null ;; esac
-    exec_ns restorecon -R "$2" 2>/dev/null
+    remap_restored "$1" "$2"
   }
   restore_one data     "/data/user/$U/$PKG"
   restore_one data_de  "/data/user_de/$U/$PKG"
@@ -1250,6 +1285,12 @@ restore() {
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
   LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
+  # live SELinux context of the freshly installed dir: it carries THIS install's per-app
+  # MCS categories (c<n>,...). restorecon only applies the base file_contexts label and
+  # does not recompute the seapp_contexts categories on some ROMs, so the backup's stale
+  # categories would persist and the app gets EACCES on its own data (issue #8). Captured
+  # BEFORE the wipe; /data/user and /data/user_de share the same per-app categories.
+  LIVECTX="$(exec_ns ls -Zd "/data/user/$U/$PKG" 2>/dev/null | cut -d' ' -f1)"
 
   # restore each data item + remap ownership/context
   prog 55 extracting "$PKG"
@@ -1303,9 +1344,6 @@ restore() {
     # the app reading its own data. (The stored root context $ctx is kept in the manifest
     # for reference/audit only, not applied.)
     case "$typ" in
-      data|data_de)
-        [ "$LIVEU" != 0 ] && exec_ns chown -hR "$LIVEU:$LIVEG" "$target" 2>/dev/null
-        exec_ns restorecon -R "$target" 2>/dev/null ;;
       profiles)
         # ref/<pkg> is system(1000):<app shared gid>; cur/<u>/<pkg> is the app uid. The
         # context (user_profile_data_file) carries no per-install category, so restorecon
@@ -1316,7 +1354,7 @@ restore() {
           exec_ns chown -R "$LIVEU:$LIVEU" "/data/misc/profiles/cur/$U/$PKG" 2>/dev/null
         fi
         exec_ns restorecon -R "/data/misc/profiles/ref/$PKG" "/data/misc/profiles/cur/$U/$PKG" 2>/dev/null ;;
-      *) exec_ns restorecon -R "$target" 2>/dev/null ;;
+      *) remap_restored "$typ" "$target" ;;
     esac
     i=$((i+1))
   done

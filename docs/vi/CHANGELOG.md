@@ -6,6 +6,12 @@
 
 Mọi thay đổi đáng chú ý của VDBackup được ghi lại ở đây. Chỉ bằng tiếng Anh.
 
+## v1.06
+
+Khôi phục:
+
+- Khôi phục một ứng dụng lên trên một bản cài đặt mới giờ sẽ gán nhãn lại dữ liệu của nó cho bản cài đặt đó. Các tệp được khôi phục vào bộ nhớ trong sẽ nhận các danh mục SELinux của bản cài đặt mới, khắc phục sự cố treo khi ứng dụng bị từ chối truy cập dữ liệu của chính nó. Các tệp được khôi phục vào bộ nhớ ngoài (Android/data, Android/obb, Android/media) được chuyển quyền sở hữu sang ứng dụng mới để nó có thể đọc lại thay vì treo khi khởi động. Áp dụng cho các lần khôi phục full, snapshot và mirror.
+
 ## v1.05
 
 Độ tin cậy:

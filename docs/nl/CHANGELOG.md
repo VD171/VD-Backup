@@ -6,6 +6,12 @@
 
 Alle noemenswaardige wijzigingen aan VDBackup worden hier gedocumenteerd. Alleen in het Engels.
 
+## v1.06
+
+Herstel:
+
+- Een app herstellen bovenop een verse installatie herlabelt nu zijn gegevens voor die installatie. Bestanden die naar de interne opslag zijn hersteld, krijgen de SELinux-categorieën van de nieuwe installatie, wat een crash verhelpt waarbij de app de toegang tot zijn eigen gegevens werd geweigerd. Bestanden die naar de externe opslag (Android/data, Android/obb, Android/media) zijn hersteld, worden overgedragen aan de nieuwe app zodat die ze weer kan lezen in plaats van vast te lopen bij het opstarten. Geldt voor full-, snapshot- en mirror-herstel.
+
 ## v1.05
 
 Betrouwbaarheid:

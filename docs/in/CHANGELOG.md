@@ -6,6 +6,12 @@
 
 Semua perubahan penting pada VDBackup didokumentasikan di sini. Hanya dalam bahasa Inggris.
 
+## v1.06
+
+Pemulihan:
+
+- Memulihkan aplikasi di atas pemasangan baru kini melabeli ulang datanya untuk pemasangan tersebut. Berkas yang dipulihkan ke penyimpanan internal diberi kategori SELinux dari pemasangan baru, memperbaiki kerusakan saat aplikasi ditolak mengakses datanya sendiri. Berkas yang dipulihkan ke penyimpanan eksternal (Android/data, Android/obb, Android/media) dialihkan kepemilikannya ke aplikasi baru agar dapat membacanya kembali alih-alih macet saat mulai. Berlaku untuk pemulihan full, snapshot, dan mirror.
+
 ## v1.05
 
 Keandalan:

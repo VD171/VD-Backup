@@ -6,6 +6,12 @@
 
 Wszystkie istotne zmiany w VDBackup są udokumentowane tutaj. Tylko po angielsku.
 
+## v1.06
+
+Przywracanie:
+
+- Przywracanie aplikacji na świeżą instalację teraz na nowo etykietuje jej dane dla tej instalacji. Pliki przywrócone do pamięci wewnętrznej otrzymują kategorie SELinux nowej instalacji, co naprawia awarię, w której aplikacji odmawiano dostępu do własnych danych. Pliki przywrócone do pamięci zewnętrznej (Android/data, Android/obb, Android/media) przechodzą na własność nowej aplikacji, aby mogła je znów odczytać, zamiast zawieszać się przy starcie. Dotyczy przywracania full, snapshot i mirror.
+
 ## v1.05
 
 Niezawodność:

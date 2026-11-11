@@ -6,6 +6,12 @@
 
 Alla noterbara ändringar i VDBackup dokumenteras här. Endast engelska.
 
+## v1.06
+
+Återställning:
+
+- Att återställa en app ovanpå en ny installation ometiketterar nu dess data för den installationen. Filer som återställs till det interna lagret får den nya installationens SELinux-kategorier, vilket åtgärdar en krasch där appen nekades åtkomst till sina egna data. Filer som återställs till det externa lagret (Android/data, Android/obb, Android/media) förs över till den nya appen så att den kan läsa dem igen i stället för att hänga sig vid start. Gäller för full-, snapshot- och mirror-återställningar.
+
 ## v1.05
 
 Tillförlitlighet:

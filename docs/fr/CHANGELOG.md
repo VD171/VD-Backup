@@ -6,6 +6,12 @@
 
 Toutes les modifications notables de VDBackup sont documentées ici. En anglais uniquement.
 
+## v1.06
+
+Restauration:
+
+- La restauration d'une application par-dessus une nouvelle installation réétiquette désormais ses données pour cette installation. Les fichiers restaurés dans le stockage interne reçoivent les catégories SELinux de la nouvelle installation, corrigeant un plantage où l'application se voyait refuser l'accès à ses propres données. Les fichiers restaurés dans le stockage externe (Android/data, Android/obb, Android/media) sont réattribués à la nouvelle application pour qu'elle puisse de nouveau les lire au lieu de se figer au démarrage. S'applique aux restaurations full, snapshot et mirror.
+
 ## v1.05
 
 Fiabilité:

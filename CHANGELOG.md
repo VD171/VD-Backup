@@ -6,6 +6,12 @@
 
 All notable changes to VDBackup are documented here. English only.
 
+## v1.06
+
+Restore:
+
+- Restoring an app over a fresh install now relabels its data for that install. Files restored to internal storage are given the new install's SELinux categories, fixing a crash where the app was denied access to its own data. Files restored to external storage (Android/data, Android/obb, Android/media) are re-owned to the new app so it can read them again instead of hanging on startup. Applies to full, snapshot and mirror restores.
+
 ## v1.05
 
 Reliability:

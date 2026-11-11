@@ -6,6 +6,12 @@
 
 Všechny podstatné změny ve VDBackup jsou zdokumentovány zde. Pouze anglicky.
 
+## v1.06
+
+Obnovení:
+
+- Obnovení aplikace přes novou instalaci nyní znovu označí její data pro tuto instalaci. Soubory obnovené do interního úložiště dostanou kategorie SELinux nové instalace, což opravuje pád, při kterém byl aplikaci odepřen přístup k vlastním datům. Soubory obnovené do externího úložiště (Android/data, Android/obb, Android/media) přejdou do vlastnictví nové aplikace, aby je zase mohla číst, místo aby se zasekla při spuštění. Platí pro obnovení full, snapshot i mirror.
+
 ## v1.05
 
 Spolehlivost:
