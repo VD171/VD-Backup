@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - 在 PC 上恢复备份（Windows / macOS / Linux）
+# VDBackup, 在 PC 上恢复备份（Windows / macOS / Linux）
 
 你的 VDBackup 备份使用**标准格式**，因此你可以在任何地方打开它们，
 无需此模块。一个备份文件夹包含一个 `manifest.json`、APK

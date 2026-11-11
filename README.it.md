@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>Backup e ripristino completi di app e dati come root - gestiti interamente da una WebUI.</b><br>
+  <b>Backup e ripristino completi di app e dati come root, gestiti interamente da una WebUI.</b><br>
   Modulo KernelSU / APatch / Magisk. Nessun avviso "concedi su", nessun cambio di <code>sucompat</code>.
 </p>
 
@@ -29,7 +29,7 @@
 ## Cos'è
 
 VDBackup è un **modulo WebUI** root che esegue il backup e il ripristino delle tue app e dei
-loro dati **senza un'app companion per le funzioni principali** - perché il modulo è
+loro dati **senza un'app companion per le funzioni principali**: perché il modulo è
 già root, non c'è nulla da "consentire". Punta a coprire tutto ciò che fanno le app di
 backup più popolari, in un unico posto, con una WebUI pulita.
 
@@ -46,7 +46,7 @@ importare i backup esistenti di Neo-Backup e Android-DataBackup così da poter m
   versionato, tramite `restic`) e **Mirror** (sincronizzazione 1:1, tramite `rclone`/`rsync`).
 - **Conservazione fedele:** contesti SELinux, uid/gid, modes, xattr e capabilities.
 - **Compressione:** nessuna / lz4 / zstd / gzip (gzip = "modalità compatibilità", si apre ovunque).
-- **Cifratura:** opzionale e portatile (`age` + passphrase, o zip AES-256) - mai
+- **Cifratura:** opzionale e portatile (`age` + passphrase, o zip AES-256), mai
   legata all'hardware del dispositivo, così un backup si ripristina su un altro dispositivo o si apre su un PC.
 - **Destinazioni:** locale, SFTP, SCP, SMB, WebDAV, FTP, S3 e oltre 70 (`rclone`),
   oltre ai repository `rsync` e `restic`. Google Drive opzionale tramite un piccolo companion opt-in.
@@ -80,10 +80,10 @@ importare i backup esistenti di Neo-Backup e Android-DataBackup così da poter m
 ## Installazione
 
 1. Scarica il `VD-Backup-vX.Y.zip` più recente da [Versioni](https://github.com/VD171/VD-Backup/releases).
-2. Installalo nel gestore KernelSU / APatch / Magisk - utilizzabile subito, senza bisogno di riavviare.
+2. Installalo nel gestore KernelSU / APatch / Magisk, utilizzabile subito, senza bisogno di riavviare.
 3. Apri la **WebUI** del modulo per configurare ed eseguire i backup. Tutto qui.
 
-**Edizioni.** Ogni release è distribuita come sei zip. `universal-full` - ogni architettura e ogni binario incorporato (incl. `rclone` per i provider cloud e `restic` per gli snapshot), completamente offline, non viene mai scaricato nulla, qualsiasi dispositivo, il più grande. `universal-lite` - ogni architettura senza i due binari più grandi (`rclone`, `restic`), il più piccolo; esegue ancora backup locali, SSH/SFTP e `rsync` senza alcun download, e la prima volta che usi una destinazione cloud (`rclone`) o la modalità snapshot (`restic`) propone di scaricare una volta quel piccolo addon per-architettura (verificato con SHA-256) e lo memorizza nella cache, così anche quelle funzioni funzionano. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - una singola architettura con ogni binario incorporato, più piccolo di `universal-full`. Conosci la tua architettura -> scegli `<abi>-full`; vuoi il più piccolo e non ti dispiace un download una tantum per cloud o snapshot -> `universal-lite`; vuoi tutto incorporato senza alcun download (offline / ripristino) -> un'edizione full. Vedi [Versioni](https://github.com/VD171/VD-Backup/releases).
+**Edizioni.** Ogni release è distribuita come sei zip. `universal-full`, ogni architettura e ogni binario incorporato (incl. `rclone` per i provider cloud e `restic` per gli snapshot), completamente offline, non viene mai scaricato nulla, qualsiasi dispositivo, il più grande. `universal-lite`, ogni architettura senza i due binari più grandi (`rclone`, `restic`), il più piccolo; esegue ancora backup locali, SSH/SFTP e `rsync` senza alcun download, e la prima volta che usi una destinazione cloud (`rclone`) o la modalità snapshot (`restic`) propone di scaricare una volta quel piccolo addon per-architettura (verificato con SHA-256) e lo memorizza nella cache, così anche quelle funzioni funzionano. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), una singola architettura con ogni binario incorporato, più piccolo di `universal-full`. Conosci la tua architettura -> scegli `<abi>-full`; vuoi il più piccolo e non ti dispiace un download una tantum per cloud o snapshot -> `universal-lite`; vuoi tutto incorporato senza alcun download (offline / ripristino) -> un'edizione full. Vedi [Versioni](https://github.com/VD171/VD-Backup/releases).
 
 Sei nuovo? La [Guida utente](docs/USER-GUIDE.md) ti accompagna dall'installazione al ripristino.
 
@@ -102,12 +102,12 @@ Il modulo è shell + WebUI più binari statici per ABI (`tar`, `zstd`, `lz4`,
 
 ## Documentazione
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - la documentazione, consultabile online.
-- **[Guida utente](docs/USER-GUIDE.md)** - dall'inizio alla fine, dall'installazione al ripristino.
-- **[Agenti IA](docs/AI-AGENTS.md)** - gestisci ogni azione senza interfaccia tramite l'API JSON.
-- **[Architettura](docs/ARCHITECTURE.md)** e **[Struttura dei file](docs/FILE-STRUCTURE.md)** - come funziona.
-- **[Binari inclusi](docs/BINARIES.md)** - provenienza e SHA-256 di ogni binario precompilato, per un audit completo.
-- **[Ripristino](module/etc/RECOVERY.md)** - apri e decifra un backup su un PC, senza il modulo.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: la documentazione, consultabile online.
+- **[Guida utente](docs/USER-GUIDE.md)**: dall'inizio alla fine, dall'installazione al ripristino.
+- **[Agenti IA](docs/AI-AGENTS.md)**: gestisci ogni azione senza interfaccia tramite l'API JSON.
+- **[Architettura](docs/ARCHITECTURE.md)** e **[Struttura dei file](docs/FILE-STRUCTURE.md)**: come funziona.
+- **[Binari inclusi](docs/BINARIES.md)**: provenienza e SHA-256 di ogni binario precompilato, per un audit completo.
+- **[Ripristino](module/etc/RECOVERY.md)**: apri e decifra un backup su un PC, senza il modulo.
 - **[Come contribuire](CONTRIBUTING.md)** e **[Sicurezza](SECURITY.md)**.
 - **[Changelog](CHANGELOG.md)** e **[Codice di condotta](CODE_OF_CONDUCT.md)**.
 
@@ -136,9 +136,9 @@ vedi **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** per la superficie di controllo c
 
 Progetti fratelli dello stesso autore:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - un debugger dei metodi del dispositivo: legge ogni elemento con tutti i metodi che possono leggerlo e li confronta fianco a fianco.
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - i tuoi servizi Google (RCS, Wallet, attestazioni di Play Integrity), letti sul tuo dispositivo senza internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - uno spoofer del dispositivo che trasforma un fingerprint nuovo in un profilo coerente e consistente.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: un debugger dei metodi del dispositivo: legge ogni elemento con tutti i metodi che possono leggerlo e li confronta fianco a fianco.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: i tuoi servizi Google (RCS, Wallet, attestazioni di Play Integrity), letti sul tuo dispositivo senza internet.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: uno spoofer del dispositivo che trasforma un fingerprint nuovo in un profilo coerente e consistente.
 
 ## Licenza
 

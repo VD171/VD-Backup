@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - आर्गुमेंट एक ही JSON ऑब्जेक्ट होते हैं, **base64-encoded**, जो एक argv टोकन के रूप में भेजे जाते हैं।
 - कमांड stdout पर **एक JSON ऑब्जेक्ट** प्रिंट करता है: `{"ok":true,...}` या
   `{"ok":false,"code":"ERR_...","message":"..."}`. उसे parse करें; कभी भी टेक्स्ट scrape न करें।
-- लंबी कार्रवाइयाँ (`backup`, `restore`, `import`) तुरंत `{"ok":true,"opid":"..."}` लौटाती हैं
+- लंबी कार्रवाइयाँ (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) तुरंत `{"ok":true,"opid":"..."}` लौटाती हैं
   और **detached** चलती हैं (कॉल करने वाले/WebUI के चले जाने पर भी वे जीवित रहती हैं)। उनकी
   प्रगति को poll करें; जब कॉल लौटता है तब वे पूरी नहीं हुई होतीं।
 - `progress` और `cancel` एक JSON ऑब्जेक्ट नहीं, बल्कि **कच्चे opid स्ट्रिंग का base64** लेते हैं।
@@ -87,7 +87,15 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `cloud-fetch` | `{}` | `{ok,opid}` (detached) `lite` संस्करण पर `rclone`/`restic` ऐडऑन डाउनलोड+सत्यापन+इंस्टॉल करता है |
 | `schedule-set` / `schedule-list` / `schedule-delete` | नीचे देखें | निर्धारित कार्य (एक बैकअप या एक restore; एक अकेले ऐप, एक समूह, या सभी ऐप्स को लक्षित करते हुए) |
 | `scheduler-tick` | `{}` | देय कार्य चलाता है + धारण लागू करता है + ऑटो-बैकअप ऑब्ज़र्वर (boot heartbeat इसे कॉल करता है) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached नहीं; तुरंत लौटता है; विफलता पर `ERR_UPDATE_CHECK` - नीचे देखें) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached नहीं; तुरंत लौटता है; विफलता पर `ERR_UPDATE_CHECK`, नीचे देखें) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) कई ऐप्स का एक ही अलग ऑपरेशन में बैकअप लेता है; प्रगति में `n`/`of` रहता है। प्रति-ऐप विफलता बैच को नहीं रोकती। |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) कई बैकअप को एक ही अलग ऑपरेशन में पुनर्स्थापित करता है; प्रगति में `n`/`of` रहता है। प्रति-ऐप विफलता बैच को नहीं रोकती। |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` फ़ोल्डर चयनकर्ता के लिए स्टोरेज वॉल्यूम: आंतरिक और हटाने योग्य SD कार्ड / USB। |
+| `config-export` | `{password}` | `{ok,opid}` (detached) कॉन्फ़िग, जॉब, गंतव्य, क्रेडेंशियल्स और कुंजियों को बैकअप फ़ोल्डर में एक पासफ़्रेज़-एन्क्रिप्टेड फ़ाइल में निर्यात करता है। |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) निर्यात की गई कॉन्फ़िग फ़ाइल को इस डिवाइस में वापस मर्ज करता है (कभी भी आँख मूँदकर अधिलेखित नहीं करता)। |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` आयात के लिए उपलब्ध एन्क्रिप्टेड कॉन्फ़िग फ़ाइलें सूचीबद्ध करता है। |
+| `wipe-credentials` | `{}` | `{ok,wiped}` सहेजे गए रिमोट पासवर्ड और डिवाइस एन्क्रिप्शन कुंजी हटाता है; गंतव्य, जॉब और बैकअप बने रहते हैं। |
+| `log-prune` | `{}` | `{ok}` बहुत पहले पूर्ण हो चुके ऑप लॉग छाँटता है, ऑडिट ट्रेल सीमित करता है और पुराने आइकन हटाता है (बूट सेवा इसे कॉल करती है)। |
 
 ### `progress` फ़ील्ड
 
@@ -174,7 +182,7 @@ restore-test):
 
 लक्ष्य के लिए `package`, `packages` या `all` में से ठीक **एक** दें। एक `backup` कार्य सामान्य
 `mode`/`dest`/`keep`/`items` बनाए रखता है। एक `restore` कार्य (`action: "restore"`) हर लक्षित ऐप का **सबसे हाल
-का** backup (या एक स्पष्ट `ref`) restore करता है और **हर रन पर ऐप के वर्तमान डेटा को अधिलेखित करता है** - यह
+का** backup (या एक स्पष्ट `ref`) restore करता है और **हर रन पर ऐप के वर्तमान डेटा को अधिलेखित करता है**: यह
 जानबूझकर और opt-in है, इसलिए इसे केवल उपयोगकर्ता के सीधे अनुरोध पर ही सेट करें।
 
 ### शेड्यूलर गेटिंग
@@ -198,7 +206,7 @@ restore-test):
 ### `remote-add` के args
 
 एक क्लाउड गंतव्य एक `type:"rclone"` dest है जो किसी `rclone` remote का नाम देता है; उस
-remote को पहले `remote-add` से बनाएँ। `backend` **कोई भी rclone backend** हो सकता है - कोई
+remote को पहले `remote-add` से बनाएँ। `backend` **कोई भी rclone backend** हो सकता है, कोई
 श्वेतसूची नहीं है। `remote-add` किसी भी backend नाम को स्वीकार करता है (`dropbox`, `onedrive`,
 `box`, `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` और rclone द्वारा
 समर्थित ~70 अन्य), और `params` सीधे `key=value` जोड़ियों के रूप में `rclone` config में भेज दिए
@@ -218,12 +226,12 @@ OneDrive, Box, pCloud) उन्हें किसी डेस्कटॉप 
 `rclone authorize <backend>` चलाता है और Android VIEW intent के ज़रिए फ़ोन का अपना ब्राउज़र प्रदाता के
 सहमति पृष्ठ पर खोलता है, और `{ok:true,url}` लौटाता है (या `{ok:false,code:"ERR_AUTHORIZE"}`)।
 `remote-authorize-poll` (`{}`) को poll करें: यह प्रतीक्षा के दौरान `{ok:true,done:false,url}` और
-उपयोगकर्ता की मंज़ूरी मिलने पर `{ok:true,done:true,token}` लौटाता है - वह `token` `remote-add` को भेजें।
+उपयोगकर्ता की मंज़ूरी मिलने पर `{ok:true,done:true,token}` लौटाता है, वह `token` `remote-add` को भेजें।
 `remote-authorize-cancel` (`{}`) किसी लंबित प्राधिकरण को रोकता है (`{ok:true,cancelled:true}`)। किसी भी
 कंप्यूटर से `rclone authorize "<backend>"` के आउटपुट को हाथ से चिपकाना अब भी फ़ॉलबैक के रूप में समर्थित है।
 
 Google Drive के दो रास्ते हैं: यह `drive` remote (किसी Google Cloud प्रोजेक्ट की ज़रूरत नहीं, rclone के
-अपने OAuth का उपयोग करता है - ऑन-डिवाइस `remote-authorize` से प्राधिकृत करें, या किसी भी कंप्यूटर पर एक
+अपने OAuth का उपयोग करता है, ऑन-डिवाइस `remote-authorize` से प्राधिकृत करें, या किसी भी कंप्यूटर पर एक
 बार `rclone authorize "drive"` चलाएँ और token भेजें) या opt-in साथी ऐप (आपका अपना OAuth client id)।
 दोनों अंततः सामान्य गंतव्य बन जाते हैं।
 
@@ -233,7 +241,7 @@ config फ़ील्ड `network_policy` नियंत्रित करत
 `any` (default), `wifi`, या `mobile`। इसे `config-set` से सेट करें। जब यह `wifi` या
 `mobile` हो, तो हर क्लाउड ट्रांसफर (Full `rclone`/Drive अपलोड, Mirror sync, remote
 `restic` snapshot backup/restore, Mirror restore) पहले सक्रिय ट्रांसपोर्ट जाँचता है और
-मेल न खाने पर `ERR_NET_POLICY` के साथ रुक जाता है - मैनुअल और निर्धारित दोनों कार्यों के लिए।
+मेल न खाने पर `ERR_NET_POLICY` के साथ रुक जाता है, मैनुअल और निर्धारित दोनों कार्यों के लिए।
 स्थानीय गंतव्यों पर कभी रोक नहीं लगती।
 
 ### क्लाउड अखंडता और कोटा
@@ -284,8 +292,8 @@ config फ़ील्ड `network_policy` नियंत्रित करत
 
 ### स्वतंत्र पथ backup
 
-`path-backup` / `path-restore` साझा स्टोरेज पर या `/data` के अंतर्गत **किसी भी निरपेक्ष पथ** - एक
-फ़ोल्डर या एक अकेली फ़ाइल - का backup और restore करते हैं, प्रति-app मॉडल से बाहर। संग्रह
+`path-backup` / `path-restore` साझा स्टोरेज पर या `/data` के अंतर्गत **किसी भी निरपेक्ष पथ**: एक
+फ़ोल्डर या एक अकेली फ़ाइल, का backup और restore करते हैं, प्रति-app मॉडल से बाहर। संग्रह
 VDBackup के अपने प्रारूप में `tar.zst` तथा एक `manifest.json` के रूप में लिखा जाता है (SHA-256
 सीलबंद, एन्क्रिप्टेड होने पर एक RECOVERY kit के साथ), backups निर्देशिका में `.paths/` के अंतर्गत।
 
@@ -300,17 +308,17 @@ VDBackup के अपने प्रारूप में `tar.zst` तथा
   `/storage/emulated`, `/data/media`, `/sdcard`, `/data`. जो पथ मौजूद नहीं है वह `ERR_NO_PATH`
   के साथ विफल होता है; अनुमत रूट्स से बाहर का पथ, या `..` वाला पथ, `ERR_BAD_PATH` के साथ विफल होता है।
 - `path-restore` मूल स्थान पर वापस लिखता है, इसलिए यह विनाशकारी है और `"confirm": true` की माँग
-  करता है - `special-restore` की तरह एक भारी-घर्षण वाला गेट। एक `ref` जो वैध पथ backup नहीं है,
+  करता है, `special-restore` की तरह एक भारी-घर्षण वाला गेट। एक `ref` जो वैध पथ backup नहीं है,
   `ERR_BAD_REF` के साथ विफल होता है।
 - दोनों **detached** चलते हैं; लौटाए गए `opid` के साथ `progress` को poll करें।
 
 ### `update-check`
 
 `update-check` बताता है कि मॉड्यूल का कोई नया संस्करण प्रकाशित हुआ है या नहीं, ताकि कोई एजेंट
-(या WebUI) उसे दिखा सके। यह एक **तुरंत लौटने वाला read verb** है - यह **detached नहीं** है, इसलिए
+(या WebUI) उसे दिखा सके। यह एक **तुरंत लौटने वाला read verb** है, यह **detached नहीं** है, इसलिए
 poll करने के लिए कोई `opid` नहीं होता। केवल उपयोगकर्ता की स्पष्ट क्रिया से ट्रिगर होकर, यह बंडल किए
 गए `curl` से root-साइड HTTP अनुरोध के ज़रिए मॉड्यूल का प्रकाशित अपडेट मैनिफ़ेस्ट (`module.prop` में से
-`updateJson` URL) लाता है - यह WebView के बाहर चलता है, इसलिए WebUI की CSP के अधीन नहीं है - और
+`updateJson` URL) लाता है, यह WebView के बाहर चलता है, इसलिए WebUI की CSP के अधीन नहीं है, और
 प्रकाशित `versionCode` की तुलना इंस्टॉल किए गए से करता है। यह **कोई आर्गुमेंट नहीं** लेता।
 
 सफल होने पर यह लौटाता है:
@@ -338,7 +346,7 @@ poll करने के लिए कोई `opid` नहीं होता।
 - **`ssaid` कड़ाई से opt-in है (default बंद)।** यह एक सिस्टम फ़ाइल को फिर से लिखकर डिवाइस के
   ANDROID_ID का backup / restore करता है; कोई restore केवल एक reboot के बाद लागू होता है, और
   पिछली फ़ाइल rollback के लिए हमेशा पहले सहेजी जाती है। `"ssaid": true` केवल किसी सीधे,
-  जानबूझकर किए गए उपयोगकर्ता अनुरोध पर भेजें - कभी भी default रूप से नहीं।
+  जानबूझकर किए गए उपयोगकर्ता अनुरोध पर भेजें, कभी भी default रूप से नहीं।
 - **परिवर्तनकारी क्रियाएँ (restore, delete, import) विनाशकारी हैं** और एक स्थानीय ऑडिट
   ट्रेल (`logs/audit.jsonl`) में लॉग की जाती हैं। Restore विश्वासयोग्य है (wipe-फिर-निकालें), इसलिए
   यह ऐप को backup की ठीक-ठीक स्थिति में वापस कर देता है। उन्हें कॉल करने से पहले इरादे की पुष्टि करें।
@@ -346,8 +354,8 @@ poll करने के लिए कोई `opid` नहीं होता।
   डिवाइस-व्यापी settings को अधिलेखित करता है, इसलिए इसे केवल किसी सीधे उपयोगकर्ता अनुरोध पर भेजें; यह
   स्पष्ट सहमति द्वारा गेट किया गया है और audit trail में दर्ज होता है।
 - **Restore idempotent है।** कच्चे provider restore (messages/contacts/wifi/bluetooth/calendar)
-  विलय करने के बजाय **प्रतिस्थापित** करते हैं - provider डेटा मिटा दिया जाता है और संग्रह उसके ऊपर
-  निकाला जाता है - इसलिए उसी backup को फिर से restore करने से पंक्तियाँ दोहराई नहीं जा सकतीं। `dns`
+  विलय करने के बजाय **प्रतिस्थापित** करते हैं, provider डेटा मिटा दिया जाता है और संग्रह उसके ऊपर
+  निकाला जाता है, इसलिए उसी backup को फिर से restore करने से पंक्तियाँ दोहराई नहीं जा सकतीं। `dns`
   और `system_settings` idempotent `settings put` से फिर से लागू किए जाते हैं।
 - **संग्रह निष्कर्षण पथ-ट्रैवर्सल के विरुद्ध सुरक्षित है।** Restore root के रूप में चलता है, इसलिए हर
   संग्रह (restore, import, special-restore, path-restore) किसी भी लेखन से पहले जाँचा जाता है: वह संग्रह
@@ -364,4 +372,4 @@ poll करने के लिए कोई `opid` नहीं होता।
 
 ---
 
-*यह दस्तावेज़ीकरण Claude (Anthropic) के साथ तैयार किया गया था और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और बेहतरी का स्वागत है - [CONTRIBUTING.md](CONTRIBUTING.md) देखें।*
+*यह दस्तावेज़ीकरण Claude (Anthropic) के साथ तैयार किया गया था और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और बेहतरी का स्वागत है, [CONTRIBUTING.md](CONTRIBUTING.md) देखें।*

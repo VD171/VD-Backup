@@ -14,7 +14,7 @@ WebUI + ABI başına statik ikili dosyalar. Çekirdek özellikler için bir uygu
 [ARCHITECTURE.md](ARCHITECTURE.md) ve [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 
 Bu, **Swift Backup, Neo-Backup ve Android-DataBackup**'ın açık, root-yerel
-**halefidir** - özelliklerinin AGPLv3 altında birleşimi ve insanların taşınabilmesi için
+**halefidir**: özelliklerinin AGPLv3 altında birleşimi ve insanların taşınabilmesi için
 mevcut Neo-Backup ve Android-DataBackup yedeklerinin içe aktarılması.
 
 ## Yapay zeka katkıcıları hoş geldiniz
@@ -25,9 +25,9 @@ Yapay zeka asistanları ve ajanları burada sonradan akla gelen değil, birinci 
   JSON nesnesi yazdırır, motor düz POSIX shell'dir ve dosya düzeni
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md) içinde belgelenmiştir.
 - Bir ajan, modülün **her** içeriğini ve eylemini bu JSON API aracılığıyla başsız olarak
-  yönetebilir - tam kontrol yüzeyi, fiiller ve güvenlik korkulukları
+  yönetebilir, tam kontrol yüzeyi, fiiller ve güvenlik korkulukları
   [docs/AI-AGENTS.md](AI-AGENTS.md) içindedir.
-- Yapay zeka destekli yamalar, diğerleriyle aynı koşullarda - kim (ya da ne) yazdığına
+- Yapay zeka destekli yamalar, diğerleriyle aynı koşullarda, kim (ya da ne) yazdığına
   göre değil, doğruluk, netlik ve aşağıdaki kurallara göre incelenip kabul edilir.
 - VDBackup'ı bir ajandan sürüyorsanız sözleşme olarak `helper.sh`'nin JSON çıktısını
   kullanın; WebUI'yi kazımayın.
@@ -62,18 +62,18 @@ Yapay zeka asistanları ve ajanları burada sonradan akla gelen değil, birinci 
 - Bir dizeyi eklemek veya değiştirmek için: `en.js` **ve** `en.json`'u düzenleyin, ardından
   her `<code>.json`'u güncelleyin. Görünür bir etikete dokunmak, **tüm** dil dosyalarını
   ve **tüm** `README.<code>.md` dosyalarını güncellemek demektir.
-- Çeviriler düz JSON'dur - harika bir ilk katkı. `module/webroot/i18n.js` içindeki dil
+- Çeviriler düz JSON'dur, harika bir ilk katkı. `module/webroot/i18n.js` içindeki dil
   listesine bakın.
 
 ## Commit'ler ve PR'ler
 
 - PR'leri odaklı tutun. Neyi ve nedenini açıklayın.
 - Commit'lerinizi imzalayın (DCO): `git commit -s` (`Signed-off-by:` ekler).
-- CI yeşil kalmalı. İncelemelerde nazik olun - bkz. [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- CI yeşil kalmalı. İncelemelerde nazik olun, bkz. [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## İyi ilk konular
 
 `good first issue` ve `help wanted` etiketlerini arayın. Çeviriler, belgeler, yeni
 `rclone` hedef hazır ayarları ve WebUI cilası harika başlangıç noktalarıdır.
 
-*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır - bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*

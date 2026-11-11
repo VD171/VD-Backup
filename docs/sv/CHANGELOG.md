@@ -6,6 +6,32 @@
 
 Alla noterbara ändringar i VDBackup dokumenteras här. Endast engelska.
 
+## v1.05
+
+Tillförlitlighet:
+
+- Satsvisa säkerhetskopior stannar inte längre halvvägs när du lämnar appen. Ett helt urval, en tagggrupp eller en schemalagd körning drivs nu av en enda frånkopplad rotprocess som fortsätter när WebUI är stängt och är skyddad från att avslutas vid minnesbrist. Förloppsvyn återansluter när du kommer tillbaka.
+
+Inställningar:
+
+- Säkerhetskopia av inställningar: exportera dina destinationer, scheman, förinställningar och sparade inloggningsuppgifter till en enda krypterad fil och importera den på en annan enhet eller efter en ren installation. Filen ber alltid om en lösenordsfras eftersom den innehåller fjärrlösenord, och importen slås samman med enheten utan att ta bort det som redan finns.
+- Du kan nu radera sparade fjärrinloggningsuppgifter och enhetens krypteringsnyckel från inställningarna i ett steg, medan dina destinationer, scheman och säkerhetskopior behålls.
+
+Säkerhet:
+
+- Säkerhetskopior kan bara lagras där de förblir krypterade i vila. Destinationer under sökvägar som är läsbara före första upplåsningen, som /data/adb eller /data/system, avvisas.
+- Sparade inloggningsuppgifter, rclone.conf och age-nyckeln ligger nu på autentiseringskrypterad lagring, låst till den första upplåsningen, i stället för en tidigare läsbar plats; en moduluppdatering flyttar dit dem permanent.
+- Säkerhetskopior kontrollerar nu ledigt utrymme innan de börjar och stannar med ett tydligt meddelande i stället för att misslyckas halvvägs.
+
+Återställning:
+
+- Att återställa en app som inte längre är installerad installerar nu om dess APK först, och återställningsdialogen erbjuder APK-alternativet så snart säkerhetskopian har en. En återställning som inte kan installera appen rapporterar felet i stället för att låtsas lyckas.
+- App-, behörighets- och inställningsåtgärder körs nu i en ren miljö, vilket åtgärdar "Failed transaction"-fel som blockerade återställning, app-ops och inställningar på vissa ROM:ar.
+
+Destinationer:
+
+- Du kan säkerhetskopiera till ett SD-kort eller en USB-enhet: mappväljaren visar en genväg till varje lagringsvolym och godtar sökvägar på flyttbara media.
+
 ## v1.04
 
 Korrigeringar:
@@ -18,7 +44,7 @@ Integritet:
 
 Säkerhetskopior:
 
-- Du kan nu ange vilka poster varje app säkerhetskopierar - till exempel bara APK, eller APK + OBB - vilket tillämpas i bulk-, automatiska och schemalagda säkerhetskopior. En enskild manuell säkerhetskopia låter dig fortfarande välja då, förifylld från appens uppsättning. Ställ in det i Inställningar, bredvid listan över uteslutna appar.
+- Du kan nu ange vilka poster varje app säkerhetskopierar, till exempel bara APK, eller APK + OBB, vilket tillämpas i bulk-, automatiska och schemalagda säkerhetskopior. En enskild manuell säkerhetskopia låter dig fortfarande välja då, förifylld från appens uppsättning. Ställ in det i Inställningar, bredvid listan över uteslutna appar.
 
 - Säkerhetskopieförval: spara namngivna uppsättningar av vad som ska ingå och använd dem med ett val i säkerhetskopieringsdialogen.
 - Fleranvändare: appsäkerhetskopior, specialsäkerhetskopior och återställningar följer nu alla den valda Android-användaren.
@@ -235,4 +261,4 @@ AI-vänligt och i18n:
 - Rik applistning och Neo-dekryptering körs genom en dex-hjälpare driven som root (`IPackageManager` via
   ServiceManager), så att de fungerar där ActivityThread hänger sig.
 
-*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna - se [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna, se [CONTRIBUTING.md](CONTRIBUTING.md).*

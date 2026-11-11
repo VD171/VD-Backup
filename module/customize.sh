@@ -59,11 +59,53 @@ if [ -d "$MODPATH/bin" ]; then
   ui_print "- Keeping binaries for $ABIDIR only"
 fi
 
+# --- one-time migration (old layout) -----------------------------------
+# Backups used to live under $STATE_DIR/backups; the engine now writes to
+# /data/media/<user>/VDBackup. Move any leftovers there and drop the old dir.
+OLD_BK="$STATE_DIR/backups"
+if [ -d "$OLD_BK" ]; then
+  if [ -n "$(ls -A "$OLD_BK" 2>/dev/null)" ]; then
+    ui_print "- Migrating old backups to /data/media/0/VDBackup"
+    mkdir -p /data/media/0/VDBackup
+    cp -a "$OLD_BK"/. /data/media/0/VDBackup/ 2>/dev/null
+    restorecon -R /data/media/0/VDBackup 2>/dev/null   # sanitize (below) heals ownership
+  fi
+  rm -rf "$OLD_BK"
+fi
+
+# --- secrets to credential-encrypted storage (one-time, permanent) ------
+# Credentials, the age keypair and the rclone config used to live under /data/adb
+# (device-encrypted, readable before first unlock). Move them, permanently, to
+# credential-encrypted storage, which stays locked until the user unlocks once. Needs CE
+# unlocked: flashing from the root manager (screen on) is unlocked; a recovery flash is
+# not, and then the module migrates them at runtime on the first unlock (secrets_init).
+SECRETS_DIR=/data/misc_ce/0/vdbackup
+if [ "$(getprop sys.user.0.ce_available)" = true ]; then
+  mkdir -p "$SECRETS_DIR/creds" "$SECRETS_DIR/keys"
+  for _s in creds keys; do
+    [ -d "$STATE_DIR/$_s" ] || continue
+    if [ -n "$(ls -A "$STATE_DIR/$_s" 2>/dev/null)" ]; then
+      ui_print "- Moving $_s to credential-encrypted storage"
+      cp -a "$STATE_DIR/$_s/." "$SECRETS_DIR/$_s/" 2>/dev/null || continue   # copy failed: keep source
+      _ok=1; for _g in "$STATE_DIR/$_s"/*; do [ -e "$_g" ] && { [ -e "$SECRETS_DIR/$_s/$(basename "$_g")" ] || _ok=0; }; done
+      [ "$_ok" = 1 ] && rm -rf "$STATE_DIR/$_s"
+    else rm -rf "$STATE_DIR/$_s"; fi
+  done
+  if [ -f "$STATE_DIR/rclone.conf" ]; then
+    cp -a "$STATE_DIR/rclone.conf" "$SECRETS_DIR/rclone.conf" 2>/dev/null && [ -f "$SECRETS_DIR/rclone.conf" ] && rm -f "$STATE_DIR/rclone.conf"
+  fi
+  chmod 700 "$SECRETS_DIR" "$SECRETS_DIR/creds" "$SECRETS_DIR/keys"
+  for _f in "$SECRETS_DIR/creds"/* "$SECRETS_DIR/keys"/* "$SECRETS_DIR/rclone.conf"; do [ -f "$_f" ] && chmod 600 "$_f" 2>/dev/null; done
+  restorecon -R "$SECRETS_DIR" 2>/dev/null
+  : > "$SECRETS_DIR/.init"
+fi
+
 # --- seed persistent state (only if absent) -----------------------------
+STATE_SUBDIRS="jobs dests logs staging"
 if [ ! -f "$STATE_DIR/config.json" ]; then
   ui_print "- Seeding default configuration"
-  mkdir -p "$STATE_DIR" "$STATE_DIR/jobs" "$STATE_DIR/dests" "$STATE_DIR/creds" \
-           "$STATE_DIR/keys" "$STATE_DIR/logs" "$STATE_DIR/staging" "$STATE_DIR/backups"
+  mkdir -p "$STATE_DIR"
+  for _d in $STATE_SUBDIRS; do mkdir -p "$STATE_DIR/$_d"; done
   cat > "$STATE_DIR/config.json" <<'EOF'
 {
   "format_version": 1,
@@ -86,8 +128,13 @@ EOF
   chmod 600 "$STATE_DIR/config.json"
 else
   ui_print "- Keeping existing configuration"
+  for _d in $STATE_SUBDIRS; do mkdir -p "$STATE_DIR/$_d"; done
 fi
+rm -f "$STATE_DIR/staging/authorize.pgid"   # stale transient from a previous run
+# Lock the state tree: dests/jobs must never be world-readable (the KSU boot umask can
+# otherwise leave freshly created dirs 0777). Secrets are chmod-ed under SECRETS_DIR above.
 chmod 700 "$STATE_DIR"
+for _d in $STATE_SUBDIRS; do chmod 700 "$STATE_DIR/$_d" 2>/dev/null; done
 
 # --- permissions --------------------------------------------------------
 ui_print "- Setting permissions"

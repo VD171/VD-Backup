@@ -14,7 +14,7 @@ VDBackup เป็น **โมดูล WebUI ของ KernelSU/APatch/Magisk**
 [ARCHITECTURE.md](ARCHITECTURE.md) และ [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md)
 
 เป็น **ผู้สืบทอดแบบเปิดและ root-native ของ Swift Backup, Neo-Backup และ
-Android-DataBackup** - การรวมฟีเจอร์ของทั้งหมดไว้ภายใต้ AGPLv3 พร้อมการนำเข้า
+Android-DataBackup**: การรวมฟีเจอร์ของทั้งหมดไว้ภายใต้ AGPLv3 พร้อมการนำเข้า
 backup เดิมของ Neo-Backup และ Android-DataBackup เพื่อให้ผู้คนย้ายข้อมูลได้
 
 ## ยินดีต้อนรับผู้ร่วมพัฒนาที่เป็น AI
@@ -25,9 +25,9 @@ backup เดิมของ Neo-Backup และ Android-DataBackup เพื�
   JSON object เดียว เอนจินเป็น POSIX shell ล้วน และโครงสร้างไฟล์มีบันทึกไว้ใน
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md)
 - agent สามารถบริหารจัดการ **ทุก** เนื้อหาและการกระทำของโมดูลแบบ headless ผ่าน
-  JSON API นั้น - พื้นผิวการควบคุมทั้งหมด, verb และราวกันภัยอยู่ใน
+  JSON API นั้น, พื้นผิวการควบคุมทั้งหมด, verb และราวกันภัยอยู่ใน
   [docs/AI-AGENTS.md](AI-AGENTS.md)
-- แพตช์ที่ช่วยเขียนโดย AI จะได้รับการตรวจและยอมรับด้วยเกณฑ์เดียวกับอื่น ๆ - โดยดูที่
+- แพตช์ที่ช่วยเขียนโดย AI จะได้รับการตรวจและยอมรับด้วยเกณฑ์เดียวกับอื่น ๆ, โดยดูที่
   ความถูกต้อง ความชัดเจน และข้อตกลงด้านล่าง ไม่ใช่ว่าใคร (หรืออะไร) เป็นคนเขียน
 - หากคุณขับเคลื่อน VDBackup จาก agent ให้ใช้ output แบบ JSON ของ `helper.sh` เป็น
   สัญญา (contract) อย่าขูด (scrape) WebUI
@@ -62,18 +62,18 @@ backup เดิมของ Neo-Backup และ Android-DataBackup เพื�
 - การเพิ่มหรือแก้สตริง: แก้ `en.js` **และ** `en.json` จากนั้นอัปเดตทุก
   `<code>.json` การแตะ label ที่มองเห็นได้หมายถึงต้องอัปเดตไฟล์ภาษา **ทั้งหมด** และ
   `README.<code>.md` **ทั้งหมด**
-- คำแปลเป็น JSON ล้วน - เป็นการร่วมพัฒนาครั้งแรกที่ดีเยี่ยม ดูรายการภาษาใน
+- คำแปลเป็น JSON ล้วน, เป็นการร่วมพัฒนาครั้งแรกที่ดีเยี่ยม ดูรายการภาษาใน
   `module/webroot/i18n.js`
 
 ## Commits และ PRs
 
 - ทำ PR ให้โฟกัส อธิบายว่าทำอะไรและทำไม
 - Sign off commit ของคุณ (DCO): `git commit -s` (เพิ่ม `Signed-off-by:`)
-- CI ต้องผ่าน (เขียว) เสมอ ใจดีในการรีวิว - ดู [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- CI ต้องผ่าน (เขียว) เสมอ ใจดีในการรีวิว, ดู [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ## issue แรกที่ดีสำหรับมือใหม่
 
 มองหา label `good first issue` และ `help wanted` การแปล, เอกสาร, preset destination
 `rclone` ใหม่ และการขัดเกลา WebUI ล้วนเป็นจุดเริ่มต้นที่ยอดเยี่ยม
 
-*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง - ดู [CONTRIBUTING.md](CONTRIBUTING.md)*
+*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง, ดู [CONTRIBUTING.md](CONTRIBUTING.md)*

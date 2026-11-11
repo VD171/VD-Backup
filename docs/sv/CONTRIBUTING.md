@@ -14,7 +14,7 @@ WebUI + statiska binärer per ABI. Ingen app krävs för kärnfunktionerna. Se
 [ARCHITECTURE.md](ARCHITECTURE.md) och [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 
 Det är den öppna, root-native **efterföljaren till Swift Backup, Neo-Backup och
-Android-DataBackup** - unionen av deras funktioner under AGPLv3, med import av
+Android-DataBackup**: unionen av deras funktioner under AGPLv3, med import av
 befintliga Neo-Backup- och Android-DataBackup-säkerhetskopior så att folk kan migrera.
 
 ## AI-bidragsgivare välkomna
@@ -25,9 +25,9 @@ AI-assistenter och agenter är förstklassiga bidragsgivare här, inte en eftert
   JSON-objekt, motorn är ren POSIX-shell, och fillayouten är dokumenterad i
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 - En agent kan administrera **varje** innehåll och åtgärd i modulen headless genom
-  det där JSON-API:et - hela kontrollytan, verben och säkerhetsspärrarna finns i
+  det där JSON-API:et, hela kontrollytan, verben och säkerhetsspärrarna finns i
   [docs/AI-AGENTS.md](AI-AGENTS.md).
-- AI-assisterade patchar granskas och accepteras på samma villkor som alla andra - efter
+- AI-assisterade patchar granskas och accepteras på samma villkor som alla andra, efter
   korrekthet, tydlighet och konventionerna nedan, inte efter vem (eller vad) som skrev dem.
 - Om du styr VDBackup från en agent, använd JSON-utdatan från `helper.sh` som
   kontrakt; skrapa inte WebUI.
@@ -62,18 +62,18 @@ AI-assistenter och agenter är förstklassiga bidragsgivare här, inte en eftert
 - För att lägga till eller ändra en sträng: redigera `en.js` **och** `en.json`, uppdatera sedan varje
   `<code>.json`. Att röra en synlig etikett innebär att uppdatera **alla** språkfiler och
   **alla** `README.<code>.md`.
-- Översättningar är ren JSON - ett utmärkt första bidrag. Se språklistan i
+- Översättningar är ren JSON, ett utmärkt första bidrag. Se språklistan i
   `module/webroot/i18n.js`.
 
 ## Commits och PR:er
 
 - Håll PR:er fokuserade. Beskriv vad och varför.
 - Signera av dina commits (DCO): `git commit -s` (lägger till `Signed-off-by:`).
-- CI måste förbli grön. Var vänlig i granskningar - se [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- CI måste förbli grön. Var vänlig i granskningar, se [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Bra första-ärenden
 
 Leta efter etiketterna `good first issue` och `help wanted`. Översättningar, dokumentation, nya
 `rclone`-destinationsförinställningar och WebUI-putsning är alla utmärkta startpunkter.
 
-*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna - se [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna, se [CONTRIBUTING.md](CONTRIBUTING.md).*

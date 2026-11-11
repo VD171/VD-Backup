@@ -18,4 +18,4 @@ zgłoszenia i wkłady, które naruszają ten kodeks, a także mogą banować pow
 To skondensowana, dopasowana do projektu adaptacja ducha Contributor
 Covenant.
 
-*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane - zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*

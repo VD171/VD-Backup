@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - odzyskiwanie kopii zapasowej na komputerze (Windows / macOS / Linux)
+# VDBackup, odzyskiwanie kopii zapasowej na komputerze (Windows / macOS / Linux)
 
 Twoje kopie zapasowe VDBackup używają **standardowych formatów**, więc możesz otworzyć je gdziekolwiek,
 bez tego modułu. Folder kopii zapasowej zawiera `manifest.json`, pliki APK

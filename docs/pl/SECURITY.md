@@ -29,6 +29,8 @@ szybko, jak zdołamy, i wymienimy Cię w podziękowaniach, jeśli sobie tego ży
   jawnym tekstem. Kopie zapasowe nigdy nie są powiązane z kluczami sprzętowymi urządzenia (więc pozostają
   przenośne), co oznacza również, że to hasło chroni zaszyfrowaną kopię zapasową -
   wybierz silne.
+- Te poświadczenia znajdują się w pamięci szyfrowanej poświadczeniami (`/data/misc_ce`), zablokowanej do pierwszego odblokowania po ponownym uruchomieniu, więc przed nim nigdy nie są czytelne, inaczej niż `/data/adb`. Aktualizacja modułu przenosi tam stare kopie na stałe (sprawdzając każdą przed usunięciem oryginału) i przetrwają one między reinstalacjami.
+- Lokalny cel kopii musi sam pozostać zaszyfrowany w spoczynku: dozwolona jest tylko wewnętrzna i wymienna pamięć użytkownika, nigdy `/data/adb`, `/data/system` ani inne ścieżki czytelne przed pierwszym odblokowaniem, ani przejście `..`. Wymienne SD/USB nie są szyfrowane w spoczynku, więc jesteś ostrzegany (nie blokowany), by włączyć dla nich szyfrowanie kopii.
 - Opcjonalna aplikacja towarzysząca Google Drive powinna być zawsze ukryta za pomocą [HMA-OSS](https://github.com/frknkrc44/HMA-OSS), aby nie
   ujawniała roota ani odblokowanego bootloadera.
 - Przywracanie działa jako root, więc każde archiwum jest sprawdzane, zanim cokolwiek zostanie
@@ -39,4 +41,4 @@ szybko, jak zdołamy, i wymienimy Cię w podziękowaniach, jeśli sobie tego ży
   źródła nadrzędnego z zapisanym SHA-256, a manifest jest dostarczany na urządzeniu, więc dołączony
   ładunek można poddać audytowi i odtworzyć. Zobacz [BINARIES.md](BINARIES.md).
 
-*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane - zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*

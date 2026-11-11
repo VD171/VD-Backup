@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>root 権限によるアプリとデータの完全なバックアップと復元 - すべて WebUI から操作。</b><br>
+  <b>root 権限によるアプリとデータの完全なバックアップと復元, すべて WebUI から操作。</b><br>
   KernelSU / APatch / Magisk モジュール。「su を許可」のプロンプトなし、<code>sucompat</code> の切り替えも不要。
 </p>
 
@@ -29,7 +29,7 @@
 ## これは何か
 
 VDBackup は、アプリとそのデータをバックアップおよび復元する root の **WebUI モジュール** です。
-**主要機能にコンパニオンアプリは不要** - モジュール自体がすでに root なので、「許可」する対象が
+**主要機能にコンパニオンアプリは不要**: モジュール自体がすでに root なので、「許可」する対象が
 ありません。人気のバックアップアプリが行うすべてを、すっきりした WebUI で一か所にまとめることを
 目指しています。
 
@@ -46,7 +46,7 @@ Android-DataBackup のバックアップをインポートして移行するこ�
   バージョン管理)、**Mirror** (`rclone`/`rsync` による 1:1 同期)。
 - **忠実な保持:** SELinux コンテキスト、uid/gid、モード、xattr、ケーパビリティ。
 - **圧縮:** none / lz4 / zstd / gzip (gzip =「互換モード」、どこでも開ける)。
-- **暗号化:** オプションでポータブル (`age` + パスフレーズ、または AES-256 zip) - デバイスの
+- **暗号化:** オプションでポータブル (`age` + パスフレーズ、または AES-256 zip), デバイスの
   ハードウェアに紐付かないため、バックアップを別のデバイスで復元したり PC で開いたりできます。
 - **保存先:** ローカル、SFTP、SCP、SMB、WebDAV、FTP、S3 ほか 70 以上 (`rclone`)、さらに `rsync`
   および `restic` リポジトリ。小さなオプトインのコンパニオンによる Google Drive も任意で利用できます。
@@ -81,10 +81,10 @@ Android-DataBackup のバックアップをインポートして移行するこ�
 
 1. 最新の `VD-Backup-vX.Y.zip` を [リリース](https://github.com/VD171/VD-Backup/releases) から
    ダウンロードします。
-2. KernelSU / APatch / Magisk のマネージャーでフラッシュします - すぐに使え、再起動は不要です。
+2. KernelSU / APatch / Magisk のマネージャーでフラッシュします, すぐに使え、再起動は不要です。
 3. モジュールの **WebUI** を開いて設定し、バックアップを実行します。これだけです。
 
-**エディション。** 各リリースは 6 つの zip で提供されます。`universal-full` - すべてのアーキテクチャとすべてのバイナリを埋め込み (クラウドプロバイダー用の `rclone`、スナップショット用の `restic` を含む)、完全オフラインで何もダウンロードされず、どの端末でも使え、最大。`universal-lite` - すべてのアーキテクチャから最大の 2 つのバイナリ (`rclone`、`restic`) を除いたもので、最小。ローカル・SSH/SFTP・`rsync` のバックアップはダウンロードなしで引き続き可能で、クラウドの保存先 (`rclone`) やスナップショットモード (`restic`) を初めて使うときに、そのアーキテクチャ別の小さなアドオンを一度だけダウンロードするか尋ね (SHA-256 で検証)、キャッシュするので、それらの機能も使えるようになります。`<abi>-full` (`arm64-v8a`、`armeabi-v7a`、`x86`、`x86_64`) - 単一アーキテクチャにすべてのバイナリを埋め込み、`universal-full` より小さい。自分のアーキテクチャが分かる -> `<abi>-full`、最小でクラウドやスナップショット用の一度きりのダウンロードを許容できる -> `universal-lite`、すべてを埋め込みでダウンロードなし (オフライン / 復旧) にしたい -> full エディション。[リリース](https://github.com/VD171/VD-Backup/releases) を参照してください。
+**エディション。** 各リリースは 6 つの zip で提供されます。`universal-full`, すべてのアーキテクチャとすべてのバイナリを埋め込み (クラウドプロバイダー用の `rclone`、スナップショット用の `restic` を含む)、完全オフラインで何もダウンロードされず、どの端末でも使え、最大。`universal-lite`, すべてのアーキテクチャから最大の 2 つのバイナリ (`rclone`、`restic`) を除いたもので、最小。ローカル・SSH/SFTP・`rsync` のバックアップはダウンロードなしで引き続き可能で、クラウドの保存先 (`rclone`) やスナップショットモード (`restic`) を初めて使うときに、そのアーキテクチャ別の小さなアドオンを一度だけダウンロードするか尋ね (SHA-256 で検証)、キャッシュするので、それらの機能も使えるようになります。`<abi>-full` (`arm64-v8a`、`armeabi-v7a`、`x86`、`x86_64`), 単一アーキテクチャにすべてのバイナリを埋め込み、`universal-full` より小さい。自分のアーキテクチャが分かる -> `<abi>-full`、最小でクラウドやスナップショット用の一度きりのダウンロードを許容できる -> `universal-lite`、すべてを埋め込みでダウンロードなし (オフライン / 復旧) にしたい -> full エディション。[リリース](https://github.com/VD171/VD-Backup/releases) を参照してください。
 
 はじめての方へ: [ユーザーガイド](docs/USER-GUIDE.md) がインストールから復元までを案内します。
 
@@ -103,12 +103,12 @@ ABI ごとの静的バイナリ (`tar`、`zstd`、`lz4`、`rclone`、`rsync`、s
 
 ## ドキュメント
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - オンラインで閲覧できるドキュメント。
-- **[ユーザーガイド](docs/USER-GUIDE.md)** - インストールから復元まで、一通り解説。
-- **[AI エージェント](docs/AI-AGENTS.md)** - JSON API を通じてすべてのアクションをヘッドレスで操作。
-- **[アーキテクチャ](docs/ARCHITECTURE.md)** と **[ファイル構成](docs/FILE-STRUCTURE.md)** - 仕組みの解説。
-- **[同梱バイナリ](docs/BINARIES.md)** - すべてのビルド済みバイナリの出所と SHA-256、完全な監査のため。
-- **[復元](module/etc/RECOVERY.md)** - モジュールなしで PC 上でバックアップを開いて復号。
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: オンラインで閲覧できるドキュメント。
+- **[ユーザーガイド](docs/USER-GUIDE.md)**: インストールから復元まで、一通り解説。
+- **[AI エージェント](docs/AI-AGENTS.md)**: JSON API を通じてすべてのアクションをヘッドレスで操作。
+- **[アーキテクチャ](docs/ARCHITECTURE.md)** と **[ファイル構成](docs/FILE-STRUCTURE.md)**: 仕組みの解説。
+- **[同梱バイナリ](docs/BINARIES.md)**: すべてのビルド済みバイナリの出所と SHA-256、完全な監査のため。
+- **[復元](module/etc/RECOVERY.md)**: モジュールなしで PC 上でバックアップを開いて復号。
 - **[貢献](CONTRIBUTING.md)** と **[セキュリティ](SECURITY.md)**。
 - **[変更履歴](CHANGELOG.md)** と **[行動規範](CODE_OF_CONDUCT.md)**。
 
@@ -118,7 +118,7 @@ VDBackup は、人だけでなく AI アシスタントやエージェントに�
 エンジンは JSON を話し (`helper.sh` のすべての verb は単一の JSON オブジェクトを返します)、コード、
 ドキュメント、ファイル構成は機械による読み取りを念頭に配置され、AI 支援による貢献も他と同じように
 レビューされ受け入れられます。エージェントは、WebUI が使うのと同じ API を通じて、モジュールの
-**すべての** アクションをヘッドレスで操作できます - 完全な制御面については
+**すべての** アクションをヘッドレスで操作できます, 完全な制御面については
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** を、貢献については
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) を参照してください。
 
@@ -137,9 +137,9 @@ VDBackup は、人だけでなく AI アシスタントやエージェントに�
 
 同じ作者による姉妹プロジェクト:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - デバイスのメソッドを調べるデバッガー。各項目を、それを読み取れるあらゆるメソッドで読み取り、結果を並べて比較します。
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - あなたの Google サービス (RCS、Wallet、Play Integrity の構成証明) を、インターネットなしでデバイス上で読み取ります。
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - 新しいフィンガープリントを、首尾一貫した整合性のあるプロファイルに変えるデバイススプーファー。
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: デバイスのメソッドを調べるデバッガー。各項目を、それを読み取れるあらゆるメソッドで読み取り、結果を並べて比較します。
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: あなたの Google サービス (RCS、Wallet、Play Integrity の構成証明) を、インターネットなしでデバイス上で読み取ります。
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: 新しいフィンガープリントを、首尾一貫した整合性のあるプロファイルに変えるデバイススプーファー。
 
 ## ライセンス
 

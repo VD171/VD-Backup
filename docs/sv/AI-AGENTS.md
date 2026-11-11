@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - Argumenten är ett enda JSON-objekt, **base64-kodat**, skickat som en argv-token.
 - Kommandot skriver **ett JSON-objekt** till stdout: `{"ok":true,...}` eller
   `{"ok":false,"code":"ERR_...","message":"..."}`. Tolka det; skrapa aldrig text.
-- Långa operationer (`backup`, `restore`, `import`) returnerar `{"ok":true,"opid":"..."}`
+- Långa operationer (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) returnerar `{"ok":true,"opid":"..."}`
   omedelbart och körs **frikopplat** (de överlever att anroparen/WebUI försvinner). Polla
   deras förlopp; de är inte klara när anropet returnerar.
 - `progress` och `cancel` tar **base64 av den råa opid-strängen**, inte ett JSON-objekt.
@@ -87,7 +87,15 @@ destinationer (`rclone`/`restic`/ssh) kommunicerar med nätverket.
 | `cloud-fetch` | `{}` | `{ok,opid}` (frikopplat) hämtar+verifierar+installerar `rclone`/`restic`-tillägget i en `lite`-utgåva |
 | `schedule-set` / `schedule-list` / `schedule-delete` | se nedan | schemalagda jobb (en säkerhetskopiering eller en återställning; mot en app, en uppsättning, eller alla appar) |
 | `scheduler-tick` | `{}` | kör förfallna jobb + tillämpar kvarhållning + auto-backup-observatören (boot-hjärtslaget anropar detta) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (inte frikopplat; returnerar direkt; `ERR_UPDATE_CHECK` vid fel - se nedan) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (inte frikopplat; returnerar direkt; `ERR_UPDATE_CHECK` vid fel, se nedan) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) säkerhetskopierar många appar i en frånkopplad op; förloppet bär `n`/`of`. Ett fel per app stoppar inte satsen. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) återställer många säkerhetskopior i en frånkopplad op; förloppet bär `n`/`of`. Ett fel per app stoppar inte satsen. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` lagringsvolymer för mappväljaren: internt plus flyttbart SD-kort / USB. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) exporterar konfig, jobb, destinationer, inloggningsuppgifter och nycklar till en enda lösenordsfrasskrypterad fil i säkerhetskopiemappen. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) slår samman en exporterad konfigfil tillbaka till den här enheten (skriver aldrig över blint). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` listar de krypterade konfigfiler som är tillgängliga att importera. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` tar bort sparade fjärrlösenord och enhetens krypteringsnyckel; destinationer, jobb och säkerhetskopior blir kvar. |
+| `log-prune` | `{}` | `{ok}` beskär sedan länge avslutade op-loggar, begränsar granskningsspåret och rensar inaktuella ikoner (startservicen anropar detta). |
 
 ### `progress`-fält
 
@@ -174,7 +182,7 @@ Ett schemajobb väljer **ett** mål och en **åtgärd**:
 Ange exakt **ett** av `package`, `packages` eller `all` för målet. Ett `backup`-jobb behåller de
 vanliga `mode`/`dest`/`keep`/`items`. Ett `restore`-jobb (`action: "restore"`) återställer varje
 målapps **senaste** säkerhetskopia (eller en uttrycklig `ref`) och **skriver över appens nuvarande data
-vid varje körning** - det är avsiktligt och ett tillval, så ställ in det bara på en direkt begäran från
+vid varje körning**: det är avsiktligt och ett tillval, så ställ in det bara på en direkt begäran från
 användaren.
 
 ### Schemaläggningsgrindar
@@ -219,12 +227,12 @@ callback-server (`127.0.0.1:53682`) och öppnar telefonens egen webbläsare på 
 samtyckessida via en Android VIEW-intent, och returnerar `{ok:true,url}` (eller
 `{ok:false,code:"ERR_AUTHORIZE"}`). Polla `remote-authorize-poll` (`{}`): den returnerar
 `{ok:true,done:false,url}` medan den väntar och `{ok:true,done:true,token}` när användaren
-godkänner - skicka det `token`:et till `remote-add`. `remote-authorize-cancel` (`{}`) stoppar en
+godkänner, skicka det `token`:et till `remote-add`. `remote-authorize-cancel` (`{}`) stoppar en
 väntande auktorisering (`{ok:true,cancelled:true}`). Att manuellt klistra in utdata från
 `rclone authorize "<backend>"` från valfri dator stöds fortfarande som reservlösning.
 
 Google Drive har två vägar: denna `drive`-fjärrplats (inget Google Cloud-projekt behövs, använder
-rclones egen OAuth - auktorisera på enheten med `remote-authorize`, eller kör
+rclones egen OAuth, auktorisera på enheten med `remote-authorize`, eller kör
 `rclone authorize "drive"` en gång på valfri dator och skicka in token) eller den valbara
 följeslagarappen (ditt eget OAuth-klient-id). Båda hamnar som vanliga destinationer.
 
@@ -234,7 +242,7 @@ Konfigurationsfältet `network_policy` styr vilken anslutning molnöverföringar
 `any` (standard), `wifi` eller `mobile`. Ställ in det med `config-set`. När det är `wifi` eller
 `mobile` kontrollerar varje molnöverföring (Full `rclone`/Drive-uppladdning, Mirror-synk, fjärr-
 `restic`-snapshotbackup/återställning, Mirror-återställning) den aktiva transporten först och
-avbryter med `ERR_NET_POLICY` om den inte matchar - för både manuella och schemalagda jobb.
+avbryter med `ERR_NET_POLICY` om den inte matchar, för både manuella och schemalagda jobb.
 Lokala destinationer är aldrig begränsade.
 
 ### Molnintegritet och kvot
@@ -285,8 +293,8 @@ direkt, avsiktlig användarbegäran.
 
 ### Fristående sökvägs-säkerhetskopia
 
-`path-backup` / `path-restore` säkerhetskopierar och återställer **valfri absolut sökväg** - en mapp
-eller en enskild fil - på delad lagring eller under `/data`, utanför per-app-modellen. Arkivet skrivs
+`path-backup` / `path-restore` säkerhetskopierar och återställer **valfri absolut sökväg**: en mapp
+eller en enskild fil, på delad lagring eller under `/data`, utanför per-app-modellen. Arkivet skrivs
 som `tar.zst` plus en `manifest.json` i VDBackups eget format (SHA-256-förseglat, med ett
 RECOVERY-kit när det är krypterat) under `.paths/` i backup-katalogen.
 
@@ -301,18 +309,18 @@ RECOVERY-kit när det är krypterat) under `.paths/` i backup-katalogen.
   `/data/media`, `/sdcard`, `/data`. En sökväg som inte finns misslyckas med `ERR_NO_PATH`; en sökväg
   utanför de tillåtna rötterna, eller en som innehåller `..`, misslyckas med `ERR_BAD_PATH`.
 - `path-restore` skriver tillbaka till den ursprungliga platsen, så den är destruktiv och kräver
-  `"confirm": true` - en spärr med hög friktion, likt `special-restore`. En `ref` som inte är en
+  `"confirm": true`, en spärr med hög friktion, likt `special-restore`. En `ref` som inte är en
   giltig sökvägs-säkerhetskopia misslyckas med `ERR_BAD_REF`.
 - Båda körs **frikopplat**; polla `progress` med det returnerade `opid`.
 
 ### `update-check`
 
 `update-check` rapporterar om en nyare version av modulen har publicerats, så att en agent
-(eller WebUI:t) kan visa den. Det är ett **läsverb som returnerar direkt** - det är **inte**
+(eller WebUI:t) kan visa den. Det är ett **läsverb som returnerar direkt**: det är **inte**
 frikopplat, så det finns ingen `opid` att polla. Det utlöses endast av en uttrycklig
 användaråtgärd och hämtar modulens publicerade uppdateringsmanifest (`updateJson`-URL:en från
-`module.prop`) med den medföljande `curl` via en root-sidig HTTP-begäran - detta körs utanför
-WebView och omfattas därför inte av WebUI:ts CSP - och jämför den publicerade `versionCode` med
+`module.prop`) med den medföljande `curl` via en root-sidig HTTP-begäran, detta körs utanför
+WebView och omfattas därför inte av WebUI:ts CSP, och jämför den publicerade `versionCode` med
 den installerade. Det tar **inga argument**.
 
 Vid framgång returnerar det:
@@ -341,7 +349,7 @@ detta verb.
 - **`ssaid` är strikt opt-in (standard av).** Det säkerhetskopierar / återställer enhetens
   ANDROID_ID genom att skriva om en systemfil; en återställning tillämpas först efter en omstart, och
   den tidigare filen sparas alltid först för återställning. Skicka endast `"ssaid": true`
-  på en direkt, avsiktlig användarbegäran - aldrig som standard.
+  på en direkt, avsiktlig användarbegäran, aldrig som standard.
 - **Muterande åtgärder (restore, delete, import) är destruktiva** och loggas till ett
   lokalt granskningsspår (`logs/audit.jsonl`). Återställning är trogen (radera-sedan-extrahera), så
   den återför appen till säkerhetskopians exakta tillstånd. Bekräfta avsikten innan du anropar dem.
@@ -349,8 +357,8 @@ detta verb.
   enhetsomfattande inställningar, så skicka den endast på en direkt användarbegäran; den skyddas av
   uttryckligt samtycke och registreras i granskningsspåret.
 - **Återställning är idempotent.** Råa provider-återställningar (messages/contacts/wifi/bluetooth/
-  calendar) **ersätter** i stället för att slå samman - provider-datan raderas och arkivet extraheras
-  över den - så att återställa samma säkerhetskopia igen kan inte duplicera rader. `dns` och
+  calendar) **ersätter** i stället för att slå samman, provider-datan raderas och arkivet extraheras
+  över den, så att återställa samma säkerhetskopia igen kan inte duplicera rader. `dns` och
   `system_settings` återappliceras med idempotent `settings put`.
 - **Arkivextraktion är skyddad mot sökvägstraversering.** Återställning körs som root, så varje arkiv
   (restore, import, special-restore, path-restore) kontrolleras före någon skrivning: ett vars
@@ -367,4 +375,4 @@ Se [ARCHITECTURE.md](ARCHITECTURE.md) och
 
 ---
 
-*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna - se [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna, se [CONTRIBUTING.md](CONTRIBUTING.md).*

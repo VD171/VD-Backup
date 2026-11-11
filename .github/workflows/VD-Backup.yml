@@ -48,6 +48,20 @@ jobs:
       - name: Build per-ABI binaries
         run: bash .github/scripts/build_bin.sh
 
+      # Supply-chain gate: never ship a release without per-ABI provenance. The v1.04
+      # payload went out without it because that build was done by hand (bypassing
+      # build_bin.sh); this fails the release if any bundled ABI lacks PROVENANCE.json.
+      - name: Verify provenance present
+        run: |
+          set -e
+          miss=0
+          for d in module/bin/*/; do
+            b="$(basename "$d")"; [ "$b" = "lib" ] && continue
+            if [ ! -s "${d}PROVENANCE.json" ]; then echo "::error::missing PROVENANCE.json in $d"; miss=1; fi
+          done
+          [ "$miss" = 0 ] || { echo "Refusing to release binaries without provenance."; exit 1; }
+          echo "provenance present for every bundled ABI"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -100,12 +114,12 @@ jobs:
         id: v
         run: echo "name=$(sed -n 's/^version=//p' module/module.prop)" >> "$GITHUB_OUTPUT"
 
-      # Regenerate the documentation screenshots from the just-bumped WebUI, so the
-      # version badge and any UI/string change land in docs/screenshots/ on release.
+      # Regenerate the documentation screenshots from the WebUI on EVERY release (bump or
+      # not), so the version badge and any UI/string change always land in docs/screenshots/.
       # channel="chrome" uses the runner's preinstalled Google Chrome; no network. The
-      # updated PNGs are tracked, so the "Commit version bump" step below carries them.
+      # updated PNGs are tracked, so the commit step below carries them. Part of the ritual,
+      # never a separate pending step.
       - name: Regenerate documentation screenshots
-        if: ${{ inputs.bump != 'none' }}
         run: |
           pip install --quiet playwright
           python3 tools/screenshots/shoot.py
@@ -191,12 +205,14 @@ jobs:
           mv "$tmp" module/update.json
           cat module/update.json
 
-      - name: Commit version bump
-        if: ${{ inputs.bump != 'none' }}
+      # Always commit the release artifacts (regenerated screenshots, filled update.json and
+      # any version bump), so no manual follow-up is ever pending after a release, including
+      # the no-bump path. VD171 authorship to match the repo's clean-commit convention.
+      - name: Commit release changes
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "Release ${{ steps.v.outputs.name }}" || true
+          git config user.name  'VD $ VD171 @ Priv8'
+          git config user.email '80125987+VD171@users.noreply.github.com'
+          git commit -am "Release ${{ steps.v.outputs.name }} (assets, screenshots, update.json)" || true
           git push || true
 
       - name: Create GitHub release

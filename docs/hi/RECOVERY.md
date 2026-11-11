@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - एक PC पर एक backup recover करें (Windows / macOS / Linux)
+# VDBackup, एक PC पर एक backup recover करें (Windows / macOS / Linux)
 
 आपके VDBackup backups **standard formats** का उपयोग करते हैं, इसलिए आप उन्हें कहीं भी,
 इस मॉड्यूल के बिना खोल सकते हैं। एक backup folder में एक `manifest.json`, APKs

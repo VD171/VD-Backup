@@ -6,6 +6,32 @@
 
 Todos los cambios relevantes de VDBackup están documentados aquí. Solo en inglés.
 
+## v1.05
+
+Fiabilidad:
+
+- Las copias por lotes ya no se detienen a mitad cuando sales de la aplicación. Una selección completa, un grupo de etiquetas o una ejecución programada ahora las gestiona un único proceso root independiente que continúa con la WebUI cerrada y está protegido de que lo cierren por presión de memoria. El progreso se reconecta cuando vuelves.
+
+Configuración:
+
+- Copia de la configuración: exporta tus destinos, programaciones, ajustes predefinidos y credenciales guardadas a un único archivo cifrado e impórtalo en otro dispositivo o tras una instalación limpia. El archivo siempre pide una frase de contraseña porque contiene contraseñas remotas, y la importación se combina en el dispositivo sin eliminar lo que ya hay.
+- Ahora puedes borrar las credenciales remotas guardadas y la clave de cifrado del dispositivo desde la configuración en un solo paso, manteniendo tus destinos, programaciones y copias de seguridad en su lugar.
+
+Seguridad:
+
+- Las copias solo pueden guardarse donde permanecen cifradas en reposo. Se rechazan los destinos en rutas legibles antes del primer desbloqueo, como /data/adb o /data/system.
+- Las credenciales guardadas, el rclone.conf y la clave age ahora residen en almacenamiento cifrado por credencial, bloqueado hasta el primer desbloqueo, en lugar de un lugar que era legible antes; una actualización del módulo las mueve allí de forma permanente.
+- Las copias ahora comprueban el espacio libre antes de empezar y se detienen con un mensaje claro en lugar de fallar a mitad.
+
+Restauración:
+
+- Restaurar una aplicación que ya no está instalada ahora reinstala primero su APK, y el diálogo de restauración ofrece la opción de APK siempre que la copia tenga uno. Una restauración que no puede instalar la aplicación informa del fallo en lugar de fingir éxito.
+- Las operaciones de aplicación, permisos y ajustes ahora se ejecutan en un entorno limpio, corrigiendo los errores "Failed transaction" que bloqueaban la restauración, los app-ops y los ajustes en algunas ROM.
+
+Destinos:
+
+- Puedes hacer copias en una tarjeta SD o una unidad USB: el selector de carpetas muestra un acceso directo a cada volumen de almacenamiento y acepta rutas de medios extraíbles.
+
 ## v1.04
 
 Correcciones:
@@ -18,7 +44,7 @@ Privacidad:
 
 Copias:
 
-- Ahora puedes definir qué elementos respalda cada app - por ejemplo solo APK, o APK + OBB - y se aplica en copias masivas, automáticas y programadas. Una copia manual individual te sigue dejando elegir, con los elementos de la app preseleccionados. Configúralo en Ajustes, junto a la lista de apps excluidas.
+- Ahora puedes definir qué elementos respalda cada app, por ejemplo solo APK, o APK + OBB, y se aplica en copias masivas, automáticas y programadas. Una copia manual individual te sigue dejando elegir, con los elementos de la app preseleccionados. Configúralo en Ajustes, junto a la lista de apps excluidas.
 
 - Presets de copia: guarda conjuntos con nombre de qué incluir y aplícalos con una sola elección en el diálogo de copia.
 - Multiusuario: las copias de apps, las especiales y las restauraciones ahora siguen el usuario de Android que elijas.
@@ -237,4 +263,4 @@ AI-friendly e i18n:
 - El listado rico de apps y el descifrado de Neo se ejecutan a través de un helper dex dirigido como root
   (`IPackageManager` vía ServiceManager), de modo que funcionan donde ActivityThread se bloquea.
 
-*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas - ve [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas, ve [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -20,7 +20,7 @@ oraz jak zweryfikować, że nie podrzucono niczego nieprzejrzystego.
   nie improwizuje.
 - **Odtwarzalne.** Uruchom build ponownie, a otrzymasz te same pliki; pobierz ponownie przypięte
    źródła, a wartości SHA-256 będą się zgadzać.
-- **Ścieżka audytu podróżuje z modułem.** Nie jest tylko na stronie - podróżuje
+- **Ścieżka audytu podróżuje z modułem.** Nie jest tylko na stronie, podróżuje
   wewnątrz zainstalowanego modułu, na Twoim urządzeniu, więc możesz przeprowadzić audyt offline.
 
 ## Co jest dostarczane i skąd
@@ -82,4 +82,4 @@ Jeśli jakikolwiek dostarczony plik nie zgadza się ze swoim zapisanym źródłe
 bezpieczeństwa i zgłoś go (zobacz [SECURITY.md](SECURITY.md)). To jest dokładnie ten rodzaj rozbieżności, który ten
 manifest istnieje, aby uczynić widocznym.
 
-*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane - zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*

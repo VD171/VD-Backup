@@ -37,6 +37,10 @@ mkdir -p "$LOGS"
 # folders stay openable by a file manager under /sdcard/VDBackup.
 "$MODDIR/scripts/helper.sh" sanitize >/dev/null 2>&1
 
+# keep the state dir bounded: prune long-finished op logs, cap the audit trail, evict
+# stale icons (never touches config/jobs/dests/creds/keys or the backups).
+"$MODDIR/scripts/helper.sh" log-prune >/dev/null 2>&1
+
 # honour the skip flag
 [ -f "$MODDIR/.scheduler.skip" ] && exit 0
 

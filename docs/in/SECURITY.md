@@ -29,6 +29,8 @@ secepat mungkin dan memberi Anda kredit jika Anda menginginkannya.
   teks jelas. Backup tidak pernah terikat ke kunci perangkat keras yang terikat-perangkat (sehingga tetap
   portabel), yang juga berarti frasa-sandi adalah yang melindungi backup terenkripsi -
   pilihlah yang kuat.
+- Kredensial itu berada di penyimpanan terenkripsi-kredensial (`/data/misc_ce`), terkunci hingga pembukaan kunci pertama setelah memulai ulang, jadi tidak pernah terbaca sebelum pembukaan itu, berbeda dari `/data/adb`. Pembaruan modul memindahkan salinan lama ke sana secara permanen (memverifikasi tiap berkas sebelum menghapus aslinya), dan tetap ada antar pemasangan ulang.
+- Tujuan cadangan lokal sendiri harus tetap terenkripsi saat diam: hanya penyimpanan pengguna internal dan lepasan yang diizinkan, tidak pernah `/data/adb`, `/data/system` atau jalur lain yang terbaca sebelum pembukaan kunci pertama, dan tidak pernah penelusuran `..`. SD/USB lepasan tidak terenkripsi saat diam, jadi Anda diperingatkan (tidak diblokir) untuk mengaktifkan enkripsi cadangan untuknya.
 - Aplikasi pendamping Google Drive opsional sebaiknya selalu disembunyikan dengan [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) agar
   tidak mengungkap root atau bootloader yang tidak terkunci.
 - Pemulihan berjalan sebagai root, jadi setiap arsip diperiksa sebelum apa pun ditulis: sebuah
@@ -38,4 +40,4 @@ secepat mungkin dan memberi Anda kredit jika Anda menginginkannya.
   SHA-256 yang tercatat, dan manifes disertakan di perangkat, sehingga muatan yang dibundel dapat
   diaudit dan direproduksi. Lihat [BINARIES.md](BINARIES.md).
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan - lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*

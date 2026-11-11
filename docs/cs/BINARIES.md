@@ -20,7 +20,7 @@ a jak ověřit, že nebylo nic neprůhledného podstrčeno.
   neimprovizuje.
 - **Reprodukovatelné.** Spusťte build znovu a dostanete stejné soubory; znovu stáhněte připnuté
    zdroje a hodnoty SHA-256 budou souhlasit.
-- **Auditní stopa se dodává s modulem.** Není jen na webu - cestuje
+- **Auditní stopa se dodává s modulem.** Není jen na webu, cestuje
   uvnitř nainstalovaného modulu, na vašem zařízení, takže můžete auditovat offline.
 
 ## Co se dodává a odkud
@@ -77,4 +77,4 @@ Pokud některý dodaný soubor neodpovídá svému zaznamenanému zdroji, považ
 problém a nahlaste jej (viz [SECURITY.md](SECURITY.md)). To je přesně ten druh nesrovnalosti, který tento
 manifest existuje proto, aby jej učinil viditelným.
 
-*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány - viz [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md).*

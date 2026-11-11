@@ -12,6 +12,9 @@
 /.claude/
 
 # --- Secrets: keys, credentials, tokens (NEVER commit) -----------------
+rclone.conf
+config.json
+!module/webroot/config.json
 *.key
 *.pem
 *.p12

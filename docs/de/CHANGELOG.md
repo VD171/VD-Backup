@@ -6,6 +6,32 @@
 
 Alle nennenswerten Änderungen an VDBackup werden hier dokumentiert. Nur auf Englisch.
 
+## v1.05
+
+Zuverlässigkeit:
+
+- Stapel-Backups brechen nicht mehr mittendrin ab, wenn Sie die App verlassen. Eine ganze Auswahl, eine Tag-Gruppe oder ein geplanter Lauf wird jetzt von einem einzigen abgekoppelten Root-Prozess ausgeführt, der bei geschlossener WebUI weiterläuft und davor geschützt ist, unter Speicherdruck beendet zu werden. Die Fortschrittsanzeige verbindet sich wieder, wenn Sie zurückkehren.
+
+Einstellungen:
+
+- Einstellungssicherung: Exportieren Sie Ihre Ziele, Zeitpläne, Voreinstellungen und gespeicherten Zugangsdaten in eine einzige verschlüsselte Datei und importieren Sie sie auf einem anderen Gerät oder nach einer Neuinstallation. Die Datei verlangt immer eine Passphrase, weil sie Remote-Passwörter enthält, und der Import führt sie mit dem Gerät zusammen, ohne das Vorhandene zu entfernen.
+- Sie können gespeicherte Remote-Zugangsdaten und den Geräteverschlüsselungsschlüssel jetzt in den Einstellungen in einem Schritt löschen, wobei Ihre Ziele, Zeitpläne und Backups erhalten bleiben.
+
+Sicherheit:
+
+- Backups können nur dort gespeichert werden, wo sie im Ruhezustand verschlüsselt bleiben. Ziele unter Pfaden, die vor dem ersten Entsperren lesbar sind, etwa /data/adb oder /data/system, werden abgelehnt.
+- Gespeicherte Zugangsdaten, die rclone-Konfiguration und der age-Schlüssel liegen jetzt auf credential-verschlüsseltem Speicher, gesperrt bis zur ersten Entsperrung, statt an einem zuvor lesbaren Ort; ein Modul-Update verschiebt sie dauerhaft dorthin.
+- Backups prüfen jetzt vor dem Start den freien Speicher und halten mit einer klaren Meldung an, statt mittendrin fehlzuschlagen.
+
+Wiederherstellung:
+
+- Beim Wiederherstellen einer nicht mehr installierten App wird jetzt zuerst ihre APK neu installiert, und der Wiederherstellungsdialog bietet die APK-Option an, sobald das Backup eine enthält. Eine Wiederherstellung, die die App nicht installieren kann, meldet den Fehler, statt Erfolg vorzutäuschen.
+- App-, Berechtigungs- und Einstellungsvorgänge laufen jetzt in einer sauberen Umgebung und beheben "Failed transaction"-Fehler, die Wiederherstellung, App-Ops und Einstellungen auf manchen ROMs blockierten.
+
+Ziele:
+
+- Sie können auf eine SD-Karte oder ein USB-Laufwerk sichern: Die Ordnerauswahl zeigt eine Verknüpfung zu jedem Speichervolume und akzeptiert Pfade auf Wechselmedien.
+
 ## v1.04
 
 Fehlerbehebungen:
@@ -18,7 +44,7 @@ Privatsphäre:
 
 Backups:
 
-- Du kannst jetzt festlegen, welche Elemente jede App sichert - zum Beispiel nur APK oder APK + OBB - angewendet in Massen-, automatischen und geplanten Backups. Ein einzelnes manuelles Backup lässt dich weiterhin wählen, vorausgefüllt aus der App-Auswahl. Stelle es in den Einstellungen ein, neben der Liste ausgeschlossener Apps.
+- Du kannst jetzt festlegen, welche Elemente jede App sichert, zum Beispiel nur APK oder APK + OBB, angewendet in Massen-, automatischen und geplanten Backups. Ein einzelnes manuelles Backup lässt dich weiterhin wählen, vorausgefüllt aus der App-Auswahl. Stelle es in den Einstellungen ein, neben der Liste ausgeschlossener Apps.
 
 - Backup-Voreinstellungen: speichere benannte Sätze dessen, was enthalten sein soll, und wende sie im Backup-Dialog mit einem Klick an.
 - Mehrbenutzer: App-Backups, spezielle Backups und Wiederherstellungen folgen jetzt alle dem gewählten Android-Benutzer.
@@ -245,4 +271,4 @@ KI-freundlich und i18n:
   dex-Helfer (`IPackageManager` über ServiceManager), sodass sie auch dort funktionieren, wo
   ActivityThread hängt.
 
-*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen - siehe [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - Los argumentos son un único objeto JSON, **codificado en base64**, pasado como un único token argv.
 - El comando imprime **un objeto JSON** en stdout: `{"ok":true,...}` o
   `{"ok":false,"code":"ERR_...","message":"..."}`. Parsea eso; nunca raspes texto.
-- Las operaciones largas (`backup`, `restore`, `import`) devuelven `{"ok":true,"opid":"..."}`
+- Las operaciones largas (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) devuelven `{"ok":true,"opid":"..."}`
   inmediatamente y corren **desacopladas** (sobreviven a que el llamador/WebUI desaparezca). Haz poll
   de su progreso; no están terminadas cuando la llamada retorna.
 - `progress` y `cancel` reciben **el base64 de la cadena opid cruda**, no un objeto JSON.
@@ -87,7 +87,15 @@ de nube (`rclone`/`restic`/ssh) hablan con la red.
 | `cloud-fetch` | `{}` | `{ok,opid}` (desacoplada) descarga+verifica+instala el addon `rclone`/`restic` en una edición `lite` |
 | `schedule-set` / `schedule-list` / `schedule-delete` | ver abajo | trabajos agendados (un backup o una restauración; apuntan a una app, un conjunto o todas las apps) |
 | `scheduler-tick` | `{}` | corre trabajos vencidos + aplica retención + el observador de copia automática (el heartbeat de arranque llama a esto) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (no destacada; retorna de inmediato; `ERR_UPDATE_CHECK` en caso de fallo - ver abajo) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (no destacada; retorna de inmediato; `ERR_UPDATE_CHECK` en caso de fallo, ver abajo) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) respalda varias aplicaciones en una op independiente; el progreso lleva `n`/`of`. Un fallo por app no detiene el lote. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) restaura varias copias en una op independiente; el progreso lleva `n`/`of`. Un fallo por app no detiene el lote. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` volúmenes de almacenamiento para el selector de carpetas: interno más SD/USB extraíble. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) exporta config, trabajos, destinos, credenciales y claves a un único archivo cifrado con frase de contraseña, bajo la carpeta de copias. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) combina un archivo de config exportado de vuelta en este dispositivo (nunca sobrescribe a ciegas). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` enumera los archivos de config cifrados disponibles para importar. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` elimina las contraseñas remotas guardadas y la clave de cifrado del dispositivo; destinos, trabajos y copias permanecen. |
+| `log-prune` | `{}` | `{ok}` poda registros de ops hace tiempo terminadas, limita el registro de auditoría y elimina iconos obsoletos (lo llama el servicio de arranque). |
 
 ### Campos de `progress`
 
@@ -175,7 +183,7 @@ Un trabajo agendado elige **un** objetivo y una **acción**:
 Pasa exactamente **uno** de `package`, `packages` o `all` como objetivo. Un trabajo `backup`
 conserva los habituales `mode`/`dest`/`keep`/`items`. Un trabajo `restore` (`action: "restore"`)
 restaura el backup **más reciente** de cada app objetivo (o una `ref` explícita) y **sobrescribe
-los datos actuales de la app en cada ejecución** - es deliberado y opcional, así que configúralo
+los datos actuales de la app en cada ejecución**: es deliberado y opcional, así que configúralo
 solo a petición directa del usuario.
 
 ### Gating del programador
@@ -220,12 +228,12 @@ contra un servidor de callback local (`127.0.0.1:53682`) y abre el propio navega
 en la página de consentimiento del proveedor mediante un intent VIEW de Android, devolviendo
 `{ok:true,url}` (o `{ok:false,code:"ERR_AUTHORIZE"}`). Sondea `remote-authorize-poll` (`{}`):
 devuelve `{ok:true,done:false,url}` mientras espera y `{ok:true,done:true,token}` una vez que el
-usuario aprueba - pasa ese `token` a `remote-add`. `remote-authorize-cancel` (`{}`) detiene una
+usuario aprueba, pasa ese `token` a `remote-add`. `remote-authorize-cancel` (`{}`) detiene una
 autorización pendiente (`{ok:true,cancelled:true}`). Pegar a mano la salida de
 `rclone authorize "<backend>"` desde cualquier computadora sigue siendo compatible como alternativa.
 
 Google Drive tiene dos caminos: este remoto `drive` (sin necesidad de un proyecto Google Cloud, usa
-el OAuth propio de rclone - autoriza en el dispositivo con `remote-authorize`, o corre
+el OAuth propio de rclone, autoriza en el dispositivo con `remote-authorize`, o corre
 `rclone authorize "drive"` una vez en cualquier computadora y pasa el token) o la app compañera
 opt-in (tu propio client id OAuth). Ambos terminan como destinos comunes.
 
@@ -235,7 +243,7 @@ El campo de config `network_policy` controla qué conexión pueden usar las tran
 `any` (por defecto), `wifi`, o `mobile`. Defínelo con `config-set`. Cuando es `wifi` o
 `mobile`, cada transferencia de nube (upload Full `rclone`/Drive, sync Mirror, backup/restauración
 de snapshot `restic` remoto, restauración Mirror) revisa el transporte activo primero y
-aborta con `ERR_NET_POLICY` si no coincide - tanto para trabajos manuales como agendados.
+aborta con `ERR_NET_POLICY` si no coincide, tanto para trabajos manuales como agendados.
 Los destinos locales nunca se gatean.
 
 ### Integridad y cuota de nube
@@ -286,8 +294,8 @@ defecto; solo a petición directa y deliberada del usuario.
 
 ### Backup de ruta independiente
 
-`path-backup` / `path-restore` respaldan y restauran **cualquier ruta absoluta** - una carpeta o un
-solo archivo - en el almacenamiento compartido o bajo `/data`, fuera del modelo por-app. El archive
+`path-backup` / `path-restore` respaldan y restauran **cualquier ruta absoluta**: una carpeta o un
+solo archivo, en el almacenamiento compartido o bajo `/data`, fuera del modelo por-app. El archive
 se escribe como `tar.zst` más un `manifest.json` en el propio formato de VDBackup (sellado con SHA-256,
 con un kit RECOVERY cuando está cifrado) bajo `.paths/` en el directorio de backups.
 
@@ -303,18 +311,18 @@ con un kit RECOVERY cuando está cifrado) bajo `.paths/` en el directorio de bac
   con `ERR_NO_PATH`; una ruta fuera de los roots permitidos, o una que contiene `..`, falla con
   `ERR_BAD_PATH`.
 - `path-restore` escribe de vuelta en la ubicación original, así que es destructivo y requiere
-  `"confirm": true` - una barrera de alta fricción, como `special-restore`. Un `ref` que no es un
+  `"confirm": true`, una barrera de alta fricción, como `special-restore`. Un `ref` que no es un
   backup de ruta válido falla con `ERR_BAD_REF`.
 - Ambos corren **desacoplados**; haz poll de `progress` con el `opid` devuelto.
 
 ### `update-check`
 
 `update-check` informa si se ha publicado una versión más nueva del módulo, para que un agente
-(o la WebUI) pueda mostrarla. Es un **verbo de lectura que retorna de inmediato** - **no** es
+(o la WebUI) pueda mostrarla. Es un **verbo de lectura que retorna de inmediato**: **no** es
 destacado, así que no hay `opid` que sondear. Disparado solo por una acción explícita del
 usuario, busca el manifiesto de actualización publicado del módulo (la URL `updateJson` del
-`module.prop`) con el `curl` empaquetado mediante una petición HTTP del lado root - esto corre
-fuera del WebView, así que no está sujeto a la CSP de la WebUI - y compara el `versionCode`
+`module.prop`) con el `curl` empaquetado mediante una petición HTTP del lado root, esto corre
+fuera del WebView, así que no está sujeto a la CSP de la WebUI, y compara el `versionCode`
 publicado con el instalado. No recibe **ningún argumento**.
 
 En caso de éxito retorna:
@@ -343,7 +351,7 @@ nunca este verbo.
 - **`ssaid` es estrictamente opt-in (por defecto apagado).** Hace backup / restaura el
   ANDROID_ID del dispositivo reescribiendo un archivo de sistema; una restauración se aplica solo tras un reboot, y
   el archivo anterior siempre se guarda primero para rollback. Solo envía `"ssaid": true`
-  a petición directa y deliberada del usuario - nunca por defecto.
+  a petición directa y deliberada del usuario, nunca por defecto.
 - **Las acciones mutables (restore, delete, import) son destructivas** y se registran en una
   traza de auditoría local (`logs/audit.jsonl`). La restauración es fiel (borra-luego-extrae), así que
   revierte la app al estado exacto del backup. Confirma la intención antes de llamarlas.
@@ -351,8 +359,8 @@ nunca este verbo.
   sobrescribe los ajustes de todo el dispositivo, así que envíalo solo a petición directa del usuario;
   está protegido por consentimiento explícito y queda registrado en la traza de auditoría.
 - **La restauración es idempotente.** Las restauraciones crudas de proveedor (messages/contacts/wifi/
-  bluetooth/calendar) **reemplazan** en vez de fusionar - los datos del proveedor se borran y el archive
-  se extrae sobre ellos - así que re-restaurar el mismo backup no puede duplicar filas. `dns` y
+  bluetooth/calendar) **reemplazan** en vez de fusionar, los datos del proveedor se borran y el archive
+  se extrae sobre ellos, así que re-restaurar el mismo backup no puede duplicar filas. `dns` y
   `system_settings` se re-aplican con `settings put` idempotente.
 - **La extracción de archives está protegida contra path traversal.** La restauración corre como root,
   así que cada archive (restore, import, special-restore, path-restore) se comprueba antes de cualquier
@@ -369,4 +377,4 @@ Ve [ARCHITECTURE.md](ARCHITECTURE.md) y
 
 ---
 
-*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas - ve [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas, ve [CONTRIBUTING.md](CONTRIBUTING.md).*

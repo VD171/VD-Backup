@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - Argumen berupa satu objek JSON, **base64-encoded**, diteruskan sebagai satu token argv.
 - Perintah mencetak **satu objek JSON** di stdout: `{"ok":true,...}` atau
   `{"ok":false,"code":"ERR_...","message":"..."}`. Parse itu; jangan pernah scrape teks.
-- Operasi panjang (`backup`, `restore`, `import`) mengembalikan `{"ok":true,"opid":"..."}`
+- Operasi panjang (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) mengembalikan `{"ok":true,"opid":"..."}`
   seketika dan berjalan **terlepas** (tetap bertahan meski pemanggil/WebUI menghilang). Poll
   kemajuannya; mereka belum selesai saat panggilan kembali.
 - `progress` dan `cancel` menerima **base64 dari string opid mentah**, bukan objek JSON.
@@ -87,7 +87,15 @@ cloud (`rclone`/`restic`/ssh) yang berkomunikasi dengan jaringan.
 | `cloud-fetch` | `{}` | `{ok,opid}` (terlepas) mengunduh+memverifikasi+memasang addon `rclone`/`restic` pada edisi `lite` |
 | `schedule-set` / `schedule-list` / `schedule-delete` | lihat di bawah | pekerjaan terjadwal (sebuah backup atau sebuah restore; menargetkan satu aplikasi, sekumpulan, atau semua aplikasi) |
 | `scheduler-tick` | `{}` | menjalankan pekerjaan yang jatuh tempo + menerapkan retensi + observer pencadangan otomatis (heartbeat boot memanggil ini) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (tidak terlepas; langsung kembali; `ERR_UPDATE_CHECK` saat gagal - lihat di bawah) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (tidak terlepas; langsung kembali; `ERR_UPDATE_CHECK` saat gagal, lihat di bawah) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) mencadangkan banyak aplikasi dalam satu op terpisah; progres membawa `n`/`of`. Kegagalan per aplikasi tidak menghentikan batch. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) memulihkan banyak cadangan dalam satu op terpisah; progres membawa `n`/`of`. Kegagalan per aplikasi tidak menghentikan batch. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` volume penyimpanan untuk pemilih folder: internal plus SD/USB lepasan. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) mengekspor konfig, tugas, tujuan, kredensial, dan kunci ke satu berkas terenkripsi frasa sandi di folder cadangan. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) menggabungkan berkas konfig yang diekspor kembali ke perangkat ini (tidak pernah menimpa secara buta). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` mencantumkan berkas konfig terenkripsi yang tersedia untuk diimpor. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` menghapus kata sandi jarak jauh tersimpan dan kunci enkripsi perangkat; tujuan, tugas, dan cadangan tetap ada. |
+| `log-prune` | `{}` | `{ok}` memangkas log op yang sudah lama selesai, membatasi jejak audit, dan membuang ikon usang (layanan boot memanggilnya). |
 
 ### Field `progress`
 
@@ -175,7 +183,7 @@ Sebuah pekerjaan terjadwal memilih **satu** target dan sebuah **action**:
 Berikan tepat **satu** dari `package`, `packages` atau `all` untuk target. Sebuah pekerjaan `backup`
 mempertahankan `mode`/`dest`/`keep`/`items` seperti biasa. Sebuah pekerjaan `restore` (`action: "restore"`)
 merestore backup **terbaru** dari setiap aplikasi target (atau sebuah `ref` eksplisit) dan **menimpa data
-aplikasi saat ini pada setiap jalannya** - ini disengaja dan opt-in, jadi setel hanya atas permintaan langsung
+aplikasi saat ini pada setiap jalannya**: ini disengaja dan opt-in, jadi setel hanya atas permintaan langsung
 pengguna.
 
 ### Penggerbangan penjadwal
@@ -219,13 +227,13 @@ OneDrive, Box, pCloud) tidak memerlukan desktop maupun token yang ditempel manua
 callback lokal (`127.0.0.1:53682`) dan membuka browser ponsel sendiri di halaman persetujuan penyedia
 lewat Android VIEW intent, mengembalikan `{ok:true,url}` (atau `{ok:false,code:"ERR_AUTHORIZE"}`).
 Poll `remote-authorize-poll` (`{}`): ia mengembalikan `{ok:true,done:false,url}` selama menunggu dan
-`{ok:true,done:true,token}` setelah pengguna menyetujui - teruskan `token` itu ke `remote-add`.
+`{ok:true,done:true,token}` setelah pengguna menyetujui, teruskan `token` itu ke `remote-add`.
 `remote-authorize-cancel` (`{}`) menghentikan otorisasi yang tertunda (`{ok:true,cancelled:true}`).
 Menempel keluaran `rclone authorize "<backend>"` secara manual dari komputer mana pun tetap didukung
 sebagai cadangan.
 
 Google Drive memiliki dua jalur: remote `drive` ini (tidak butuh proyek Google Cloud, memakai
-OAuth milik rclone sendiri - otorisasi di perangkat dengan `remote-authorize`, atau jalankan
+OAuth milik rclone sendiri, otorisasi di perangkat dengan `remote-authorize`, atau jalankan
 `rclone authorize "drive"` satu kali di komputer mana pun dan teruskan tokennya) atau aplikasi
 pendamping opt-in (client id OAuth Anda sendiri). Keduanya berakhir sebagai tujuan biasa.
 
@@ -235,7 +243,7 @@ Field config `network_policy` mengontrol koneksi mana yang boleh dipakai transfe
 `any` (default), `wifi`, atau `mobile`. Setel dengan `config-set`. Ketika bernilai `wifi` atau
 `mobile`, setiap transfer cloud (unggah `rclone`/Drive Full, sinkronisasi Mirror, backup/restore
 snapshot `restic` remote, restore Mirror) memeriksa transport aktif terlebih dahulu dan
-berhenti dengan `ERR_NET_POLICY` jika tidak cocok - baik untuk pekerjaan manual maupun terjadwal.
+berhenti dengan `ERR_NET_POLICY` jika tidak cocok, baik untuk pekerjaan manual maupun terjadwal.
 Tujuan lokal tidak pernah dibatasi.
 
 ### Integritas dan kuota cloud
@@ -287,8 +295,8 @@ permintaan pengguna yang langsung dan disengaja.
 
 ### Backup path mandiri
 
-`path-backup` / `path-restore` membackup dan merestore **sembarang path absolut** - sebuah folder
-atau satu file - di penyimpanan bersama atau di bawah `/data`, di luar model per-app. Arsip ditulis
+`path-backup` / `path-restore` membackup dan merestore **sembarang path absolut**: sebuah folder
+atau satu file, di penyimpanan bersama atau di bawah `/data`, di luar model per-app. Arsip ditulis
 sebagai `tar.zst` plus sebuah `manifest.json` dalam format milik VDBackup sendiri (disegel SHA-256,
 dengan kit RECOVERY saat terenkripsi) di bawah `.paths/` di direktori backups.
 
@@ -304,18 +312,18 @@ dengan kit RECOVERY saat terenkripsi) di bawah `.paths/` di direktori backups.
   `ERR_NO_PATH`; path di luar root yang diizinkan, atau yang mengandung `..`, gagal dengan
   `ERR_BAD_PATH`.
 - `path-restore` menulis kembali ke lokasi asli, jadi ia merusak dan membutuhkan
-  `"confirm": true` - sebuah gate berfriksi tinggi, seperti `special-restore`. Sebuah `ref` yang
+  `"confirm": true`, sebuah gate berfriksi tinggi, seperti `special-restore`. Sebuah `ref` yang
   bukan backup path yang valid gagal dengan `ERR_BAD_REF`.
 - Keduanya berjalan **terlepas**; poll `progress` dengan `opid` yang dikembalikan.
 
 ### `update-check`
 
 `update-check` melaporkan apakah versi modul yang lebih baru telah dirilis, agar agen (atau WebUI)
-dapat menampilkannya. Ini adalah **verba baca yang langsung kembali** - **tidak** terlepas,
+dapat menampilkannya. Ini adalah **verba baca yang langsung kembali**: **tidak** terlepas,
 sehingga tidak ada `opid` untuk di-poll. Dipicu hanya oleh tindakan eksplisit pengguna, ia
 mengambil manifest pembaruan modul yang dirilis (URL `updateJson` dari `module.prop`) dengan `curl`
-yang dibundel melalui permintaan HTTP di sisi root - ini berjalan di luar WebView, jadi tidak tunduk
-pada CSP WebUI - dan membandingkan `versionCode` yang dirilis dengan yang terpasang. Ia tidak
+yang dibundel melalui permintaan HTTP di sisi root, ini berjalan di luar WebView, jadi tidak tunduk
+pada CSP WebUI, dan membandingkan `versionCode` yang dirilis dengan yang terpasang. Ia tidak
 menerima **argumen apa pun**.
 
 Saat berhasil ia mengembalikan:
@@ -344,7 +352,7 @@ verba ini.
 - **`ssaid` ketat bersifat opt-in (default mati).** Ia membackup / merestore ANDROID_ID
   perangkat dengan menulis ulang file sistem; sebuah restore berlaku hanya setelah reboot, dan
   file sebelumnya selalu disimpan lebih dulu untuk rollback. Kirim `"ssaid": true`
-  hanya atas permintaan pengguna yang langsung dan disengaja - jangan pernah secara default.
+  hanya atas permintaan pengguna yang langsung dan disengaja, jangan pernah secara default.
 - **Tindakan yang mengubah (restore, delete, import) bersifat merusak** dan dicatat ke
   jejak audit lokal (`logs/audit.jsonl`). Restore bersifat setia (wipe-lalu-ekstrak), jadi
   ia mengembalikan aplikasi ke keadaan persis dari backup. Konfirmasi niat sebelum memanggilnya.
@@ -352,8 +360,8 @@ verba ini.
   menimpa settings di seluruh perangkat, jadi kirim hanya atas permintaan langsung pengguna; ia
   dibatasi oleh persetujuan eksplisit dan dicatat di jejak audit.
 - **Restore bersifat idempoten.** Restore provider mentah (messages/contacts/wifi/bluetooth/
-  calendar) **mengganti** alih-alih menggabungkan - data provider dihapus dan arsip diekstrak di
-  atasnya - jadi merestore ulang backup yang sama tidak bisa menduplikasi baris. `dns` dan
+  calendar) **mengganti** alih-alih menggabungkan, data provider dihapus dan arsip diekstrak di
+  atasnya, jadi merestore ulang backup yang sama tidak bisa menduplikasi baris. `dns` dan
   `system_settings` diterapkan ulang dengan `settings put` yang idempoten.
 - **Ekstraksi arsip dijaga terhadap path traversal.** Restore berjalan sebagai root, jadi setiap
   arsip (restore, import, special-restore, path-restore) diperiksa sebelum penulisan apa pun: arsip
@@ -370,4 +378,4 @@ Lihat [ARCHITECTURE.md](ARCHITECTURE.md) dan
 
 ---
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan - lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*

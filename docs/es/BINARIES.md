@@ -21,7 +21,7 @@ nada opaco.
   compilación falla ruidosamente, nunca improvisa.
 - **Reproducible.** Vuelve a ejecutar la compilación y obtienes los mismos archivos; vuelve a
    obtener las fuentes fijadas y los valores SHA-256 coinciden.
-- **El rastro de auditoría se incluye con el módulo.** No está solo en el sitio web - viaja
+- **El rastro de auditoría se incluye con el módulo.** No está solo en el sitio web, viaja
   dentro del módulo instalado, en tu dispositivo, para que puedas auditar sin conexión.
 
 ## Qué se incluye, y de dónde
@@ -78,4 +78,4 @@ Si algún archivo incluido no coincide con su fuente registrada, trátalo como u
 seguridad e infórmalo (consulta [SECURITY.md](SECURITY.md)). Esta es exactamente la clase de
 discrepancia que este manifiesto existe para hacer visible.
 
-*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas - ve [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas, ve [CONTRIBUTING.md](CONTRIBUTING.md).*

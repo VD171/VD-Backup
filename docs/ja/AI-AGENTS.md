@@ -21,7 +21,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - コマンドは stdout に **1 つの JSON オブジェクト** を出力します: `{"ok":true,...}` または
   `{"ok":false,"code":"ERR_...","message":"..."}` それを parse してください。決してテキストを
   スクレイピングしないでください。
-- 長時間の操作 (`backup`, `restore`, `import`) はただちに `{"ok":true,"opid":"..."}` を返し、
+- 長時間の操作 (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) はただちに `{"ok":true,"opid":"..."}` を返し、
   **detached (切り離し)** で実行されます (呼び出し元/WebUI が消えても生き残ります)。その進捗を
   poll してください。呼び出しが返った時点では完了していません。
 - `progress` と `cancel` は JSON オブジェクトではなく、**生の opid 文字列の base64** を受け取ります。
@@ -89,7 +89,15 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `cloud-fetch` | `{}` | `{ok,opid}` (detached) `lite` エディションで `rclone`/`restic` アドオンをダウンロード+検証+インストールする |
 | `schedule-set` / `schedule-list` / `schedule-delete` | 下記参照 | スケジュールされたジョブ (backup または復元。単一のアプリ, 集合, またはすべてのアプリを対象) |
 | `scheduler-tick` | `{}` | 期限が来たジョブを実行 + リテンションを適用 + 自動バックアップのオブザーバー (ブート時の heartbeat がこれを呼ぶ) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached ではない; すぐに返る; 失敗時は `ERR_UPDATE_CHECK` - 下記参照) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached ではない; すぐに返る; 失敗時は `ERR_UPDATE_CHECK`, 下記参照) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) 多数のアプリを 1 つの切り離されたオペレーションでバックアップします。進捗に `n`/`of` を含みます。アプリ単位の失敗でバッチは止まりません。 |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) 多数のバックアップを 1 つの切り離されたオペレーションで復元します。進捗に `n`/`of` を含みます。アプリ単位の失敗でバッチは止まりません。 |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` フォルダ選択用のストレージボリューム（内部＋リムーバブル SD カード/USB）。 |
+| `config-export` | `{password}` | `{ok,opid}` (detached) 設定・ジョブ・保存先・認証情報・鍵を、パスフレーズで暗号化した 1 つのファイルとしてバックアップ先フォルダへエクスポートします。 |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) エクスポートした設定ファイルをこの端末に統合します（ブラインド上書きはしません）。 |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` インポート可能な暗号化設定ファイルを一覧します。 |
+| `wipe-credentials` | `{}` | `{ok,wiped}` 保存済みのリモートパスワードと端末の暗号化キーを削除します。保存先・ジョブ・バックアップは残ります。 |
+| `log-prune` | `{}` | `{ok}` 完了して久しいオペレーションログを整理し、監査証跡を上限で切り、古いアイコンを削除します（起動サービスが呼び出します）。 |
 
 ### `progress` のフィールド
 
@@ -176,7 +184,7 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 
 対象には `package`, `packages`, `all` のうち正確に **1 つ** を指定してください。`backup` ジョブは通常の
 `mode`/`dest`/`keep`/`items` を保ちます。`restore` ジョブ (`action: "restore"`) は各対象アプリの **最新** の
-backup (または明示的な `ref`) を復元し、**実行ごとにアプリの現在のデータを上書き** します - これは意図的で
+backup (または明示的な `ref`) を復元し、**実行ごとにアプリの現在のデータを上書き** します, これは意図的で
 オプトインなので、ユーザーの直接の要求があるときにだけ設定してください。
 
 ### スケジューラのゲーティング
@@ -219,13 +227,13 @@ OneDrive、Box、pCloud) は、デスクトップも手動で貼り付ける tok
 `rclone authorize <backend>` を実行し、Android の VIEW intent 経由でプロバイダーの同意ページを電話
 自身のブラウザで開き、`{ok:true,url}` (または `{ok:false,code:"ERR_AUTHORIZE"}`) を返します。
 `remote-authorize-poll` (`{}`) をポーリングすると、待機中は `{ok:true,done:false,url}` を、ユーザーが
-承認したら `{ok:true,done:true,token}` を返します - その `token` を `remote-add` に渡してください。
+承認したら `{ok:true,done:true,token}` を返します, その `token` を `remote-add` に渡してください。
 `remote-authorize-cancel` (`{}`) は保留中の認可を停止します (`{ok:true,cancelled:true}`)。どの
 コンピュータからでも `rclone authorize "<backend>"` の出力を手動で貼り付ける方法も、フォールバックと
 して引き続きサポートされています。
 
 Google Drive には 2 つの経路があります: この `drive` remote (Google Cloud プロジェクトは不要で、
-rclone 自身の OAuth を使う - `remote-authorize` で端末上で認可するか、どのコンピュータでも一度
+rclone 自身の OAuth を使う, `remote-authorize` で端末上で認可するか、どのコンピュータでも一度
 `rclone authorize "drive"` を実行して token を渡す) か、opt-in のコンパニオンアプリ (自分自身の
 OAuth client id) です。どちらも通常の宛先として扱われます。
 
@@ -235,7 +243,7 @@ config フィールドの `network_policy` は、クラウド転送が使える�
 `any` (デフォルト), `wifi`, `mobile` のいずれか。`config-set` で設定します。`wifi` または
 `mobile` のとき、すべてのクラウド転送 (Full の `rclone`/Drive アップロード、Mirror の sync、
 リモートの `restic` スナップショットの backup/restore、Mirror の restore) は、まず有効な
-トランスポートを確認し、一致しなければ `ERR_NET_POLICY` で中止します - 手動ジョブとスケジュール
+トランスポートを確認し、一致しなければ `ERR_NET_POLICY` で中止します, 手動ジョブとスケジュール
 ジョブの両方で。ローカルの宛先は決して制限されません。
 
 ### クラウドの整合性とクォータ
@@ -288,7 +296,7 @@ config フィールドの `network_policy` は、クラウド転送が使える�
 ### スタンドアロンのパス backup
 
 `path-backup` / `path-restore` は、per-app モデルの外で、共有ストレージ上または `/data` 配下の
-**任意の絶対パス** - フォルダまたは単一のファイル - を backup / 復元します。アーカイブは VDBackup
+**任意の絶対パス**: フォルダまたは単一のファイル, を backup / 復元します。アーカイブは VDBackup
 独自のフォーマットで `tar.zst` と `manifest.json` として (SHA-256 で封印され、暗号化時は RECOVERY
 kit 付きで)、backups ディレクトリ内の `.paths/` 配下に書き込まれます。
 
@@ -313,8 +321,8 @@ kit 付きで)、backups ディレクトリ内の `.paths/` 配下に書き込�
 (または WebUI) がそれを提示できるようにします。これは **すぐに返る読み取り verb** で、
 **detached ではない** ため、ポーリングする `opid` はありません。ユーザーの明示的な操作でのみ
 起動され、同梱の `curl` で root 側の HTTP リクエストを通じてモジュールの公開済み更新マニフェスト
-(`module.prop` の `updateJson` URL) を取得し - これは WebView の外で走るため WebUI の CSP の
-対象になりません - 公開された `versionCode` をインストール済みのものと比較します。**引数は取りません**。
+(`module.prop` の `updateJson` URL) を取得し, これは WebView の外で走るため WebUI の CSP の
+対象になりません, 公開された `versionCode` をインストール済みのものと比較します。**引数は取りません**。
 
 成功時は次を返します:
 
@@ -341,7 +349,7 @@ kit 付きで)、backups ディレクトリ内の `.paths/` 配下に書き込�
 - **`ssaid` は厳密に opt-in です (デフォルトはオフ)** これはシステムファイルを書き換えることで
   デバイスの ANDROID_ID を backup/restore します。restore はリブート後にのみ適用され、
   以前のファイルはロールバックのために常に先に保存されます。`"ssaid": true` を送るのは、ユーザーの
-  直接的で意図的な要求があるときだけにしてください - デフォルトでは決して送らないでください。
+  直接的で意図的な要求があるときだけにしてください, デフォルトでは決して送らないでください。
 - **変更を伴う操作 (restore, delete, import) は破壊的** であり、ローカルの audit trail
   (`logs/audit.jsonl`) に記録されます。restore は忠実 (消去してから展開) なので、アプリを backup
   の正確な状態に戻します。呼び出す前に意図を確認してください。
@@ -349,7 +357,7 @@ kit 付きで)、backups ディレクトリ内の `.paths/` 配下に書き込�
   全体の settings を上書きするので、ユーザーの直接の要求があるときだけ送ってください。明示的な同意に
   よってゲートされ、audit trail に記録されます。
 - **復元は idempotent です。** 生の provider 復元 (messages/contacts/wifi/bluetooth/calendar) は
-  マージではなく **置き換え** ます - provider データは消去され、その上にアーカイブが展開されます -
+  マージではなく **置き換え** ます, provider データは消去され、その上にアーカイブが展開されます -
   ので、同じ backup を再度復元しても行が重複することはありません。`dns` と `system_settings` は
   idempotent な `settings put` で再適用されます。
 - **アーカイブの展開はパストラバーサルから保護されています。** restore は root として実行されるため、
@@ -367,4 +375,4 @@ kit 付きで)、backups ディレクトリ内の `.paths/` 配下に書き込�
 
 ---
 
-*このドキュメントは Claude (Anthropic) で生成され、VD171 が保守しています。訂正や改善を歓迎します - [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。*
+*このドキュメントは Claude (Anthropic) で生成され、VD171 が保守しています。訂正や改善を歓迎します, [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。*

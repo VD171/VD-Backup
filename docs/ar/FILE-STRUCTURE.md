@@ -71,4 +71,4 @@ docs/                               # all public documentation
 
 ---
 
-*أُنشئت هذه الوثائق بمساعدة Claude (Anthropic) ويتولى صيانتها VD171. التصحيحات والتحسينات موضع ترحيب - انظر [CONTRIBUTING.md](CONTRIBUTING.md).*
+*أُنشئت هذه الوثائق بمساعدة Claude (Anthropic) ويتولى صيانتها VD171. التصحيحات والتحسينات موضع ترحيب, انظر [CONTRIBUTING.md](CONTRIBUTING.md).*

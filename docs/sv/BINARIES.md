@@ -20,7 +20,7 @@ och hur du verifierar att inget ogenomskinligt har smugits in.
   aldrig.
 - **Reproducerbart.** Kör bygget igen och du får samma filer; hämta de fastnålade
    källorna på nytt och SHA-256-värdena stämmer.
-- **Granskningsspåret följer med modulen.** Det finns inte bara på webbplatsen - det följer
+- **Granskningsspåret följer med modulen.** Det finns inte bara på webbplatsen, det följer
   med inuti den installerade modulen, på din enhet, så att du kan granska offline.
 
 ## Vad som levereras, och varifrån
@@ -82,4 +82,4 @@ Om någon levererad fil inte matchar sin registrerade källa, behandla det som e
 rapportera det (se [SECURITY.md](SECURITY.md)). Det är precis den sorts avvikelse som detta
 manifest finns till för att göra synlig.
 
-*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna - se [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna, se [CONTRIBUTING.md](CONTRIBUTING.md).*

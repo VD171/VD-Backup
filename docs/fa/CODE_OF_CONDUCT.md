@@ -18,4 +18,4 @@
 این یک اقتباس فشرده و متناسب با پروژه از روح Contributor
 Covenant است.
 
-*این مستندات با Claude (Anthropic) تولید شده و توسط VD171 نگه‌داری می‌شود. تصحیح‌ها و بهبودها خوشامد است - [CONTRIBUTING.md](CONTRIBUTING.md) را ببینید.*
+*این مستندات با Claude (Anthropic) تولید شده و توسط VD171 نگه‌داری می‌شود. تصحیح‌ها و بهبودها خوشامد است, [CONTRIBUTING.md](CONTRIBUTING.md) را ببینید.*

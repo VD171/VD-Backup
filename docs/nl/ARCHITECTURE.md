@@ -87,4 +87,4 @@ Voor het volledige technische ontwerp (archiefformaat, metadataschema, pijplijne
 bestemmingen, importeurs) houden de maintainers gedetailleerde ontwerpnotities bij; dit bestand is het
 overzicht gericht op bijdragers.
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom - zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*

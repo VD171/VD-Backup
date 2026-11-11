@@ -29,6 +29,8 @@ prima possibile e ti daremo credito se lo desideri.
   chiaro. I backup non sono mai legati a chiavi hardware vincolate al dispositivo (così da restare
   portabili), il che significa anche che la passphrase è ciò che protegge un backup cifrato -
   scegline una robusta.
+- Queste credenziali risiedono su archiviazione cifrata per credenziale (`/data/misc_ce`), bloccata fino al primo sblocco dopo il riavvio, quindi mai leggibili prima di quello sblocco, a differenza di `/data/adb`. Un aggiornamento del modulo vi sposta le copie vecchie in modo permanente (verificando ciascuna prima di rimuovere l'originale), e persistono tra le reinstallazioni.
+- Una destinazione di backup locale deve restare cifrata a riposo: sono consentiti solo archiviazione utente interna e rimovibile, mai `/data/adb`, `/data/system` o altri percorsi leggibili prima del primo sblocco, né un attraversamento `..`. I supporti rimovibili SD/USB non sono cifrati a riposo, quindi vieni avvisato (non bloccato) di attivare la cifratura del backup per essi.
 - L'app companion opzionale per Google Drive dovrebbe sempre essere nascosta con [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) così da non
   rivelare il root o un bootloader sbloccato.
 - Il ripristino viene eseguito come root, quindi ogni archivio viene controllato prima di
@@ -39,4 +41,4 @@ prima possibile e ti daremo credito se lo desideri.
   SHA-256 registrato, e il manifest è incluso sul dispositivo, così che il payload incluso possa
   essere verificato e riprodotto. Vedi [BINARIES.md](BINARIES.md).
 
-*Questa documentazione è stata generata con Claude (Anthropic) ed è mantenuta da VD171. Correzioni e miglioramenti sono benvenuti - vedi [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Questa documentazione è stata generata con Claude (Anthropic) ed è mantenuta da VD171. Correzioni e miglioramenti sono benvenuti, vedi [CONTRIBUTING.md](CONTRIBUTING.md).*

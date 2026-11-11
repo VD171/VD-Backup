@@ -6,6 +6,32 @@
 
 Mọi thay đổi đáng chú ý của VDBackup được ghi lại ở đây. Chỉ bằng tiếng Anh.
 
+## v1.05
+
+Độ tin cậy:
+
+- Sao lưu hàng loạt không còn dừng giữa chừng khi bạn rời khỏi ứng dụng. Toàn bộ lựa chọn, một nhóm thẻ hoặc một lần chạy theo lịch giờ đây do một tiến trình root tách rời duy nhất điều khiển, tiếp tục chạy khi đóng WebUI và được bảo vệ khỏi bị kết thúc khi thiếu bộ nhớ. Chế độ xem tiến trình kết nối lại khi bạn quay lại.
+
+Cài đặt:
+
+- Sao lưu cài đặt: xuất các đích đến, lịch trình, cài đặt sẵn và thông tin xác thực đã lưu ra một tệp được mã hóa duy nhất, rồi nhập vào thiết bị khác hoặc sau khi cài đặt lại. Tệp luôn yêu cầu một cụm mật khẩu vì nó chứa mật khẩu từ xa, và việc nhập sẽ hợp nhất vào thiết bị mà không xóa những gì đã có.
+- Giờ đây bạn có thể xóa thông tin xác thực từ xa đã lưu và khóa mã hóa thiết bị từ phần cài đặt chỉ trong một bước, trong khi vẫn giữ nguyên các đích đến, lịch trình và bản sao lưu.
+
+An toàn:
+
+- Bản sao lưu chỉ có thể được lưu ở nơi chúng vẫn được mã hóa khi ở trạng thái nghỉ. Các đích đến dưới những đường dẫn có thể đọc trước lần mở khóa đầu tiên, chẳng hạn như /data/adb hoặc /data/system, sẽ bị từ chối.
+- Thông tin xác thực đã lưu, rclone.conf và khóa age giờ nằm trên bộ nhớ mã hóa bằng thông tin xác thực, khóa cho đến lần mở khóa đầu tiên, thay vì một vị trí trước đây đọc được; một bản cập nhật mô-đun chuyển chúng sang đó vĩnh viễn.
+- Bản sao lưu giờ đây kiểm tra dung lượng trống trước khi bắt đầu và dừng lại với một thông báo rõ ràng thay vì thất bại giữa chừng.
+
+Khôi phục:
+
+- Khôi phục một ứng dụng không còn được cài đặt giờ sẽ cài lại APK của nó trước, và hộp thoại khôi phục đưa ra tùy chọn APK mỗi khi bản sao lưu có APK. Một lần khôi phục không thể cài đặt ứng dụng sẽ báo lỗi thay vì giả vờ thành công.
+- Các thao tác ứng dụng, quyền và cài đặt giờ chạy trong môi trường sạch, khắc phục các lỗi "Failed transaction" từng chặn khôi phục, app-ops và cài đặt trên một số ROM.
+
+Đích đến:
+
+- Bạn có thể sao lưu vào thẻ SD hoặc ổ USB: bộ chọn thư mục hiển thị lối tắt đến từng ổ lưu trữ và chấp nhận đường dẫn phương tiện rời.
+
 ## v1.04
 
 Sửa lỗi:
@@ -18,7 +44,7 @@ Quyền riêng tư:
 
 Sao lưu:
 
-- Giờ bạn có thể đặt những mục nào mỗi ứng dụng sao lưu - ví dụ chỉ APK, hoặc APK + OBB - được áp dụng trong sao lưu hàng loạt, tự động và theo lịch. Một bản sao lưu thủ công đơn lẻ vẫn cho bạn chọn lúc đó, điền sẵn từ bộ của ứng dụng. Đặt trong Cài đặt, cạnh danh sách ứng dụng loại trừ.
+- Giờ bạn có thể đặt những mục nào mỗi ứng dụng sao lưu, ví dụ chỉ APK, hoặc APK + OBB, được áp dụng trong sao lưu hàng loạt, tự động và theo lịch. Một bản sao lưu thủ công đơn lẻ vẫn cho bạn chọn lúc đó, điền sẵn từ bộ của ứng dụng. Đặt trong Cài đặt, cạnh danh sách ứng dụng loại trừ.
 
 - Cấu hình sao lưu: lưu các bộ có tên về nội dung cần sao lưu và áp dụng bằng một lựa chọn trong hộp thoại sao lưu.
 - Đa người dùng: sao lưu ứng dụng, sao lưu đặc biệt và khôi phục giờ đều theo người dùng Android bạn chọn.
@@ -228,4 +254,4 @@ Thân thiện với AI và i18n:
 - Việc liệt kê ứng dụng phong phú và giải mã Neo chạy qua một trợ giúp dex được điều khiển với quyền root
   (`IPackageManager` qua ServiceManager), nên chúng hoạt động ở những nơi mà ActivityThread bị treo.
 
-*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến - xem [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md).*

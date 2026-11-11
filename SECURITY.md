@@ -29,6 +29,8 @@ soon as we can and credit you if you wish.
   clear text. Backups are never tied to device-bound hardware keys (so they stay
   portable), which also means the passphrase is what protects an encrypted backup -
   choose a strong one.
+- Those credentials live on credential-encrypted storage (`/data/misc_ce`), locked until the first unlock after a reboot, so they are never readable before that unlock, unlike `/data/adb`. A module update moves any legacy copies there permanently (verifying each before removing the original), and they persist across reinstalls.
+- A local backup destination must itself stay encrypted at rest: only internal and removable user storage is allowed, never `/data/adb`, `/data/system` or other paths readable before first unlock, and never a `..` traversal. Removable SD/USB is not encrypted at rest, so you are warned (not blocked) to turn on backup encryption for it.
 - The optional Google Drive companion app should always be hidden with [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) so it
   does not reveal root or an unlocked bootloader.
 - Restore runs as root, so every archive is checked before anything is written: a

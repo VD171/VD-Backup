@@ -14,7 +14,7 @@ VDBackup to **moduł WebUI dla KernelSU/APatch/Magisk**: skrypty powłoki + WebU
 [ARCHITECTURE.md](ARCHITECTURE.md) i [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 
 To otwarty, natywnie rootowy **następca Swift Backup, Neo-Backup i
-Android-DataBackup** - unia ich funkcji na licencji AGPLv3, z importem istniejących
+Android-DataBackup**: unia ich funkcji na licencji AGPLv3, z importem istniejących
 kopii zapasowych Neo-Backup i Android-DataBackup, aby ludzie mogli się przenieść.
 
 ## Współtwórcy AI mile widziani
@@ -25,9 +25,9 @@ Asystenci i agenci AI są tu pełnoprawnymi współtwórcami, a nie dodatkiem na
   obiekt JSON, silnik to zwykła powłoka POSIX, a układ plików jest udokumentowany w
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 - Agent może administrować **każdą** treścią i akcją modułu bezgłowo poprzez
-  to API JSON - pełna powierzchnia kontroli, czasowniki i zabezpieczenia są w
+  to API JSON, pełna powierzchnia kontroli, czasowniki i zabezpieczenia są w
   [docs/AI-AGENTS.md](AI-AGENTS.md).
-- Łatki tworzone z pomocą AI są recenzowane i akceptowane na tych samych zasadach co każde inne - według
+- Łatki tworzone z pomocą AI są recenzowane i akceptowane na tych samych zasadach co każde inne, według
   poprawności, przejrzystości i konwencji poniżej, a nie według tego, kto (lub co) je napisał.
 - Jeśli sterujesz VDBackup z poziomu agenta, używaj wyjścia JSON z `helper.sh` jako
   kontraktu; nie zdrapuj WebUI.
@@ -62,18 +62,18 @@ Asystenci i agenci AI są tu pełnoprawnymi współtwórcami, a nie dodatkiem na
 - Aby dodać lub zmienić ciąg: edytuj `en.js` **oraz** `en.json`, a następnie zaktualizuj każdy
   `<code>.json`. Dotknięcie widocznej etykiety oznacza aktualizację **wszystkich** plików językowych i
   **wszystkich** `README.<code>.md`.
-- Tłumaczenia to zwykły JSON - świetny pierwszy wkład. Zobacz listę języków w
+- Tłumaczenia to zwykły JSON, świetny pierwszy wkład. Zobacz listę języków w
   `module/webroot/i18n.js`.
 
 ## Commity i PR-y
 
 - Trzymaj PR-y skupione. Opisz co i dlaczego.
 - Podpisz swoje commity (DCO): `git commit -s` (dodaje `Signed-off-by:`).
-- CI musi pozostać zielone. Bądź życzliwy w recenzjach - zobacz [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- CI musi pozostać zielone. Bądź życzliwy w recenzjach, zobacz [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Dobre pierwsze zadania
 
 Szukaj etykiet `good first issue` i `help wanted`. Tłumaczenia, dokumentacja, nowe
 gotowe ustawienia miejsc docelowych `rclone` i dopieszczanie WebUI to świetne punkty startowe.
 
-*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane - zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*

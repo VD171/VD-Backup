@@ -20,7 +20,7 @@ from, and how to verify that nothing opaque was slipped in.
   improvises.
 - **Reproducible.** Re-run the build and you get the same files; re-fetch the pinned
    sources and the SHA-256 values match.
-- **The audit trail ships with the module.** It is not just on the website - it travels
+- **The audit trail ships with the module.** It is not just on the website, it travels
   inside the installed module, on your device, so you can audit offline.
 
 ## What ships, and from where
@@ -82,4 +82,4 @@ If any shipped file does not match its recorded source, treat it as a security i
 report it (see [SECURITY.md](../SECURITY.md)). This is exactly the kind of discrepancy this
 manifest exists to make visible.
 
-*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome - see [CONTRIBUTING.md](../CONTRIBUTING.md).*
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome, see [CONTRIBUTING.md](../CONTRIBUTING.md).*

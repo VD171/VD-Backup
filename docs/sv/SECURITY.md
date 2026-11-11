@@ -29,6 +29,8 @@ snart vi kan och ger dig erkännande om du vill.
   klartext. Säkerhetskopior binds aldrig till enhetsbundna hårdvarunycklar (så att de förblir
   portabla), vilket också betyder att lösenfrasen är det som skyddar en krypterad säkerhetskopia -
   välj en stark. 
+- Dessa inloggningsuppgifter finns på autentiseringskrypterad lagring (`/data/misc_ce`), låst till den första upplåsningen efter en omstart, så aldrig läsbara före den, till skillnad från `/data/adb`. En moduluppdatering flyttar dit gamla kopior permanent (varje verifieras innan originalet tas bort) och de består över ominstallationer.
+- En lokal säkerhetskopieringsdestination måste själv förbli krypterad i vila: endast intern och flyttbar användarlagring tillåts, aldrig `/data/adb`, `/data/system` eller andra sökvägar som är läsbara före första upplåsningen, och aldrig en `..`-traversering. Flyttbara SD/USB är inte krypterade i vila, så du varnas (blockeras inte) att slå på säkerhetskopieringskryptering för dem.
 - Den valfria Google Drive-följeslagar-appen bör alltid döljas med [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) så att den
   inte avslöjar root eller en upplåst bootloader.
 - Återställning körs som root, så varje arkiv kontrolleras innan något skrivs: en
@@ -38,4 +40,4 @@ snart vi kan och ger dig erkännande om du vill.
   registrerad SHA-256, och manifestet levereras på enheten, så att den medföljande nyttolasten kan
   granskas och reproduceras. Se [BINARIES.md](BINARIES.md).
 
-*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna - se [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna, se [CONTRIBUTING.md](CONTRIBUTING.md).*

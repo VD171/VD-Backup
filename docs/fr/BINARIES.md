@@ -21,7 +21,7 @@ vérifier que rien d'opaque n'a été glissé dedans.
   n'improvise jamais.
 - **Reproductible.** Relancez le build et vous obtenez les mêmes fichiers ; récupérez à nouveau
    les sources épinglées et les valeurs SHA-256 correspondent.
-- **La piste d'audit est livrée avec le module.** Elle n'est pas seulement sur le site web - elle
+- **La piste d'audit est livrée avec le module.** Elle n'est pas seulement sur le site web, elle
   voyage à l'intérieur du module installé, sur votre appareil, pour que vous puissiez auditer
   hors ligne.
 
@@ -80,4 +80,4 @@ Si un fichier livré ne correspond pas à sa source enregistrée, traitez cela c
 sécurité et signalez-le (voir [SECURITY.md](SECURITY.md)). C'est exactement le genre d'écart que
 ce manifeste existe pour rendre visible.
 
-*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues - voir [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md).*

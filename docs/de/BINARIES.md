@@ -21,7 +21,7 @@ eingeschleust wurde.
   er improvisiert nie.
 - **Reproduzierbar.** Führen Sie den Build erneut aus und Sie erhalten dieselben Dateien; holen
    Sie die fixierten Quellen erneut und die SHA-256-Werte stimmen überein.
-- **Der Prüfpfad wird mit dem Modul mitgeliefert.** Er steht nicht nur auf der Website - er
+- **Der Prüfpfad wird mit dem Modul mitgeliefert.** Er steht nicht nur auf der Website, er
   reist im installierten Modul mit, auf Ihrem Gerät, sodass Sie offline prüfen können.
 
 ## Was mitgeliefert wird und woher
@@ -81,4 +81,4 @@ Wenn eine mitgelieferte Datei nicht zu ihrer erfassten Quelle passt, behandeln S
 Sicherheitsproblem und melden Sie es (siehe [SECURITY.md](SECURITY.md)). Genau diese Art von
 Abweichung soll dieses Manifest sichtbar machen.
 
-*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen - siehe [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -14,7 +14,7 @@ WebUI + statische binaries per ABI. Geen app vereist voor de kernfuncties. Zie
 [ARCHITECTURE.md](ARCHITECTURE.md) en [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 
 Het is de open, root-native **opvolger van Swift Backup, Neo-Backup en
-Android-DataBackup** - de vereniging van hun functies onder AGPLv3, met import van
+Android-DataBackup**: de vereniging van hun functies onder AGPLv3, met import van
 bestaande Neo-Backup- en Android-DataBackup-backups zodat mensen kunnen migreren.
 
 ## AI-bijdragers welkom
@@ -25,9 +25,9 @@ AI-assistenten en -agenten zijn hier eersteklas bijdragers, geen bijzaak.
   JSON-object, de engine is pure POSIX-shell, en de bestandsindeling is gedocumenteerd in
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 - Een agent kan **elke** inhoud en actie van de module headless beheren via
-  die JSON-API - het volledige besturingsoppervlak, de werkwoorden en veiligheidsmaatregelen staan in
+  die JSON-API, het volledige besturingsoppervlak, de werkwoorden en veiligheidsmaatregelen staan in
   [docs/AI-AGENTS.md](AI-AGENTS.md).
-- Door AI geassisteerde patches worden beoordeeld en geaccepteerd op dezelfde voorwaarden als elke andere - op
+- Door AI geassisteerde patches worden beoordeeld en geaccepteerd op dezelfde voorwaarden als elke andere, op
   correctheid, duidelijkheid en de onderstaande conventies, niet op wie (of wat) ze schreef.
 - Als je VDBackup vanuit een agent aanstuurt, gebruik dan de JSON-uitvoer van `helper.sh` als het
   contract; schraap de WebUI niet.
@@ -62,18 +62,18 @@ AI-assistenten en -agenten zijn hier eersteklas bijdragers, geen bijzaak.
 - Een string toevoegen of wijzigen: bewerk `en.js` **en** `en.json`, en werk dan elke
   `<code>.json` bij. Een zichtbaar label aanraken betekent **alle** taalbestanden en
   **alle** `README.<code>.md` bijwerken.
-- Vertalingen zijn gewone JSON - een geweldige eerste bijdrage. Zie de talenlijst in
+- Vertalingen zijn gewone JSON, een geweldige eerste bijdrage. Zie de talenlijst in
   `module/webroot/i18n.js`.
 
 ## Commits & PRs
 
 - Houd PRs gericht. Beschrijf wat en waarom.
 - Teken je commits af (DCO): `git commit -s` (voegt `Signed-off-by:` toe).
-- CI moet groen blijven. Wees vriendelijk in reviews - zie [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- CI moet groen blijven. Wees vriendelijk in reviews, zie [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Goede eerste issues
 
 Zoek naar de labels `good first issue` en `help wanted`. Vertalingen, docs, nieuwe
 `rclone`-bestemmingspresets en WebUI-afwerking zijn allemaal geweldige startpunten.
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom - zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*

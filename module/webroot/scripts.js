@@ -385,22 +385,12 @@ function startBatchRestore() {
                 titleKey: "restore", confirmKey: "restore",
                 msg: I18N.t("confirm_restore_n", { n: refs.length }) }).then(function (res) {
     if (res == null) return;
-    var queue = refs.map(function (r) { return bkSelected[r]; });
     setBkSelectMode(false);
-    runRestoreBatch(queue, res);
+    // ONE detached op restores the whole list server-side (survives the WebUI closing).
+    var args = { refs: refs, ssaid: res.ssaid, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
+    var run = function () { helper("restore-batch", args).then(function (r) { if (r && r.opid) trackOp(r.opid, { batch: true, retry: run }); }); };
+    run();
   });
-}
-function runRestoreBatch(queue, res) {
-  if (!queue.length) return;
-  var b = queue.shift();
-  var args = { ref: b.ref, ssaid: res.ssaid, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
-  var run = function () {
-    helper("restore", args).then(function (r) {
-      if (r && r.opid) trackOp(r.opid, { restoreRef: b.ref, restorePkg: b.package, retry: run, onDone: function () { runRestoreBatch(queue, res); } });
-      else runRestoreBatch(queue, res);
-    });
-  };
-  run();
 }
 // Backup-list icon: read the icon stored in the manifest, so it shows even when
 // the app is uninstalled. Cached per backup ref; "0" marks a backup with no icon.
@@ -590,6 +580,7 @@ function openOpModal(o) {
   return new Promise(function (resolve) {
     var modal = $("#pw-modal"), input = $("#pw-input"), errBox = $("#pw-err"), ssaid = $("#pw-ssaid");
     var okBtn = $("#pw-ok"), ackRow = $("#pw-overwrite-row"), ack = $("#pw-overwrite");
+    var ssaidRow = $("#pw-ssaid-row"); ssaidRow.hidden = (o.allowSsaid === false);   // hide for flows where SSAID is irrelevant (e.g. settings backup)
     input.value = ""; ssaid.checked = false; input.hidden = !o.needPassword;
     errBox.textContent = (o.needPassword && o.retry) ? I18N.t("msg_import_password_wrong") : "";
     $("#pw-title").textContent = I18N.t(o.titleKey || "ui_import_password");
@@ -625,7 +616,7 @@ function openOpModal(o) {
     if (o.needPassword) setTimeout(function () { input.focus(); }, 0);
     function cleanup() {
       input.value = ""; errBox.textContent = ""; modal.hidden = true; input.hidden = false;
-      okBtn.disabled = false; ackRow.hidden = true; ack.onchange = null; itemsBox.hidden = true; itemsBox.innerHTML = "";
+      okBtn.disabled = false; ackRow.hidden = true; ack.onchange = null; itemsBox.hidden = true; itemsBox.innerHTML = ""; ssaidRow.hidden = false;
       testRow.hidden = true; test.onchange = null; spoofRow.hidden = true;
       deepRow.hidden = true; deep.disabled = false; spoof.onchange = null;
       okBtn.onclick = null; $("#pw-cancel").onclick = null; input.onkeydown = null;
@@ -981,8 +972,26 @@ function openDirPicker(targetSel) {
   var m = $("#dir-modal"); m.hidden = false;
   var start = $(targetSel).value;
   loadDir((start && start.charAt(0) === "/") ? start : "/storage/emulated/0");
+  loadVolumes();
   $("#dir-cancel").onclick = function () { m.hidden = true; };
   $("#dir-use").onclick = function () { $(targetSel).value = _dirCur; m.hidden = true; };
+}
+// quick-jump chips for each storage volume (internal + any SD card / USB), so a
+// destination on removable media is one tap away instead of climbing to /storage.
+function loadVolumes() {
+  var box = $("#dir-vols"); if (!box) return;
+  box.innerHTML = "";
+  helper("list-volumes").then(function (r) {
+    var vols = (r && r.volumes) ? r.volumes : [];
+    if (vols.length < 2) return;   // only internal: no shortcut worth showing
+    vols.forEach(function (v) {
+      var label = v.removable ? (I18N.t("ui_vol_sd") + (v.id ? " · " + v.id : "")) : I18N.t("ui_vol_internal");
+      var c = el("button", "vol-chip", label);
+      c.title = v.path;
+      c.onclick = function () { loadDir(v.path); };
+      box.appendChild(c);
+    });
+  });
 }
 function loadDir(path) {
   var ul = $("#dir-list"); ul.innerHTML = "<li class='muted'>" + I18N.t("apps_loading") + "</li>";
@@ -1011,9 +1020,12 @@ function addDest() {
     repo: $("#d-repo").value.trim(), password: $("#d-pass").value
   };
   if (!d.id) return;
-  helper("dest-add", d).then(function () {
+  helper("dest-add", d).then(function (r) {
     $("#d-id").value = ""; $("#d-pass").value = ""; loadDests();
     if (type === "gdrive") setupGdrive(d.id);
+    // removable media (SD/USB) is plaintext at rest; warn (do not block) when the backup
+    // itself is not encrypted, so an unencrypted backup on a card is an informed choice.
+    if (r && r.removable && !CFG.encrypt_data) modalAlert(I18N.t("msg_removable_unencrypted"), I18N.t("ui_removable_title"));
   });
 }
 function testDest(id) {
@@ -1139,26 +1151,23 @@ function startBackup(pkg, label) {
     run();
   });
 }
-// batch: one modal (items/verify/pass apply to all), then back up each in turn.
+// batch: one modal (items/verify/pass apply to all), then ONE detached op backs up the
+// whole list server-side, so closing the WebUI or the root manager never stops it (issue
+// #5: the old per-app JS chain died with the webview and left bulk backups half-done).
 function startBatchBackup() {
   var pkgs = Object.keys(selected);
   if (!pkgs.length) return;
   openBackupModal(I18N.t("ui_selected_n", { n: pkgs.length }), "").then(function (res) {
     if (!res) return;
     setSelectMode(false);
-    runBatch(pkgs.slice(), res);
+    runBatchBackup(pkgs, res);
   });
 }
-function runBatch(queue, res) {
-  if (!queue.length) return;
-  var pkg = queue.shift();
-  var args = backupArgs(pkg, res);
-  var run = function () {
-    helper("backup", args).then(function (r) {
-      if (r && r.opid) trackOp(r.opid, { retry: run, onDone: function () { runBatch(queue, res); } });
-      else runBatch(queue, res);
-    });
-  };
+// ONE detached op backs up the whole list server-side (survives WebUI / manager close).
+function runBatchBackup(pkgs, res) {
+  var args = backupArgs(pkgs[0], res);   // shared settings (items/mode/dest/pass/verify/user)
+  delete args.package; args.packages = pkgs;
+  var run = function () { helper("backup-batch", args).then(function (r) { if (r && r.opid) trackOp(r.opid, { batch: true, retry: run }); }); };
   run();
 }
 function phaseLabel(ph) {
@@ -1267,8 +1276,12 @@ function trackOp(opid, ctx) {
           fetchCloudThenRetry(ctx.retry);
           return;
         }
-        label.textContent = p.ok ? I18N.t("op_done") : errMsg(p);
-        if (ctx && ctx.onDone) ctx.onDone(p);   // chain the next batch item
+        if (ctx && ctx.batch && typeof p.of === "number" && p.of > 0) {
+          label.textContent = I18N.t("msg_batch_done", { n: p.n || 0, of: p.of });   // e.g. "148 of 150 done"
+        } else {
+          label.textContent = p.ok ? I18N.t("op_done") : errMsg(p);
+        }
+        if (ctx && ctx.onDone) ctx.onDone(p);
         setTimeout(function () { box.hidden = true; }, 4000);
         return;
       }
@@ -1644,6 +1657,70 @@ function saveSettings() {
   });
 }
 
+// --- settings backup (export / import / wipe credentials) ----------------
+// The bundle (config + jobs + dests + creds + keys) carries remote passwords, so a
+// passphrase is always required; the detached worker writes it under VDBackup/.export.
+function exportConfig() {
+  openOpModal({ needPassword: true, allowSsaid: false, titleKey: "settings_config_export",
+                msg: I18N.t("settings_config_pass_msg"), confirmKey: "settings_config_export" }).then(function (res) {
+    if (res == null) return;
+    $("#cfg-config-status").textContent = I18N.t("settings_config_exporting");
+    helper("config-export", { password: res.password }).then(function (r) {
+      if (r && r.opid) trackOp(r.opid, { config: true, onDone: function (p) {
+        $("#cfg-config-status").textContent = p.ok
+          ? I18N.t("settings_config_exported", { path: p.path || "" }) : errMsg(p);
+      } });
+      else $("#cfg-config-status").textContent = errMsg(r);
+    });
+  });
+}
+function importConfig() {
+  helper("config-exports").then(function (r) {
+    var list = (r && r.exports) ? r.exports : [];
+    var m = $("#cfg-import-modal"), ul = $("#cfg-import-list");
+    ul.innerHTML = "";
+    $("#cfg-import-empty").hidden = list.length > 0;
+    list.forEach(function (ex) {
+      var li = el("li", "row");
+      var grow = el("div", "grow");
+      grow.appendChild(el("div", "name", ex.name || ""));
+      grow.appendChild(el("div", "pkg", fmtSize(ex.size)));
+      var btn = el("button", "btn go small", I18N.t("settings_config_import"));
+      btn.onclick = function () { m.hidden = true; runConfigImport(ex); };
+      li.appendChild(grow); li.appendChild(btn);
+      ul.appendChild(li);
+    });
+    m.hidden = false;
+    $("#cfg-import-close").onclick = function () { m.hidden = true; };
+  });
+}
+function runConfigImport(ex) {
+  openOpModal({ needPassword: true, allowSsaid: false, titleKey: "settings_config_import",
+                msg: I18N.t("settings_config_import_msg", { name: ex.name }),
+                confirmKey: "settings_config_import" }).then(function (res) {
+    if (res == null) return;
+    $("#cfg-config-status").textContent = I18N.t("settings_config_importing");
+    helper("config-import", { ref: ex.ref, password: res.password }).then(function (r) {
+      if (r && r.opid) trackOp(r.opid, { config: true, onDone: function (p) {
+        $("#cfg-config-status").textContent = p.ok
+          ? I18N.t("settings_config_imported") : errMsg(p);
+        if (p.ok) helper("config-get").then(function (c) {
+          CFG = c || {}; I18N.apply(); loadSettings(); loadDests();
+        });
+      } });
+      else $("#cfg-config-status").textContent = errMsg(r);
+    });
+  });
+}
+function wipeCredentials() {
+  modalConfirm(I18N.t("settings_wipe_credentials_confirm"), I18N.t("settings_wipe_credentials")).then(function (yes) {
+    if (!yes) return;
+    helper("wipe-credentials").then(function (r) {
+      $("#cfg-config-status").textContent = (r && r.ok !== false) ? I18N.t("settings_wipe_credentials_done") : errMsg(r);
+    });
+  });
+}
+
 // --- blocklist (apps excluded from auto/scheduled backups) ---------------
 // Same scrollable, searchable, tick-to-select picker as the Schedule tab (shared
 // lazy icon loader: iconObserver + loadIcon + the localStorage icon cache). The
@@ -1826,7 +1903,7 @@ function startTagBackup() {
   openBackupModal(I18N.t("ui_tag_backup_title", { tag: tagFilter, n: pkgs.length }), "").then(function (res) {
     if (!res) return;
     setSelectMode(false);
-    runBatch(pkgs.slice(), res);
+    runBatchBackup(pkgs, res);
   });
 }
 
@@ -2261,6 +2338,9 @@ function boot() {
   if ($("#update-banner-x")) $("#update-banner-x").onclick = function () { $("#update-banner").classList.remove("show"); };
   $("#user-sel").onchange = function () { activeUser = this.value | 0; CFG.user = activeUser; loadApps(); loadOverview(); };
   $("#set-save").onclick = saveSettings;
+  if ($("#cfg-export")) $("#cfg-export").onclick = exportConfig;
+  if ($("#cfg-import")) $("#cfg-import").onclick = importConfig;
+  if ($("#cfg-wipe")) $("#cfg-wipe").onclick = wipeCredentials;
   $("#d-save").onclick = addDest;
   $("#d-type").onchange = syncDestFields;
   if ($("#d-add-remote")) $("#d-add-remote").onclick = focusAddRemote;

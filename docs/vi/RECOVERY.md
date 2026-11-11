@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - khôi phục một bản backup trên PC (Windows / macOS / Linux)
+# VDBackup, khôi phục một bản backup trên PC (Windows / macOS / Linux)
 
 Các bản backup VDBackup của bạn dùng **các định dạng chuẩn**, nên bạn có thể mở chúng ở bất cứ đâu,
 mà không cần module này. Một thư mục backup chứa một `manifest.json`, các APK

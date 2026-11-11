@@ -87,4 +87,4 @@ Para o design técnico completo (formato de archive, schema de metadados, pipeli
 destinos, importadores) os mantenedores guardam notas de design detalhadas; este arquivo é a
 visão geral voltada aos colaboradores.
 
-*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas - veja [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -6,6 +6,32 @@
 
 Todas as mudanças relevantes do VDBackup estão documentadas aqui. Apenas em inglês.
 
+## v1.05
+
+Confiabilidade:
+
+- Backups em lote não param mais no meio quando você sai do app. Uma seleção inteira, um grupo de tags ou uma execução agendada agora é tocada por um único processo root destacado que continua com a WebUI fechada, e protegido de ser morto sob pressão de memória. O progresso reata quando você volta.
+
+Configurações:
+
+- Backup das configurações: exporte seus destinos, agendamentos, predefinições e credenciais salvas para um único arquivo criptografado e importe em outro aparelho ou após uma instalação limpa. O arquivo sempre pede uma frase-senha porque carrega senhas remotas, e a importação mescla no aparelho sem remover o que já existe.
+- Agora você pode apagar as credenciais remotas salvas e a chave de criptografia do aparelho pelas Configurações em um passo, mantendo seus destinos, agendamentos e backups no lugar.
+
+Segurança:
+
+- Backups só podem ser guardados onde permanecem criptografados em repouso. Destinos em caminhos legíveis antes do primeiro desbloqueio, como /data/adb ou /data/system, são recusados.
+- As credenciais salvas, o rclone.conf e a chave age agora ficam em armazenamento credential-encrypted, bloqueado até o primeiro desbloqueio, em vez de um local que era legível antes dele; uma atualização do módulo os move para lá de forma permanente.
+- Os backups agora verificam o espaço livre antes de começar e param com uma mensagem clara em vez de falhar no meio.
+
+Restauração:
+
+- Restaurar um app que não está mais instalado agora reinstala o APK primeiro, e o diálogo de restauração oferece a opção de APK sempre que o backup tem um. Uma restauração que não consegue instalar o app reporta a falha em vez de fingir sucesso.
+- Operações de app, permissão e configuração agora rodam num ambiente limpo, corrigindo erros "Failed transaction" que travavam restauração, app-ops e configurações em algumas ROMs.
+
+Destinos:
+
+- Você pode fazer backup em cartão SD ou pen drive USB: o seletor de pastas mostra um atalho para cada volume de armazenamento e aceita caminhos de mídia removível.
+
 ## v1.04
 
 Correções:
@@ -18,7 +44,7 @@ Privacidade:
 
 Backups:
 
-- Agora você pode definir quais itens cada app faz backup - por exemplo só APK, ou APK + OBB - aplicado em backups em massa, automáticos e agendados. Um backup manual individual ainda te deixa escolher na hora, pré-preenchido com o conjunto do app. Configure em Ajustes, ao lado da lista de apps excluídos.
+- Agora você pode definir quais itens cada app faz backup, por exemplo só APK, ou APK + OBB, aplicado em backups em massa, automáticos e agendados. Um backup manual individual ainda te deixa escolher na hora, pré-preenchido com o conjunto do app. Configure em Ajustes, ao lado da lista de apps excluídos.
 
 - Presets de backup: salve conjuntos nomeados do que incluir e aplique com uma escolha no diálogo de backup.
 - Multiusuário: backups de apps, backups especiais e restaurações agora seguem o usuário do Android que você escolher.
@@ -235,4 +261,4 @@ AI-friendly e i18n:
 - A listagem rica de apps e a descriptografia do Neo rodam através de um helper dex dirigido como root
   (`IPackageManager` via ServiceManager), de modo que funcionam onde o ActivityThread trava.
 
-*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas - veja [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md).*

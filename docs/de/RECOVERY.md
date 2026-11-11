@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - ein Backup auf einem PC wiederherstellen (Windows / macOS / Linux)
+# VDBackup, ein Backup auf einem PC wiederherstellen (Windows / macOS / Linux)
 
 Deine VDBackup-Backups verwenden **Standardformate**, sodass du sie überall öffnen kannst,
 ohne dieses Modul. Ein Backup-Ordner enthält eine `manifest.json`, die APKs

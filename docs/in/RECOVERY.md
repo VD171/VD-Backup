@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - memulihkan backup di PC (Windows / macOS / Linux)
+# VDBackup, memulihkan backup di PC (Windows / macOS / Linux)
 
 Backup VDBackup Anda menggunakan **format standar**, jadi Anda dapat membukanya di mana saja,
 tanpa modul ini. Folder backup berisi `manifest.json`, APK

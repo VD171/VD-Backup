@@ -383,6 +383,17 @@
 
       <button id="set-save" class="btn go block" data-i18n="save">Save</button>
       <div id="set-status" class="muted"></div>
+
+      <div class="card">
+        <h2 class="section-head"><span class="sh-ic"><svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="M8 10l4 4 4-4"/><path d="M4 20h16"/></svg></span><span class="sh-t" data-i18n="settings_config_backup">Settings backup</span></h2>
+        <div class="muted" data-i18n="settings_config_backup_hint">Save your destinations, schedules, presets and stored credentials to a single encrypted file you can import onto another device or after a clean install. The file holds remote passwords, so it is always protected with a passphrase.</div>
+        <button id="cfg-export" class="btn go block" data-i18n="settings_config_export">Export settings</button>
+        <button id="cfg-import" class="btn block" data-i18n="settings_config_import">Import settings</button>
+        <div id="cfg-config-status" class="muted"></div>
+        <h2 class="section-head"><span class="sh-ic"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg></span><span class="sh-t" data-i18n="settings_wipe_credentials">Wipe stored credentials</span></h2>
+        <div class="muted" data-i18n="settings_wipe_credentials_hint">Remove saved remote passwords and the device encryption key. Your destinations, schedules and backups stay, but you will need to re-enter passwords next time.</div>
+        <button id="cfg-wipe" class="btn danger block" data-i18n="settings_wipe_credentials">Wipe stored credentials</button>
+      </div>
     </section>
 
     <section id="schedule" class="panel">
@@ -549,7 +560,7 @@
       <input id="pw-input" type="password" autocomplete="off" autocapitalize="off"
              spellcheck="false" data-i18n-ph="ui_import_password" placeholder="Backup password">
       <div class="modal-err" id="pw-err"></div>
-      <div class="notice warn">
+      <div class="notice warn" id="pw-ssaid-row">
         <label class="notice-toggle">
           <input type="checkbox" class="switch" id="pw-ssaid">
           <span data-i18n="ui_ssaid_label">Include the device ID (SSAID)</span>
@@ -607,6 +618,18 @@
   </div>
 
   <!-- per-app backup history (tap an app to see its backups and restore) -->
+  <div id="cfg-import-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="settings_config_import">Import settings</div>
+      <div class="muted" data-i18n="settings_config_import_pick">Pick a settings file to import. Importing merges destinations, schedules, presets and credentials into this device without removing what is already here.</div>
+      <ul id="cfg-import-list" class="list"></ul>
+      <div id="cfg-import-empty" class="muted" data-i18n="settings_config_import_empty" hidden>No settings files found. Export settings first, or copy a file into VDBackup/.export on this device.</div>
+      <div class="modal-actions">
+        <button class="btn" id="cfg-import-close" data-i18n="ui_close">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div id="appbk-modal" class="modal" hidden role="dialog" aria-modal="true">
     <div class="modal-card">
       <div class="modal-title" id="appbk-title"></div>
@@ -709,6 +732,7 @@
   <div id="dir-modal" class="modal" hidden role="dialog" aria-modal="true">
     <div class="modal-card">
       <div class="modal-title" data-i18n="ui_dir_title">Choose a folder</div>
+      <div id="dir-vols" class="vol-chips"></div>
       <div class="modal-msg" id="dir-path"></div>
       <ul id="dir-list" class="list"></ul>
       <div class="modal-actions">

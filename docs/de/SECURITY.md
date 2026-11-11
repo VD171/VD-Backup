@@ -29,6 +29,8 @@ schnell wir können und nennen dich, wenn du möchtest.
   Klartext geschrieben. Backups sind niemals an geräteabhängige Hardware-Schlüssel gebunden (damit sie
   portabel bleiben), was auch bedeutet, dass die Passphrase das ist, was ein verschlüsseltes Backup schützt -
   wähle eine starke.
+- Diese Zugangsdaten liegen auf credential-verschlüsseltem Speicher (`/data/misc_ce`), gesperrt bis zur ersten Entsperrung nach einem Neustart, also vor dieser Entsperrung nie lesbar, anders als `/data/adb`. Ein Modul-Update verschiebt Altkopien dauerhaft dorthin (jede wird vor dem Entfernen des Originals geprüft), und sie bleiben über Neuinstallationen erhalten.
+- Ein lokales Backup-Ziel muss selbst im Ruhezustand verschlüsselt bleiben: erlaubt sind nur interner und wechselbarer Nutzerspeicher, nie `/data/adb`, `/data/system` oder andere vor der ersten Entsperrung lesbare Pfade und nie ein `..`-Durchlauf. Wechselmedien (SD/USB) sind im Ruhezustand nicht verschlüsselt, daher werden Sie gewarnt (nicht blockiert), die Backup-Verschlüsselung dafür zu aktivieren.
 - Die optionale Google-Drive-Begleit-App sollte immer mit [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) versteckt werden, damit sie
   weder Root noch einen entsperrten Bootloader verrät.
 - Die Wiederherstellung läuft als Root, daher wird jedes Archiv geprüft, bevor irgendetwas
@@ -39,4 +41,4 @@ schnell wir können und nennen dich, wenn du möchtest.
   einem festgehaltenen SHA-256 zurückverfolgbar, und das Manifest wird auf dem Gerät mitgeliefert,
   sodass die gebündelte Nutzlast geprüft und reproduziert werden kann. Siehe [BINARIES.md](BINARIES.md).
 
-*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen - siehe [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).*

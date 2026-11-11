@@ -6,6 +6,32 @@
 
 Alle noemenswaardige wijzigingen aan VDBackup worden hier gedocumenteerd. Alleen in het Engels.
 
+## v1.05
+
+Betrouwbaarheid:
+
+- Batchback-ups stoppen niet meer halverwege als je de app verlaat. Een hele selectie, een taggroep of een geplande uitvoering wordt nu aangestuurd door één losgekoppeld rootproces dat doorgaat als de WebUI gesloten is en beschermd is tegen beëindiging onder geheugendruk. De voortgangsweergave verbindt opnieuw wanneer je terugkomt.
+
+Instellingen:
+
+- Instellingen back-up: exporteer je bestemmingen, planningen, voorinstellingen en opgeslagen inloggegevens naar één versleuteld bestand en importeer het op een ander apparaat of na een schone installatie. Het bestand vraagt altijd om een wachtwoordzin omdat het externe wachtwoorden bevat, en bij het importeren wordt samengevoegd met het apparaat zonder te verwijderen wat er al is.
+- Je kunt nu opgeslagen externe inloggegevens en de versleutelingssleutel van het apparaat in één stap wissen vanuit de instellingen, terwijl je bestemmingen, planningen en back-ups behouden blijven.
+
+Veiligheid:
+
+- Back-ups kunnen alleen worden opgeslagen waar ze in rust versleuteld blijven. Bestemmingen onder paden die vóór de eerste ontgrendeling leesbaar zijn, zoals /data/adb of /data/system, worden geweigerd.
+- Opgeslagen inloggegevens, de rclone.conf en de age-sleutel staan nu op credential-versleutelde opslag, vergrendeld tot de eerste ontgrendeling, in plaats van een eerder leesbare locatie; een module-update verplaatst ze er permanent heen.
+- Back-ups controleren nu vóór het starten de vrije ruimte en stoppen met een duidelijke melding in plaats van halverwege te mislukken.
+
+Herstel:
+
+- Bij het herstellen van een app die niet meer is geïnstalleerd wordt nu eerst de APK opnieuw geïnstalleerd, en het herstelvenster biedt de APK-optie zodra de back-up er een bevat. Een herstel dat de app niet kan installeren meldt de fout in plaats van succes voor te wenden.
+- App-, machtigings- en instellingsbewerkingen draaien nu in een schone omgeving, wat "Failed transaction"-fouten verhelpt die herstel, app-ops en instellingen op sommige ROM's blokkeerden.
+
+Bestemmingen:
+
+- Je kunt back-uppen naar een SD-kaart of USB-stick: de mappenkiezer toont een snelkoppeling naar elk opslagvolume en accepteert paden op verwisselbare media.
+
 ## v1.04
 
 Oplossingen:
@@ -18,7 +44,7 @@ Privacy:
 
 Back-ups:
 
-- Je kunt nu instellen welke items elke app back-upt - bijvoorbeeld alleen APK, of APK + OBB - toegepast in bulk-, automatische en geplande back-ups. Bij een losse handmatige back-up kun je nog steeds kiezen, vooraf ingevuld vanuit de set van de app. Stel het in bij Instellingen, naast de lijst met uitgesloten apps.
+- Je kunt nu instellen welke items elke app back-upt, bijvoorbeeld alleen APK, of APK + OBB, toegepast in bulk-, automatische en geplande back-ups. Bij een losse handmatige back-up kun je nog steeds kiezen, vooraf ingevuld vanuit de set van de app. Stel het in bij Instellingen, naast de lijst met uitgesloten apps.
 
 - Back-upvoorinstellingen: bewaar benoemde sets van wat op te nemen en pas ze toe met één keuze in het back-updialoog.
 - Multi-user: app-back-ups, speciale back-ups en herstel volgen nu allemaal de gekozen Android-gebruiker.
@@ -241,4 +267,4 @@ AI-vriendelijk en i18n:
 - De uitgebreide app-lijst en de Neo-ontsleuteling lopen via een als root aangestuurde dex-helper
   (`IPackageManager` via ServiceManager), zodat ze werken waar ActivityThread vastloopt.
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom - zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*

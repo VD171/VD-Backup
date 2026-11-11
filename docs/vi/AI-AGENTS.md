@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - Các đối số là một đối tượng JSON duy nhất, **được mã hóa base64**, truyền vào như một token argv.
 - Lệnh in ra **một đối tượng JSON** trên stdout: `{"ok":true,...}` hoặc
   `{"ok":false,"code":"ERR_...","message":"..."}`. Hãy phân tích nó; đừng bao giờ quét văn bản.
-- Các thao tác dài (`backup`, `restore`, `import`) trả về `{"ok":true,"opid":"..."}` ngay lập tức
+- Các thao tác dài (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) trả về `{"ok":true,"opid":"..."}` ngay lập tức
   và chạy **tách rời (detached)** (chúng sống sót khi trình gọi/WebUI biến mất). Hãy thăm dò
   tiến trình của chúng; chúng chưa xong khi lệnh trả về.
 - `progress` và `cancel` nhận **base64 của chuỗi opid thô**, không phải một đối tượng JSON.
@@ -87,7 +87,15 @@ các đích đám mây (`rclone`/`restic`/ssh) mới nói chuyện với mạng.
 | `cloud-fetch` | `{}` | `{ok,opid}` (tách rời) tải+xác minh+cài đặt addon `rclone`/`restic` trên phiên bản `lite` |
 | `schedule-set` / `schedule-list` / `schedule-delete` | xem bên dưới | các công việc theo lịch (một bản sao lưu hoặc một bản khôi phục; nhắm tới một ứng dụng, một tập hợp, hoặc tất cả ứng dụng) |
 | `scheduler-tick` | `{}` | chạy các công việc đến hạn + áp dụng lưu giữ + bộ quan sát tự động sao lưu (nhịp khởi động gọi cái này) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (không tách rời; trả về ngay; `ERR_UPDATE_CHECK` khi thất bại - xem bên dưới) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (không tách rời; trả về ngay; `ERR_UPDATE_CHECK` khi thất bại, xem bên dưới) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) sao lưu nhiều ứng dụng trong một thao tác tách rời; tiến trình mang `n`/`of`. Một lỗi mỗi ứng dụng không dừng lô. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) khôi phục nhiều bản sao lưu trong một thao tác tách rời; tiến trình mang `n`/`of`. Một lỗi mỗi ứng dụng không dừng lô. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` các ổ lưu trữ cho bộ chọn thư mục: trong máy cộng thẻ SD/USB rời. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) xuất cấu hình, công việc, đích đến, thông tin xác thực và khóa ra một tệp mã hóa bằng cụm mật khẩu trong thư mục sao lưu. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) hợp nhất một tệp cấu hình đã xuất trở lại thiết bị này (không bao giờ ghi đè mù quáng). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` liệt kê các tệp cấu hình mã hóa có sẵn để nhập. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` xóa mật khẩu từ xa đã lưu và khóa mã hóa thiết bị; đích đến, công việc và bản sao lưu vẫn còn. |
+| `log-prune` | `{}` | `{ok}` cắt tỉa nhật ký thao tác đã hoàn tất từ lâu, giới hạn dấu vết kiểm toán và loại bỏ biểu tượng cũ (dịch vụ khởi động gọi cái này). |
 
 ### Các trường của `progress`
 
@@ -175,7 +183,7 @@ Một công việc theo lịch chọn **một** mục tiêu và một **hành đ
 Hãy cung cấp đúng **một** trong số `package`, `packages` hoặc `all` cho mục tiêu. Một công việc
 `backup` giữ nguyên `mode`/`dest`/`keep`/`items` thông thường. Một công việc `restore`
 (`action: "restore"`) khôi phục bản sao lưu **gần nhất** của mỗi ứng dụng mục tiêu (hoặc một
-`ref` chỉ định rõ) và **ghi đè dữ liệu hiện tại của ứng dụng ở mỗi lần chạy** - điều này là có
+`ref` chỉ định rõ) và **ghi đè dữ liệu hiện tại của ứng dụng ở mỗi lần chạy**: điều này là có
 chủ đích và phải tự chọn, nên chỉ đặt nó theo yêu cầu trực tiếp của người dùng.
 
 ### Chặn cổng bộ lập lịch
@@ -199,7 +207,7 @@ nhật ký kiểm toán dưới dạng `op:"scheduler-gated"` với `reason` là
 ### Đối số của `remote-add`
 
 Một đích đám mây là một đích `type:"rclone"` đặt tên cho một remote `rclone`; hãy tạo remote đó
-trước bằng `remote-add`. `backend` có thể là **bất kỳ backend rclone nào** - không có whitelist.
+trước bằng `remote-add`. `backend` có thể là **bất kỳ backend rclone nào**: không có whitelist.
 `remote-add` chấp nhận bất kỳ tên backend nào (`dropbox`, `onedrive`, `box`, `pcloud`, `mega`,
 `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` và khoảng ~70 backend khác mà rclone hỗ trợ),
 và `params` được truyền thẳng vào cấu hình `rclone` dưới dạng các cặp `key=value`. Các trường mật
@@ -218,13 +226,13 @@ Drive, Dropbox, OneDrive, Box, pCloud) không cần máy tính để bàn hay to
 server cục bộ (`127.0.0.1:53682`) và mở trình duyệt của chính điện thoại tại trang đồng ý của nhà
 cung cấp qua một Android VIEW intent, trả về `{ok:true,url}` (hoặc `{ok:false,code:"ERR_AUTHORIZE"}`).
 Poll `remote-authorize-poll` (`{}`): nó trả về `{ok:true,done:false,url}` trong khi chờ và
-`{ok:true,done:true,token}` khi người dùng chấp thuận - truyền `token` đó cho `remote-add`.
+`{ok:true,done:true,token}` khi người dùng chấp thuận, truyền `token` đó cho `remote-add`.
 `remote-authorize-cancel` (`{}`) dừng một ủy quyền đang chờ (`{ok:true,cancelled:true}`). Việc dán
 thủ công đầu ra của `rclone authorize "<backend>"` từ bất kỳ máy tính nào vẫn được hỗ trợ như một
 phương án dự phòng.
 
 Google Drive có hai đường: remote `drive` này (không cần dự án Google Cloud, dùng OAuth riêng
-của rclone - ủy quyền ngay trên thiết bị bằng `remote-authorize`, hoặc chạy `rclone authorize "drive"`
+của rclone, ủy quyền ngay trên thiết bị bằng `remote-authorize`, hoặc chạy `rclone authorize "drive"`
 một lần trên bất kỳ máy tính nào và truyền token) hoặc ứng dụng đồng hành tùy chọn (OAuth client id
 của riêng bạn). Cả hai đều kết thúc như những đích thông thường.
 
@@ -234,7 +242,7 @@ Trường config `network_policy` kiểm soát loại kết nối nào mà các 
 `any` (mặc định), `wifi`, hoặc `mobile`. Đặt nó bằng `config-set`. Khi nó là `wifi` hoặc
 `mobile`, mọi lần truyền đám mây (Full tải lên `rclone`/Drive, đồng bộ Mirror, backup/restore
 snapshot `restic` từ xa, restore Mirror) sẽ kiểm tra phương tiện truyền dẫn đang hoạt động trước
-và hủy với `ERR_NET_POLICY` nếu không khớp - cho cả công việc thủ công lẫn theo lịch. Các đích
+và hủy với `ERR_NET_POLICY` nếu không khớp, cho cả công việc thủ công lẫn theo lịch. Các đích
 cục bộ không bao giờ bị chặn.
 
 ### Toàn vẹn và hạn mức đám mây
@@ -285,8 +293,8 @@ cầu trực tiếp, có chủ ý của người dùng.
 
 ### Sao lưu đường dẫn độc lập
 
-`path-backup` / `path-restore` sao lưu và khôi phục **bất kỳ đường dẫn tuyệt đối nào** - một thư mục
-hoặc một tệp đơn - trên bộ nhớ dùng chung hoặc dưới `/data`, bên ngoài mô hình theo từng ứng dụng.
+`path-backup` / `path-restore` sao lưu và khôi phục **bất kỳ đường dẫn tuyệt đối nào**: một thư mục
+hoặc một tệp đơn, trên bộ nhớ dùng chung hoặc dưới `/data`, bên ngoài mô hình theo từng ứng dụng.
 Kho lưu trữ được ghi dưới dạng `tar.zst` cộng một `manifest.json` theo định dạng riêng của VDBackup
 (được niêm phong bằng SHA-256, kèm một bộ RECOVERY khi được mã hóa) dưới `.paths/` trong thư mục
 backups.
@@ -301,7 +309,7 @@ backups.
 - Đường dẫn nguồn phải là **tuyệt đối** và nằm dưới một trong các gốc được phép: `/storage/emulated`,
   `/data/media`, `/sdcard`, `/data`. Một đường dẫn không tồn tại sẽ thất bại với `ERR_NO_PATH`; một
   đường dẫn bên ngoài các gốc được phép, hoặc một đường dẫn chứa `..`, sẽ thất bại với `ERR_BAD_PATH`.
-- `path-restore` ghi lại về vị trí gốc, nên nó có tính phá hủy và yêu cầu `"confirm": true` - một
+- `path-restore` ghi lại về vị trí gốc, nên nó có tính phá hủy và yêu cầu `"confirm": true`, một
   cổng ma sát cao, giống `special-restore`. Một `ref` không phải là một bản sao lưu đường dẫn hợp lệ
   sẽ thất bại với `ERR_BAD_REF`.
 - Cả hai đều chạy **tách rời**; thăm dò `progress` bằng `opid` được trả về.
@@ -309,11 +317,11 @@ backups.
 ### `update-check`
 
 `update-check` báo cáo liệu một phiên bản mới hơn của mô-đun đã được phát hành hay chưa, để một
-tác nhân (hoặc WebUI) có thể hiển thị nó. Đây là một **động từ đọc trả về ngay lập tức** - nó
+tác nhân (hoặc WebUI) có thể hiển thị nó. Đây là một **động từ đọc trả về ngay lập tức**: nó
 **không** tách rời, nên không có `opid` để poll. Chỉ được kích hoạt bởi một hành động rõ ràng của
 người dùng, nó tải manifest cập nhật đã phát hành của mô-đun (URL `updateJson` từ `module.prop`)
-bằng `curl` đi kèm qua một yêu cầu HTTP phía root - cái này chạy ngoài WebView, nên không chịu ràng
-buộc bởi CSP của WebUI - và so sánh `versionCode` đã phát hành với cái đã cài đặt. Nó **không nhận
+bằng `curl` đi kèm qua một yêu cầu HTTP phía root, cái này chạy ngoài WebView, nên không chịu ràng
+buộc bởi CSP của WebUI, và so sánh `versionCode` đã phát hành với cái đã cài đặt. Nó **không nhận
 đối số nào**.
 
 Khi thành công nó trả về:
@@ -342,7 +350,7 @@ không bao giờ bởi động từ này.
 - **`ssaid` là opt-in nghiêm ngặt (mặc định tắt).** Nó sao lưu / khôi phục ANDROID_ID của thiết
   bị bằng cách ghi lại một tệp hệ thống; một lần khôi phục chỉ áp dụng sau khi khởi động lại, và
   tệp trước đó luôn được lưu trước để hoàn tác. Chỉ gửi `"ssaid": true` theo một yêu cầu trực
-  tiếp, có chủ ý của người dùng - không bao giờ theo mặc định.
+  tiếp, có chủ ý của người dùng, không bao giờ theo mặc định.
 - **Các hành động làm thay đổi (restore, delete, import) có tính phá hủy** và được ghi vào một
   dấu vết kiểm toán cục bộ (`logs/audit.jsonl`). Khôi phục là trung thực (xóa-rồi-giải-nén), nên
   nó đưa ứng dụng về đúng trạng thái của bản sao lưu. Hãy xác nhận ý định trước khi gọi chúng.
@@ -350,7 +358,7 @@ không bao giờ bởi động từ này.
   đặt trên toàn thiết bị, nên chỉ gửi nó theo một yêu cầu trực tiếp của người dùng; nó được canh gác
   bằng sự đồng ý rõ ràng và được ghi vào dấu vết kiểm toán.
 - **Khôi phục là idempotent.** Các khôi phục provider thô (messages/contacts/wifi/bluetooth/calendar)
-  **thay thế** thay vì hợp nhất - dữ liệu provider bị xóa và kho lưu trữ được giải nén đè lên - nên
+  **thay thế** thay vì hợp nhất, dữ liệu provider bị xóa và kho lưu trữ được giải nén đè lên, nên
   khôi phục lại cùng một bản sao lưu không thể tạo ra các hàng trùng lặp. `dns` và `system_settings`
   được áp dụng lại bằng `settings put` idempotent.
 - **Việc giải nén kho lưu trữ được bảo vệ chống lại path traversal.** Khôi phục chạy với quyền root,
@@ -369,4 +377,4 @@ Xem [ARCHITECTURE.md](ARCHITECTURE.md) và
 
 ---
 
-*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến - xem [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md).*

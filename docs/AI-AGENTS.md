@@ -20,9 +20,10 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - Arguments are a single JSON object, **base64-encoded**, passed as one argv token.
 - The command prints **one JSON object** on stdout: `{"ok":true,...}` or
   `{"ok":false,"code":"ERR_...","message":"..."}`. Parse that; never scrape text.
-- Long operations (`backup`, `restore`, `import`) return `{"ok":true,"opid":"..."}`
-  immediately and run **detached** (they survive the caller/WebUI going away). Poll
-  their progress; they are not finished when the call returns.
+- Long operations (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`,
+  `config-export`, `config-import`) return `{"ok":true,"opid":"..."}` immediately and run
+  **detached** (they survive the caller/WebUI going away). Poll their progress; they are
+  not finished when the call returns.
 - `progress` and `cancel` take **base64 of the raw opid string**, not a JSON object.
 
 A tiny helper for your shell:
@@ -87,7 +88,15 @@ destinations (`rclone`/`restic`/ssh) talk to the network.
 | `cloud-fetch` | `{}` | `{ok,opid}` (detached) fetch+verify+install the `rclone`/`restic` addon on a `lite` edition |
 | `schedule-set` / `schedule-list` / `schedule-delete` | see below | scheduled jobs (a backup or a restore; targeting one app, a set, or all apps) |
 | `scheduler-tick` | `{}` | runs due jobs + applies retention + the auto-backup observer (the boot heartbeat calls this) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (not detached; returns immediately; `ERR_UPDATE_CHECK` on failure - see below) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (not detached; returns immediately; `ERR_UPDATE_CHECK` on failure, see below) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) backs up many apps in one detached op; progress carries `n`/`of`. A per-app failure does not stop the batch. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) restores many backups in one detached op; progress carries `n`/`of`. A per-app failure does not stop the batch. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` storage volumes for the folder picker: internal plus removable SD card / USB. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) exports config, jobs, destinations, credentials and keys to one passphrase-encrypted file under the backups dir. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) merges an exported config file back into this device (never blind-overwrites). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` lists the encrypted config files available to import. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` removes stored remote passwords and the device encryption key; destinations, jobs and backups stay. |
+| `log-prune` | `{}` | `{ok}` prunes long-finished op logs, caps the audit trail and evicts stale icons (the boot service calls this). |
 
 ### `progress` fields
 
@@ -175,7 +184,7 @@ A schedule job picks **one** target and an **action**:
 Give exactly **one** of `package`, `packages` or `all` for the target. A `backup` job
 keeps the usual `mode`/`dest`/`keep`/`items`. A `restore` job (`action: "restore"`)
 restores each target app's **latest** backup (or an explicit `ref`) and **overwrites the
-app's current data on every run** - it is deliberate and opt-in, so set it only on a
+app's current data on every run**: it is deliberate and opt-in, so set it only on a
 direct user request.
 
 ### Scheduler gating
@@ -199,7 +208,7 @@ skipped while the device is critically hot. Every gate skip is written to the au
 ### `remote-add` args
 
 A cloud destination is a `type:"rclone"` dest that names an `rclone` remote; create
-that remote first with `remote-add`. The `backend` may be **any rclone backend** - there
+that remote first with `remote-add`. The `backend` may be **any rclone backend**: there
 is no whitelist. `remote-add` accepts any backend name (`dropbox`, `onedrive`, `box`,
 `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` and the ~70 others
 rclone supports), and the `params` are passed straight through to the `rclone` config as
@@ -220,12 +229,12 @@ local callback server (`127.0.0.1:53682`) and opens the phone's own browser at t
 consent page via an Android VIEW intent, returning `{ok:true,url}` (or
 `{ok:false,code:"ERR_AUTHORIZE"}`). Poll `remote-authorize-poll` (`{}`): it returns
 `{ok:true,done:false,url}` while waiting and `{ok:true,done:true,token}` once the user
-approves - pass that `token` to `remote-add`. `remote-authorize-cancel` (`{}`) stops a
+approves, pass that `token` to `remote-add`. `remote-authorize-cancel` (`{}`) stops a
 pending authorization (`{ok:true,cancelled:true}`). Manually pasting the output of
 `rclone authorize "<backend>"` from any computer is still supported as a fallback.
 
 Google Drive has two paths: this `drive` remote (no Google Cloud project needed, uses
-rclone's own OAuth - authorize on-device with `remote-authorize`, or run
+rclone's own OAuth, authorize on-device with `remote-authorize`, or run
 `rclone authorize "drive"` once on any computer and pass the token) or the opt-in companion
 app (your own OAuth client id). Both end up as ordinary destinations.
 
@@ -235,7 +244,7 @@ The config field `network_policy` controls which connection cloud transfers may 
 `any` (default), `wifi`, or `mobile`. Set it with `config-set`. When it is `wifi` or
 `mobile`, every cloud transfer (Full `rclone`/Drive upload, Mirror sync, remote
 `restic` snapshot backup/restore, Mirror restore) checks the active transport first and
-aborts with `ERR_NET_POLICY` if it does not match - for both manual and scheduled jobs.
+aborts with `ERR_NET_POLICY` if it does not match, for both manual and scheduled jobs.
 Local destinations are never gated.
 
 ### Cloud integrity and quota
@@ -286,8 +295,8 @@ deliberate user request.
 
 ### Standalone path backup
 
-`path-backup` / `path-restore` back up and restore **any absolute path** - a folder or a
-single file - on shared storage or under `/data`, outside the per-app model. The archive
+`path-backup` / `path-restore` back up and restore **any absolute path**: a folder or a
+single file, on shared storage or under `/data`, outside the per-app model. The archive
 is written as `tar.zst` plus a `manifest.json` in VDBackup's own format (SHA-256 sealed,
 with a RECOVERY kit when encrypted) under `.paths/` in the backups directory.
 
@@ -303,18 +312,18 @@ with a RECOVERY kit when encrypted) under `.paths/` in the backups directory.
   with `ERR_NO_PATH`; a path outside the allowed roots, or one containing `..`, fails with
   `ERR_BAD_PATH`.
 - `path-restore` writes back to the original location, so it is destructive and requires
-  `"confirm": true` - a heavy-friction gate, like `special-restore`. A `ref` that is not a
+  `"confirm": true`, a heavy-friction gate, like `special-restore`. A `ref` that is not a
   valid path backup fails with `ERR_BAD_REF`.
 - Both run **detached**; poll `progress` with the returned `opid`.
 
 ### `update-check`
 
 `update-check` reports whether a newer version of the module has been published, so an agent
-(or the WebUI) can surface it. It is a **read verb that returns immediately** - it is **not**
+(or the WebUI) can surface it. It is a **read verb that returns immediately**: it is **not**
 detached, so there is no `opid` to poll. Triggered only by an explicit user action, it fetches
 the module's published update manifest (the `updateJson` URL from `module.prop`) with the bundled
-`curl` over a root-side HTTP request - this runs outside the WebView, so it is not subject to the
-WebUI CSP - and compares the published `versionCode` with the installed one. It takes **no
+`curl` over a root-side HTTP request, this runs outside the WebView, so it is not subject to the
+WebUI CSP, and compares the published `versionCode` with the installed one. It takes **no
 arguments**.
 
 On success it returns:
@@ -343,7 +352,7 @@ verb.
 - **`ssaid` is strictly opt-in (default off).** It backs up / restores the device
   ANDROID_ID by rewriting a system file; a restore applies only after a reboot, and
   the previous file is always saved first for rollback. Only send `"ssaid": true`
-  on a direct, deliberate user request - never by default.
+  on a direct, deliberate user request, never by default.
 - **Mutating actions (restore, delete, import) are destructive** and are logged to a
   local audit trail (`logs/audit.jsonl`). Restore is faithful (wipe-then-extract), so
   it reverts the app to the backup's exact state. Confirm intent before you call them.
@@ -351,8 +360,8 @@ verb.
   overwrites device-wide settings, so send it only on a direct user request; it is gated
   by explicit consent and recorded in the audit trail.
 - **Restore is idempotent.** Raw provider restores (messages/contacts/wifi/bluetooth/
-  calendar) **replace** rather than merge - the provider data is wiped and the archive is
-  extracted over it - so re-restoring the same backup cannot duplicate rows. `dns` and
+  calendar) **replace** rather than merge, the provider data is wiped and the archive is
+  extracted over it, so re-restoring the same backup cannot duplicate rows. `dns` and
   `system_settings` are re-applied with idempotent `settings put`.
 - **Archive extraction is guarded against path traversal.** Restore runs as root, so
   every archive (restore, import, special-restore, path-restore) is checked before any
@@ -369,4 +378,4 @@ See [ARCHITECTURE.md](../ARCHITECTURE.md) and
 
 ---
 
-*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome - see [CONTRIBUTING.md](../CONTRIBUTING.md).*
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome, see [CONTRIBUTING.md](../CONTRIBUTING.md).*

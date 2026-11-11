@@ -21,7 +21,7 @@ sokulmadığını nasıl doğrulayacağınızı belgeler.
   asla doğaçlama yapmaz.
 - **Yeniden üretilebilir.** Derlemeyi tekrar çalıştırın, aynı dosyaları alırsınız;
    sabitlenmiş kaynakları tekrar çekin, SHA-256 değerleri eşleşir.
-- **Denetim izi modülle birlikte gelir.** Sadece web sitesinde değil - kurulu modülün
+- **Denetim izi modülle birlikte gelir.** Sadece web sitesinde değil, kurulu modülün
   içinde, cihazınızda yolculuk eder, böylece çevrimdışı denetim yapabilirsiniz.
 
 ## Ne sevk edilir ve nereden
@@ -86,4 +86,4 @@ Sevk edilen herhangi bir dosya kayıtlı kaynağıyla eşleşmezse, bunu bir gü
 olarak değerlendirin ve bildirin (bkz. [SECURITY.md](SECURITY.md)). Bu, tam olarak bu
 manifestin görünür kılmak için var olduğu türden bir tutarsızlıktır.
 
-*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır - bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*

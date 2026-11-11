@@ -18,4 +18,4 @@ Issues und Beiträge entfernen, die gegen diesen Kodex verstoßen, und dürfen W
 Dies ist eine verdichtete, projektgerechte Anpassung des Geists des Contributor
 Covenant.
 
-*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen - siehe [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - Argümanlar tek bir JSON nesnesidir, **base64 ile kodlanır** ve tek bir argv token'ı olarak geçirilir.
 - Komut, stdout üzerine **tek bir JSON nesnesi** yazdırır: `{"ok":true,...}` veya
   `{"ok":false,"code":"ERR_...","message":"..."}`. Bunu ayrıştırın; asla metni kazımayın.
-- Uzun işlemler (`backup`, `restore`, `import`) hemen `{"ok":true,"opid":"..."}` döndürür
+- Uzun işlemler (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) hemen `{"ok":true,"opid":"..."}` döndürür
   ve **ayrık (detached)** çalışır (çağıran/WebUI kapansa bile hayatta kalırlar). İlerlemelerini
   yoklayın; çağrı döndüğünde henüz bitmemişlerdir.
 - `progress` ve `cancel`, bir JSON nesnesi değil, **ham opid dizesinin base64'ünü** alır.
@@ -87,7 +87,15 @@ dosyalarla gelir, bu yüzden kurulduktan sonra yerel yedekleme/geri yükleme iç
 | `cloud-fetch` | `{}` | `{ok,opid}` (ayrık) bir `lite` sürümünde `rclone`/`restic` eklentisini indirir+doğrular+kurar |
 | `schedule-set` / `schedule-list` / `schedule-delete` | aşağıya bakın | zamanlanmış işler (bir yedekleme veya bir geri yükleme; tek bir uygulamayı, bir kümeyi veya tüm uygulamaları hedefler) |
 | `scheduler-tick` | `{}` | vadesi gelen işleri çalıştırır + saklama uygular + otomatik yedekleme gözlemcisi (açılış sinyali bunu çağırır) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (ayrık değil; hemen döner; başarısızlıkta `ERR_UPDATE_CHECK` - aşağıya bakın) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (ayrık değil; hemen döner; başarısızlıkta `ERR_UPDATE_CHECK`, aşağıya bakın) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) birçok uygulamayı tek bir ayrık işlemde yedekler; ilerleme `n`/`of` taşır. Uygulama başına bir hata partiyi durdurmaz. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) birçok yedeği tek bir ayrık işlemde geri yükler; ilerleme `n`/`of` taşır. Uygulama başına bir hata partiyi durdurmaz. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` klasör seçici için depolama birimleri: dahili artı çıkarılabilir SD kart / USB. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) yapılandırmayı, işleri, hedefleri, kimlik bilgilerini ve anahtarları yedek klasöründe parola ifadesiyle şifreli tek bir dosyaya aktarır. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) dışa aktarılmış bir yapılandırma dosyasını bu cihaza geri birleştirir (asla körlemesine üzerine yazmaz). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` içe aktarmak için mevcut şifreli yapılandırma dosyalarını listeler. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` kayıtlı uzak parolaları ve cihaz şifreleme anahtarını kaldırır; hedefler, işler ve yedekler kalır. |
+| `log-prune` | `{}` | `{ok}` çoktan bitmiş işlem günlüklerini budar, denetim izini sınırlar ve eski simgeleri temizler (önyükleme hizmeti bunu çağırır). |
 
 ### `progress` alanları
 
@@ -176,7 +184,7 @@ Bir zamanlama işi **bir** hedef ve bir **eylem** seçer:
 Hedef için `package`, `packages` veya `all` değerlerinden tam olarak **birini** verin. Bir
 `backup` işi her zamanki `mode`/`dest`/`keep`/`items` değerlerini korur. Bir `restore` işi
 (`action: "restore"`) her hedef uygulamanın **en son** yedeğini (veya açık bir `ref`) geri
-yükler ve **her çalıştırmada uygulamanın mevcut verilerinin üzerine yazar** - bu, kasıtlı ve
+yükler ve **her çalıştırmada uygulamanın mevcut verilerinin üzerine yazar**: bu, kasıtlı ve
 isteğe bağlıdır, bu yüzden yalnızca doğrudan bir kullanıcı isteği üzerine ayarlayın.
 
 ### Zamanlayıcı kapılama
@@ -201,7 +209,7 @@ derecede sıcakken zamanlanmış bir işlem atlanır. Her kapı atlaması deneti
 
 Bir bulut hedefi, bir `rclone` uzak biriminin adını veren bir `type:"rclone"` hedefidir;
 o uzak birimi önce `remote-add` ile oluşturun. `backend` **herhangi bir rclone backend'i**
-olabilir - whitelist yoktur. `remote-add` herhangi bir backend adını kabul eder (`dropbox`,
+olabilir, whitelist yoktur. `remote-add` herhangi bir backend adını kabul eder (`dropbox`,
 `onedrive`, `box`, `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` ve
 rclone'un desteklediği ~70 diğeri) ve `params`, `rclone` yapılandırmasına doğrudan `key=value`
 çiftleri olarak aktarılır. Parola alanları gizlenmiş olarak saklanır, asla açık metin olarak
@@ -221,12 +229,12 @@ sunucusuna (`127.0.0.1:53682`) karşı `rclone authorize <backend>` çalıştır
 VIEW intent ile telefonun kendi tarayıcısını sağlayıcının onay sayfasında açar, `{ok:true,url}`
 (veya `{ok:false,code:"ERR_AUTHORIZE"}`) döndürür. `remote-authorize-poll`'u (`{}`) yoklayın:
 beklerken `{ok:true,done:false,url}` ve kullanıcı onayladığında `{ok:true,done:true,token}`
-döndürür - o `token`'ı `remote-add`'e geçirin. `remote-authorize-cancel` (`{}`) bekleyen bir
+döndürür, o `token`'ı `remote-add`'e geçirin. `remote-authorize-cancel` (`{}`) bekleyen bir
 yetkilendirmeyi durdurur (`{ok:true,cancelled:true}`). `rclone authorize "<backend>"` çıktısını
 herhangi bir bilgisayardan elle yapıştırmak hâlâ bir yedek olarak desteklenir.
 
 Google Drive'ın iki yolu vardır: bu `drive` uzak birimi (Google Cloud projesi gerekmez,
-rclone'un kendi OAuth'unu kullanır - cihaz üzerinde `remote-authorize` ile yetkilendirin veya
+rclone'un kendi OAuth'unu kullanır, cihaz üzerinde `remote-authorize` ile yetkilendirin veya
 herhangi bir bilgisayarda bir kez `rclone authorize "drive"` çalıştırın ve token'ı geçirin) veya
 katılımlı eşlik eden uygulama (kendi OAuth istemci kimliğiniz). Her ikisi de sıradan hedefler
 olarak sonuçlanır.
@@ -237,7 +245,7 @@ olarak sonuçlanır.
 `any` (varsayılan), `wifi` veya `mobile`. `config-set` ile ayarlayın. `wifi` veya `mobile`
 olduğunda, her bulut aktarımı (Full `rclone`/Drive yüklemesi, Mirror senkronizasyonu, uzak
 `restic` anlık yedek yedekleme/geri yükleme, Mirror geri yükleme) önce etkin taşıyıcıyı
-kontrol eder ve eşleşmezse `ERR_NET_POLICY` ile iptal eder - hem manuel hem de zamanlanmış
+kontrol eder ve eşleşmezse `ERR_NET_POLICY` ile iptal eder, hem manuel hem de zamanlanmış
 işler için. Yerel hedefler asla kapılanmaz.
 
 ### Bulut bütünlüğü ve kota
@@ -289,7 +297,7 @@ kasıtlı bir kullanıcı isteğinde.
 ### Bağımsız yol yedeği
 
 `path-backup` / `path-restore`, uygulama başına modelin dışında, paylaşılan depolamada veya `/data`
-altında **herhangi bir mutlak yolu** - bir klasör veya tek bir dosya - yedekler ve geri yükler.
+altında **herhangi bir mutlak yolu**: bir klasör veya tek bir dosya, yedekler ve geri yükler.
 Arşiv, backups dizini altındaki `.paths/` içinde VDBackup'ın kendi formatında (SHA-256 ile mühürlü,
 şifrelendiğinde bir RECOVERY kitiyle) `tar.zst` artı bir `manifest.json` olarak yazılır.
 
@@ -312,11 +320,11 @@ Arşiv, backups dizini altındaki `.paths/` içinde VDBackup'ın kendi formatın
 ### `update-check`
 
 `update-check`, modülün daha yeni bir sürümünün yayınlanıp yayınlanmadığını bildirir, böylece bir
-ajan (veya WebUI) bunu gösterebilir. **Hemen dönen bir okuma fiilidir** - ayrık **değildir**,
+ajan (veya WebUI) bunu gösterebilir. **Hemen dönen bir okuma fiilidir**: ayrık **değildir**,
 dolayısıyla sorgulanacak bir `opid` yoktur. Yalnızca kullanıcının açık bir eylemiyle tetiklenir ve
 modülün yayınlanmış güncelleme manifestini (`module.prop` içindeki `updateJson` URL'si) paketlenmiş
-`curl` ile root tarafındaki bir HTTP isteği üzerinden alır - bu, WebView dışında çalışır, bu yüzden
-WebUI'nin CSP'sine tabi değildir - ve yayınlanan `versionCode` ile kurulu olanı karşılaştırır.
+`curl` ile root tarafındaki bir HTTP isteği üzerinden alır, bu, WebView dışında çalışır, bu yüzden
+WebUI'nin CSP'sine tabi değildir, ve yayınlanan `versionCode` ile kurulu olanı karşılaştırır.
 **Hiçbir argüman** almaz.
 
 Başarılı olduğunda şunu döner:
@@ -345,7 +353,7 @@ fiil yapmaz.
 - **`ssaid` kesinlikle katılımlıdır (varsayılan kapalı).** Cihaz ANDROID_ID'sini bir sistem
   dosyasını yeniden yazarak yedekler / geri yükler; bir geri yükleme yalnızca yeniden başlatmadan
   sonra uygulanır ve önceki dosya geri alma için her zaman önce kaydedilir. `"ssaid": true`'yu
-  yalnızca doğrudan, kasıtlı bir kullanıcı isteğinde gönderin - asla varsayılan olarak.
+  yalnızca doğrudan, kasıtlı bir kullanıcı isteğinde gönderin, asla varsayılan olarak.
 - **Değiştiren eylemler (restore, delete, import) yıkıcıdır** ve yerel bir denetim izine
   (`logs/audit.jsonl`) kaydedilir. Geri yükleme sadıktır (önce sil-sonra çıkar), bu nedenle
   uygulamayı yedeğin tam durumuna döndürür. Çağırmadan önce niyeti onaylayın.
@@ -353,8 +361,8 @@ fiil yapmaz.
   genelindeki ayarların üzerine yazar, bu yüzden onu yalnızca doğrudan bir kullanıcı isteğinde
   gönderin; açık rızayla kapı tutulur ve denetim izine kaydedilir.
 - **Geri yükleme idempotenttir.** Ham provider geri yüklemeleri (messages/contacts/wifi/bluetooth/
-  calendar) birleştirmek yerine **değiştirir** - provider verisi silinir ve arşiv onun üzerine
-  çıkarılır - bu yüzden aynı yedeği yeniden geri yüklemek satırları çoğaltamaz. `dns` ve
+  calendar) birleştirmek yerine **değiştirir**: provider verisi silinir ve arşiv onun üzerine
+  çıkarılır, bu yüzden aynı yedeği yeniden geri yüklemek satırları çoğaltamaz. `dns` ve
   `system_settings` idempotent `settings put` ile yeniden uygulanır.
 - **Arşiv çıkarma, yol geçişine (path traversal) karşı korunur.** Geri yükleme root olarak çalışır,
   bu yüzden her arşiv (restore, import, special-restore, path-restore) herhangi bir yazmadan önce
@@ -371,4 +379,4 @@ Dahili yapı için [ARCHITECTURE.md](ARCHITECTURE.md) ve
 
 ---
 
-*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır - bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*

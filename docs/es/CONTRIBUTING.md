@@ -14,7 +14,7 @@ en vanilla-JS + binarios estáticos por ABI. No se requiere ninguna aplicación 
 [ARCHITECTURE.md](ARCHITECTURE.md) y [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 
 Es el **sucesor** abierto y root-native de **Swift Backup, Neo-Backup y
-Android-DataBackup** - la unión de sus funciones bajo AGPLv3, con importación de
+Android-DataBackup**: la unión de sus funciones bajo AGPLv3, con importación de
 backups existentes de Neo-Backup y Android-DataBackup para que la gente pueda migrar.
 
 ## Colaboradores IA bienvenidos
@@ -25,9 +25,9 @@ Los asistentes y agentes de IA son colaboradores de primera clase aquí, no una 
   objeto JSON, el motor es shell POSIX puro, y la disposición de archivos está documentada en
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 - Un agente puede administrar **todo** el contenido y acción del módulo de forma headless a través de
-  esa API JSON - la superficie de control completa, los verbos y las barreras de seguridad están en
+  esa API JSON, la superficie de control completa, los verbos y las barreras de seguridad están en
   [docs/AI-AGENTS.md](AI-AGENTS.md).
-- Los parches asistidos por IA se revisan y aceptan en los mismos términos que cualquier otro - por
+- Los parches asistidos por IA se revisan y aceptan en los mismos términos que cualquier otro, por
   corrección, claridad y las convenciones de abajo, no por quién (o qué) los escribió.
 - Si manejas VDBackup desde un agente, usa la salida JSON de `helper.sh` como el
   contrato; no raspes la WebUI.
@@ -62,18 +62,18 @@ Los asistentes y agentes de IA son colaboradores de primera clase aquí, no una 
 - Para añadir o cambiar una cadena: edita `en.js` **y** `en.json`, luego actualiza cada
   `<code>.json`. Tocar una etiqueta visible significa actualizar **todos** los archivos de idioma y
   **todos** los `README.<code>.md`.
-- Las traducciones son JSON plano - una gran primera contribución. Ver la lista de idiomas en
+- Las traducciones son JSON plano, una gran primera contribución. Ver la lista de idiomas en
   `module/webroot/i18n.js`.
 
 ## Commits y PRs
 
 - Mantén los PRs enfocados. Describe qué y por qué.
 - Firma tus commits (DCO): `git commit -s` (añade `Signed-off-by:`).
-- La CI debe permanecer en verde. Sé amable en las revisiones - ver [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- La CI debe permanecer en verde. Sé amable en las revisiones, ver [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Buenas primeras tareas
 
 Busca las etiquetas `good first issue` y `help wanted`. Las traducciones, la documentación, los nuevos
 presets de destino de `rclone` y el pulido de la WebUI son todos grandes puntos de partida.
 
-*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas - ve [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas, ve [CONTRIBUTING.md](CONTRIBUTING.md).*

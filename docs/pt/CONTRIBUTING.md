@@ -14,7 +14,7 @@ em vanilla-JS + binários estáticos por-ABI. Nenhum app é necessário para os 
 [ARCHITECTURE.md](ARCHITECTURE.md) e [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 
 Ele é o **sucessor** aberto e root-native **do Swift Backup, Neo-Backup e
-Android-DataBackup** - a união dos recursos deles sob AGPLv3, com importação de
+Android-DataBackup**: a união dos recursos deles sob AGPLv3, com importação de
 backups existentes do Neo-Backup e do Android-DataBackup para que as pessoas possam migrar.
 
 ## Colaboradores de IA são bem-vindos
@@ -25,9 +25,9 @@ Assistentes e agentes de IA são colaboradores de primeira classe aqui, não um 
   objeto JSON, a engine é shell POSIX puro, e o layout de arquivos está documentado em
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 - Um agente pode administrar **cada** conteúdo e ação do módulo de forma headless por meio
-  dessa API JSON - a superfície de controle completa, verbos e salvaguardas estão em
+  dessa API JSON, a superfície de controle completa, verbos e salvaguardas estão em
   [docs/AI-AGENTS.md](AI-AGENTS.md).
-- Patches assistidos por IA são revisados e aceitos nos mesmos termos de qualquer outro - por
+- Patches assistidos por IA são revisados e aceitos nos mesmos termos de qualquer outro, por
   correção, clareza e as convenções abaixo, não por quem (ou o quê) os escreveu.
 - Se você dirige o VDBackup a partir de um agente, use a saída JSON do `helper.sh` como o
   contrato; não raspe a WebUI.
@@ -62,18 +62,18 @@ Assistentes e agentes de IA são colaboradores de primeira classe aqui, não um 
 - Para adicionar ou mudar uma string: edite `en.js` **e** `en.json`, depois atualize cada
   `<code>.json`. Mexer num label visível significa atualizar **todos** os arquivos de idioma e
   **todos** os `README.<code>.md`.
-- Traduções são JSON puro - uma ótima primeira contribuição. Veja a lista de idiomas em
+- Traduções são JSON puro, uma ótima primeira contribuição. Veja a lista de idiomas em
   `module/webroot/i18n.js`.
 
 ## Commits e PRs
 
 - Mantenha os PRs focados. Descreva o quê e o porquê.
 - Assine seus commits (DCO): `git commit -s` (adiciona `Signed-off-by:`).
-- A CI deve ficar verde. Seja gentil nas revisões - veja [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- A CI deve ficar verde. Seja gentil nas revisões, veja [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Boas primeiras issues
 
 Procure pelos labels `good first issue` e `help wanted`. Traduções, docs, novos
 presets de destino `rclone` e polimento da WebUI são todos ótimos pontos de partida.
 
-*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas - veja [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md).*

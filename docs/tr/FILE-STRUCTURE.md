@@ -71,4 +71,4 @@ docs/                               # all public documentation
 
 ---
 
-*Bu belge Claude (Anthropic) ile üretilmiştir ve VD171 tarafından bakılmaktadır. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır - bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Bu belge Claude (Anthropic) ile üretilmiştir ve VD171 tarafından bakılmaktadır. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -6,6 +6,32 @@
 
 VDBackup'taki tüm kayda değer değişiklikler burada belgelenir. Yalnızca İngilizce.
 
+## v1.05
+
+Güvenilirlik:
+
+- Toplu yedekler, uygulamadan çıktığınızda artık yarıda durmuyor. Tüm bir seçim, bir etiket grubu veya zamanlanmış bir çalıştırma artık WebUI kapatıldığında da süren ve bellek baskısı altında sonlandırılmaya karşı korunan tek bir ayrık kök işlemi tarafından yürütülüyor. İlerleme görünümü geri döndüğünüzde yeniden bağlanır.
+
+Ayarlar:
+
+- Ayar yedeği: hedeflerinizi, zamanlamalarınızı, hazır ayarlarınızı ve kayıtlı kimlik bilgilerinizi tek bir şifreli dosyaya aktarın, ardından başka bir cihaza veya temiz kurulumdan sonra içe aktarın. Dosya uzak parolalar içerdiği için her zaman bir parola ifadesi ister ve içe aktarma, zaten var olanları kaldırmadan cihazla birleştirir.
+- Kayıtlı uzak kimlik bilgilerini ve cihaz şifreleme anahtarını artık ayarlardan tek adımda silebilirsiniz; hedefleriniz, zamanlamalarınız ve yedekleriniz yerinde kalır.
+
+Güvenlik:
+
+- Yedekler yalnızca bekleme sırasında şifreli kaldıkları yerlerde saklanabilir. İlk kilit açmadan önce okunabilen yollar altındaki hedefler (örneğin /data/adb veya /data/system) reddedilir.
+- Kayıtlı kimlik bilgileri, rclone.conf ve age anahtarı artık önceden okunabilen bir konum yerine, ilk kilit açmaya kadar kilitli kalan kimlik bilgisiyle şifreli depolamada bulunuyor; bir modül güncellemesi onları oraya kalıcı olarak taşır.
+- Yedekler artık başlamadan önce boş alanı denetler ve yarıda başarısız olmak yerine açık bir mesajla durur.
+
+Geri yükleme:
+
+- Artık yüklü olmayan bir uygulamayı geri yüklemek önce APK'sını yeniden yükler ve yedekte APK olduğunda geri yükleme iletişim kutusu APK seçeneğini sunar. Uygulamayı yükleyemeyen bir geri yükleme, başarıyı iddia etmek yerine hatayı bildirir.
+- Uygulama, izin ve ayar işlemleri artık temiz bir ortamda çalışıyor; bu da bazı ROM'larda geri yüklemeyi, app-ops'u ve ayarları engelleyen "Failed transaction" hatalarını düzeltiyor.
+
+Hedefler:
+
+- SD karta veya USB sürücüye yedekleyebilirsiniz: klasör seçici her depolama birimine bir kısayol gösterir ve çıkarılabilir ortam yollarını kabul eder.
+
 ## v1.04
 
 Düzeltmeler:
@@ -18,7 +44,7 @@ Gizlilik:
 
 Yedekler:
 
-- Artık her uygulamanın hangi öğeleri yedekleyeceğini ayarlayabilirsiniz - örneğin yalnızca APK veya APK + OBB - bu toplu, otomatik ve zamanlanmış yedeklere uygulanır. Tek bir elle yedekte yine o anda seçebilirsiniz, uygulamanın kümesinden önceden doldurulmuş olarak. Ayarlar'da, hariç tutulan uygulamalar listesinin yanında ayarlayın.
+- Artık her uygulamanın hangi öğeleri yedekleyeceğini ayarlayabilirsiniz, örneğin yalnızca APK veya APK + OBB, bu toplu, otomatik ve zamanlanmış yedeklere uygulanır. Tek bir elle yedekte yine o anda seçebilirsiniz, uygulamanın kümesinden önceden doldurulmuş olarak. Ayarlar'da, hariç tutulan uygulamalar listesinin yanında ayarlayın.
 
 - Yedek ön ayarları: neyin dahil edileceğine dair adlandırılmış kümeleri kaydedin ve yedek penceresinde tek seçimle uygulayın.
 - Çoklu kullanıcı: uygulama yedekleri, özel yedekler ve geri yüklemeler artık seçtiğiniz Android kullanıcısını izler.
@@ -237,4 +263,4 @@ Yapay zeka dostu ve i18n:
   yürütülür (`IPackageManager`, ServiceManager üzerinden), böylece ActivityThread'in takıldığı yerlerde
   bile çalışırlar.
 
-*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır - bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*

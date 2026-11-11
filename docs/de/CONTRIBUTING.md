@@ -14,7 +14,7 @@ statische Binärdateien pro ABI. Für die Kernfunktionen ist keine App erforderl
 [ARCHITECTURE.md](ARCHITECTURE.md) und [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 
 Es ist der offene, root-native **Nachfolger von Swift Backup, Neo-Backup und
-Android-DataBackup** - die Vereinigung ihrer Funktionen unter AGPLv3, mit Import vorhandener
+Android-DataBackup**: die Vereinigung ihrer Funktionen unter AGPLv3, mit Import vorhandener
 Neo-Backup- und Android-DataBackup-Backups, damit Leute migrieren können.
 
 ## KI-Mitwirkende willkommen
@@ -25,7 +25,7 @@ KI-Assistenten und -Agenten sind hier erstklassige Mitwirkende, kein nachträgli
   JSON-Objekt aus, die Engine ist reine POSIX-Shell, und das Dateilayout ist in
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md) dokumentiert.
 - Ein Agent kann **jeden** Inhalt und jede Aktion des Moduls headless über diese JSON-API
-  verwalten - die vollständige Steuerungsfläche, Verben und Sicherheitsleitplanken stehen in
+  verwalten, die vollständige Steuerungsfläche, Verben und Sicherheitsleitplanken stehen in
   [docs/AI-AGENTS.md](AI-AGENTS.md).
 - KI-unterstützte Patches werden zu denselben Bedingungen geprüft und akzeptiert wie alle anderen -
   nach Korrektheit, Klarheit und den Konventionen unten, nicht danach, wer (oder was) sie geschrieben hat.
@@ -62,18 +62,18 @@ KI-Assistenten und -Agenten sind hier erstklassige Mitwirkende, kein nachträgli
 - Um einen String hinzuzufügen oder zu ändern: bearbeite `en.js` **und** `en.json`, dann aktualisiere jede
   `<code>.json`. Ein sichtbares Label zu berühren bedeutet, **alle** Sprachdateien und
   **alle** `README.<code>.md` zu aktualisieren.
-- Übersetzungen sind reines JSON - ein großartiger erster Beitrag. Siehe die Sprachliste in
+- Übersetzungen sind reines JSON, ein großartiger erster Beitrag. Siehe die Sprachliste in
   `module/webroot/i18n.js`.
 
 ## Commits & PRs
 
 - Halte PRs fokussiert. Beschreibe was und warum.
 - Zeichne deine Commits ab (DCO): `git commit -s` (fügt `Signed-off-by:` hinzu).
-- Die CI muss grün bleiben. Sei freundlich in Reviews - siehe [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- Die CI muss grün bleiben. Sei freundlich in Reviews, siehe [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Gute erste Issues
 
 Halte Ausschau nach den Labels `good first issue` und `help wanted`. Übersetzungen, Docs, neue
 `rclone`-Ziel-Presets und WebUI-Feinschliff sind alle großartige Ausgangspunkte.
 
-*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen - siehe [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).*

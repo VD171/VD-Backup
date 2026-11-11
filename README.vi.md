@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>Sao lưu và khôi phục đầy đủ ứng dụng và dữ liệu với quyền root - điều khiển hoàn toàn qua WebUI.</b><br>
+  <b>Sao lưu và khôi phục đầy đủ ứng dụng và dữ liệu với quyền root, điều khiển hoàn toàn qua WebUI.</b><br>
   Mô-đun KernelSU / APatch / Magisk. Không có lời nhắc "cấp su", không cần bật tắt <code>sucompat</code>.
 </p>
 
@@ -29,7 +29,7 @@
 ## Nó là gì
 
 VDBackup là một **mô-đun WebUI** root giúp sao lưu và khôi phục các ứng dụng cùng dữ liệu của chúng
-**mà không cần ứng dụng đồng hành cho các tính năng cốt lõi** - bởi vì mô-đun đã sẵn là root, nên
+**mà không cần ứng dụng đồng hành cho các tính năng cốt lõi**: bởi vì mô-đun đã sẵn là root, nên
 không có gì để "cho phép". Nó hướng tới việc gói gọn mọi thứ mà các ứng dụng sao lưu phổ biến làm
 được vào một nơi, với một WebUI gọn gàng.
 
@@ -46,7 +46,7 @@ các bản sao lưu Neo-Backup và Android-DataBackup hiện có để bạn chu
   có phiên bản, qua `restic`) và **Mirror** (đồng bộ 1:1, qua `rclone`/`rsync`).
 - **Bảo toàn trung thực:** ngữ cảnh SELinux, uid/gid, chế độ, xattr và capabilities.
 - **Nén:** none / lz4 / zstd / gzip (gzip = "chế độ tương thích", mở được ở mọi nơi).
-- **Mã hóa:** tùy chọn và khả chuyển (`age` + cụm mật khẩu, hoặc zip AES-256) - không bao giờ
+- **Mã hóa:** tùy chọn và khả chuyển (`age` + cụm mật khẩu, hoặc zip AES-256), không bao giờ
   gắn với phần cứng của thiết bị, nên một bản sao lưu có thể khôi phục trên thiết bị khác hoặc mở trên PC.
 - **Đích đến:** cục bộ, SFTP, SCP, SMB, WebDAV, FTP, S3 và hơn 70 loại khác (`rclone`), cùng với
   kho `rsync` và `restic`. Tùy chọn Google Drive qua một ứng dụng đồng hành nhỏ bật theo lựa chọn.
@@ -80,10 +80,10 @@ các bản sao lưu Neo-Backup và Android-DataBackup hiện có để bạn chu
 ## Cài đặt
 
 1. Tải `VD-Backup-vX.Y.zip` mới nhất từ [Bản phát hành](https://github.com/VD171/VD-Backup/releases).
-2. Flash nó trong trình quản lý KernelSU / APatch / Magisk - dùng được ngay, không cần khởi động lại.
+2. Flash nó trong trình quản lý KernelSU / APatch / Magisk, dùng được ngay, không cần khởi động lại.
 3. Mở **WebUI** của mô-đun để cấu hình và chạy sao lưu. Vậy là xong.
 
-**Các phiên bản.** Mỗi bản phát hành gồm sáu zip. `universal-full` - mọi kiến trúc và mọi tệp nhị phân được nhúng sẵn (gồm `rclone` cho nhà cung cấp đám mây và `restic` cho ảnh chụp nhanh), hoàn toàn ngoại tuyến, không bao giờ tải xuống bất cứ thứ gì, mọi thiết bị, lớn nhất. `universal-lite` - mọi kiến trúc nhưng bỏ hai tệp nhị phân lớn nhất (`rclone`, `restic`), nhỏ nhất; vẫn sao lưu được cục bộ, SSH/SFTP và `rsync` mà không cần tải xuống, và lần đầu tiên bạn dùng đích đám mây (`rclone`) hoặc chế độ ảnh chụp nhanh (`restic`), nó sẽ đề nghị tải phần bổ trợ nhỏ theo kiến trúc đó một lần (được xác minh bằng SHA-256) và lưu vào bộ nhớ đệm, sau đó các tính năng ấy cũng hoạt động. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - một kiến trúc duy nhất với mọi tệp nhị phân được nhúng sẵn, nhỏ hơn `universal-full`. Biết kiến trúc của bạn -> chọn `<abi>-full`; muốn nhỏ nhất và không ngại một lần tải xuống cho đám mây hoặc ảnh chụp nhanh -> `universal-lite`; muốn mọi thứ được nhúng sẵn mà không tải xuống gì (ngoại tuyến / khôi phục) -> một phiên bản full. Xem [Bản phát hành](https://github.com/VD171/VD-Backup/releases).
+**Các phiên bản.** Mỗi bản phát hành gồm sáu zip. `universal-full`, mọi kiến trúc và mọi tệp nhị phân được nhúng sẵn (gồm `rclone` cho nhà cung cấp đám mây và `restic` cho ảnh chụp nhanh), hoàn toàn ngoại tuyến, không bao giờ tải xuống bất cứ thứ gì, mọi thiết bị, lớn nhất. `universal-lite`, mọi kiến trúc nhưng bỏ hai tệp nhị phân lớn nhất (`rclone`, `restic`), nhỏ nhất; vẫn sao lưu được cục bộ, SSH/SFTP và `rsync` mà không cần tải xuống, và lần đầu tiên bạn dùng đích đám mây (`rclone`) hoặc chế độ ảnh chụp nhanh (`restic`), nó sẽ đề nghị tải phần bổ trợ nhỏ theo kiến trúc đó một lần (được xác minh bằng SHA-256) và lưu vào bộ nhớ đệm, sau đó các tính năng ấy cũng hoạt động. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), một kiến trúc duy nhất với mọi tệp nhị phân được nhúng sẵn, nhỏ hơn `universal-full`. Biết kiến trúc của bạn -> chọn `<abi>-full`; muốn nhỏ nhất và không ngại một lần tải xuống cho đám mây hoặc ảnh chụp nhanh -> `universal-lite`; muốn mọi thứ được nhúng sẵn mà không tải xuống gì (ngoại tuyến / khôi phục) -> một phiên bản full. Xem [Bản phát hành](https://github.com/VD171/VD-Backup/releases).
 
 Mới làm quen? [Hướng dẫn người dùng](docs/USER-GUIDE.md) sẽ dẫn bạn từ cài đặt đến khôi phục.
 
@@ -102,12 +102,12 @@ Mô-đun gồm shell + WebUI cộng với các tệp nhị phân tĩnh theo từ
 
 ## Tài liệu
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - tài liệu, duyệt trực tuyến.
-- **[Hướng dẫn người dùng](docs/USER-GUIDE.md)** - từ đầu đến cuối, từ cài đặt đến khôi phục.
-- **[Tác nhân AI](docs/AI-AGENTS.md)** - điều khiển mọi hành động không giao diện qua JSON API.
-- **[Kiến trúc](docs/ARCHITECTURE.md)** và **[Cấu trúc tệp](docs/FILE-STRUCTURE.md)** - cách nó hoạt động.
-- **[Tệp nhị phân đi kèm](docs/BINARIES.md)** - nguồn gốc và SHA-256 của mọi tệp nhị phân biên dịch sẵn, để kiểm tra đầy đủ.
-- **[Khôi phục](module/etc/RECOVERY.md)** - mở và giải mã bản sao lưu trên PC, không cần mô-đun.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: tài liệu, duyệt trực tuyến.
+- **[Hướng dẫn người dùng](docs/USER-GUIDE.md)**: từ đầu đến cuối, từ cài đặt đến khôi phục.
+- **[Tác nhân AI](docs/AI-AGENTS.md)**: điều khiển mọi hành động không giao diện qua JSON API.
+- **[Kiến trúc](docs/ARCHITECTURE.md)** và **[Cấu trúc tệp](docs/FILE-STRUCTURE.md)**: cách nó hoạt động.
+- **[Tệp nhị phân đi kèm](docs/BINARIES.md)**: nguồn gốc và SHA-256 của mọi tệp nhị phân biên dịch sẵn, để kiểm tra đầy đủ.
+- **[Khôi phục](module/etc/RECOVERY.md)**: mở và giải mã bản sao lưu trên PC, không cần mô-đun.
 - **[Đóng góp](CONTRIBUTING.md)** và **[Bảo mật](SECURITY.md)**.
 - **[Nhật ký thay đổi](CHANGELOG.md)** và **[Quy tắc ứng xử](CODE_OF_CONDUCT.md)**.
 
@@ -117,7 +117,7 @@ VDBackup được xây dựng để chào đón các trợ lý và tác nhân AI
 (mọi verb của `helper.sh` trả về một đối tượng JSON duy nhất), mã nguồn, tài liệu và cấu trúc tệp
 được bố trí để máy đọc, và các đóng góp có hỗ trợ của AI được xem xét và chấp nhận như mọi đóng góp
 khác. Một tác nhân có thể quản trị **mọi** hành động của mô-đun theo kiểu không giao diện qua cùng
-API mà WebUI dùng - xem toàn bộ bề mặt điều khiển tại **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**, và
+API mà WebUI dùng, xem toàn bộ bề mặt điều khiển tại **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**, và
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) để đóng góp.
 
 ## Liên hệ
@@ -135,9 +135,9 @@ API mà WebUI dùng - xem toàn bộ bề mặt điều khiển tại **[docs/AI
 
 Các dự án anh em của cùng tác giả:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - một trình gỡ lỗi phương thức của thiết bị: đọc từng mục qua mọi phương thức có thể đọc nó và so sánh chúng cạnh nhau.
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - các dịch vụ Google của bạn (RCS, Wallet, các chứng thực Play Integrity), đọc ngay trên thiết bị của bạn mà không cần internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - một trình giả lập thiết bị biến một fingerprint mới thành một hồ sơ mạch lạc, nhất quán.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: một trình gỡ lỗi phương thức của thiết bị: đọc từng mục qua mọi phương thức có thể đọc nó và so sánh chúng cạnh nhau.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: các dịch vụ Google của bạn (RCS, Wallet, các chứng thực Play Integrity), đọc ngay trên thiết bị của bạn mà không cần internet.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: một trình giả lập thiết bị biến một fingerprint mới thành một hồ sơ mạch lạc, nhất quán.
 
 ## Giấy phép
 

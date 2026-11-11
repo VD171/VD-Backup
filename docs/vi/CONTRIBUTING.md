@@ -14,7 +14,7 @@ vanilla-JS + các binary tĩnh theo từng ABI. Không cần ứng dụng nào c
 [ARCHITECTURE.md](ARCHITECTURE.md) và [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 
 Đây là bản **kế thừa mở, chạy root-native của Swift Backup, Neo-Backup và
-Android-DataBackup** - sự hợp nhất các tính năng của chúng dưới giấy phép AGPLv3, kèm khả năng nhập
+Android-DataBackup**: sự hợp nhất các tính năng của chúng dưới giấy phép AGPLv3, kèm khả năng nhập
 các bản backup Neo-Backup và Android-DataBackup hiện có để mọi người có thể di chuyển sang.
 
 ## Chào đón người đóng góp là AI
@@ -25,9 +25,9 @@ Các trợ lý và tác nhân AI là những người đóng góp hạng nhất 
   JSON duy nhất, engine là shell POSIX thuần, và bố cục tập tin được ghi lại trong
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 - Một tác nhân có thể quản trị **mọi** nội dung và hành động của module theo kiểu headless thông qua
-  API JSON đó - toàn bộ bề mặt điều khiển, các verb và các thanh chắn an toàn nằm trong
+  API JSON đó, toàn bộ bề mặt điều khiển, các verb và các thanh chắn an toàn nằm trong
   [docs/AI-AGENTS.md](AI-AGENTS.md).
-- Các bản vá có AI hỗ trợ được xét duyệt và chấp nhận theo cùng điều kiện như bất kỳ bản vá nào khác - theo
+- Các bản vá có AI hỗ trợ được xét duyệt và chấp nhận theo cùng điều kiện như bất kỳ bản vá nào khác, theo
   tính đúng đắn, sự rõ ràng và các quy ước bên dưới, không phải theo ai (hay cái gì) đã viết chúng.
 - Nếu bạn điều khiển VDBackup từ một tác nhân, hãy dùng đầu ra JSON của `helper.sh` làm
   hợp đồng; đừng cào dữ liệu từ WebUI.
@@ -62,18 +62,18 @@ Các trợ lý và tác nhân AI là những người đóng góp hạng nhất 
 - Để thêm hoặc đổi một chuỗi: sửa `en.js` **và** `en.json`, rồi cập nhật mọi
   `<code>.json`. Đụng đến một nhãn hiển thị nghĩa là cập nhật **tất cả** các tập tin ngôn ngữ và
   **tất cả** các `README.<code>.md`.
-- Bản dịch là JSON thuần - một đóng góp đầu tiên tuyệt vời. Xem danh sách ngôn ngữ trong
+- Bản dịch là JSON thuần, một đóng góp đầu tiên tuyệt vời. Xem danh sách ngôn ngữ trong
   `module/webroot/i18n.js`.
 
 ## Commit & PR
 
 - Giữ PR tập trung. Mô tả cái gì và vì sao.
 - Ký nhận (sign off) các commit của bạn (DCO): `git commit -s` (thêm `Signed-off-by:`).
-- CI phải luôn xanh. Hãy tử tế trong các lần review - xem [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- CI phải luôn xanh. Hãy tử tế trong các lần review, xem [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Các issue tốt để bắt đầu
 
 Tìm các nhãn `good first issue` và `help wanted`. Bản dịch, tài liệu, các preset đích đến
 `rclone` mới và việc trau chuốt WebUI đều là những điểm khởi đầu tuyệt vời.
 
-*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến - xem [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md).*

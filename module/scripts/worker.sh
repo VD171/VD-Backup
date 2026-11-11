@@ -33,8 +33,35 @@
 
 d="${0%/*}"; [ "$d" = "$0" ] && d="."; MODDIR="$(cd "$d/.." 2>/dev/null && pwd || echo "${d%/*}")"
 STATE=/data/adb/vdbackup
+# Secrets (remote credentials, the age keypair, the rclone config) live on CREDENTIAL-
+# ENCRYPTED storage, locked until first unlock (BFU), NOT in /data/adb (device-encrypted,
+# readable before first unlock). secrets_init MOVES any legacy secrets out of the DE tree
+# permanently (historical installs kept them in /data/adb). See docs/SECURITY.md.
+SECRETS=/data/misc_ce/0/vdbackup
+ce_ready() { [ "$(getprop sys.user.0.ce_available)" = true ]; }
+secrets_init() {
+  [ -f "$SECRETS/.init" ] && return 0
+  ce_ready || return 1
+  mkdir -p "$SECRETS/creds" "$SECRETS/keys" 2>/dev/null || return 1
+  for _s in creds keys; do
+    _o="/data/adb/vdbackup/$_s"; [ -d "$_o" ] || continue
+    if [ -n "$(ls -A "$_o" 2>/dev/null)" ]; then
+      cp -a "$_o/." "$SECRETS/$_s/" 2>/dev/null || continue        # copy failed: keep the source
+      _ok=1; for _g in "$_o"/*; do [ -e "$_g" ] && { [ -e "$SECRETS/$_s/$(basename "$_g")" ] || _ok=0; }; done
+      [ "$_ok" = 1 ] && rm -rf "$_o"                               # only drop the source once every file landed
+    else rm -rf "$_o"; fi
+  done
+  if [ -f /data/adb/vdbackup/rclone.conf ]; then
+    cp -a /data/adb/vdbackup/rclone.conf "$SECRETS/rclone.conf" 2>/dev/null && [ -f "$SECRETS/rclone.conf" ] && rm -f /data/adb/vdbackup/rclone.conf
+  fi
+  chmod 700 "$SECRETS" "$SECRETS/creds" "$SECRETS/keys" 2>/dev/null
+  for _f in "$SECRETS/creds"/* "$SECRETS/keys"/* "$SECRETS/rclone.conf"; do [ -f "$_f" ] && chmod 600 "$_f" 2>/dev/null; done
+  restorecon -R "$SECRETS" 2>/dev/null
+  : > "$SECRETS/.init"
+}
+secrets_init 2>/dev/null
 # restic shells out to rclone for rclone: repos; point it at the module config.
-export RCLONE_CONFIG="$STATE/rclone.conf"
+export RCLONE_CONFIG="$SECRETS/rclone.conf"
 LOGS="$STATE/logs"
 # Backups live on credential-encrypted, user-visible storage (/sdcard/VDBackup,
 # per Android user), NOT in /data/adb (device-encrypted, readable before first
@@ -117,6 +144,14 @@ ssaid_restore() {
 # ends nsenter's option parsing so everything after is the command verbatim.
 if command -v nsenter >/dev/null 2>&1; then exec_ns() { nsenter --mount=/proc/1/ns/mnt -- "$@"; }
 else exec_ns() { "$@"; }; fi
+# framework tools (pm/cmd/am/settings/dumpsys/appops/content/svc/bmgr) are app_process
+# based: run them from /system/bin, in init's mount ns, with a CLEAN env and a system-only
+# PATH. The bundled Termux libs on LD_LIBRARY_PATH otherwise shadow ART's and binder
+# marshalling fails on some ROMs ("Failure calling service package: Failed transaction");
+# a Termux PATH (SSH/dropbear) would also shadow pm/am with wrappers that crash once
+# LD_LIBRARY_PATH is cleared. Bundled binaries keep LD_LIBRARY_PATH via exec_ns; only
+# framework tools go through fw. /system/bin/env is explicit so env is never a wrapper.
+fw() { exec_ns /system/bin/env -u LD_LIBRARY_PATH -u LD_PRELOAD PATH=/system/bin:/system_ext/bin:/vendor/bin:/product/bin "$@"; }
 
 # prefer bundled binaries, fall back to whatever the ROM provides
 bin_or() { if [ -x "$BIN/$1" ]; then echo "$BIN/$1"; elif [ -x "$CLOUD/$1" ]; then echo "$CLOUD/$1"; else echo "$1"; fi; }
@@ -143,6 +178,16 @@ VERB="$1"; OPID="$2"; ARGS_B64="$3"
 PROG="$LOGS/progress-$OPID.json"
 ARGS="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
 
+# Survive Android's low-memory killer. A bulk backup backgrounds the root manager and the
+# user opens other apps (camera, etc.); without this the LMK kills this detached worker
+# mid-op (seen on MIUI: op frozen at "preparing", pid alive, no output). Root can lower its
+# own oom score; children inherit it. Best-effort wakelock keeps the CPU alive with the
+# screen off. Both are released/harmless on exit.
+echo -1000 > /proc/$$/oom_score_adj 2>/dev/null || true
+echo "vdbackup_$OPID" > /sys/power/wake_lock 2>/dev/null || true
+_release_wakelock() { echo "vdbackup_$OPID" > /sys/power/wake_unlock 2>/dev/null || true; }
+trap _release_wakelock EXIT
+
 cleanup() { verifier_restore; rm -f "$LOGS/$OPID.pid"; }
 trap cleanup EXIT
 
@@ -152,13 +197,18 @@ jstr() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'; }
 # eta/n/of/cur are extra and optional (empty string / 0 = unknown).
 # progx <percent> <phase> <item> <rate> <eta> <n> <of> <cur>
 progx() {
+  # in a batch the n/of/cur fields carry the app position (app i of N), overriding the
+  # per-op extras, so the UI shows overall progress while one worker drives the whole list.
+  if [ "${IN_BATCH:-0}" = 1 ]; then set -- "$1" "$2" "$3" "$4" "$5" "${BATCH_I:-0}" "${BATCH_N:-0}" "${BATCH_CUR:-}"; fi
   _pxn="$6"; case "$_pxn" in ''|*[!0-9]*) _pxn=0 ;; esac
   _pxo="$7"; case "$_pxo" in ''|*[!0-9]*) _pxo=0 ;; esac
   printf '{"opid":"%s","percent":%s,"phase":"%s","item":"%s","done":false,"rate":"%s","eta":"%s","n":%s,"of":%s,"cur":"%s"}\n' \
     "$OPID" "$1" "$(jstr "$2")" "$(jstr "$3")" "$(jstr "$4")" "$(jstr "$5")" "$_pxn" "$_pxo" "$(jstr "$8")" > "$PROG"; }
 prog() {  # prog <percent> <phase> <item> (back-compat: no rich extras)
   progx "$1" "$2" "$3" "" "" 0 0 ""; }
-finish() { # finish <ok> <code>
+finish() { # finish <ok> <code>; inside a batch it records the per-app result instead of
+  # writing the terminal state, so one app's end does not end the whole batch op.
+  if [ "${IN_BATCH:-0}" = 1 ]; then LAST_OK="$1"; LAST_CODE="$2"; return 0; fi
   printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":%s,"code":"%s"}\n' \
     "$OPID" "$1" "$2" > "$PROG"; }
 audit() { printf '{"ts":"%s","op":"%s","opid":"%s","detail":"%s"}\n' \
@@ -172,7 +222,7 @@ audit() { printf '{"ts":"%s","op":"%s","opid":"%s","detail":"%s"}\n' \
 notify() {
   _nl="$(cfg .language)"; case "$_nl" in ""|null|auto) _nl=en ;; esac
   if command -v vdb_notify_msg >/dev/null 2>&1; then _nm="$(vdb_notify_msg "$_nl" "$1" "$2")"; else _nm="$2"; fi
-  cmd notification post -t "VDBackup" "vdbackup_$OPID" "$_nm" >/dev/null 2>&1 && return 0
+  fw cmd notification post -t "VDBackup" "vdbackup_$OPID" "$_nm" >/dev/null 2>&1 && return 0
   [ -f "$MODDIR/etc/vdbackup_helper.dex" ] && LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" \
       /system/bin ru.vd171.vdbackup.Helper notify "VDBackup" "$_nm" >/dev/null 2>&1; }
 
@@ -183,7 +233,7 @@ cfg() { "$JQ" -r "$1 // empty" "$STATE/config.json" 2>/dev/null; }
 # it works across ROMs: dumpsys active default network, legacy NetworkInfo, then
 # the default route interface.
 net_transport() {
-  _d="$(exec_ns dumpsys connectivity 2>/dev/null)"
+  _d="$(fw dumpsys connectivity 2>/dev/null)"
   _id="$(printf '%s' "$_d" | sed -n 's/.*[Aa]ctive default network[^0-9]*\([0-9][0-9]*\).*/\1/p' | head -1)"
   if [ -n "$_id" ]; then
     case "$(printf '%s' "$_d" | grep -m1 "network{$_id}")" in
@@ -220,13 +270,20 @@ net_guard() {
 # companion (could be mid-upload) or the framework itself.
 freeze() {
   case "$1" in ru.vd171.vdbackup|android|system|"") return 0 ;; esac
-  exec_ns env -u LD_LIBRARY_PATH -u LD_PRELOAD /system/bin/am force-stop "$1" 2>/dev/null
+  # Bounded and best-effort: a hung ActivityManager (binder "Failed transaction" under
+  # memory pressure, seen in bulk-backup logs) must not freeze the op at "preparing".
+  # Skip and continue if the force-stop stalls or fails; a running app is still backed up.
+  if exec_ns test -x /system/bin/timeout; then
+    fw /system/bin/timeout 30 /system/bin/am force-stop "$1" 2>/dev/null || true
+  else
+    fw /system/bin/am force-stop "$1" 2>/dev/null || true
+  fi
 }
 PM_FLAGS=""
 pm_install_flags() {
   if [ -z "$PM_FLAGS" ]; then
     PM_FLAGS="-r -t -d"
-    exec_ns pm install-create --help 2>&1 | grep -q 'bypass-low-target-sdk-block' \
+    fw pm install-create --help 2>&1 | grep -q 'bypass-low-target-sdk-block' \
       && PM_FLAGS="$PM_FLAGS --bypass-low-target-sdk-block"
   fi
   printf '%s' "$PM_FLAGS"
@@ -252,7 +309,7 @@ installer_flag() {   # <captured-installer>; echoes "-i <pkg>" or nothing
 # activity log shows what actually stuck - and warn if the spoof did not take (Swift
 # Backup verifies getInstallSourceInfo the same way). Audit-only, never fails the restore.
 verify_install_source() {
-  _ivs="$(exec_ns dumpsys package "$PKG" 2>/dev/null)"
+  _ivs="$(fw dumpsys package "$PKG" 2>/dev/null)"
   _inst="$(printf '%s' "$_ivs" | sed -n 's/.*installerPackageName=\([^ ,}]*\).*/\1/p' | head -1)"
   _init="$(printf '%s' "$_ivs" | sed -n 's/.*[iI]nitiatingPackageName=\([^ ,}]*\).*/\1/p' | head -1)"
   audit "install-source $PKG: installer=${_inst:-none} initiating=${_init:-none}"
@@ -315,17 +372,17 @@ deep_spoof_installer() {   # <pkg> <installer-pkg>
 VERIFIER_OLD=""
 PKGVERIF_OLD=""
 verifier_off() {
-  VERIFIER_OLD="$(exec_ns settings get global verifier_verify_adb_installs 2>/dev/null)"
-  exec_ns settings put global verifier_verify_adb_installs 0 2>/dev/null
+  VERIFIER_OLD="$(fw settings get global verifier_verify_adb_installs 2>/dev/null)"
+  fw settings put global verifier_verify_adb_installs 0 2>/dev/null
   # also silence the Play Protect scan around the install (Swift Backup does both)
-  PKGVERIF_OLD="$(exec_ns settings get global package_verifier_enable 2>/dev/null)"
-  exec_ns settings put global package_verifier_enable 0 2>/dev/null
+  PKGVERIF_OLD="$(fw settings get global package_verifier_enable 2>/dev/null)"
+  fw settings put global package_verifier_enable 0 2>/dev/null
 }
 verifier_restore() {
   # restore the EXACT prior state - including leaving it ABSENT when it was null/empty
   # (a 0/1 where there was none is itself a tell on a stealth device).
-  case "$VERIFIER_OLD" in ""|null|"null") : ;; *) exec_ns settings put global verifier_verify_adb_installs "$VERIFIER_OLD" 2>/dev/null ;; esac
-  case "$PKGVERIF_OLD" in ""|null|"null") : ;; *) exec_ns settings put global package_verifier_enable "$PKGVERIF_OLD" 2>/dev/null ;; esac
+  case "$VERIFIER_OLD" in ""|null|"null") : ;; *) fw settings put global verifier_verify_adb_installs "$VERIFIER_OLD" 2>/dev/null ;; esac
+  case "$PKGVERIF_OLD" in ""|null|"null") : ;; *) fw settings put global package_verifier_enable "$PKGVERIF_OLD" 2>/dev/null ;; esac
   VERIFIER_OLD=""; PKGVERIF_OLD=""
 }
 # wait for the freshly installed app's data dir to exist before chown (it may lag
@@ -406,14 +463,14 @@ ROOT_MANAGERS="com.topjohnwu.magisk io.github.vvb2060.magisk io.github.huskydg.m
 is_root_manager() { case " $ROOT_MANAGERS " in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
 
 COMPANION_PKG=ru.vd171.vdbackup
-companion_installed() { exec_ns pm path "$COMPANION_PKG" >/dev/null 2>&1; }
+companion_installed() { fw pm path "$COMPANION_PKG" >/dev/null 2>&1; }
 companion_ensure() {
   companion_installed && return 0
   [ -f "$MODDIR/etc/companion.apk" ] || return 1
   # system_server cannot read /data/adb (adb_data_file); stage the APK in a
   # location the installer can read, then install from there.
   _capk=/data/local/tmp/vdbackup-companion.apk; cp "$MODDIR/etc/companion.apk" "$_capk"; chmod 644 "$_capk"
-  exec_ns pm install -r "$_capk" >/dev/null 2>&1
+  fw pm install -r "$_capk" >/dev/null 2>&1
   rm -f "$_capk"
   companion_installed
 }
@@ -429,7 +486,7 @@ drive_cmd() {                               # drive_cmd <op> [extra -e args...] 
   _op="$1"; shift
   _drv="$(companion_resdir)"; _res="$_drv/res.$OPID.$$"
   exec_ns rm -f "$_res" "$_res.done" 2>/dev/null
-  exec_ns env -u LD_LIBRARY_PATH -u LD_PRELOAD /system/bin/am start-foreground-service -n "$COMPANION_PKG/.DriveCommandService" \
+  fw /system/bin/am start-foreground-service -n "$COMPANION_PKG/.DriveCommandService" \
     -e op "$_op" "$@" -e result "$_res" >/dev/null 2>&1
   _i=0; while ! exec_ns test -f "$_res.done" && [ "$_i" -lt 600 ]; do sleep 1; _i=$((_i+1)); done
   if exec_ns test -f "$_res.done"; then exec_ns cat "$_res"; exec_ns rm -f "$_res" "$_res.done" 2>/dev/null
@@ -448,6 +505,33 @@ resolve_dest() {
     DPATH="$("$JQ" -r '.path // empty'   "$DJSON")"
     DREPO="$("$JQ" -r '.repo // empty'   "$DJSON")"
   fi
+}
+
+# A local backup destination MUST live in user storage. Backups must never be written to
+# /data/adb, /data/system and the like: those are device-encrypted / system paths, readable
+# before first unlock (BFU), so a backup there leaks app data at rest. Allow only internal
+# (/data/media = /sdcard) and external removable storage (/storage, /mnt/media_rw).
+# A backup must land where it stays encrypted at rest before first unlock (BFU). Android FBE
+# keeps credential-encrypted (CE) user storage locked until the user unlocks once; everything
+# else, the device-encrypted (DE) and system trees (/data/adb, /data/system, /data/misc,
+# /data/user_de, /data/local, /metadata, /cache, /persist, ...), is readable in the BFU state
+# and would leak app data at rest. So this is an allowlist (deny by default): only CE internal
+# storage (/sdcard, /data/media) and removable media (/storage, /mnt/media_rw) are permitted;
+# every other path is refused, no blocklist to keep in sync. `..` is rejected first so a
+# traversal like /data/media/../adb can never escape the allowlist into a pre-BFU tree.
+safe_local_dest() {  # <path>; 0 = allowed, 1 = refuse
+  case "$1" in *..*) return 1 ;; esac
+  case "$1" in
+    /data/media/*|/storage/*|/mnt/media_rw/*|/sdcard/*|/sdcard) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+# free bytes available on the filesystem that holds <path> (0 when it cannot be read).
+fs_free() {
+  _fa="$(stat -f -c %a "$1" 2>/dev/null)"; _fs="$(stat -f -c %S "$1" 2>/dev/null)"
+  case "$_fa" in ''|*[!0-9]*) echo 0; return ;; esac
+  case "$_fs" in ''|*[!0-9]*) echo 0; return ;; esac
+  echo $(( _fa * _fs ))
 }
 
 # Offline edition omits the cloud transport binaries (rclone/restic/rsync/ssh/sftp)
@@ -494,7 +578,7 @@ remote_pfx() { printf '%s' "${DPATH:+$DPATH/}vdbackup"; }
 rclone_live() {   # <phase> <basepct> <rclone args...>; returns rclone's exit code
   _rlph="$1"; _rlbp="$2"; shift 2
   _rlrc="$STATE/staging/rclone-rc.$OPID"; rm -f "$_rlrc"
-  { exec_ns "$RCLONE" --config "$STATE/rclone.conf" \
+  { exec_ns "$RCLONE" --config "$SECRETS/rclone.conf" \
        --stats 1s --stats-one-line --stats-log-level NOTICE "$@" 2>&1; echo $? > "$_rlrc"; } \
   | while IFS= read -r _rll; do
       case "$_rll" in *Transferred:*) ;; *) continue ;; esac
@@ -511,7 +595,7 @@ rclone_live() {   # <phase> <basepct> <rclone args...>; returns rclone's exit co
 # Quota guard (best-effort): if the remote reports free space and the backup would not
 # fit, finish ERR_QUOTA before uploading. Backends without "about"/free info are skipped.
 rclone_quota_guard() {   # <remote:> <neededbytes>; returns 1 (and finishes) on overflow
-  _qab="$(exec_ns "$RCLONE" --config "$STATE/rclone.conf" about --json "$1" 2>/dev/null)"
+  _qab="$(exec_ns "$RCLONE" --config "$SECRETS/rclone.conf" about --json "$1" 2>/dev/null)"
   [ -n "$_qab" ] || return 0
   _qfree="$(printf '%s' "$_qab" | "$JQ" -r '.free // empty' 2>/dev/null)"
   case "$_qfree" in ''|*[!0-9]*) return 0 ;; esac
@@ -523,7 +607,7 @@ rclone_quota_guard() {   # <remote:> <neededbytes>; returns 1 (and finishes) on 
 # Checksum seal (best-effort): confirm the remote copy matches the local source by hash.
 # A backend with no common hash is skipped with an audit note (never a hard fail).
 rclone_check_seal() {   # <localdir> <remote:path>; 0 = verified or skipped, 1 = mismatch
-  _cso="$(exec_ns "$RCLONE" --config "$STATE/rclone.conf" check "$1" "$2" 2>&1)"; _csr=$?
+  _cso="$(exec_ns "$RCLONE" --config "$SECRETS/rclone.conf" check "$1" "$2" 2>&1)"; _csr=$?
   case "$_cso" in
     *"no common hash"*|*"hash unsupported"*|*"Hash unsupported"*|*"not support hash"*|*"no hashes"*)
       audit "verify seal skipped (remote has no hashes) $PKG"; return 0 ;;
@@ -563,6 +647,10 @@ transfer_full() {
             done
             exec_ns rm -rf "$_stg" ;;
     local)  if [ -n "$DPATH" ] && [ "$DPATH" != "$BACKUPS" ]; then
+              safe_local_dest "$DPATH" || { audit "refused unsafe local dest $DPATH $PKG"; finish false ERR_DEST_UNSAFE; return 1; }
+              _lsz="$(du -s -B1 "$DEST" 2>/dev/null | cut -f1)"; _lfree="$(fs_free "$DPATH")"
+              [ "$_lfree" -gt 0 ] && [ "${_lsz:-0}" -gt 0 ] && [ "$_lfree" -lt $(( _lsz + 10485760 )) ] \
+                && { audit "no space at dest $DPATH $PKG"; finish false ERR_NO_SPACE; return 1; }
               mkdir -p "$(remote_pfx)/$PKG" && cp -a "$DEST" "$(remote_pfx)/$PKG/" \
                 || { audit "local transfer failed $PKG"; finish false ERR_TRANSFER; return 1; }; fi ;;
   esac
@@ -575,9 +663,9 @@ do_snapshot() {
   prog 5 freezing "$PKG"; notify backup_start "$PKG"
   freeze "$PKG"
   PATHS="$(item_paths)"
-  for a in $(exec_ns pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do PATHS="$PATHS $a"; done
+  for a in $(fw pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do PATHS="$PATHS $a"; done
   prog 20 snapshot-init "$PKG"
-  export RESTIC_PASSWORD_FILE="$STATE/creds/$DESTID.pass"
+  export RESTIC_PASSWORD_FILE="$SECRETS/creds/$DESTID.pass"
   # initialize the repo on first use
   exec_ns "$RESTIC" -r "$DREPO" snapshots >/dev/null 2>&1 || exec_ns "$RESTIC" -r "$DREPO" init >/dev/null 2>&1
   prog 45 snapshot "$PKG"
@@ -603,7 +691,7 @@ do_mirror() {
   if echo " $ITEMS " | grep -q ' apk '; then
     prog 18 mirror apk
     apkdir="$STATE/staging/mapk.$OPID"; rm -rf "$apkdir"; mkdir -p "$apkdir"
-    for p in $(exec_ns pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do
+    for p in $(fw pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do
       "$ZSTD" -q -10 -c "$p" > "$apkdir/$(basename "$p").zst"; done
     case "$DTYPE" in
       local)  mkdir -p "$(remote_pfx)/$PKG/apk" && exec_ns "$RSYNC" -a --delete "$apkdir/" "$(remote_pfx)/$PKG/apk/" >/dev/null 2>&1 ;;
@@ -633,7 +721,7 @@ backup() {
   is_root_manager "$PKG" && { audit "refused root manager backup: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
   BACKUPS="$(backups_dir "$U")"
-  if ! exec_ns pm path --user "$U" "$PKG" >/dev/null 2>&1 \
+  if ! fw pm path --user "$U" "$PKG" >/dev/null 2>&1 \
      && [ ! -d "/data/user/$U/$PKG" ] && [ ! -d "/data/user_de/$U/$PKG" ]; then
     audit "backup package not installed: $PKG (user $U)"; finish false ERR_PKG_NOT_FOUND; return
   fi
@@ -664,13 +752,16 @@ backup() {
   # modifies nothing (no force-stop, no archives), returns ok with a plan object.
   DRY="$(jget "$ARGS" '.dry_run')"
   if [ "$DRY" = true ]; then
+    # in a batch the per-app plan is not shown; count it as a no-op success and move on
+    # (writing the plan here would be the batch op's terminal state and end it after app 1).
+    if [ "${IN_BATCH:-0}" = 1 ]; then LAST_OK=true; return; fi
     prog 10 planning "$PKG"; audit "dry-run $PKG"
     PLAN='[]'
     add_plan() { [ -e "$2" ] || return 0
       sz="$(du -s -B1 "$2" 2>/dev/null | cut -f1)"; sz="${sz:-0}"
       PLAN="$(printf '%s' "$PLAN" | "$JQ" --arg t "$1" --arg p "$2" --argjson b "$sz" '. + [{type:$t,path:$p,bytes:$b}]')"; }
     if echo " $ITEMS " | grep -q ' apk '; then
-      asz=0; for p in $(exec_ns pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do
+      asz=0; for p in $(fw pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do
         s="$(stat -c %s "$p" 2>/dev/null || echo 0)"; asz=$((asz+s)); done
       PLAN="$(printf '%s' "$PLAN" | "$JQ" --argjson b "$asz" '. + [{type:"apk",path:"(installed base + splits)",bytes:$b}]')"
     fi
@@ -697,7 +788,7 @@ backup() {
   # metadata (shell)
   # dumpsys output is huge; write to a file and parse the file (mksh has no printf
   # builtin, so `printf '%s' "$HUGE"` would hit the external printf's ARG_MAX limit).
-  DUMPF="$STATE/staging/dump.$OPID"; exec_ns dumpsys package "$PKG" > "$DUMPF" 2>/dev/null
+  DUMPF="$STATE/staging/dump.$OPID"; fw dumpsys package "$PKG" > "$DUMPF" 2>/dev/null
   VN="$(sed -n 's/.*versionName=\([^ ]*\).*/\1/p' "$DUMPF" | head -1)"
   VC="$(sed -n 's/.*versionCode=\([0-9]*\).*/\1/p' "$DUMPF" | head -1)"; VC="${VC:-0}"
   ISSYS=false; grep -q 'pkgFlags=\[.*SYSTEM' "$DUMPF" && ISSYS=true
@@ -723,6 +814,22 @@ backup() {
       ru.vd171.vdbackup.Helper icon "$PKG" "$_ic" "$U" >/dev/null 2>&1
     [ -s "$_ic" ] && ICON_B64="$(base64 -w0 < "$_ic")"
     rm -f "$_ic"
+  fi
+
+  # a custom local destination must be in user storage, never a system/pre-BFU path
+  if [ "$DTYPE" = local ] && [ -n "$DPATH" ] && ! safe_local_dest "$DPATH"; then
+    audit "refused unsafe local dest $DPATH $PKG"; finish false ERR_DEST_UNSAFE; return
+  fi
+  # free-space guard: the live footprint is an upper bound (the backup is compressed), so
+  # if it fits uncompressed it surely fits. Refuse up front instead of filling the disk.
+  _spneed=0
+  for _sp in $(item_paths); do [ -e "$_sp" ] && { _spz="$(du -s -B1 "$_sp" 2>/dev/null | cut -f1)"; _spneed=$(( _spneed + ${_spz:-0} )); }; done
+  if echo " $ITEMS " | grep -q ' apk '; then
+    for _sp in $(fw pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do _spz="$(stat -c %s "$_sp" 2>/dev/null || echo 0)"; _spneed=$(( _spneed + _spz )); done
+  fi
+  _spfree="$(fs_free "$BACKUPS")"
+  if [ "$_spfree" -gt 0 ] && [ "$_spneed" -gt 0 ] && [ "$_spfree" -lt $(( _spneed + 10485760 )) ]; then
+    audit "insufficient space need=$_spneed free=$_spfree $PKG"; finish false ERR_NO_SPACE; return
   fi
 
   TS="$(date -u +%Y%m%dT%H%M%SZ)"
@@ -807,7 +914,7 @@ backup() {
   APKS='[]'
   if echo " $ITEMS " | grep -q ' apk '; then
     ITEMN=$(( ITEMN + 1 )); progx 15 apk "$PKG" "" "" "$ITEMN" "$ITEMOF" apk
-    for p in $(exec_ns pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do
+    for p in $(fw pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do
       name="$(basename "$p")"
       if use_apk_age; then
         "$ZSTD" -q "-$APKLEVEL" -c "$p" | enc_age "$DEST/${name}.zst.age"; an="${name}.zst.age"
@@ -840,7 +947,7 @@ backup() {
   PERMS_JSON="$(printf '%s\n' "$PERMS_TSV" | "$JQ" -R -s 'split("\n")|map(select(length>0)|split("\t")|{name:.[0],granted:(.[1]=="true")})')"
   [ -n "$PERMS_JSON" ] || PERMS_JSON='[]'
   # app ops (per user)
-  APPOPS_JSON="$(exec_ns cmd appops get --user "$U" "$PKG" 2>/dev/null | "$JQ" -R -s '
+  APPOPS_JSON="$(fw cmd appops get --user "$U" "$PKG" 2>/dev/null | "$JQ" -R -s '
       split("\n")|map(select(test(": "))
         |{op:(.|sub("^ +";"")|split(":")[0]), mode:(.|split(": ")[1]|split(";")[0])}
         |select(.op|test("^[A-Z][A-Z0-9_]*$")))')"
@@ -851,9 +958,9 @@ backup() {
   #   - notification-listener components this app has enabled
   #   - accessibility-service components this app has enabled
   _pe="$(printf '%s' "$PKG" | sed 's/\./\\./g')"
-  DOZE=false; exec_ns dumpsys deviceidle whitelist 2>/dev/null | grep -qE "(^|,)$_pe(,|\$)" && DOZE=true
-  NLJSON="$(exec_ns env -u LD_LIBRARY_PATH /system/bin/settings --user "$U" get secure enabled_notification_listeners 2>/dev/null | tr ':' '\n' | grep "^$PKG/" | "$JQ" -R -s 'split("\n")|map(select(length>0))')"; [ -n "$NLJSON" ] || NLJSON='[]'
-  ACCJSON="$(exec_ns env -u LD_LIBRARY_PATH /system/bin/settings --user "$U" get secure enabled_accessibility_services 2>/dev/null | tr ':' '\n' | grep "^$PKG/" | "$JQ" -R -s 'split("\n")|map(select(length>0))')"; [ -n "$ACCJSON" ] || ACCJSON='[]'
+  DOZE=false; fw dumpsys deviceidle whitelist 2>/dev/null | grep -qE "(^|,)$_pe(,|\$)" && DOZE=true
+  NLJSON="$(fw /system/bin/settings --user "$U" get secure enabled_notification_listeners 2>/dev/null | tr ':' '\n' | grep "^$PKG/" | "$JQ" -R -s 'split("\n")|map(select(length>0))')"; [ -n "$NLJSON" ] || NLJSON='[]'
+  ACCJSON="$(fw /system/bin/settings --user "$U" get secure enabled_accessibility_services 2>/dev/null | tr ':' '\n' | grep "^$PKG/" | "$JQ" -R -s 'split("\n")|map(select(length>0))')"; [ -n "$ACCJSON" ] || ACCJSON='[]'
   # ssaid: OPT-IN only (.ssaid arg). The device ANDROID_ID is sensitive and its
   # restore rewrites a system file, so we never capture it unless asked.
   SSAID=""; SSF="/data/system/users/$U/settings_ssaid.xml"
@@ -948,7 +1055,7 @@ do_restore_snapshot() {
   [ -n "$DREPO" ] || { finish false ERR_NO_REPO; return; }
   transport_guard snapshot || return
   case "$DREPO" in /*) : ;; *) net_guard || return ;; esac   # remote restic repo
-  export RESTIC_PASSWORD_FILE="$STATE/creds/$DESTID.pass"
+  export RESTIC_PASSWORD_FILE="$SECRETS/creds/$DESTID.pass"
   prog 5 fetching "$PKG"; audit "restore-snapshot start $PKG"; notify restore_start "$PKG"
   freeze "$PKG"
   ST="$STATE/staging/restore.$OPID"; rm -rf "$ST"; mkdir -p "$ST"
@@ -960,12 +1067,12 @@ do_restore_snapshot() {
   # install APKs found in the restored tree
   prog 55 installing "$PKG"
   verifier_off
-  SESSION="$(exec_ns pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
+  SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
   if [ -n "$SESSION" ]; then
     find "$ST/data/app" -name '*.apk' 2>/dev/null | while IFS= read -r apk; do
-      exec_ns pm install-write "$SESSION" "$(basename "$apk" .apk)" "$apk" >/dev/null 2>&1
+      fw pm install-write "$SESSION" "$(basename "$apk" .apk)" "$apk" >/dev/null 2>&1
     done
-    exec_ns pm install-commit "$SESSION" >/dev/null 2>&1
+    fw pm install-commit "$SESSION" >/dev/null 2>&1
   fi
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
@@ -992,18 +1099,18 @@ do_restore_mirror() {
   prog 5 fetching "$PKG"; audit "restore-mirror start $PKG"; notify restore_start "$PKG"
   if [ "$DTYPE" = local ]; then SRC="$(remote_pfx)/$PKG"
   else SRC="$STATE/staging/mrestore.$OPID"; rm -rf "$SRC"; mkdir -p "$SRC"
-       exec_ns "$RCLONE" --config "$STATE/rclone.conf" copy "$DREMOTE:$(remote_pfx)/$PKG" "$SRC" >/dev/null 2>&1; fi
+       exec_ns "$RCLONE" --config "$SECRETS/rclone.conf" copy "$DREMOTE:$(remote_pfx)/$PKG" "$SRC" >/dev/null 2>&1; fi
   [ -d "$SRC" ] || { finish false ERR_NO_BACKUP; return; }
   freeze "$PKG"
   prog 35 installing "$PKG"
   verifier_off
-  SESSION="$(exec_ns pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
+  SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
   if [ -n "$SESSION" ] && [ -d "$SRC/apk" ]; then
     TMP="$STATE/staging/mapk-r.$OPID"; rm -rf "$TMP"; mkdir -p "$TMP"
     for af in "$SRC"/apk/*.zst; do [ -e "$af" ] || continue
       bn="$(basename "$af" .zst)"; "$ZSTD" -dqc "$af" > "$TMP/$bn"
-      exec_ns pm install-write "$SESSION" "${bn%.apk}" "$TMP/$bn" >/dev/null 2>&1; done
-    exec_ns pm install-commit "$SESSION" >/dev/null 2>&1; rm -rf "$TMP"
+      fw pm install-write "$SESSION" "${bn%.apk}" "$TMP/$bn" >/dev/null 2>&1; done
+    fw pm install-commit "$SESSION" >/dev/null 2>&1; rm -rf "$TMP"
   fi
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
@@ -1082,13 +1189,25 @@ restore() {
     done
     rm -rf "$TDIR"
     TERR="$(printf '%s' "$TERR" | sed 's/^ *//')"
+    audit "restore-test done $PKG ok=$([ "$TFAIL" = 0 ] && echo true || echo false) failed=$TFAIL"
+    # in a batch, record the per-app result instead of writing the op's terminal state.
+    if [ "${IN_BATCH:-0}" = 1 ]; then if [ "$TFAIL" -eq 0 ]; then LAST_OK=true; else LAST_OK=false; fi; return; fi
     "$JQ" -n --arg opid "$OPID" --arg pkg "$PKG" --argjson total "$TTOTAL" --argjson failed "$TFAIL" --arg errs "$TERR" \
       '{opid:$opid,percent:100,phase:"finished",done:true, ok:($failed==0),
         code:(if $failed==0 then "ERR_NONE" else "ERR_RESTORE_TEST" end),
         restore_test:true, package:$pkg, archives:$total, failed:$failed,
         errors:($errs|split(" ")|map(select(length>0)))}' > "$PROG"
-    audit "restore-test done $PKG ok=$([ "$TFAIL" = 0 ] && echo true || echo false) failed=$TFAIL"
     return
+  fi
+
+  # an uninstalled target can only be restored by (re)installing its APK first: the data
+  # dirs do not exist yet, so data/obb/media have nowhere to land. Force the APK in even
+  # if the selection omitted it; with no APK in the backup the app cannot be restored.
+  APK_PRESENT=false; ls "$REF"/base*.apk.zst* >/dev/null 2>&1 && APK_PRESENT=true
+  INSTALLED=false; fw pm path --user "$U" "$PKG" >/dev/null 2>&1 && INSTALLED=true
+  if [ "$INSTALLED" = false ]; then
+    [ "$APK_PRESENT" = true ] || { audit "restore: $PKG not installed and backup has no APK"; finish false ERR_INSTALL; return; }
+    [ -n "$RITEMS" ] && case " $RITEMS " in *" apk "*) : ;; *) RITEMS="apk $RITEMS" ;; esac
   fi
 
   prog 3 fetching "$PKG"; audit "restore start $PKG"; notify restore_start "$PKG"
@@ -1100,7 +1219,7 @@ restore() {
   TMP=/data/local/tmp/vdb.$$; mkdir -p "$TMP"
   verifier_off
   RINST="$("$JQ" -r '.package.installer // empty' "$M" 2>/dev/null)"
-  SESSION=""; want_item apk && SESSION="$(exec_ns pm install-create $(pm_install_flags) $(installer_flag "$RINST") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
+  SESSION=""; want_item apk && SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "$RINST") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
   if [ -n "$SESSION" ]; then
     for af in "$REF"/base*.apk.zst* "$REF"/split_*.apk.zst*; do
       [ -e "$af" ] || continue
@@ -1111,11 +1230,21 @@ restore() {
       else
         "$ZSTD" -dqc "$af" > "$TMP/$outname"
       fi
-      exec_ns pm install-write "$SESSION" "${outname%.apk}" "$TMP/$outname" >/dev/null 2>&1
+      fw pm install-write "$SESSION" "${outname%.apk}" "$TMP/$outname" >/dev/null 2>&1
     done
-    exec_ns pm install-commit "$SESSION" >/dev/null 2>&1
+    CMT="$(fw pm install-commit "$SESSION" 2>&1)"
   fi
   rm -rf "$TMP"
+
+  # verify the APK actually installed when it was part of this restore: a silent pm
+  # failure (broken binder call, rejected session) must never be reported as success,
+  # or data is restored into a package that is not there (issue #7).
+  if want_item apk && [ "$APK_PRESENT" = true ]; then
+    if [ -z "$SESSION" ] || ! fw pm path --user "$U" "$PKG" >/dev/null 2>&1; then
+      audit "restore: APK install failed for $PKG: $(printf '%s' "${CMT:-no session}" | tr '\n' ' ' | cut -c1-200)"
+      finish false ERR_INSTALL; return
+    fi
+  fi
 
   # live owner of the freshly installed data dir (uid differs per device)
   wait_datadir "/data/user/$U/$PKG"
@@ -1197,37 +1326,37 @@ restore() {
   "$JQ" -c '.permissions.runtime[]?' "$M" 2>/dev/null | while IFS= read -r row; do
     name="$(printf '%s' "$row" | "$JQ" -r '.name')"; g="$(printf '%s' "$row" | "$JQ" -r '.granted')"
     [ -n "$name" ] && [ "$name" != null ] || continue
-    if [ "$g" = "true" ]; then exec_ns pm grant  --user "$U" "$PKG" "$name" 2>/dev/null
-    else                        exec_ns pm revoke --user "$U" "$PKG" "$name" 2>/dev/null; fi
+    if [ "$g" = "true" ]; then fw pm grant  --user "$U" "$PKG" "$name" 2>/dev/null
+    else                        fw pm revoke --user "$U" "$PKG" "$name" 2>/dev/null; fi
   done
-  exec_ns cmd appops reset --user "$U" "$PKG" 2>/dev/null
+  fw cmd appops reset --user "$U" "$PKG" 2>/dev/null
   "$JQ" -c '.permissions.appops[]?' "$M" 2>/dev/null | while IFS= read -r row; do
     op="$(printf '%s' "$row" | "$JQ" -r '.op')"; mode="$(printf '%s' "$row" | "$JQ" -r '.mode')"
     [ -n "$op" ] && [ "$op" != null ] && [ -n "$mode" ] || continue
-    exec_ns cmd appops set --user "$U" "$PKG" "$op" "$mode" 2>/dev/null
+    fw cmd appops set --user "$U" "$PKG" "$op" "$mode" 2>/dev/null
   done
   # extra grants captured at backup: Doze battery-exemption + notification-listener +
   # accessibility components, re-applied so automation/accessibility apps work at once.
   [ "$("$JQ" -r '.permissions.doze_whitelisted // false' "$M" 2>/dev/null)" = true ] && \
-    exec_ns dumpsys deviceidle whitelist "+$PKG" >/dev/null 2>&1
+    fw dumpsys deviceidle whitelist "+$PKG" >/dev/null 2>&1
   _secure_append() {   # <secure-key> <component>: append the component if not already listed
-    _cur="$(exec_ns env -u LD_LIBRARY_PATH /system/bin/settings --user "$U" get secure "$1" 2>/dev/null)"
+    _cur="$(fw /system/bin/settings --user "$U" get secure "$1" 2>/dev/null)"
     case "$_cur" in null|"") _cur="" ;; esac
     case ":$_cur:" in *":$2:"*) return 0 ;; esac
-    exec_ns env -u LD_LIBRARY_PATH /system/bin/settings --user "$U" put secure "$1" "${_cur:+$_cur:}$2" 2>/dev/null
+    fw /system/bin/settings --user "$U" put secure "$1" "${_cur:+$_cur:}$2" 2>/dev/null
   }
   "$JQ" -r '.permissions.notification_listeners[]?' "$M" 2>/dev/null | while IFS= read -r _c; do
     [ -n "$_c" ] && _secure_append enabled_notification_listeners "$_c"; done
   "$JQ" -r '.permissions.accessibility_services[]?' "$M" 2>/dev/null | while IFS= read -r _c; do
     [ -n "$_c" ] && _secure_append enabled_accessibility_services "$_c"; done
   [ -n "$("$JQ" -r '.permissions.accessibility_services[0]? // empty' "$M" 2>/dev/null)" ] && \
-    exec_ns env -u LD_LIBRARY_PATH /system/bin/settings --user "$U" put secure accessibility_enabled 1 2>/dev/null
+    fw /system/bin/settings --user "$U" put secure accessibility_enabled 1 2>/dev/null
   # install-source attribution is applied at install time via install-create -i (see
   # installer_flag); pm set-installer is rejected for uid 0, so nothing to do here.
   # enabled-state fidelity: an app disabled when it was backed up is disabled again.
   # enabled codes: 2=disabled, 3=disabled-by-user (re-disable); others stay enabled.
   REN="$("$JQ" -r '.package.enabled // 0' "$M" 2>/dev/null)"
-  case "$REN" in 2|3) exec_ns pm disable-user --user "$U" "$PKG" 2>/dev/null ;; esac
+  case "$REN" in 2|3) fw pm disable-user --user "$U" "$PKG" 2>/dev/null ;; esac
   # deep install-source spoof (OPT-IN per-op): also forge initiatingPackageName +
   # packageSource in packages.xml so the app looks fully Play-installed. Reboot required.
   if want_item apk && [ "$(jget "$ARGS" '.deep_spoof')" = true ]; then
@@ -1270,11 +1399,11 @@ do_import_databackup() {
     TMP="$STATE/staging/dbimp.$OPID"; rm -rf "$TMP"; mkdir -p "$TMP"
     "$ZSTD" -dqc "$REF/apk.tar.zst" | exec_ns "$TAR" $NAN -x -C "$TMP" 2>/dev/null
     verifier_off
-    SESSION="$(exec_ns pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
+    SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
     if [ -n "$SESSION" ]; then
       for apk in "$TMP"/*.apk; do [ -e "$apk" ] || continue
-        exec_ns pm install-write "$SESSION" "$(basename "$apk" .apk)" "$apk" >/dev/null 2>&1; done
-      exec_ns pm install-commit "$SESSION" >/dev/null 2>&1
+        fw pm install-write "$SESSION" "$(basename "$apk" .apk)" "$apk" >/dev/null 2>&1; done
+      fw pm install-commit "$SESSION" >/dev/null 2>&1
     fi
     rm -rf "$TMP"
   fi
@@ -1301,13 +1430,13 @@ do_import_databackup() {
   if [ -f "$CFG" ]; then
     # recursive descent so it works regardless of where DataBackup nests the array
     "$JQ" -r '[.. | objects | select(.isGranted==true and (.name!=null))] | .[].name' "$CFG" 2>/dev/null | while IFS= read -r perm; do
-      [ -n "$perm" ] && exec_ns pm grant --user "$U" "$PKG" "$perm" 2>/dev/null
+      [ -n "$perm" ] && fw pm grant --user "$U" "$PKG" "$perm" 2>/dev/null
     done
     # appops: mode int (0 allow,1 ignore,2 deny,3 default) -> name; op may be a name or code
-    exec_ns cmd appops reset --user "$U" "$PKG" 2>/dev/null
+    fw cmd appops reset --user "$U" "$PKG" 2>/dev/null
     "$JQ" -r '[.. | objects | select(.op!=null and .mode!=null)] | .[] | "\(.op)\t\(.mode)"' "$CFG" 2>/dev/null | while IFS="$(printf '\t')" read -r op mode; do
       case "$mode" in 0) m=allow ;; 1) m=ignore ;; 2) m=deny ;; 3) m=default ;; *) continue ;; esac
-      [ -n "$op" ] && exec_ns cmd appops set --user "$U" "$PKG" "$op" "$m" 2>/dev/null
+      [ -n "$op" ] && fw cmd appops set --user "$U" "$PKG" "$op" "$m" 2>/dev/null
     done
   fi
   prog 97 framework "$PKG"; audit "import-db done $PKG"; notify restore_done "$PKG"
@@ -1346,7 +1475,7 @@ do_import_neo() {
   APKTMP="$STATE/staging/neo-apk.$OPID"
   if ls "$REF"/base*.apk "$REF"/base*.apk.enc >/dev/null 2>&1; then
     verifier_off
-    SESSION="$(exec_ns pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
+    SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
     if [ -n "$SESSION" ]; then
       mkdir -p "$APKTMP"
       for apk in "$REF"/base*.apk "$REF"/split_*.apk "$REF"/base*.apk.enc "$REF"/split_*.apk.enc; do
@@ -1356,9 +1485,9 @@ do_import_neo() {
           *.enc) [ "$ENC" = yes ] || continue
                  src="$APKTMP/$(basename "${apk%.enc}")"; neo_decrypt_to "$apk" "$src" || { rm -f "$src"; continue; } ;;
         esac
-        exec_ns pm install-write "$SESSION" "$(basename "${src%.apk}")" "$src" >/dev/null 2>&1
+        fw pm install-write "$SESSION" "$(basename "${src%.apk}")" "$src" >/dev/null 2>&1
       done
-      exec_ns pm install-commit "$SESSION" >/dev/null 2>&1
+      fw pm install-commit "$SESSION" >/dev/null 2>&1
     fi
   fi
   rm -rf "$APKTMP"
@@ -1399,7 +1528,7 @@ do_import_neo() {
   prog 90 framework "$PKG"
   "$JQ" -r '(.permissions // [])[]' "$PROP" 2>/dev/null | while IFS= read -r perm; do
     perm="$(printf '%s' "$perm" | tr -d ' ')"
-    case "$perm" in android.permission.*|*.permission.*) exec_ns pm grant --user "$U" "$PKG" "$perm" 2>/dev/null ;; esac
+    case "$perm" in android.permission.*|*.permission.*) fw pm grant --user "$U" "$PKG" "$perm" 2>/dev/null ;; esac
   done
   prog 97 framework "$PKG"; audit "import-neo done $PKG"; notify restore_done "$PKG"
   finish true ERR_NONE
@@ -1476,7 +1605,7 @@ special_export() {   # <category> <dest-dir>
 # same hazard as abx2xml). `settings put` is idempotent (overwrite), so a re-restore
 # never duplicates anything. DEST/IFILE/use_special_age/emit_special_settings come
 # from do_special_backup; REF from do_special_restore.
-sget() { exec_ns env -u LD_LIBRARY_PATH /system/bin/settings "$@"; }
+sget() { fw /system/bin/settings "$@"; }
 # encrypt a settings sidecar in place when the backup is encrypted; drop the
 # plaintext (never leak) if encryption fails. Mirrors special_export's _jexport.
 enc_sidecar() {   # <plaintext-file>
@@ -1815,12 +1944,112 @@ do_path_restore() {
   finish true ERR_NONE
 }
 
+# --- batch backup / restore -------------------------------------------------------------
+# One detached worker drives the WHOLE list, so closing the WebUI or the root manager never
+# stops it. The WebUI used to chain per-app in JavaScript (trackOp.onDone -> next), which
+# died with the webview and left a bulk backup half-done (issue #5). Each app reuses the
+# single-app backup()/restore() unchanged; finish() records the per-app result (IN_BATCH)
+# instead of ending the op, and progx reports the app position (n of N).
+batch_finish() {  # <ok_count> <total> <fail_count>
+  printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":%s,"code":"%s","n":%s,"of":%s}\n' \
+    "$OPID" "$([ "$3" -eq 0 ] && echo true || echo false)" \
+    "$([ "$3" -eq 0 ] && echo ERR_NONE || echo ERR_BATCH_PARTIAL)" "$1" "$2" > "$PROG"; }
+backup_batch() {
+  _lst="$STATE/staging/batch.$OPID"; mkdir -p "$STATE/staging"
+  jget "$ARGS" '.packages[]?' > "$_lst"
+  BATCH_N="$(grep -c . "$_lst" 2>/dev/null)"; case "$BATCH_N" in ''|*[!0-9]*) BATCH_N=0 ;; esac
+  [ "$BATCH_N" -gt 0 ] || { rm -f "$_lst"; finish false ERR_NO_PACKAGE; return; }
+  audit "batch backup start: $BATCH_N apps"
+  _base="$ARGS"; IN_BATCH=1; BATCH_I=0; _bok=0; _bfail=0
+  # read the list on FD 3: backup() (am/pm/app_process) must not consume the loop's stdin,
+  # which would swallow the remaining packages and stop the batch after the first app.
+  while IFS= read -r _p <&3; do
+    [ -n "$_p" ] || continue
+    BATCH_I=$((BATCH_I + 1)); BATCH_CUR="$_p"
+    ARGS="$("$JQ" -nc --argjson b "$_base" --arg p "$_p" '$b + {package:$p} | del(.packages)')"
+    LAST_OK=false; backup
+    if [ "$LAST_OK" = true ]; then _bok=$((_bok + 1)); else _bfail=$((_bfail + 1)); fi
+  done 3< "$_lst"
+  rm -f "$_lst"; ARGS="$_base"; IN_BATCH=0
+  audit "batch backup done: $_bok ok, $_bfail failed"
+  batch_finish "$_bok" "$BATCH_N" "$_bfail"; }
+restore_batch() {
+  _lst="$STATE/staging/batch.$OPID"; mkdir -p "$STATE/staging"
+  jget "$ARGS" '.refs[]?' > "$_lst"
+  BATCH_N="$(grep -c . "$_lst" 2>/dev/null)"; case "$BATCH_N" in ''|*[!0-9]*) BATCH_N=0 ;; esac
+  [ "$BATCH_N" -gt 0 ] || { rm -f "$_lst"; finish false ERR_NO_REF; return; }
+  audit "batch restore start: $BATCH_N backups"
+  _base="$ARGS"; IN_BATCH=1; BATCH_I=0; _bok=0; _bfail=0
+  while IFS= read -r _r <&3; do
+    [ -n "$_r" ] || continue
+    BATCH_I=$((BATCH_I + 1)); BATCH_CUR="$_r"
+    ARGS="$("$JQ" -nc --argjson b "$_base" --arg r "$_r" '$b + {ref:$r} | del(.refs)')"
+    LAST_OK=false; restore
+    if [ "$LAST_OK" = true ]; then _bok=$((_bok + 1)); else _bfail=$((_bfail + 1)); fi
+  done 3< "$_lst"
+  rm -f "$_lst"; ARGS="$_base"; IN_BATCH=0
+  audit "batch restore done: $_bok ok, $_bfail failed"
+  batch_finish "$_bok" "$BATCH_N" "$_bfail"; }
+
+# --- portable config export / import ----------------------------------------------------
+# Carry the module's own state (config + jobs + destinations + credentials + keys) to a new
+# device. Encrypted with a passphrase because it holds credentials; the same portable age
+# format as backups, so it also opens on a PC.
+config_export() {
+  PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
+  [ -n "$PW" ] || { finish false ERR_CRYPTO_PASS; return; }   # carries credentials
+  secrets_init || { finish false ERR_LOCKED; return; }        # creds/keys live on CE storage
+  prog 20 exporting ""
+  _xdir="/data/media/0/VDBackup/.export"; exec_ns mkdir -p "$_xdir"
+  media_own "/data/media/0/VDBackup"; media_own "$_xdir"
+  _xout="$_xdir/vdbackup-config-$(date -u +%Y%m%dT%H%M%SZ).tar.zst.age"
+  prog 50 exporting ""
+  # config/jobs/dests come from the DE state tree; creds/keys/rclone.conf from CE secrets.
+  _rc=""; [ -f "$SECRETS/rclone.conf" ] && _rc="rclone.conf"
+  "$TAR" -c -C "$STATE" config.json jobs dests -C "$SECRETS" creds keys $_rc 2>/dev/null \
+    | comp "zstd:19" | enc_age "$_xout" \
+    || { audit "config export failed"; finish false ERR_TRANSFER; return; }
+  exec_ns restorecon "$_xout" 2>/dev/null; media_own "$_xout"
+  audit "config exported -> $_xout"
+  printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":true,"code":"ERR_NONE","path":"%s"}\n' \
+    "$OPID" "$(jstr "$_xout")" > "$PROG"
+}
+config_import() {
+  PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
+  IREF="$(jget "$ARGS" '.ref')"
+  { [ -n "$IREF" ] && [ -f "$IREF" ]; } || { finish false ERR_NO_REF; return; }
+  [ -n "$PW" ] || { finish false ERR_CRYPTO_PASS; return; }
+  secrets_init || { finish false ERR_LOCKED; return; }        # creds/keys land on CE storage
+  prog 30 importing ""
+  _itmp="$STATE/staging/import.$OPID"; rm -rf "$_itmp"; mkdir -p "$_itmp"
+  dec_age "$IREF" | "$ZSTD" -dc 2>/dev/null | "$TAR" -C "$_itmp" -x 2>/dev/null
+  if [ ! -f "$_itmp/config.json" ]; then rm -rf "$_itmp"; audit "config import: bad archive or passphrase"; finish false ERR_CRYPTO_PASS; return; fi
+  prog 70 importing ""
+  # merge config (never blind-overwrite); jobs/dests go to the DE tree, creds/keys/rclone.conf
+  # to CE secrets (an older export may still carry them under the archive root).
+  "$JQ" -s '.[0] * .[1] | .format_version = (.format_version // 1)' "$STATE/config.json" "$_itmp/config.json" > "$STATE/config.json.new" 2>/dev/null \
+    && mv "$STATE/config.json.new" "$STATE/config.json"
+  for _id in jobs dests; do [ -d "$_itmp/$_id" ] && { mkdir -p "$STATE/$_id"; cp -a "$_itmp/$_id/." "$STATE/$_id/" 2>/dev/null; }; done
+  for _id in creds keys; do [ -d "$_itmp/$_id" ] && { mkdir -p "$SECRETS/$_id"; cp -a "$_itmp/$_id/." "$SECRETS/$_id/" 2>/dev/null; }; done
+  [ -f "$_itmp/rclone.conf" ] && cp -a "$_itmp/rclone.conf" "$SECRETS/rclone.conf" 2>/dev/null
+  chmod 700 "$STATE/jobs" "$STATE/dests" "$SECRETS/creds" "$SECRETS/keys" 2>/dev/null
+  chmod 600 "$STATE/config.json" 2>/dev/null
+  for _f in "$SECRETS/creds"/* "$SECRETS/keys"/* "$SECRETS/rclone.conf"; do [ -f "$_f" ] && chmod 600 "$_f" 2>/dev/null; done
+  rm -rf "$_itmp"
+  audit "config imported from $IREF"
+  finish true ERR_NONE
+}
+
 # mark the operation live immediately, before any (possibly slow) validation, so the
 # UI never sits on a stale "starting" while the first guard/dumpsys runs.
-case "$VERB" in backup|restore|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore) prog 2 preparing "" ;; esac
+case "$VERB" in backup|backup-batch|restore|restore-batch|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore|config-export|config-import) prog 2 preparing "" ;; esac
 case "$VERB" in
   backup)          backup ;;
+  backup-batch)    backup_batch ;;
   restore)         restore ;;
+  restore-batch)   restore_batch ;;
+  config-export)   config_export ;;
+  config-import)   config_import ;;
   import)          do_import ;;
   special-backup)  do_special_backup ;;
   special-restore) do_special_restore ;;

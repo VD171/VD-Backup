@@ -160,6 +160,12 @@ main { padding: var(--pad-main); max-width: 760px; margin: 0 auto; }
 .tag-chip button:hover { opacity: 1; }
 .row .tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
 .row .tags .tag-chip { padding: 0 8px; }
+.vol-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 10px; }
+.vol-chip { font-size: 12px; font-weight: 600; color: var(--accent); cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: var(--r-pill);
+  padding: 4px 11px; background: color-mix(in srgb, var(--accent) 12%, transparent); max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vol-chip:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); }
 .checks { display: flex; flex-direction: column; gap: 2px; }
 .checks label { display: flex; align-items: center; gap: 12px; padding: 11px 4px; font-size: 16px; cursor: pointer; }
 .checks label + label { border-top: 1px solid var(--line); }

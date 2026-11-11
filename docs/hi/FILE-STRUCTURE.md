@@ -71,4 +71,4 @@ docs/                               # all public documentation
 
 ---
 
-*यह documentation Claude (Anthropic) के साथ generated की गई थी और VD171 द्वारा maintained है। सुधार और बेहतरी का स्वागत है - देखें [CONTRIBUTING.md](CONTRIBUTING.md)।*
+*यह documentation Claude (Anthropic) के साथ generated की गई थी और VD171 द्वारा maintained है। सुधार और बेहतरी का स्वागत है, देखें [CONTRIBUTING.md](CONTRIBUTING.md)।*

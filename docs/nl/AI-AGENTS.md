@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - Argumenten vormen één enkel JSON-object, **base64-gecodeerd**, doorgegeven als één argv-token.
 - Het commando print **één JSON-object** op stdout: `{"ok":true,...}` of
   `{"ok":false,"code":"ERR_...","message":"..."}`. Parse dat; scrape nooit tekst.
-- Langdurige operaties (`backup`, `restore`, `import`) geven onmiddellijk
+- Langdurige operaties (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) geven onmiddellijk
   `{"ok":true,"opid":"..."}` terug en draaien **losgekoppeld** (ze overleven het verdwijnen
   van de aanroeper/WebUI). Pol hun voortgang; ze zijn niet klaar wanneer de aanroep terugkeert.
 - `progress` en `cancel` nemen **base64 van de ruwe opid-tekenreeks**, geen JSON-object.
@@ -87,7 +87,15 @@ backup/restore; alleen cloudbestemmingen (`rclone`/`restic`/ssh) praten met het 
 | `cloud-fetch` | `{}` | `{ok,opid}` (losgekoppeld) downloadt+verifieert+installeert de `rclone`/`restic`-addon op een `lite`-editie |
 | `schedule-set` / `schedule-list` / `schedule-delete` | zie hieronder | geplande taken (een backup of een herstel; gericht op een app, een set, of alle apps) |
 | `scheduler-tick` | `{}` | voert vervallen taken uit + past retentie toe + de auto-backup-observer (de boot-heartbeat roept dit aan) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (niet losgekoppeld; keert meteen terug; `ERR_UPDATE_CHECK` bij mislukking - zie hieronder) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (niet losgekoppeld; keert meteen terug; `ERR_UPDATE_CHECK` bij mislukking, zie hieronder) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) maakt een back-up van veel apps in één losgekoppelde op; voortgang bevat `n`/`of`. Een fout per app stopt de batch niet. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) herstelt veel back-ups in één losgekoppelde op; voortgang bevat `n`/`of`. Een fout per app stopt de batch niet. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` opslagvolumes voor de mappenkiezer: intern plus verwisselbare SD-kaart / USB. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) exporteert config, taken, bestemmingen, inloggegevens en sleutels naar één met wachtwoordzin versleuteld bestand in de back-upmap. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) voegt een geëxporteerd configbestand terug samen in dit apparaat (overschrijft nooit blind). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` somt de versleutelde configbestanden op die beschikbaar zijn om te importeren. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` verwijdert opgeslagen externe wachtwoorden en de versleutelingssleutel van het apparaat; bestemmingen, taken en back-ups blijven. |
+| `log-prune` | `{}` | `{ok}` snoeit allang voltooide op-logs, beperkt het auditspoor en verwijdert verouderde iconen (de opstartservice roept dit aan). |
 
 ### `progress`-velden
 
@@ -176,7 +184,7 @@ Een geplande taak kiest **één** doel en een **actie**:
 Geef precies **één** van `package`, `packages` of `all` op voor het doel. Een `backup`-taak behoudt
 de gebruikelijke `mode`/`dest`/`keep`/`items`. Een `restore`-taak (`action: "restore"`) herstelt de
 **meest recente** backup van elke doel-app (of een expliciete `ref`) en **overschrijft bij elke run de
-huidige gegevens van de app** - het is bewust en opt-in, dus stel het alleen in op een direct verzoek
+huidige gegevens van de app**: het is bewust en opt-in, dus stel het alleen in op een direct verzoek
 van de gebruiker.
 
 ### Scheduler-gating
@@ -201,7 +209,7 @@ auditspoor geschreven als `op:"scheduler-gated"` met een `reason` van `wifi` / `
 ### `remote-add`-args
 
 Een cloudbestemming is een `type:"rclone"`-bestemming die een `rclone`-remote benoemt; maak
-die remote eerst aan met `remote-add`. De `backend` mag **elke rclone-backend** zijn - er is
+die remote eerst aan met `remote-add`. De `backend` mag **elke rclone-backend** zijn, er is
 geen whitelist. `remote-add` accepteert elke backendnaam (`dropbox`, `onedrive`, `box`,
 `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` en de ~70 andere die
 rclone ondersteunt), en de `params` worden rechtstreeks als `key=value`-paren aan de
@@ -222,12 +230,12 @@ lokale callbackserver (`127.0.0.1:53682`) en opent de eigen browser van de telef
 toestemmingspagina van de provider via een Android-VIEW-intent, en geeft `{ok:true,url}` terug
 (of `{ok:false,code:"ERR_AUTHORIZE"}`). Pol `remote-authorize-poll` (`{}`): die geeft
 `{ok:true,done:false,url}` tijdens het wachten en `{ok:true,done:true,token}` zodra de gebruiker
-goedkeurt - geef die `token` door aan `remote-add`. `remote-authorize-cancel` (`{}`) stopt een
+goedkeurt, geef die `token` door aan `remote-add`. `remote-authorize-cancel` (`{}`) stopt een
 lopende autorisatie (`{ok:true,cancelled:true}`). De uitvoer van `rclone authorize "<backend>"`
 vanaf een willekeurige computer handmatig plakken wordt nog steeds als fallback ondersteund.
 
 Google Drive heeft twee paden: deze `drive`-remote (geen Google Cloud-project nodig, gebruikt
-rclones eigen OAuth - autoriseer op het apparaat met `remote-authorize`, of draai
+rclones eigen OAuth, autoriseer op het apparaat met `remote-authorize`, of draai
 `rclone authorize "drive"` eenmaal op een willekeurige computer en geef de token door) of de
 opt-in-begeleidingsapp (je eigen OAuth-client-id). Beide eindigen als gewone bestemmingen.
 
@@ -237,7 +245,7 @@ Het config-veld `network_policy` bepaalt welke verbinding cloudoverdrachten moge
 `any` (standaard), `wifi` of `mobile`. Stel het in met `config-set`. Wanneer het `wifi` of
 `mobile` is, controleert elke cloudoverdracht (Full-`rclone`/Drive-upload, Mirror-sync,
 `restic`-remote-snapshot-backup/-restore, Mirror-restore) eerst het actieve transport en
-breekt af met `ERR_NET_POLICY` als het niet overeenkomt - voor zowel handmatige als geplande
+breekt af met `ERR_NET_POLICY` als het niet overeenkomt, voor zowel handmatige als geplande
 taken. Lokale bestemmingen worden nooit beperkt.
 
 ### Cloud-integriteit en quota
@@ -290,8 +298,8 @@ standaard; alleen op een direct, bewust gebruikersverzoek.
 
 ### Zelfstandige pad-back-up
 
-`path-backup` / `path-restore` maken een back-up van en herstellen **elk absoluut pad** - een
-map of een enkel bestand - op gedeelde opslag of onder `/data`, buiten het per-app-model. Het
+`path-backup` / `path-restore` maken een back-up van en herstellen **elk absoluut pad**: een
+map of een enkel bestand, op gedeelde opslag of onder `/data`, buiten het per-app-model. Het
 archief wordt geschreven als `tar.zst` plus een `manifest.json` in VDBackups eigen formaat
 (SHA-256-verzegeld, met een RECOVERY-kit bij versleuteling) onder `.paths/` in de backups-map.
 
@@ -307,18 +315,18 @@ archief wordt geschreven als `tar.zst` plus een `manifest.json` in VDBackups eig
   `ERR_NO_PATH`; een pad buiten de toegestane roots, of een dat `..` bevat, mislukt met
   `ERR_BAD_PATH`.
 - `path-restore` schrijft terug naar de oorspronkelijke locatie, dus het is destructief en
-  vereist `"confirm": true` - een zware-frictie-afscherming, zoals `special-restore`. Een `ref`
+  vereist `"confirm": true`, een zware-frictie-afscherming, zoals `special-restore`. Een `ref`
   die geen geldige pad-back-up is mislukt met `ERR_BAD_REF`.
 - Beide draaien **losgekoppeld**; pol `progress` met de teruggegeven `opid`.
 
 ### `update-check`
 
 `update-check` meldt of er een nieuwere versie van de module is gepubliceerd, zodat een agent
-(of de WebUI) die kan tonen. Het is een **leeswerkwoord dat meteen terugkeert** - het is
+(of de WebUI) die kan tonen. Het is een **leeswerkwoord dat meteen terugkeert**: het is
 **niet** losgekoppeld, dus er is geen `opid` om te pollen. Alleen door een expliciete
 gebruikersactie geactiveerd, haalt het het gepubliceerde update-manifest van de module op (de
 `updateJson`-URL uit `module.prop`) met de meegeleverde `curl` via een root-zijdig HTTP-verzoek -
-dit draait buiten de WebView en valt dus niet onder de CSP van de WebUI - en vergelijkt de
+dit draait buiten de WebView en valt dus niet onder de CSP van de WebUI, en vergelijkt de
 gepubliceerde `versionCode` met de geïnstalleerde. Het neemt **geen argumenten**.
 
 Bij succes geeft het terug:
@@ -347,7 +355,7 @@ nooit door dit werkwoord.
 - **`ssaid` is strikt opt-in (standaard uit).** Het maakt een back-up van / herstelt de
   ANDROID_ID van het apparaat door een systeembestand te herschrijven; een herstel wordt pas
   na een herstart toegepast, en het vorige bestand wordt altijd eerst opgeslagen voor rollback.
-  Stuur `"ssaid": true` alleen op een directe, bewuste gebruikersaanvraag - nooit standaard.
+  Stuur `"ssaid": true` alleen op een directe, bewuste gebruikersaanvraag, nooit standaard.
 - **Muterende acties (restore, delete, import) zijn destructief** en worden vastgelegd in een
   lokaal auditspoor (`logs/audit.jsonl`). Restore is getrouw (wissen-dan-uitpakken), dus het
   zet de app terug naar de exacte staat van de backup. Bevestig de intentie voordat je ze aanroept.
@@ -355,8 +363,8 @@ nooit door dit werkwoord.
   overschrijft apparaatbrede instellingen, dus stuur het alleen op een direct gebruikersverzoek;
   het is afgeschermd door expliciete toestemming en vastgelegd in het auditspoor.
 - **Herstel is idempotent.** Ruwe provider-herstelbewerkingen (messages/contacts/wifi/bluetooth/
-  calendar) **vervangen** in plaats van samen te voegen - de provider-gegevens worden gewist en
-  het archief wordt eroverheen uitgepakt - zodat het opnieuw herstellen van dezelfde backup geen
+  calendar) **vervangen** in plaats van samen te voegen, de provider-gegevens worden gewist en
+  het archief wordt eroverheen uitgepakt, zodat het opnieuw herstellen van dezelfde backup geen
   rijen kan dupliceren. `dns` en `system_settings` worden opnieuw toegepast met idempotente
   `settings put`.
 - **Het uitpakken van archieven is beschermd tegen path traversal.** Herstel draait als root,
@@ -375,4 +383,4 @@ Zie [ARCHITECTURE.md](ARCHITECTURE.md) en
 
 ---
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom - zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*

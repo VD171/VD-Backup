@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - การกู้คืน backup บน PC (Windows / macOS / Linux)
+# VDBackup, การกู้คืน backup บน PC (Windows / macOS / Linux)
 
 backup ของ VDBackup ใช้ **รูปแบบมาตรฐาน** ดังนั้นคุณสามารถเปิดมันได้ทุกที่
 โดยไม่ต้องมีโมดูลนี้ โฟลเดอร์ backup มี `manifest.json` ตัว APK

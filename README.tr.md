@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>Root ile tam uygulama ve veri yedekleme ve geri yükleme - tamamen bir WebUI üzerinden yönetilir.</b><br>
+  <b>Root ile tam uygulama ve veri yedekleme ve geri yükleme, tamamen bir WebUI üzerinden yönetilir.</b><br>
   KernelSU / APatch / Magisk modülü. "su ver" istemi yok, <code>sucompat</code> açıp kapatmak yok.
 </p>
 
@@ -29,7 +29,7 @@
 ## Nedir
 
 VDBackup, uygulamalarınızı ve verilerini **temel özellikler için bir yardımcı uygulama olmadan**
-yedekleyip geri yükleyen bir root **WebUI modülüdür** - modül zaten root olduğundan "izin verilecek"
+yedekleyip geri yükleyen bir root **WebUI modülüdür**: modül zaten root olduğundan "izin verilecek"
 bir şey yoktur. Popüler yedekleme uygulamalarının yaptığı her şeyi tek bir yerde, temiz bir WebUI ile
 kapsamayı hedefler.
 
@@ -46,7 +46,7 @@ Neo-Backup ve Android-DataBackup yedeklerini içe aktarabilir.
   sürümlü, `restic` ile) ve **Mirror** (1:1 eşitleme, `rclone`/`rsync` ile).
 - **Sadık koruma:** SELinux bağlamları, uid/gid, modlar, xattr ve yetenekler (capabilities).
 - **Sıkıştırma:** yok / lz4 / zstd / gzip (gzip = "uyumluluk modu", her yerde açılır).
-- **Şifreleme:** isteğe bağlı ve taşınabilir (`age` + parola ya da AES-256 zip) - asla cihaz
+- **Şifreleme:** isteğe bağlı ve taşınabilir (`age` + parola ya da AES-256 zip), asla cihaz
   donanımına bağlı değildir, böylece bir yedek başka bir cihazda geri yüklenir veya bir PC'de açılır.
 - **Hedefler:** yerel, SFTP, SCP, SMB, WebDAV, FTP, S3 ve 70'ten fazlası (`rclone`),
   ayrıca `rsync` ve `restic` depoları. Küçük, tercihe bağlı bir yardımcı ile isteğe bağlı Google Drive.
@@ -81,10 +81,10 @@ Neo-Backup ve Android-DataBackup yedeklerini içe aktarabilir.
 ## Kurulum
 
 1. En son `VD-Backup-vX.Y.zip` dosyasını [Sürümler](https://github.com/VD171/VD-Backup/releases) sayfasından indirin.
-2. KernelSU / APatch / Magisk yöneticisinde flaşlayın - hemen kullanılabilir, yeniden başlatma gerekmez.
+2. KernelSU / APatch / Magisk yöneticisinde flaşlayın, hemen kullanılabilir, yeniden başlatma gerekmez.
 3. Yedeklemeleri yapılandırmak ve çalıştırmak için modülün **WebUI**'sini açın. Hepsi bu.
 
-**Sürüm çeşitleri.** Her sürüm altı zip halinde gelir. `universal-full` - her mimari ve her ikili gömülü halde (bulut sağlayıcıları için `rclone` ve anlık görüntüler için `restic` dahil), tamamen çevrimdışı, hiçbir şey asla indirilmez, her cihaz, en büyüğü. `universal-lite` - her mimari, ancak en büyük iki ikili (`rclone`, `restic`) çıkarılmış, en küçüğü; yine de yerel, SSH/SFTP ve `rsync` yedeklemelerini indirme olmadan yapar ve bir bulut hedefini (`rclone`) ya da anlık görüntü modunu (`restic`) ilk kez kullandığında o küçük mimariye özel eklentiyi bir kez indirmeyi önerir (SHA-256 ile doğrulanır) ve önbelleğe alır, böylece o özellikler de çalışır. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - her ikili gömülü halde tek bir mimari, `universal-full`'dan küçük. Mimarini biliyor musun -> `<abi>-full` seç; en küçüğünü istiyor ve bulut ya da anlık görüntüler için tek seferlik bir indirmeye aldırmıyorsan -> `universal-lite`; her şeyi gömülü halde ve hiçbir indirme olmadan istiyorsan (çevrimdışı / kurtarma) -> bir full sürüm. Bkz. [Sürümler](https://github.com/VD171/VD-Backup/releases).
+**Sürüm çeşitleri.** Her sürüm altı zip halinde gelir. `universal-full`, her mimari ve her ikili gömülü halde (bulut sağlayıcıları için `rclone` ve anlık görüntüler için `restic` dahil), tamamen çevrimdışı, hiçbir şey asla indirilmez, her cihaz, en büyüğü. `universal-lite`, her mimari, ancak en büyük iki ikili (`rclone`, `restic`) çıkarılmış, en küçüğü; yine de yerel, SSH/SFTP ve `rsync` yedeklemelerini indirme olmadan yapar ve bir bulut hedefini (`rclone`) ya da anlık görüntü modunu (`restic`) ilk kez kullandığında o küçük mimariye özel eklentiyi bir kez indirmeyi önerir (SHA-256 ile doğrulanır) ve önbelleğe alır, böylece o özellikler de çalışır. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), her ikili gömülü halde tek bir mimari, `universal-full`'dan küçük. Mimarini biliyor musun -> `<abi>-full` seç; en küçüğünü istiyor ve bulut ya da anlık görüntüler için tek seferlik bir indirmeye aldırmıyorsan -> `universal-lite`; her şeyi gömülü halde ve hiçbir indirme olmadan istiyorsan (çevrimdışı / kurtarma) -> bir full sürüm. Bkz. [Sürümler](https://github.com/VD171/VD-Backup/releases).
 
 Yeni misiniz? [Kullanıcı kılavuzu](docs/USER-GUIDE.md) sizi kurulumdan geri yüklemeye kadar adım adım götürür.
 
@@ -103,12 +103,12 @@ ABI başına statik ikili dosyalardan (`tar`, `zstd`, `lz4`, `rclone`, `rsync`, 
 
 ## Belgeler
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - belgeler, çevrimiçi göz atılabilir.
-- **[Kullanıcı kılavuzu](docs/USER-GUIDE.md)** - baştan sona, kurulumdan geri yüklemeye.
-- **[Yapay zeka aracıları](docs/AI-AGENTS.md)** - her eylemi JSON API üzerinden arayüzsüz yönetin.
-- **[Mimari](docs/ARCHITECTURE.md)** ve **[Dosya yapısı](docs/FILE-STRUCTURE.md)** - nasıl çalışır.
-- **[Paket içi ikili dosyalar](docs/BINARIES.md)** - her önceden derlenmiş ikili dosyanın kaynağı ve SHA-256 değeri, tam denetim için.
-- **[Kurtarma](module/etc/RECOVERY.md)** - bir yedeği modül olmadan bilgisayarda açın ve şifresini çözün.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: belgeler, çevrimiçi göz atılabilir.
+- **[Kullanıcı kılavuzu](docs/USER-GUIDE.md)**: baştan sona, kurulumdan geri yüklemeye.
+- **[Yapay zeka aracıları](docs/AI-AGENTS.md)**: her eylemi JSON API üzerinden arayüzsüz yönetin.
+- **[Mimari](docs/ARCHITECTURE.md)** ve **[Dosya yapısı](docs/FILE-STRUCTURE.md)**: nasıl çalışır.
+- **[Paket içi ikili dosyalar](docs/BINARIES.md)**: her önceden derlenmiş ikili dosyanın kaynağı ve SHA-256 değeri, tam denetim için.
+- **[Kurtarma](module/etc/RECOVERY.md)**: bir yedeği modül olmadan bilgisayarda açın ve şifresini çözün.
 - **[Katkıda bulunma](CONTRIBUTING.md)** ve **[Güvenlik](SECURITY.md)**.
 - **[Değişiklik günlüğü](CHANGELOG.md)** ve **[Davranış kuralları](CODE_OF_CONDUCT.md)**.
 
@@ -118,7 +118,7 @@ VDBackup, yalnızca insanlara değil, yapay zeka asistanlarına ve aracılarına
 şekilde inşa edilmiştir. Motor JSON konuşur (her `helper.sh` fiili tek bir JSON nesnesi döndürür),
 kod, belgeler ve dosya yapısı makine okumasına göre düzenlenmiştir ve yapay zeka destekli katkılar
 diğerleri gibi incelenip kabul edilir. Bir aracı, WebUI'nin kullandığı aynı API üzerinden modülün
-**her** eylemini arayüzsüz yönetebilir - tam kontrol yüzeyi için
+**her** eylemini arayüzsüz yönetebilir, tam kontrol yüzeyi için
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**'ye, katkıda bulunmak için ise
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)'ye bakın.
 
@@ -137,9 +137,9 @@ diğerleri gibi incelenip kabul edilir. Bir aracı, WebUI'nin kullandığı ayn�
 
 Aynı yazarın kardeş projeleri:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - bir cihaz yöntem hata ayıklayıcısı: her öğeyi, onu okuyabilen her yöntemle okur ve bunları yan yana karşılaştırır.
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - Google hizmetleriniz (RCS, Wallet, Play Integrity doğrulamaları), internet olmadan cihazınızda okunur.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - taze bir parmak izini tutarlı, uyumlu bir profile dönüştüren bir cihaz sahteleyici.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: bir cihaz yöntem hata ayıklayıcısı: her öğeyi, onu okuyabilen her yöntemle okur ve bunları yan yana karşılaştırır.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: Google hizmetleriniz (RCS, Wallet, Play Integrity doğrulamaları), internet olmadan cihazınızda okunur.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: taze bir parmak izini tutarlı, uyumlu bir profile dönüştüren bir cihaz sahteleyici.
 
 ## Lisans
 

@@ -71,4 +71,4 @@ docs/                               # all public documentation
 
 ---
 
-*Эта документация была сгенерирована с помощью Claude (Anthropic) и сопровождается VD171. Исправления и улучшения приветствуются - см. [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Эта документация была сгенерирована с помощью Claude (Anthropic) и сопровождается VD171. Исправления и улучшения приветствуются, см. [CONTRIBUTING.md](CONTRIBUTING.md).*

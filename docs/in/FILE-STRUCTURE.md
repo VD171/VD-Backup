@@ -71,4 +71,4 @@ docs/                               # all public documentation
 
 ---
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dipelihara oleh VD171. Koreksi dan perbaikan disambut - lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dipelihara oleh VD171. Koreksi dan perbaikan disambut, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -6,6 +6,32 @@
 
 Tutte le modifiche rilevanti di VDBackup sono documentate qui. Solo in inglese.
 
+## v1.05
+
+Affidabilità:
+
+- I backup in blocco non si interrompono più a metà quando esci dall'app. Un'intera selezione, un gruppo di tag o un'esecuzione pianificata è ora gestita da un unico processo root distaccato che continua a WebUI chiusa ed è protetto dall'essere terminato sotto pressione di memoria. L'avanzamento si riaggancia quando torni.
+
+Impostazioni:
+
+- Backup delle impostazioni: esporta destinazioni, pianificazioni, preimpostazioni e credenziali salvate in un unico file cifrato e importalo su un altro dispositivo o dopo un'installazione pulita. Il file chiede sempre una passphrase perché contiene password remote, e l'importazione si unisce al dispositivo senza rimuovere ciò che è già presente.
+- Ora puoi cancellare le credenziali remote salvate e la chiave di cifratura del dispositivo dalle impostazioni in un solo passaggio, mantenendo destinazioni, pianificazioni e backup.
+
+Sicurezza:
+
+- I backup possono essere archiviati solo dove restano cifrati a riposo. Le destinazioni sotto percorsi leggibili prima del primo sblocco, come /data/adb o /data/system, vengono rifiutate.
+- Le credenziali salvate, il rclone.conf e la chiave age ora risiedono su archiviazione cifrata per credenziale, bloccata fino al primo sblocco, invece di un percorso prima leggibile; un aggiornamento del modulo le sposta lì in modo permanente.
+- I backup ora controllano lo spazio libero prima di iniziare e si fermano con un messaggio chiaro invece di fallire a metà.
+
+Ripristino:
+
+- Il ripristino di un'app non più installata ora reinstalla prima il suo APK, e la finestra di ripristino offre l'opzione APK ogni volta che il backup ne contiene uno. Un ripristino che non riesce a installare l'app segnala l'errore invece di fingere successo.
+- Le operazioni di app, permessi e impostazioni ora vengono eseguite in un ambiente pulito, correggendo gli errori "Failed transaction" che bloccavano ripristino, app-ops e impostazioni su alcune ROM.
+
+Destinazioni:
+
+- Puoi eseguire il backup su scheda SD o unità USB: il selettore di cartelle mostra una scorciatoia a ogni volume di archiviazione e accetta percorsi su supporti rimovibili.
+
 ## v1.04
 
 Correzioni:
@@ -18,7 +44,7 @@ Privacy:
 
 Backup:
 
-- Ora puoi definire quali elementi salva ogni app - per esempio solo APK, o APK + OBB - applicato nei backup di massa, automatici e pianificati. Un singolo backup manuale ti lascia comunque scegliere sul momento, precompilato dal set dell'app. Impostalo nelle Impostazioni, accanto all'elenco delle app escluse.
+- Ora puoi definire quali elementi salva ogni app, per esempio solo APK, o APK + OBB, applicato nei backup di massa, automatici e pianificati. Un singolo backup manuale ti lascia comunque scegliere sul momento, precompilato dal set dell'app. Impostalo nelle Impostazioni, accanto all'elenco delle app escluse.
 
 - Preset di backup: salva insiemi con nome di cosa includere e applicali con una scelta nel dialogo di backup.
 - Multiutente: backup delle app, backup speciali e ripristini ora seguono tutti l'utente Android selezionato.
@@ -237,4 +263,4 @@ AI-friendly e i18n:
 - L'elenco ricco delle app e la decifratura di Neo passano attraverso un helper dex pilotato come root
   (`IPackageManager` tramite ServiceManager), così che funzionino dove ActivityThread si blocca.
 
-*Questa documentazione è stata generata con Claude (Anthropic) ed è mantenuta da VD171. Correzioni e miglioramenti sono benvenuti - vedi [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Questa documentazione è stata generata con Claude (Anthropic) ed è mantenuta da VD171. Correzioni e miglioramenti sono benvenuti, vedi [CONTRIBUTING.md](CONTRIBUTING.md).*

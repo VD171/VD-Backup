@@ -7,7 +7,7 @@
 En komplett, vänlig genomgång av VDBackup, från att installera modulen till att göra
 din första säkerhetskopia, återställa den, skicka den till molnet, schemalägga den och öppna
 den på en PC flera år senare. Om du har använt Swift Backup, Neo-Backup eller
-Android-DataBackup tidigare kommer detta att kännas bekant - bara att allt händer på ett
+Android-DataBackup tidigare kommer detta att kännas bekant, bara att allt händer på ett
 ställe, med inget att "tillåta".
 
 ## Innehållsförteckning
@@ -26,6 +26,7 @@ ställe, med inget att "tillåta".
   - [5.7 Fristående säkerhetskopior av mappar och filer](#57-fristående-säkerhetskopior-av-mappar-och-filer)
 - [6. Återställa en säkerhetskopia](#6-återställa-en-säkerhetskopia)
 - [7. Destinationer: lokal och fjärr](#7-destinationer-lokal-och-fjärr)
+  - [7.1 Säkerhetskopiera dina inställningar](#71-säkerhetskopiera-dina-inställningar)
 - [8. Schemaläggning och kvarhållning](#8-schemaläggning-och-kvarhållning)
 - [9. Migrera in: importera Neo-Backup och Android-DataBackup](#9-migrera-in-importera-neo-backup-och-android-databackup)
 - [10. SSAID (enhetens ANDROID_ID)](#10-ssaid-enhetens-android_id)
@@ -80,24 +81,24 @@ när de inte är tillgängliga på din enhet.
 1. Ladda ner den senaste `VD-Backup-vX.Y.zip`-releasen.
 2. I din KernelSU / APatch / Magisk-hanterare, flasha modul-zip:en som vilken annan
    modul som helst.
-3. Den är användbar omedelbart - **ingen omstart behövs**. (En omstart är endast någonsin relevant
+3. Den är användbar omedelbart, **ingen omstart behövs**. (En omstart är endast någonsin relevant
    vid återställning av SSAID; se [avsnitt 10](#avsnitt-10).)
 4. Öppna modulens **WebUI** från hanteraren. Det är hela gränssnittet.
 
 **Vilken utgåva du laddar ner.** Varje release levereras som flera flashbara zip-utgåvor, så att du
 bara laddar ner det du behöver. Välj en:
 
-- **`VD-Backup-<ver>-universal-full.zip`** - varje CPU-arkitektur och varje binärfil inbäddad,
+- **`VD-Backup-<ver>-universal-full.zip`**: varje CPU-arkitektur och varje binärfil inbäddad,
   inklusive `rclone` (molnleverantörer: Google Drive, S3 och 70+ andra rclone-backends) och
   `restic` (deduplicerade ögonblicksbilder). Helt offline, ingenting laddas någonsin ner.
   Fungerar på vilken enhet som helst. Största nedladdningen.
-- **`VD-Backup-<ver>-universal-lite.zip`** - varje arkitektur, men **utan** de två största
+- **`VD-Backup-<ver>-universal-lite.zip`**: varje arkitektur, men **utan** de två största
   binärfilerna (`rclone` och `restic`). Minsta nedladdningen; gör fortfarande lokala,
   SSH/SFTP- och rsync-säkerhetskopior utan nedladdning, med portabel `age`-kryptering. Första
   gången du använder en molndestination (`rclone`) eller ögonblicksbildsläge (`restic`) erbjuder
   WebUI:t sig att ladda ner det lilla arkitekturspecifika tillägget en gång (verifierat med
   SHA-256) och cachar det; därefter fungerar även de funktionerna.
-- **`VD-Backup-<ver>-<abi>-full.zip`** (en av `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - en
+- **`VD-Backup-<ver>-<abi>-full.zip`** (en av `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), en
   enda arkitektur med varje binärfil inbäddad (samma funktioner som `universal-full` men endast
   för din enhets arkitektur, alltså mindre än `universal-full`).
 
@@ -112,7 +113,7 @@ modulen endast din enhets arkitektur oavsett vilken utgåva du flashar.
 Vid första körningen sår modulen en standardkonfiguration (endast om ingen finns ännu), så att
 dina inställningar bevaras över moduluppdateringar.
 
-**Var tillståndet bor.** VDBackups arbetsdata - din konfiguration, schemalagda jobb,
+**Var tillståndet bor.** VDBackups arbetsdata, din konfiguration, schemalagda jobb,
 sparade destinationer, krypterade inloggningsuppgifter, loggar och granskningsspår, och staging-område -
 bor under:
 
@@ -135,20 +136,20 @@ Håll detta i åtanke av två skäl: säkerhetskopior tar upp utrymme under `/sd
 
 WebUI är organiserat i några flikar:
 
-- **Home** - en startöversikt som visar antal för dina säkerhetskopior (appar, säkerhetskopior, mappar och schemalagda jobb) och en lagringsstapel för hur mycket plats dina säkerhetskopior använder jämfört med ledigt, med statusmärken, kopiera hashar och sökvägar till urklipp, och en **Check for updates**-åtgärd.
-- **Apps** - listan över installerade appar (användare och system), var och en visad med sitt verkliga
+- **Home**: en startöversikt som visar antal för dina säkerhetskopior (appar, säkerhetskopior, mappar och schemalagda jobb) och en lagringsstapel för hur mycket plats dina säkerhetskopior använder jämfört med ledigt, med statusmärken, kopiera hashar och sökvägar till urklipp, och en **Check for updates**-åtgärd.
+- **Apps**: listan över installerade appar (användare och system), var och en visad med sitt verkliga
   namn, sitt paketnamn och sin ikon (ikoner laddas lat och cachas, så listan
   förblir responsiv). Knappen på en rad säkerhetskopierar appen; ett tryck på raden öppnar den
   appens backup-historik, där du kan återställa valfri tidigare säkerhetskopia.
-- **Backups** - de säkerhetskopior du redan har, var och en visar appnamnet på en rad och
+- **Backups**: de säkerhetskopior du redan har, var och en visar appnamnet på en rad och
   paketet på nästa. Tryck på en säkerhetskopia för att se dess fullständiga detaljer (version, datum, storlek,
   inkluderade objekt, behörighetsantal, och enheten den kom från). Det är också här du
   återställer, kör en återställningstest, tar bort en säkerhetskopia, eller importerar säkerhetskopior från Neo-Backup eller
   Android-DataBackup.
-- **Destinations** - hantera vart säkerhetskopior går: lokal lagring plus eventuella fjärr-
+- **Destinations**: hantera vart säkerhetskopior går: lokal lagring plus eventuella fjärr-
   destinationer du lägger till (se [avsnitt 7](#avsnitt-7)). Du kan
   testa en destination här innan du förlitar dig på den.
-- **Settings** - en växling för ljust/mörkt tema, en accentfärgsväljare (förinställningar, en egen
+- **Settings**: en växling för ljust/mörkt tema, en accentfärgsväljare (förinställningar, en egen
   färg eller återställning), en språkväljare (gränssnittet renderas från höger till vänster för
   arabiska och persiska), ett skjutreglage för gränssnittsskala som du drar för att
   skala om hela gränssnittet (sidhuvud, innehåll och nedre navigering tillsammans) från 85 % till 120 % (100 % är standard), för skärmar med olika
@@ -157,7 +158,7 @@ WebUI är organiserat i några flikar:
   molnöverföringar (se [avsnitt 7](#avsnitt-7)), automatisk säkerhetskopiering och listan över
   uteslutna appar, alternativet för installationskälla, krypterings-
   nyckeln, och schemaläggning. Av/på-inställningar använder växlingsbrytare i Android-stil.
-- **About** - version, länkar, systerprojekten (See also), granskningsmanifestet för de medföljande binärfilerna, och en **Check for updates**-åtgärd som rapporterar om en nyare version har publicerats (med dess versionsanteckningar). Du installerar alla uppdateringar via din root-hanterare, på samma sätt som du flashade modulen.
+- **About**: version, länkar, systerprojekten (See also), granskningsmanifestet för de medföljande binärfilerna, och en **Check for updates**-åtgärd som rapporterar om en nyare version har publicerats (med dess versionsanteckningar). Du installerar alla uppdateringar via din root-hanterare, på samma sätt som du flashade modulen.
 
 Appen söker också själv efter en nyare version varje gång du öppnar den (högst en gång i timmen) och visar uppdateringsbannern bara när en finns; tyst när uppdaterad eller offline.
 
@@ -180,7 +181,7 @@ Det grundläggande flödet: öppna **Apps**, välj en app, välj vad som ska ink
 ställ in komprimering och (valfritt) kryptering, kör sedan. Förloppet visas live och en
 notis talar om när det är klart.
 
-I säkerhetskopieringsdialogen kan du även välja **mål** för denna kopia - lokal lagring eller valfritt tillagt moln-/fjärrmål - utan att först ändra standardmålet i Inställningar.
+I säkerhetskopieringsdialogen kan du även välja **mål** för denna kopia, lokal lagring eller valfritt tillagt moln-/fjärrmål, utan att först ändra standardmålet i Inställningar.
 
 ### 5.1 Välja vad som ska säkerhetskopieras
 
@@ -207,15 +208,15 @@ uid/gid-ägande, fillägen, utökade attribut (xattr) och förmågor.
 VDBackup erbjuder tre lägen. WebUI förväljer **Full**, vilket är det rätta valet
 för de flesta.
 
-- **Full** - en komplett, fristående, portabel säkerhetskopia skriven som `tar.zst` (eller
+- **Full**: en komplett, fristående, portabel säkerhetskopia skriven som `tar.zst` (eller
   din valda komprimering). Varje körning producerar en fristående säkerhetskopia som du kan kopiera
   var som helst och öppna på en PC. Bäst för: en ren, portabel ögonblicksbild av en app som du kan
   arkivera och flytta runt. Detta är standard och det mest portabla alternativet.
-- **Snapshot** - inkrementell och versionerad, underbyggd av `restic`. Varje körning lägger till en ny
+- **Snapshot**: inkrementell och versionerad, underbyggd av `restic`. Varje körning lägger till en ny
   tidpunktsbild till ett arkiv, lagrar endast vad som ändrats och
   av-duplicerar över ögonblicksbilder. Bäst för: att hålla en löpande historik av en app
   utan att betala full storlek vid varje körning.
-- **Mirror** - en 1:1-synk av den aktiva datan till destinationen, underbyggd av
+- **Mirror**: en 1:1-synk av den aktiva datan till destinationen, underbyggd av
   `rclone`/`rsync`. Den håller destinationen identisk med vad som finns på enheten just
   nu (ändrade filer kopieras, borttagna filer raderas på destinationen). Bäst
   för: en snabb, alltid-aktuell kopia, till exempel till en moln-fjärrplats. Observera att APK:n
@@ -225,11 +226,11 @@ för de flesta.
 
 Du kan välja komprimering för en Full-säkerhetskopia:
 
-- **none** - ingen komprimering (snabbast, störst).
-- **lz4** - mycket snabb, lätt komprimering.
-- **zstd** - standarden, en stark balans mellan hastighet och förhållande. Du kan också välja en
+- **none**: ingen komprimering (snabbast, störst).
+- **lz4**: mycket snabb, lätt komprimering.
+- **zstd**: standarden, en stark balans mellan hastighet och förhållande. Du kan också välja en
   nivå (till exempel en högre nivå för en mindre fil).
-- **gzip** - **"kompatibilitetsläget"**. gzip öppnas med inbyggda verktyg på
+- **gzip**: **"kompatibilitetsläget"**. gzip öppnas med inbyggda verktyg på
   praktiskt taget vilken dator som helst och i de flesta filhanterare, utan något extra att installera.
   Välj detta när du bryr dig mest om att kunna öppna arkivet var som helst.
 
@@ -246,7 +247,7 @@ tillgängligt för krypterade arkiv som du vill öppna med ett dubbelklick och e
 
 För att använda kryptering, generera krypteringsnyckeln en gång (Settings), aktivera sedan
 kryptering för ditt jobb och ställ in en lösenfras. Lösenfrasen är det som skyddar
-säkerhetskopian, så välj en stark - det finns ingen hårdvarunyckel och ingen återställnings-bakdörr.
+säkerhetskopian, så välj en stark, det finns ingen hårdvarunyckel och ingen återställnings-bakdörr.
 
 **APK-regeln (viktigt):**
 
@@ -260,11 +261,11 @@ säkerhetskopian, så välj en stark - det finns ingen hårdvarunyckel och ingen
 
 Två säkerhetsalternativ hjälper dig att lita på en säkerhetskopia innan du förlitar dig på den:
 
-- **Verify** - efter skrivning hashar VDBackup om varje arkiv och kontrollerar det mot
+- **Verify**: efter skrivning hashar VDBackup om varje arkiv och kontrollerar det mot
   manifestet. Detta är **på som standard för Full**-säkerhetskopior. Om en fil inte matchar
   misslyckas jobbet med ett tydligt fel i stället för att lämna dig med en tyst korrupt
   säkerhetskopia.
-- **Dry-run** - planerar jobbet och rapporterar de storlekar det skulle producera **utan att skriva
+- **Dry-run**: planerar jobbet och rapporterar de storlekar det skulle producera **utan att skriva
   något**. Använd det för att uppskatta utrymme eller för att kontrollera ditt objekturval innan du kör
   det riktiga.
 
@@ -311,7 +312,7 @@ samma säkerhetskopia två gånger skapar aldrig dubbletter, och DNS och systemi
 
 ### 5.7 Fristående säkerhetskopior av mappar och filer
 
-Ibland vill du säkerhetskopiera en vanlig mapp eller fil som inte är en app - en kameramapp, en
+Ibland vill du säkerhetskopiera en vanlig mapp eller fil som inte är en app, en kameramapp, en
 dokumentkatalog, en enskild databas. VDBackup kan säkerhetskopiera **valfri absolut sökväg** på
 delad lagring eller under `/data`, med samma portabla format som en app-säkerhetskopia: ett
 `tar.zst`-arkiv plus en `manifest.json`, SHA-256-förseglad, med en RECOVERY-notis när du krypterar
@@ -333,7 +334,7 @@ registrerar åtgärden i en lokal granskningslogg.
 
 En återställning är **trogen**: VDBackup raderar appens aktuella tillstånd och extraherar
 säkerhetskopian, så att appen återförs till det **exakta tillstånd** som fångats i den säkerhetskopian
-(inklusive ägande, lägen, SELinux-kontexter och xattr). Det är inte en sammanslagning - det är en
+(inklusive ägande, lägen, SELinux-kontexter och xattr). Det är inte en sammanslagning, det är en
 sann återställning till säkerhetskopians tidpunkt. Eftersom en återställning körs som root
 kontrollerar VDBackup också varje arkiv innan det extraherar något och vägrar ett manipulerat arkiv
 som försöker skriva utanför sitt mål, så att en modifierad säkerhetskopia aldrig kan skriva över
@@ -341,17 +342,17 @@ resten av ditt system.
 
 Användbara återställningsalternativ:
 
-- **Restore-test** - extraherar säkerhetskopian till ett tillfälligt staging-område och verifierar det
+- **Restore-test**: extraherar säkerhetskopian till ett tillfälligt staging-område och verifierar det
   **utan att röra den aktiva appen**. Detta är det säkra sättet att bekräfta att en säkerhetskopia är
   intakt och återställningsbar innan du skriver över något. Om testet misslyckas får du ett
   tydligt fel och din installerade app lämnas orörd.
-- **Partiell återställning** - återställ endast några av objekten som säkerhetskopierades. Till
+- **Partiell återställning**: återställ endast några av objekten som säkerhetskopierades. Till
   exempel, återställ bara appdatan utan att återinstallera APK:n, eller återställ
   sparfilerna utan den stora OBB/media. Välj de objekt du vill ha på återställnings-
   skärmen.
 - För **Snapshot**- och **Mirror**-säkerhetskopior hämtar återställningen från det versionerade
   arkivet respektive den speglade kopian.
-- **Installationskälla** - som standard anger en återställd app **Play Store** som sin
+- **Installationskälla**: som standard anger en återställd app **Play Store** som sin
   installationskälla (i stället för att se sidladdad ut), vilket är vad de flesta appar och
   app-kontroller förväntar sig. Du kan stänga av detta globalt i Settings eller per återställning,
   och när det är av behålls den ursprungliga installationskällan. En avancerad växling som är tillval,
@@ -363,7 +364,7 @@ Användbara återställningsalternativ:
 det för batchsäkerhetskopiering. Slå på **Select**, kryssa för de säkerhetskopior du vill ha med deras
 kryssrutor och återställ dem alla på en gång. En enda alternativdialog täcker hela urvalet -
 bekräftelsen av överskrivning, återställningstestet och valet av installationskälla gäller för varje
-säkerhetskopia du valt - och de återställs efter varandra.
+säkerhetskopia du valt, och de återställs efter varandra.
 
 **Radera en säkerhetskopia.** Öppna en säkerhetskopias detaljer (eller en apps historik) och använd
 **Delete**; du ombeds bekräfta, och raderingen skrivs till aktivitetsloggen. Du kan också sätta ett
@@ -372,7 +373,7 @@ automatiskt.
 
 **Montera en installerad app som en systemapp.** Från en apps säkerhetskopiehistorik förbereder
 **Mount as system** appens APK i en VDBackup-overlay-undermodul så att root-hanteraren serverar den
-från `/system/app` (eller `/system/priv-app`) - den riktiga `/system`-partitionen rörs aldrig. Med
+från `/system/app` (eller `/system/priv-app`), den riktiga `/system`-partitionen rörs aldrig. Med
 **NoMount** på KernelSU tillämpas det live; annars tillämpas det efter en omstart. Detta beror aldrig
 på att NoMount är installerat.
 
@@ -385,10 +386,10 @@ lagringen (`/sdcard`) i stället för att skriva in sökvägen.
 
 Fjärrtransport hanteras av de medföljande verktygen:
 
-- **rclone** - navet för ett enormt urval av fjärrplatser: **SFTP, SMB, WebDAV, FTP, S3,
+- **rclone**: navet för ett enormt urval av fjärrplatser: **SFTP, SMB, WebDAV, FTP, S3,
   Google Drive** och 70+ fler tjänster.
-- **rsync** och **ssh/scp/sftp**-sviten - för deltasynk och vanliga SSH-mål.
-- **restic** - krypterade, av-duplicerade **Snapshot**-arkiv (lokala eller fjärr).
+- **rsync** och **ssh/scp/sftp**-sviten, för deltasynk och vanliga SSH-mål.
+- **restic**: krypterade, av-duplicerade **Snapshot**-arkiv (lokala eller fjärr).
 
 **Skapa en moln-fjärrplats (ingen SSH behövs).** I Destinations-fliken, välj
 **rclone**-destinationstypen och använd **Add cloud remote**. Du kan ansluta **vilken
@@ -413,17 +414,17 @@ Två regler håller fjärranvändning säker:
 **Nätverkspolicy (Wi-Fi vs mobildata).** I Settings låter "Cloud transfers over" dig
 begränsa vilken anslutning molnöverföringar får använda: **Wi-Fi and mobile data** (
 standarden), **Wi-Fi only** eller **Mobile data only**. När du begränsar det kontrollerar varje moln-
-överföring - manuell eller schemalagd, uppladdning eller återställning - den aktiva anslutningen först
+överföring, manuell eller schemalagd, uppladdning eller återställning, den aktiva anslutningen först
 och vägrar köra på fel, så att en Wi-Fi-only-policy aldrig spenderar mobildata.
 Lokala säkerhetskopior påverkas aldrig.
 
 **Google Drive.** Du har två sätt att nå Google Drive:
 
-1. **Via rclone** - lägg till Drive som en rclone-fjärrplats som vilken annan destination som helst, utan
+1. **Via rclone**: lägg till Drive som en rclone-fjärrplats som vilken annan destination som helst, utan
    extra app och **inget Google Cloud-konto**. På vilken dator som helst, kör
    `rclone authorize "drive"` en gång, logga in på ditt Google-konto i webbläsaren, och
    klistra in token den skriver ut i Drive-fjärrplatsens token-fält.
-2. **Via den valfria följeslagaren** - en liten, opt-in följeslagarapp som hanterar
+2. **Via den valfria följeslagaren**: en liten, opt-in följeslagarapp som hanterar
    Google-inloggningen och Drive-uppladdningen. Den installeras **endast när du uttryckligen väljer
    Google Drive-följeslagardestinationen**, aldrig som standard, och den tas bort när
    du inaktiverar den. Den engångs Google-samtyckesskärmen är det enda steget som händer
@@ -431,17 +432,25 @@ Lokala säkerhetskopior påverkas aldrig.
    **alltid dölja den med [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** så att dess närvaro inte avslöjar root eller
    en upplåst bootloader, och den erbjuder att lägga till den i HMA-OSS-listan åt dig. VDBackup påminner dig också, när du har lokala säkerhetskopior, om att dölja säkerhetskopiemappen (/sdcard/VDBackup) med SUSFS av samma skäl.
 
+### 7.1 Säkerhetskopiera dina inställningar
+
+Din egen VDBackup-konfiguration, destinationerna, schemana, förinställningarna och sparade inloggningsuppgifter, kan skrivas till en enda fil och tas med till en annan enhet eller återställas efter en ren installation. Under **Inställningar**, i **Säkerhetskopia av inställningar**:
+
+- **Exportera inställningar** skriver en krypterad fil till `VDBackup/.export`. Den ber alltid om en lösenordsfras, eftersom filen innehåller dina fjärrlösenord.
+- **Importera inställningar** läser tillbaka en sådan fil och slår samman den med den här enheten, utan att ta bort något som redan finns.
+- **Radera sparade inloggningsuppgifter** tar bort de sparade fjärrlösenorden och enhetens krypteringsnyckel i ett steg; dina destinationer, scheman och säkerhetskopior blir kvar.
+
 ## 8. Schemaläggning och kvarhållning
 
-VDBackup kan köra säkerhetskopior - och återställningar - automatiskt enligt ett schema. I
+VDBackup kan köra säkerhetskopior, och återställningar, automatiskt enligt ett schema. I
 schemaläggaren definierar du ett jobb med:
 
-- ett **mål** - en enda app, en uppsättning appar, eller **alla appar** (minus listan över uteslutna
-  appar) - och objekten/läget att använda,
-- en **åtgärd** - **Back up** (standard) eller **Restore latest**, som återställer varje målapps
+- ett **mål**: en enda app, en uppsättning appar, eller **alla appar** (minus listan över uteslutna
+  appar), och objekten/läget att använda,
+- en **åtgärd**: **Back up** (standard) eller **Restore latest**, som återställer varje målapps
   senaste säkerhetskopia,
 - en destination,
-- ett **cron-liknande schema** - varje timme, dagligen eller veckovis, vid en tid du väljer (HH:MM),
+- ett **cron-liknande schema**: varje timme, dagligen eller veckovis, vid en tid du väljer (HH:MM),
 - en **kvarhållnings**-inställning: **behåll N** senaste säkerhetskopior för det jobbet, äldre
   rensas automatiskt,
 - valfria **körvillkor**: endast på **Wi-Fi**, endast under **laddning**, endast vid eller över en
@@ -455,14 +464,14 @@ behöver schemalagda säkerhetskopior inte att WebUI är öppet.
 **Körvillkor (grindar).** Ett schemalagt jobb kan bära villkor som måste vara uppfyllda för att det
 ska köras: endast Wi-Fi, endast laddning, en lägsta batterinivå och specifika veckodagar. När ett
 jobb är förfallet men ett villkor inte är uppfyllt **hoppas det över och försöks igen vid nästa
-kontroll** - dess schema flyttas inte fram, så det körs så snart villkoret är uppfyllt. En inbyggd
+kontroll**: dess schema flyttas inte fram, så det körs så snart villkoret är uppfyllt. En inbyggd
 termisk säkerhetskontroll hoppar också över ett schemalagt jobb medan enheten är för varm. Varje
 sådan överhoppning registreras i aktivitetsloggen.
 
 **Schemalagd återställning skriver över vid varje körning.** Ett **Restore latest**-jobb återställer
 varje målapps senaste säkerhetskopia på nytt varje gång det avfyras, och återställning är destruktiv:
 vid varje körning **skriver den över appens nuvarande data** med den senaste säkerhetskopian. Detta är
-avsiktligt och ett tillval - välj det bara när du vill hålla målen vid deras senaste säkerhetskopia.
+avsiktligt och ett tillval, välj det bara när du vill hålla målen vid deras senaste säkerhetskopia.
 
 **Auto-säkerhetskopiering vid installation/uppdatering.** I Settings kan du slå på **automatisk
 säkerhetskopiering**: samma bakgrundshjärtslag märker appar som nyligen installerats eller
@@ -474,15 +483,15 @@ en gång.
 säkerhetskopiera automatiskt eller enligt schema; du kan lägga till flera samtidigt (flerval), och
 uteslutna appar hoppas över av båda.
 
-**Säkerhetskopieförval.** Även i Inställningar kan du spara namngivna förval - uppsättningar av poster att inkludera, som bara APK eller APK + OBB - och välja ett i säkerhetskopieringsdialogen för att fylla valen på en gång.
+**Säkerhetskopieförval.** Även i Inställningar kan du spara namngivna förval, uppsättningar av poster att inkludera, som bara APK eller APK + OBB, och välja ett i säkerhetskopieringsdialogen för att fylla valen på en gång.
 
-**Säkerhetskopieposter per app.** Även i Inställningar kan du välja exakt vilka poster varje app säkerhetskopierar i bulk-, automatiska och schemalagda säkerhetskopior - till exempel bara APK, eller APK + OBB. En enskild manuell säkerhetskopia låter dig fortfarande välja då, med appens uppsättning som utgångspunkt. Appar du inte ställer in här säkerhetskopierar allt.
+**Säkerhetskopieposter per app.** Även i Inställningar kan du välja exakt vilka poster varje app säkerhetskopierar i bulk-, automatiska och schemalagda säkerhetskopior, till exempel bara APK, eller APK + OBB. En enskild manuell säkerhetskopia låter dig fortfarande välja då, med appens uppsättning som utgångspunkt. Appar du inte ställer in här säkerhetskopierar allt.
 
-**App-taggar.** Tryck på en app i Inställningar (Objekt och taggar per app) för att ge den fria etiketter - till exempel games eller work. Ovanför applistan visas då en taggväljare: välj en tagg för att visa bara dess appar och säkerhetskopiera hela gruppen på en gång. Du kan också nå det från fliken Appar: tryck på en app och sedan på Objekt och taggar.
+**App-taggar.** Tryck på en app i Inställningar (Objekt och taggar per app) för att ge den fria etiketter, till exempel games eller work. Ovanför applistan visas då en taggväljare: välj en tagg för att visa bara dess appar och säkerhetskopiera hela gruppen på en gång. Du kan också nå det från fliken Appar: tryck på en app och sedan på Objekt och taggar.
 
 **Aktivitetslogg.** Fliken Schedule har en knapp **View activity log** som öppnar en helskärm (direkt)
-och visar den lokala revisionsloggen - säkerhetskopior, återställningar, raderingar, schemalagda och
-automatiska körningar, och gallringar - nyast först. En åtgärd **Export logs** sparar en loggfil (under
+och visar den lokala revisionsloggen, säkerhetskopior, återställningar, raderingar, schemalagda och
+automatiska körningar, och gallringar, nyast först. En åtgärd **Export logs** sparar en loggfil (under
 säkerhetskopieringsmappen) som du kan bifoga en feedback- eller felrapport.
 
 ## 9. Migrera in: importera Neo-Backup och Android-DataBackup
@@ -496,12 +505,12 @@ om. Från **Backups**-fliken kan du **importera** dina befintliga säkerhetskopi
 3. Starta importen. Som andra långa operationer körs den frikopplat med live-förlopp.
 
 **Lösenordskrypterade Neo-Backup-säkerhetskopior stöds.** Neo-Backups AES-256-
-krypterade säkerhetskopior kan importeras - du **ombeds om lösenordet** när det
+krypterade säkerhetskopior kan importeras, du **ombeds om lösenordet** när det
 behövs, och lösenordet används endast för att dekryptera, lagras aldrig i kommandoraden.
 
 ## 10. SSAID (enhetens ANDROID_ID)
 
-SSAID är det per-app `ANDROID_ID` - en identifierare på enhetsnivå som vissa appar läser.
+SSAID är det per-app `ANDROID_ID`, en identifierare på enhetsnivå som vissa appar läser.
 VDBackup kan säkerhetskopiera och återställa det, men detta är det känsligaste det
 rör, så det hanteras med extra omsorg:
 
@@ -544,7 +553,7 @@ klistra-in-kommandona för Windows, macOS och Linux. Se
 [`../module/etc/RECOVERY.md`](RECOVERY.md) för det fullständiga, steg-för-steg-kitet.
 
 Observera att SELinux-kontexter, uid/gid och lägen lagras inuti tar:en och återtillämpas
-endast korrekt när du återställer på Android - på en PC får du fortfarande alla dina filer,
+endast korrekt när du återställer på Android, på en PC får du fortfarande alla dina filer,
 bara utan att det Android-specifika ägandet upprätthålls.
 
 ## 12. Styra VDBackup från en AI-assistent
@@ -553,7 +562,7 @@ VDBackup är byggt för att vara vänligt mot AI-assistenter och agenter, inte b
 är endast en klient till ett litet JSON-API; en agent kan administrera **varje** åtgärd
 i modulen utan gränssnitt genom samma API (varje kommando returnerar ett enda JSON-
 objekt, långa operationer körs frikopplat och du pollar deras förlopp, och samma säkerhets-
-räcken gäller - SSAID förblir opt-in, muterande åtgärder förblir bekräftade och granskade).
+räcken gäller, SSAID förblir opt-in, muterande åtgärder förblir bekräftade och granskade).
 
 Om du vill att en assistent ska köra dina säkerhetskopior och återställningar åt dig, rikta den mot
 [`AI-AGENTS.md`](AI-AGENTS.md), som dokumenterar hela kontrollytan: kommando-
@@ -572,14 +581,14 @@ att stänga WebUI stoppar dem inte. Öppna WebUI igen och det återansluter till
 körande operation och visar aktuellt förlopp.
 
 **Jag fick ett `ERR_...`-meddelande.** Fel rapporteras med en tydlig kod. Några vanliga:
-- `ERR_VERIFY` - ett skrivet arkiv matchade inte sin manifest-hash (verifieringen
+- `ERR_VERIFY`, ett skrivet arkiv matchade inte sin manifest-hash (verifieringen
   fångade en dålig säkerhetskopia). Kör säkerhetskopian igen.
-- `ERR_RESTORE_TEST` - ett restore-test misslyckades; säkerhetskopian extraherade/verifierade inte
+- `ERR_RESTORE_TEST`, ett restore-test misslyckades; säkerhetskopian extraherade/verifierade inte
   rent och din aktiva app lämnades orörd.
-- `ERR_UNSAFE_ARCHIVE` - ett arkiv avvisades för att det försökte skriva utanför sin målkatalog
+- `ERR_UNSAFE_ARCHIVE`, ett arkiv avvisades för att det försökte skriva utanför sin målkatalog
   (absoluta sökvägar eller `..`). Detta skyddar dig från en manipulerad säkerhetskopia; ingenting
   skrevs.
-- `ERR_QUOTA` - en moln-fjärr hade inte tillräckligt med ledigt utrymme för en Full-uppladdning;
+- `ERR_QUOTA`, en moln-fjärr hade inte tillräckligt med ledigt utrymme för en Full-uppladdning;
   säkerhetskopian stoppades innan något laddades upp.
 
 **Min fjärrdestination misslyckas.** Använd destinations-**testet** i Destinations-fliken
@@ -590,11 +599,11 @@ nätverket; lokal backup/restore är helt offline.
 i modulen vid build-tid; inget hämtas till enheten vid körtid. Endast moln-
 destinationer (rclone/restic/ssh) kommunicerar med nätverket, och endast när du använder dem.
 
-**Kommer min säkerhetskopia att återställas på en annan telefon?** Ja - säkerhetskopior är portabla och inte
+**Kommer min säkerhetskopia att återställas på en annan telefon?** Ja, säkerhetskopior är portabla och inte
 bundna till enhetshårdvara. (SSAID är det enda enhetsspecifika undantaget, och det är opt-in
 och omstarts-tillämpat; se [avsnitt 10](#avsnitt-10).)
 
-**Min krypterade säkerhetskopia öppnas inte - jag tappade lösenfrasen.** Det finns ingen återställnings-
+**Min krypterade säkerhetskopia öppnas inte, jag tappade lösenfrasen.** Det finns ingen återställnings-
 bakdörr avsiktligt; lösenfrasen är det som skyddar säkerhetskopian. Håll den säker.
 
 ## 14. Avinstallera
@@ -602,10 +611,10 @@ bakdörr avsiktligt; lösenfrasen är det som skyddar säkerhetskopian. Håll de
 Avinstallera VDBackup som vilken annan modul som helst från din KernelSU / APatch / Magisk-hanterare.
 Avinstallation **bevarar din användarkonfiguration** och tar bort endast övergående tillstånd,
 så att ominstallation senare plockar upp dina inställningar. Dina faktiska säkerhetskopior bor under
-`/data/adb/vdbackup/` - om du vill ta bort dem också, radera den katalogen
+`/data/adb/vdbackup/`, om du vill ta bort dem också, radera den katalogen
 manuellt efter avinstallationen; annars förblir de tillgängliga (och, eftersom de är standard-
 format, öppningsbara på en PC) även utan modulen.
 
 ---
 
-*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna - se [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna, se [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -7,7 +7,7 @@
 Kompletne, przyjazne przejście przez VDBackup, od instalacji modułu po utworzenie
 pierwszej kopii, jej przywrócenie, wysłanie do chmury, zaplanowanie i otwarcie
 jej na PC lata później. Jeśli wcześniej używałeś Swift Backup, Neo-Backup lub
-Android-DataBackup, będzie to znajome - tylko wszystko dzieje się w jednym
+Android-DataBackup, będzie to znajome, tylko wszystko dzieje się w jednym
 miejscu, bez niczego do "zezwolenia".
 
 ## Spis treści
@@ -26,6 +26,7 @@ miejscu, bez niczego do "zezwolenia".
   - [5.7 Samodzielne kopie folderów i plików](#57-samodzielne-kopie-folderów-i-plików)
 - [6. Przywracanie kopii](#6-przywracanie-kopii)
 - [7. Cele: lokalne i zdalne](#7-cele-lokalne-i-zdalne)
+  - [7.1 Kopia twoich ustawień](#71-kopia-twoich-ustawień)
 - [8. Planowanie i retencja](#8-planowanie-i-retencja)
 - [9. Migracja do środka: import Neo-Backup i Android-DataBackup](#9-migracja-do-środka-import-neo-backup-i-android-databackup)
 - [10. SSAID (ANDROID_ID urządzenia)](#10-ssaid-android_id-urządzenia)
@@ -80,18 +81,18 @@ i degradują się elegancko, gdy nie są dostępne na twoim urządzeniu.
 1. Pobierz najnowsze wydanie `VD-Backup-vX.Y.zip`.
 2. W swoim menedżerze KernelSU / APatch / Magisk flashnij zip modułu jak każdy inny
    moduł.
-3. Jest używalny natychmiast - **restart nie jest potrzebny**. (Restart jest istotny tylko
+3. Jest używalny natychmiast, **restart nie jest potrzebny**. (Restart jest istotny tylko
    przy przywracaniu SSAID; zobacz [sekcja 10](#sekcja-10).)
 4. Otwórz **WebUI** modułu z menedżera. To jest cały interfejs.
 
 **Którą edycję pobrać.** Każde wydanie jest dostarczane jako kilka flashowalnych edycji zip, więc
 pobierasz tylko to, czego potrzebujesz. Wybierz jedną:
 
-- **`VD-Backup-<ver>-universal-full.zip`** - każda architektura CPU i każdy plik binarny wbudowany, w tym
+- **`VD-Backup-<ver>-universal-full.zip`**: każda architektura CPU i każdy plik binarny wbudowany, w tym
   `rclone` (dostawcy chmury: Google Drive, S3 i 70+ innych backendów rclone) i `restic`
   (zdeduplikowane migawki). W pełni offline, nic nigdy nie jest pobierane. Działa na każdym
   urządzeniu. Największy plik do pobrania.
-- **`VD-Backup-<ver>-universal-lite.zip`** - każda architektura, ale **bez** dwóch największych
+- **`VD-Backup-<ver>-universal-lite.zip`**: każda architektura, ale **bez** dwóch największych
   plików binarnych (`rclone` i `restic`). Najmniejszy plik do pobrania; nadal wykonuje kopie
   lokalne oraz przez SSH/SFTP i rsync bez pobierania, z przenośnym szyfrowaniem `age`. Przy
   pierwszym użyciu miejsca docelowego w chmurze (`rclone`) lub trybu migawek (`restic`) WebUI
@@ -112,7 +113,7 @@ tylko architekturę twojego urządzenia, niezależnie od tego, którą edycję f
 Przy pierwszym uruchomieniu moduł zasiewa domyślną konfigurację (tylko jeśli żadna jeszcze nie istnieje), więc
 twoje ustawienia są zachowane przez aktualizacje modułu.
 
-**Gdzie żyje stan.** Dane robocze VDBackup - twoja konfiguracja, zaplanowane zadania,
+**Gdzie żyje stan.** Dane robocze VDBackup, twoja konfiguracja, zaplanowane zadania,
 zapisane cele, zaszyfrowane poświadczenia, logi i ścieżka audytu oraz obszar staging -
 żyją pod:
 
@@ -135,20 +136,20 @@ Miej to na uwadze z dwóch powodów: kopie zajmują miejsce pod `/sdcard/VDBacku
 
 WebUI jest zorganizowane w kilka zakładek:
 
-- **Home** - przegląd startowy pokazujący liczby twoich kopii (aplikacje, kopie, foldery i zaplanowane zadania) oraz pasek pamięci, ile miejsca zajmują twoje kopie w stosunku do wolnego, ze znaczkami statusu, kopiowaniem hashów i ścieżek do schowka oraz akcją **Check for updates**.
-- **Apps** - lista zainstalowanych aplikacji (użytkownika i systemowych), każda pokazana ze swoją prawdziwą
+- **Home**: przegląd startowy pokazujący liczby twoich kopii (aplikacje, kopie, foldery i zaplanowane zadania) oraz pasek pamięci, ile miejsca zajmują twoje kopie w stosunku do wolnego, ze znaczkami statusu, kopiowaniem hashów i ścieżek do schowka oraz akcją **Check for updates**.
+- **Apps**: lista zainstalowanych aplikacji (użytkownika i systemowych), każda pokazana ze swoją prawdziwą
   nazwą, nazwą pakietu i ikoną (ikony ładują się leniwie i są cachowane, więc lista
   pozostaje responsywna). Przycisk w wierszu tworzy kopię aplikacji; dotknięcie wiersza otwiera
   historię kopii tej aplikacji, gdzie możesz przywrócić dowolną wcześniejszą kopię.
-- **Backups** - kopie, które już masz, każda pokazująca nazwę aplikacji w jednej linii i
+- **Backups**: kopie, które już masz, każda pokazująca nazwę aplikacji w jednej linii i
   pakiet w następnej. Dotknij kopii, aby zobaczyć jej pełne szczegóły (wersja, data, rozmiar,
   dołączone elementy, liczby uprawnień oraz urządzenie, z którego pochodzi). Tu również
   przywracasz, uruchamiasz restore-test, usuwasz kopię lub importujesz kopie z Neo-Backup lub
   Android-DataBackup.
-- **Destinations** - zarządzaj, dokąd trafiają kopie: magazyn lokalny plus dowolne zdalne
+- **Destinations**: zarządzaj, dokąd trafiają kopie: magazyn lokalny plus dowolne zdalne
   cele, które dodasz (zobacz [sekcja 7](#sekcja-7)). Możesz tu
   przetestować cel, zanim na nim polegniesz.
-- **Settings** - przełącznik motywu jasny/ciemny, selektor koloru akcentu (gotowe ustawienia,
+- **Settings**: przełącznik motywu jasny/ciemny, selektor koloru akcentu (gotowe ustawienia,
   własny kolor lub reset), selektor języka (interfejs jest renderowany od prawej do lewej dla
   języka arabskiego i perskiego), suwak skali interfejsu, który przeciągasz, aby przeskalować
   cały interfejs (nagłówek, treść i dolna nawigacja razem) od 85% do 120% (100% jest domyślne), do ekranów o różnej
@@ -157,7 +158,7 @@ WebUI jest zorganizowane w kilka zakładek:
   przesyłów chmurowych (zobacz [sekcja 7](#sekcja-7)), automatyczna kopia i lista wykluczonych
   aplikacji, opcja źródła instalacji, klucz
   szyfrowania oraz planowanie. Ustawienia wł/wył używają przełączników w stylu Androida.
-- **About** - wersja, linki, projekty siostrzane (See also), manifest audytu dołączonych plików binarnych oraz akcja **Check for updates**, która zgłasza, czy opublikowano nowszą wersję (wraz z jej informacjami o wydaniu). Każdą aktualizację instalujesz przez swojego menedżera roota, tak samo jak flashowałeś moduł.
+- **About**: wersja, linki, projekty siostrzane (See also), manifest audytu dołączonych plików binarnych oraz akcja **Check for updates**, która zgłasza, czy opublikowano nowszą wersję (wraz z jej informacjami o wydaniu). Każdą aktualizację instalujesz przez swojego menedżera roota, tak samo jak flashowałeś moduł.
 
 Aplikacja sama też sprawdza nowszą wersję przy każdym otwarciu (najwyżej raz na godzinę) i pokazuje baner aktualizacji tylko, gdy jest dostępna; milczy, gdy jest aktualna lub offline.
 
@@ -179,7 +180,7 @@ Podstawowy przepływ: otwórz **Apps**, wybierz aplikację, zaznacz, co dołącz
 ustaw kompresję i (opcjonalnie) szyfrowanie, a następnie uruchom. Postęp pojawia się na żywo, a
 powiadomienie mówi ci, kiedy jest gotowe.
 
-W oknie kopii zapasowej możesz też wybrać **miejsce docelowe** tej kopii - pamięć lokalną lub dowolne dodane miejsce w chmurze/zdalne - bez wcześniejszej zmiany domyślnego miejsca w Ustawieniach.
+W oknie kopii zapasowej możesz też wybrać **miejsce docelowe** tej kopii, pamięć lokalną lub dowolne dodane miejsce w chmurze/zdalne, bez wcześniejszej zmiany domyślnego miejsca w Ustawieniach.
 
 ### 5.1 Wybór tego, co kopiować
 
@@ -206,15 +207,15 @@ własność uid/gid, tryby plików, atrybuty rozszerzone (xattr) i capabilities.
 VDBackup oferuje trzy tryby. WebUI wstępnie wybiera **Full**, co jest właściwym wyborem
 dla większości osób.
 
-- **Full** - kompletna, samowystarczalna, przenośna kopia zapisana jako `tar.zst` (lub
+- **Full**: kompletna, samowystarczalna, przenośna kopia zapisana jako `tar.zst` (lub
   wybrana przez ciebie kompresja). Każde uruchomienie tworzy samodzielną kopię, którą możesz skopiować
   gdziekolwiek i otworzyć na PC. Najlepsze dla: czystego, przenośnego snapshota aplikacji, który możesz
   zarchiwizować i przenosić. To domyślna i najbardziej przenośna opcja.
-- **Snapshot** - przyrostowa i wersjonowana, oparta na `restic`. Każde uruchomienie dodaje nowy
+- **Snapshot**: przyrostowa i wersjonowana, oparta na `restic`. Każde uruchomienie dodaje nowy
   snapshot w punkcie czasu do repozytorium, przechowując tylko to, co się zmieniło, i
   deduplikując między snapshotami. Najlepsze dla: utrzymywania bieżącej historii aplikacji
   bez płacenia pełnym rozmiarem przy każdym uruchomieniu.
-- **Mirror** - synchronizacja 1:1 żywych danych do celu, oparta na
+- **Mirror**: synchronizacja 1:1 żywych danych do celu, oparta na
   `rclone`/`rsync`. Utrzymuje cel identyczny z tym, co jest na urządzeniu teraz
   (zmienione pliki są kopiowane, usunięte pliki są kasowane w celu). Najlepsze
   dla: szybkiej, zawsze aktualnej kopii, na przykład do zdalnego chmurowego. Zauważ, że APK
@@ -224,11 +225,11 @@ dla większości osób.
 
 Możesz wybrać kompresję dla kopii Full:
 
-- **none** - brak kompresji (najszybsze, największe).
-- **lz4** - bardzo szybka, lekka kompresja.
-- **zstd** - domyślna, mocna równowaga szybkości i współczynnika. Możesz też wybrać poziom
+- **none**: brak kompresji (najszybsze, największe).
+- **lz4**: bardzo szybka, lekka kompresja.
+- **zstd**: domyślna, mocna równowaga szybkości i współczynnika. Możesz też wybrać poziom
   (na przykład wyższy poziom dla mniejszego pliku).
-- **gzip** - **"tryb zgodności"**. gzip otwiera się wbudowanymi narzędziami na
+- **gzip**: **"tryb zgodności"**. gzip otwiera się wbudowanymi narzędziami na
   praktycznie każdym komputerze i w większości menedżerów plików, bez niczego dodatkowego do instalacji.
   Wybierz to, gdy najbardziej zależy ci na możliwości otwarcia archiwum gdziekolwiek.
 
@@ -245,7 +246,7 @@ dla zaszyfrowanych archiwów, które chcesz otworzyć dwuklikiem i hasłem.)
 
 Aby użyć szyfrowania, wygeneruj klucz szyfrujący raz (Settings), następnie włącz
 szyfrowanie dla swojego zadania i ustaw passphrase. Passphrase jest tym, co chroni
-kopię, więc wybierz silne - nie ma klucza sprzętowego ani tylnej furtki do odzyskiwania.
+kopię, więc wybierz silne, nie ma klucza sprzętowego ani tylnej furtki do odzyskiwania.
 
 **Reguła APK (ważne):**
 
@@ -259,11 +260,11 @@ kopię, więc wybierz silne - nie ma klucza sprzętowego ani tylnej furtki do od
 
 Dwie opcje bezpieczeństwa pomagają ci zaufać kopii, zanim na niej polegniesz:
 
-- **Verify** - po zapisie VDBackup ponownie hashuje każde archiwum i sprawdza je względem
+- **Verify**: po zapisie VDBackup ponownie hashuje każde archiwum i sprawdza je względem
   manifestu. To jest **domyślnie włączone dla kopii Full**. Jeśli plik się nie zgadza,
   zadanie kończy się niepowodzeniem z czytelnym błędem, zamiast zostawiać cię z cicho uszkodzoną
   kopią.
-- **Dry-run** - planuje zadanie i raportuje rozmiary, które by wyprodukowało, **bez zapisywania
+- **Dry-run**: planuje zadanie i raportuje rozmiary, które by wyprodukowało, **bez zapisywania
   czegokolwiek**. Użyj tego, by oszacować miejsce lub sprawdzić swój wybór elementów przed uruchomieniem
   prawdziwej rzeczy.
 
@@ -311,7 +312,7 @@ prostu ponownie stosowane.
 
 ### 5.7 Samodzielne kopie folderów i plików
 
-Czasami chcesz zrobić kopię zwykłego folderu lub pliku, który nie jest aplikacją - folderu
+Czasami chcesz zrobić kopię zwykłego folderu lub pliku, który nie jest aplikacją, folderu
 aparatu, katalogu dokumentów, pojedynczej bazy danych. VDBackup potrafi zrobić kopię **dowolnej
 ścieżki bezwzględnej** w pamięci współdzielonej lub pod `/data`, w tym samym przenośnym formacie
 co kopia aplikacji: archiwum `tar.zst` plus `manifest.json`, zapieczętowane SHA-256, z notatką
@@ -334,7 +335,7 @@ zapisuje akcję w lokalnym logu audytu.
 
 Przywracanie jest **wierne**: VDBackup wymazuje bieżący stan aplikacji i rozpakowuje
 kopię, więc aplikacja jest przywracana do **dokładnego stanu** uchwyconego w tej kopii
-(wraz z własnością, trybami, kontekstami SELinux i xattr). To nie jest scalenie - to
+(wraz z własnością, trybami, kontekstami SELinux i xattr). To nie jest scalenie, to
 prawdziwe przywrócenie do punktu w czasie kopii. Ponieważ przywracanie działa jako root,
 VDBackup sprawdza też każde archiwum, zanim cokolwiek rozpakuje, i odrzuca zmanipulowane, które
 próbuje zapisać poza swoim celem, więc zmodyfikowana kopia nigdy nie może nadpisać reszty twojego
@@ -342,16 +343,16 @@ systemu.
 
 Przydatne opcje przywracania:
 
-- **Restore-test** - rozpakowuje kopię do tymczasowego obszaru staging i weryfikuje ją
+- **Restore-test**: rozpakowuje kopię do tymczasowego obszaru staging i weryfikuje ją
   **bez dotykania żywej aplikacji**. To bezpieczny sposób na potwierdzenie, że kopia jest
   nienaruszona i możliwa do przywrócenia, zanim cokolwiek nadpiszesz. Jeśli test się nie powiedzie, otrzymasz
   czytelny błąd, a twoja zainstalowana aplikacja pozostaje nietknięta.
-- **Częściowe przywracanie** - przywróć tylko niektóre z elementów, które zostały skopiowane. Na przykład
+- **Częściowe przywracanie**: przywróć tylko niektóre z elementów, które zostały skopiowane. Na przykład
   przywróć same dane aplikacji bez reinstalacji APK, lub przywróć pliki
   zapisu bez dużych OBB/media. Wybierz elementy, które chcesz, na ekranie przywracania.
 - Dla kopii **Snapshot** i **Mirror** przywracanie pobiera odpowiednio z wersjonowanego
   repozytorium lub z mirrorowanej kopii.
-- **Źródło instalacji** - domyślnie przywrócona aplikacja zgłasza **Sklep Play** jako swoje
+- **Źródło instalacji**: domyślnie przywrócona aplikacja zgłasza **Sklep Play** jako swoje
   źródło instalacji (zamiast wyglądać na sideloaded), czego oczekuje większość aplikacji i
   kontroli aplikacji. Możesz to wyłączyć globalnie w Settings lub dla pojedynczego przywracania,
   a po wyłączeniu zachowywane jest oryginalne źródło instalacji. Zaawansowany, opcjonalny
@@ -361,8 +362,8 @@ Przydatne opcje przywracania:
 
 **Przywracanie wsadowe.** Zakładka **Backups** ma tryb **Select**, tak samo jak zakładka Apps ma go
 do wsadowego tworzenia kopii. Włącz **Select**, zaznacz polami wyboru kopie, które chcesz, i przywróć
-je wszystkie naraz. Jedno okno opcji obejmuje cały wybór - potwierdzenie nadpisania, restore-test oraz
-wybór źródła instalacji dotyczą każdej wybranej przez ciebie kopii - a są one przywracane jedna po
+je wszystkie naraz. Jedno okno opcji obejmuje cały wybór, potwierdzenie nadpisania, restore-test oraz
+wybór źródła instalacji dotyczą każdej wybranej przez ciebie kopii, a są one przywracane jedna po
 drugiej.
 
 **Usuwanie kopii.** Otwórz szczegóły kopii (lub historię aplikacji) i użyj **Delete**;
@@ -372,7 +373,7 @@ automatycznie.
 
 **Zamontuj zainstalowaną aplikację jako systemową.** Z historii kopii aplikacji **Mount as
 system** przygotowuje APK aplikacji w podmodule overlay VDBackup, aby menedżer root serwował ją
-z `/system/app` (lub `/system/priv-app`) - rzeczywista partycja `/system` nigdy nie jest
+z `/system/app` (lub `/system/priv-app`), rzeczywista partycja `/system` nigdy nie jest
 naruszana. Z **NoMount** na KernelSU stosuje się na żywo; w przeciwnym razie stosuje się po
 restarcie. Nigdy nie zależy to od tego, czy NoMount jest zainstalowany.
 
@@ -385,10 +386,10 @@ wpisywać ścieżkę.
 
 Transport zdalny jest obsługiwany przez dołączone narzędzia:
 
-- **rclone** - hub dla ogromnego zakresu zdalnych: **SFTP, SMB, WebDAV, FTP, S3,
+- **rclone**: hub dla ogromnego zakresu zdalnych: **SFTP, SMB, WebDAV, FTP, S3,
   Google Drive** i 70+ innych usług.
-- **rsync** oraz pakiet **ssh/scp/sftp** - dla delta sync i zwykłych celów SSH.
-- **restic** - zaszyfrowane, deduplikowane repozytoria **Snapshot** (lokalne lub zdalne).
+- **rsync** oraz pakiet **ssh/scp/sftp**: dla delta sync i zwykłych celów SSH.
+- **restic**: zaszyfrowane, deduplikowane repozytoria **Snapshot** (lokalne lub zdalne).
 
 **Tworzenie zdalnego chmurowego (SSH niepotrzebne).** W zakładce Destinations wybierz
 typ celu **rclone** i użyj **Add cloud remote**. Możesz połączyć **dowolny backend rclone**:
@@ -412,17 +413,17 @@ Dwie reguły utrzymują użycie zdalnych bezpiecznym:
 **Polityka sieciowa (Wi-Fi vs dane mobilne).** W Settings "Cloud transfers over" pozwala ci
 ograniczyć, które połączenie mogą użyć przesyły chmurowe: **Wi-Fi i dane mobilne** (
 domyślne), **tylko Wi-Fi**, lub **tylko dane mobilne**. Gdy to ograniczysz, każdy chmurowy
-przesył - ręczny lub zaplanowany, upload lub przywracanie - najpierw sprawdza aktywne połączenie
+przesył, ręczny lub zaplanowany, upload lub przywracanie, najpierw sprawdza aktywne połączenie
 i odmawia działania na niewłaściwym, więc polityka tylko-Wi-Fi nigdy nie wyda danych mobilnych.
 Kopie lokalne nigdy nie są dotknięte.
 
 **Google Drive.** Masz dwa sposoby, by dotrzeć do Google Drive:
 
-1. **Przez rclone** - dodaj Drive jako zdalny rclone jak każdy inny cel, bez
+1. **Przez rclone**: dodaj Drive jako zdalny rclone jak każdy inny cel, bez
    dodatkowej aplikacji i **bez konta Google Cloud**. Na dowolnym komputerze uruchom
    `rclone authorize "drive"` raz, zaloguj się na swoje konto Google w przeglądarce, i
    wklej token, który wypisze, do pola tokenu zdalnego Drive.
-2. **Przez opcjonalny companion** - niewielka, opt-in aplikacja towarzysząca, która obsługuje
+2. **Przez opcjonalny companion**: niewielka, opt-in aplikacja towarzysząca, która obsługuje
    logowanie Google i upload do Drive. Instaluje się **tylko gdy jawnie wybierzesz
    cel companion Google Drive**, nigdy domyślnie, i jest usuwana, gdy
    ją wyłączysz. Jednorazowy ekran zgody Google to jedyny krok, który dzieje się
@@ -430,17 +431,25 @@ Kopie lokalne nigdy nie są dotknięte.
    **zawsze ukrywać go za pomocą [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)**, aby jego obecność nie ujawniała roota lub
    odblokowanego bootloadera, i oferuje dodanie go do listy HMA-OSS za ciebie. VDBackup przypomina też, gdy masz lokalne kopie, aby z tego samego powodu ukryć folder kopii (/sdcard/VDBackup) za pomocą SUSFS.
 
+### 7.1 Kopia twoich ustawień
+
+Samą konfigurację VDBackup, czyli miejsca docelowe, harmonogramy, ustawienia wstępne i zapisane dane logowania, można zapisać do jednego pliku i przenieść na inne urządzenie lub przywrócić po czystej instalacji. W **Ustawieniach**, w sekcji **Kopia ustawień**:
+
+- **Eksportuj ustawienia** zapisuje zaszyfrowany plik do `VDBackup/.export`. Zawsze prosi o hasło, ponieważ plik zawiera twoje hasła zdalne.
+- **Importuj ustawienia** wczytuje taki plik z powrotem i scala go z tym urządzeniem, nie usuwając niczego, co już istnieje.
+- **Usuń zapisane dane logowania** usuwa zapisane hasła zdalne i klucz szyfrowania urządzenia w jednym kroku; twoje miejsca docelowe, harmonogramy i kopie pozostają na miejscu.
+
 ## 8. Planowanie i retencja
 
-VDBackup potrafi uruchamiać kopie - oraz przywracanie - automatycznie według harmonogramu. W planerze
+VDBackup potrafi uruchamiać kopie, oraz przywracanie, automatycznie według harmonogramu. W planerze
 definiujesz zadanie z:
 
-- **celem** - pojedyncza aplikacja, zestaw aplikacji lub **wszystkie aplikacje** (minus lista
-  wykluczonych aplikacji) - oraz elementami/trybem do użycia,
-- **akcją** - **Back up** (domyślna) lub **Restore latest**, która przywraca najnowszą kopię każdej
+- **celem**: pojedyncza aplikacja, zestaw aplikacji lub **wszystkie aplikacje** (minus lista
+  wykluczonych aplikacji), oraz elementami/trybem do użycia,
+- **akcją**: **Back up** (domyślna) lub **Restore latest**, która przywraca najnowszą kopię każdej
   aplikacji docelowej,
 - celem (miejscem docelowym),
-- **harmonogramem w stylu cron** - co godzinę, codziennie lub co tydzień, o wybranej przez ciebie porze (HH:MM),
+- **harmonogramem w stylu cron**: co godzinę, codziennie lub co tydzień, o wybranej przez ciebie porze (HH:MM),
 - ustawieniem **retencji**: **zachowaj N** najnowszych kopii dla tego zadania, starsze są
   przycinane automatycznie,
 - opcjonalnymi **warunkami uruchomienia**: tylko przez **Wi-Fi**, tylko podczas **ładowania**, tylko
@@ -454,14 +463,14 @@ zaplanowane kopie nie potrzebują otwartego WebUI.
 **Warunki uruchomienia (bramki).** Zaplanowane zadanie może nieść warunki, które muszą być spełnione,
 aby się uruchomiło: tylko Wi-Fi, tylko ładowanie, minimalny poziom baterii oraz określone dni
 tygodnia. Gdy zadanie jest należne, ale warunek nie jest spełniony, jest ono **pomijane i ponawiane
-przy następnym sprawdzeniu** - jego harmonogram się nie przesuwa, więc uruchamia się, gdy tylko
+przy następnym sprawdzeniu**: jego harmonogram się nie przesuwa, więc uruchamia się, gdy tylko
 warunek zostanie spełniony. Wbudowane zabezpieczenie termiczne również pomija zaplanowane zadanie,
 gdy urządzenie jest zbyt gorące. Każde takie pominięcie jest zapisywane w dzienniku aktywności.
 
 **Zaplanowane przywracanie nadpisuje przy każdym uruchomieniu.** Zadanie **Restore latest** ponownie
 przywraca najnowszą kopię każdej aplikacji docelowej za każdym razem, gdy się uruchamia, a przywracanie
 jest destrukcyjne: przy każdym uruchomieniu **nadpisuje bieżące dane aplikacji** najnowszą kopią. Jest to
-zamierzone i opcjonalne (opt-in) - wybieraj to tylko wtedy, gdy chcesz utrzymywać cele na ich najnowszej
+zamierzone i opcjonalne (opt-in), wybieraj to tylko wtedy, gdy chcesz utrzymywać cele na ich najnowszej
 kopii.
 
 **Automatyczna kopia przy instalacji/aktualizacji.** W Settings możesz włączyć **automatyczną
@@ -474,15 +483,15 @@ urządzenia naraz.
 nigdy nie chcesz kopiować automatycznie ani według harmonogramu; możesz dodać kilka naraz
 (wielokrotny wybór), a wykluczone aplikacje są pomijane przez oba mechanizmy.
 
-**Ustawienia predefiniowane kopii.** Również w Ustawieniach możesz zapisać nazwane ustawienia - zestawy elementów do uwzględnienia, np. tylko APK lub APK + OBB - i wybrać jedno w oknie kopii, aby wypełnić wybór elementów naraz.
+**Ustawienia predefiniowane kopii.** Również w Ustawieniach możesz zapisać nazwane ustawienia, zestawy elementów do uwzględnienia, np. tylko APK lub APK + OBB, i wybrać jedno w oknie kopii, aby wypełnić wybór elementów naraz.
 
-**Elementy kopii dla aplikacji.** Również w Ustawieniach możesz wybrać dokładnie, które elementy każda aplikacja kopiuje w kopiach zbiorczych, automatycznych i zaplanowanych - na przykład tylko APK lub APK + OBB. Pojedyncza ręczna kopia nadal pozwala wybrać na miejscu, zaczynając od zestawu aplikacji. Aplikacje, których tu nie ustawisz, kopiują wszystko.
+**Elementy kopii dla aplikacji.** Również w Ustawieniach możesz wybrać dokładnie, które elementy każda aplikacja kopiuje w kopiach zbiorczych, automatycznych i zaplanowanych, na przykład tylko APK lub APK + OBB. Pojedyncza ręczna kopia nadal pozwala wybrać na miejscu, zaczynając od zestawu aplikacji. Aplikacje, których tu nie ustawisz, kopiują wszystko.
 
-**Tagi aplikacji.** Dotknij aplikacji w Ustawieniach (Elementy i tagi dla aplikacji), aby nadać jej swobodne etykiety - na przykład games lub work. Nad listą aplikacji pojawi się wtedy wybór tagów: wybierz tag, aby pokazać tylko jego aplikacje, i utwórz kopię całej grupy naraz. Możesz też otworzyć to z karty Aplikacje: dotknij aplikacji, a potem Elementy i tagi.
+**Tagi aplikacji.** Dotknij aplikacji w Ustawieniach (Elementy i tagi dla aplikacji), aby nadać jej swobodne etykiety, na przykład games lub work. Nad listą aplikacji pojawi się wtedy wybór tagów: wybierz tag, aby pokazać tylko jego aplikacje, i utwórz kopię całej grupy naraz. Możesz też otworzyć to z karty Aplikacje: dotknij aplikacji, a potem Elementy i tagi.
 
 **Dziennik aktywności.** Zakładka Schedule ma przycisk **View activity log**, który otwiera pełny
-ekran (natychmiast) pokazujący lokalny ślad audytu - kopie, przywracania, usunięcia, zaplanowane i
-automatyczne uruchomienia oraz przycięcia - od najnowszych. Akcja **Export logs** zapisuje plik
+ekran (natychmiast) pokazujący lokalny ślad audytu, kopie, przywracania, usunięcia, zaplanowane i
+automatyczne uruchomienia oraz przycięcia, od najnowszych. Akcja **Export logs** zapisuje plik
 dziennika (w folderze kopii zapasowych), który możesz dołączyć do zgłoszenia opinii lub błędu.
 
 ## 9. Migracja do środka: import Neo-Backup i Android-DataBackup
@@ -496,12 +505,12 @@ od nowa. Z zakładki **Backups** możesz **zaimportować** swoje istniejące kop
 3. Rozpocznij import. Jak inne długie operacje działa odłączony z żywym postępem.
 
 **Kopie Neo-Backup zaszyfrowane hasłem są obsługiwane.** Zaszyfrowane AES-256 kopie
-Neo-Backup można zaimportować - jesteś **proszony o hasło**, gdy jest
+Neo-Backup można zaimportować, jesteś **proszony o hasło**, gdy jest
 potrzebne, a hasło jest używane tylko do odszyfrowania, nigdy nie jest przechowywane w linii poleceń.
 
 ## 10. SSAID (ANDROID_ID urządzenia)
 
-SSAID to per-aplikacyjny `ANDROID_ID` - identyfikator na poziomie urządzenia, który niektóre aplikacje odczytują.
+SSAID to per-aplikacyjny `ANDROID_ID`, identyfikator na poziomie urządzenia, który niektóre aplikacje odczytują.
 VDBackup potrafi go skopiować i przywrócić, ale to najwrażliwsza rzecz, jakiej
 dotyka, więc jest obsługiwana z dodatkową ostrożnością:
 
@@ -544,7 +553,7 @@ polecenia copy-paste dla Windows, macOS i Linux. Zobacz
 [`../module/etc/RECOVERY.md`](RECOVERY.md) dla pełnego zestawu krok po kroku.
 
 Zauważ, że konteksty SELinux, uid/gid i tryby są przechowywane wewnątrz tar i są
-poprawnie ponownie zastosowane tylko wtedy, gdy przywracasz na Androidzie - na PC nadal dostajesz wszystkie swoje pliki,
+poprawnie ponownie zastosowane tylko wtedy, gdy przywracasz na Androidzie, na PC nadal dostajesz wszystkie swoje pliki,
 tylko bez egzekwowania własności specyficznej dla Androida.
 
 ## 12. Sterowanie VDBackup z asystenta AI
@@ -553,7 +562,7 @@ VDBackup jest zbudowany tak, by być przyjaznym asystentom i agentom AI, nie tyl
 jest tylko jednym klientem małego API JSON; agent może administrować **każdą** akcją
 modułu bezgłowo przez to samo API (każde polecenie zwraca pojedynczy obiekt
 JSON, długie operacje działają odłączone i odpytujesz ich postęp, i obowiązują te same bariery
-bezpieczeństwa - SSAID pozostaje opt-in, akcje modyfikujące pozostają potwierdzone i audytowane).
+bezpieczeństwa, SSAID pozostaje opt-in, akcje modyfikujące pozostają potwierdzone i audytowane).
 
 Jeśli chcesz, by asystent uruchamiał twoje kopie i przywracania za ciebie, wskaż mu
 [`AI-AGENTS.md`](AI-AGENTS.md), który dokumentuje pełną powierzchnię sterowania: kontrakt
@@ -572,14 +581,14 @@ zamknięcie WebUI ich nie zatrzymuje. Otwórz WebUI ponownie, a podłączy się 
 działającej operacji i pokaże bieżący postęp.
 
 **Dostałem komunikat `ERR_...`.** Błędy są zgłaszane z czytelnym kodem. Kilka częstych:
-- `ERR_VERIFY` - zapisane archiwum nie zgadzało się ze swoim hashem w manifeście (weryfikacja
+- `ERR_VERIFY`, zapisane archiwum nie zgadzało się ze swoim hashem w manifeście (weryfikacja
   wychwyciła złą kopię). Uruchom kopię ponownie.
-- `ERR_RESTORE_TEST` - restore-test się nie powiódł; kopia nie rozpakowała/zweryfikowała się
+- `ERR_RESTORE_TEST`, restore-test się nie powiódł; kopia nie rozpakowała/zweryfikowała się
   czysto, a twoja żywa aplikacja pozostała nietknięta.
-- `ERR_UNSAFE_ARCHIVE` - archiwum zostało odrzucone, ponieważ próbowało zapisać poza swoim
+- `ERR_UNSAFE_ARCHIVE`, archiwum zostało odrzucone, ponieważ próbowało zapisać poza swoim
   katalogiem docelowym (ścieżki bezwzględne lub z `..`). To chroni cię przed zmanipulowaną kopią;
   nic nie zostało zapisane.
-- `ERR_QUOTA` - zdalny cel w chmurze nie miał dość wolnego miejsca na wysyłkę Full; kopia została
+- `ERR_QUOTA`, zdalny cel w chmurze nie miał dość wolnego miejsca na wysyłkę Full; kopia została
   zatrzymana, zanim cokolwiek wysłano.
 
 **Mój zdalny cel zawodzi.** Użyj **testu** celu w zakładce Destinations,
@@ -590,11 +599,11 @@ sieci; lokalna kopia/przywracanie jest w pełni offline.
 w module w czasie buildu; nic nie jest pobierane na urządzenie w czasie działania. Tylko cele
 chmurowe (rclone/restic/ssh) komunikują się z siecią, i tylko gdy ich używasz.
 
-**Czy moja kopia przywróci się na innym telefonie?** Tak - kopie są przenośne i nie są
+**Czy moja kopia przywróci się na innym telefonie?** Tak, kopie są przenośne i nie są
 związane ze sprzętem urządzenia. (SSAID to jedyny wyjątek specyficzny dla urządzenia, i jest opt-in
 oraz stosowany po restarcie; zobacz [sekcja 10](#sekcja-10).)
 
-**Moja zaszyfrowana kopia się nie otworzy - zgubiłem passphrase.** Nie ma tylnej furtki
+**Moja zaszyfrowana kopia się nie otworzy, zgubiłem passphrase.** Nie ma tylnej furtki
 do odzyskiwania z założenia; passphrase jest tym, co chroni kopię. Trzymaj ją bezpiecznie.
 
 ## 14. Odinstalowanie
@@ -602,10 +611,10 @@ do odzyskiwania z założenia; passphrase jest tym, co chroni kopię. Trzymaj j�
 Odinstaluj VDBackup jak każdy inny moduł ze swojego menedżera KernelSU / APatch / Magisk.
 Odinstalowanie **zachowuje twoją konfigurację użytkownika** i usuwa tylko stan przejściowy,
 więc późniejsza reinstalacja podejmuje twoje ustawienia. Twoje faktyczne kopie żyją pod
-`/data/adb/vdbackup/` - jeśli chcesz je też usunąć, skasuj ten katalog
+`/data/adb/vdbackup/`, jeśli chcesz je też usunąć, skasuj ten katalog
 ręcznie po odinstalowaniu; w przeciwnym razie pozostają dostępne (i, będąc standardowymi
 formatami, otwieralne na PC) nawet bez modułu.
 
 ---
 
-*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane - zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*

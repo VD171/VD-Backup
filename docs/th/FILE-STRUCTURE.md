@@ -71,4 +71,4 @@ docs/                               # all public documentation
 
 ---
 
-*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง - ดู [CONTRIBUTING.md](CONTRIBUTING.md)*
+*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง, ดู [CONTRIBUTING.md](CONTRIBUTING.md)*

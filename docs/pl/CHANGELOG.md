@@ -6,6 +6,32 @@
 
 Wszystkie istotne zmiany w VDBackup są udokumentowane tutaj. Tylko po angielsku.
 
+## v1.05
+
+Niezawodność:
+
+- Kopie wsadowe nie zatrzymują się już w połowie, gdy opuścisz aplikację. Cały wybór, grupa etykiet lub zaplanowane uruchomienie są teraz obsługiwane przez jeden odłączony proces root, który działa dalej po zamknięciu WebUI i jest chroniony przed zakończeniem przy niedoborze pamięci. Widok postępu łączy się ponownie po powrocie.
+
+Ustawienia:
+
+- Kopia ustawień: wyeksportuj miejsca docelowe, harmonogramy, ustawienia wstępne i zapisane dane logowania do jednego zaszyfrowanego pliku, a następnie zaimportuj go na innym urządzeniu lub po czystej instalacji. Plik zawsze prosi o hasło, ponieważ zawiera hasła zdalne, a import scala je z urządzeniem bez usuwania tego, co już istnieje.
+- Zapisane zdalne dane logowania i klucz szyfrowania urządzenia można teraz usunąć w ustawieniach jednym krokiem, zachowując miejsca docelowe, harmonogramy i kopie zapasowe.
+
+Bezpieczeństwo:
+
+- Kopie można przechowywać tylko tam, gdzie pozostają zaszyfrowane w spoczynku. Miejsca docelowe w ścieżkach czytelnych przed pierwszym odblokowaniem, takich jak /data/adb lub /data/system, są odrzucane.
+- Zapisane poświadczenia, rclone.conf i klucz age znajdują się teraz w pamięci szyfrowanej poświadczeniami, zablokowanej do pierwszego odblokowania, zamiast w miejscu wcześniej czytelnym; aktualizacja modułu przenosi je tam na stałe.
+- Kopie sprawdzają teraz wolne miejsce przed rozpoczęciem i zatrzymują się z czytelnym komunikatem zamiast kończyć się niepowodzeniem w połowie.
+
+Przywracanie:
+
+- Przywracanie aplikacji, która nie jest już zainstalowana, najpierw ponownie instaluje jej APK, a okno przywracania oferuje opcję APK, gdy kopia ją zawiera. Przywracanie, które nie może zainstalować aplikacji, zgłasza niepowodzenie zamiast udawać sukces.
+- Operacje na aplikacjach, uprawnieniach i ustawieniach działają teraz w czystym środowisku, naprawiając błędy "Failed transaction", które blokowały przywracanie, app-ops i ustawienia na niektórych ROM-ach.
+
+Miejsca docelowe:
+
+- Możesz tworzyć kopie na karcie SD lub dysku USB: selektor folderów pokazuje skrót do każdego woluminu pamięci i akceptuje ścieżki na nośnikach wymiennych.
+
 ## v1.04
 
 Poprawki:
@@ -18,7 +44,7 @@ Prywatność:
 
 Kopie zapasowe:
 
-- Możesz teraz ustawić, które elementy każda aplikacja kopiuje - na przykład tylko APK lub APK + OBB - stosowane w kopiach zbiorczych, automatycznych i zaplanowanych. Pojedyncza ręczna kopia nadal pozwala wybrać na miejscu, z wartościami wstępnie wypełnionymi z zestawu aplikacji. Ustaw to w Ustawieniach, obok listy wykluczonych aplikacji.
+- Możesz teraz ustawić, które elementy każda aplikacja kopiuje, na przykład tylko APK lub APK + OBB, stosowane w kopiach zbiorczych, automatycznych i zaplanowanych. Pojedyncza ręczna kopia nadal pozwala wybrać na miejscu, z wartościami wstępnie wypełnionymi z zestawu aplikacji. Ustaw to w Ustawieniach, obok listy wykluczonych aplikacji.
 
 - Ustawienia kopii: zapisz nazwane zestawy tego, co uwzględnić, i zastosuj je jednym wyborem w oknie kopii.
 - Wielu użytkowników: kopie aplikacji, kopie specjalne i przywracanie podążają teraz za wybranym użytkownikiem Androida.
@@ -241,4 +267,4 @@ Przyjazny dla AI i i18n:
 - Bogaty wykaz aplikacji i odszyfrowywanie Neo działają przez pomocnika dex sterowanego jako root
   (`IPackageManager` przez ServiceManager), więc działają tam, gdzie ActivityThread się zawiesza.
 
-*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane - zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*

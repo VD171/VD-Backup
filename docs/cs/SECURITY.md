@@ -29,6 +29,8 @@ a připíšeme vám zásluhy, pokud si to budete přát.
   v otevřeném textu. Zálohy nikdy nejsou vázány na hardwarové klíče zařízení (takže zůstávají
   přenositelné), což také znamená, že právě heslová fráze chrání šifrovanou zálohu -
   zvolte silnou.
+- Tyto přihlašovací údaje jsou na úložišti šifrovaném přihlašovacími údaji (`/data/misc_ce`), zamčeném až do prvního odemknutí po restartu, takže před ním nikdy nejsou čitelné, na rozdíl od `/data/adb`. Aktualizace modulu tam staré kopie přesune trvale (každou ověří před odstraněním originálu) a přetrvávají mezi přeinstalacemi.
+- Lokální cíl zálohy musí sám zůstat šifrovaný v klidu: povoleno je jen vnitřní a vyměnitelné uživatelské úložiště, nikdy `/data/adb`, `/data/system` ani jiné cesty čitelné před prvním odemknutím, ani průchod `..`. Vyměnitelné SD/USB nejsou v klidu šifrovány, proto jste upozorněni (nikoli zablokováni), abyste pro ně zapnuli šifrování zálohy.
 - Volitelná doprovodná aplikace Google Drive by měla být vždy skryta pomocí [HMA-OSS](https://github.com/frknkrc44/HMA-OSS), aby
   neodhalila root ani odemčený bootloader.
 - Obnovení běží jako root, takže každý archiv je zkontrolován, než se cokoli zapíše:
@@ -38,4 +40,4 @@ a připíšeme vám zásluhy, pokud si to budete přát.
   se zaznamenaným SHA-256 a manifest je dodáván v zařízení, takže přibalený obsah lze auditovat a
   reprodukovat. Viz [BINARIES.md](BINARIES.md).
 
-*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány - viz [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md).*

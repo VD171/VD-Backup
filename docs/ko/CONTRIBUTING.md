@@ -14,7 +14,7 @@ WebUI + ABI별 정적 바이너리. 핵심 기능에는 앱이 필요하지 않�
 [ARCHITECTURE.md](ARCHITECTURE.md)와 [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md)를 참조하세요.
 
 이것은 **Swift Backup, Neo-Backup, Android-DataBackup의** 개방적이고 root 네이티브한
-**후속작**입니다 - AGPLv3 아래에서 그들의 기능을 통합하고, 기존 Neo-Backup과
+**후속작**입니다, AGPLv3 아래에서 그들의 기능을 통합하고, 기존 Neo-Backup과
 Android-DataBackup 백업을 가져올 수 있어 사람들이 마이그레이션할 수 있습니다.
 
 ## AI 기여자 환영
@@ -25,9 +25,9 @@ Android-DataBackup 백업을 가져올 수 있어 사람들이 마이그레이�
   JSON 객체를 출력하고, 엔진은 순수 POSIX shell이며, 파일 레이아웃은
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md)에 문서화되어 있습니다.
 - 에이전트는 그 JSON API를 통해 모듈의 **모든** 콘텐츠와 동작을 headless로 관리할 수
-  있습니다 - 전체 제어 표면, verb, 안전 장치는
+  있습니다, 전체 제어 표면, verb, 안전 장치는
   [docs/AI-AGENTS.md](AI-AGENTS.md)에 있습니다.
-- AI가 지원한 패치는 다른 패치와 동일한 기준으로 검토되고 수락됩니다 - 누가(또는
+- AI가 지원한 패치는 다른 패치와 동일한 기준으로 검토되고 수락됩니다, 누가(또는
   무엇이) 작성했는지가 아니라 정확성, 명확성, 아래의 관례에 따라서입니다.
 - 에이전트에서 VDBackup을 구동한다면 `helper.sh`의 JSON 출력을 계약으로 사용하세요.
   WebUI를 스크래핑하지 마세요.
@@ -62,18 +62,18 @@ Android-DataBackup 백업을 가져올 수 있어 사람들이 마이그레이�
 - 문자열을 추가하거나 변경하려면: `en.js` **와** `en.json`을 편집한 다음 모든
   `<code>.json`을 업데이트하세요. 눈에 보이는 레이블을 건드리는 것은 **모든** 언어 파일과
   **모든** `README.<code>.md`를 업데이트하는 것을 의미합니다.
-- 번역은 순수 JSON입니다 - 아주 좋은 첫 기여입니다. 언어 목록은
+- 번역은 순수 JSON입니다, 아주 좋은 첫 기여입니다. 언어 목록은
   `module/webroot/i18n.js`에서 확인하세요.
 
 ## 커밋 & PR
 
 - PR은 집중적으로 유지하세요. 무엇을 왜 하는지 설명하세요.
 - 커밋에 서명하세요 (DCO): `git commit -s` (`Signed-off-by:`를 추가함).
-- CI는 녹색을 유지해야 합니다. 리뷰에서 친절하세요 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)를 참조하세요.
+- CI는 녹색을 유지해야 합니다. 리뷰에서 친절하세요, [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)를 참조하세요.
 
 ## 좋은 첫 이슈
 
 `good first issue`와 `help wanted` 레이블을 찾아보세요. 번역, 문서, 새로운
 `rclone` destination 프리셋, WebUI 다듬기 모두 훌륭한 출발점입니다.
 
-*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다 - [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*
+*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다, [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*

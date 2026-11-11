@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>以 root 身份完整备份和还原应用与数据 - 完全通过 WebUI 操作。</b><br>
+  <b>以 root 身份完整备份和还原应用与数据, 完全通过 WebUI 操作。</b><br>
   KernelSU / APatch / Magisk 模块。无需「授予 su」提示，无需切换 <code>sucompat</code>。
 </p>
 
@@ -44,7 +44,7 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
   版本化) 和 **Mirror** (通过 `rclone`/`rsync` 实现 1:1 同步)。
 - **忠实保留:** SELinux 上下文、uid/gid、模式、xattr 和 capabilities。
 - **压缩:** none / lz4 / zstd / gzip (gzip =「兼容模式」，随处可开)。
-- **加密:** 可选、可移植 (`age` + 口令，或 AES-256 zip) - 绝不绑定到设备硬件，因此备份可在
+- **加密:** 可选、可移植 (`age` + 口令，或 AES-256 zip), 绝不绑定到设备硬件，因此备份可在
   另一台设备上还原或在 PC 上打开。
 - **目标位置:** 本地、SFTP、SCP、SMB、WebDAV、FTP、S3 以及 70 多种 (`rclone`)，外加 `rsync`
   和 `restic` 仓库。还可通过一个小型的选择加入配套应用选用 Google Drive。
@@ -68,10 +68,10 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 ## 安装
 
 1. 从 [发布](https://github.com/VD171/VD-Backup/releases) 下载最新的 `VD-Backup-vX.Y.zip`。
-2. 在 KernelSU / APatch / Magisk 管理器中刷入 - 立即可用，无需重启。
+2. 在 KernelSU / APatch / Magisk 管理器中刷入, 立即可用，无需重启。
 3. 打开模块的 **WebUI** 进行配置并运行备份。就这么简单。
 
-**版本。** 每个发行版包含六个 zip。`universal-full` - 所有架构和全部二进制文件均已内置（含用于云服务商的 `rclone`、用于快照的 `restic`），完全离线，永不下载任何内容，任何设备可用，体积最大。`universal-lite` - 所有架构，但去掉两个最大的二进制文件（`rclone`、`restic`），体积最小；仍可进行本地、SSH/SFTP 和 `rsync` 备份而无需下载，首次使用云端目标（`rclone`）或快照模式（`restic`）时，它会提示下载对应架构的小型附加组件一次（通过 SHA-256 校验）并缓存，之后这些功能也可使用。`<abi>-full`（`arm64-v8a`、`armeabi-v7a`、`x86`、`x86_64`） - 单一架构含全部内置二进制文件，比 `universal-full` 小。知道自己的架构 -> 选 `<abi>-full`；想要最小且不介意为云端或快照进行一次性下载 -> `universal-lite`；想要全部内置且零下载（离线 / 恢复） -> full 版本。参见 [发布](https://github.com/VD171/VD-Backup/releases)。
+**版本。** 每个发行版包含六个 zip。`universal-full`, 所有架构和全部二进制文件均已内置（含用于云服务商的 `rclone`、用于快照的 `restic`），完全离线，永不下载任何内容，任何设备可用，体积最大。`universal-lite`, 所有架构，但去掉两个最大的二进制文件（`rclone`、`restic`），体积最小；仍可进行本地、SSH/SFTP 和 `rsync` 备份而无需下载，首次使用云端目标（`rclone`）或快照模式（`restic`）时，它会提示下载对应架构的小型附加组件一次（通过 SHA-256 校验）并缓存，之后这些功能也可使用。`<abi>-full`（`arm64-v8a`、`armeabi-v7a`、`x86`、`x86_64`）, 单一架构含全部内置二进制文件，比 `universal-full` 小。知道自己的架构 -> 选 `<abi>-full`；想要最小且不介意为云端或快照进行一次性下载 -> `universal-lite`；想要全部内置且零下载（离线 / 恢复） -> full 版本。参见 [发布](https://github.com/VD171/VD-Backup/releases)。
 
 初次使用？[用户指南](docs/USER-GUIDE.md) 将带你从安装一路走到还原。
 
@@ -89,12 +89,12 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 
 ## 文档
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - 可在线浏览的文档。
-- **[用户指南](docs/USER-GUIDE.md)** - 从安装到还原，端到端。
-- **[AI 代理](docs/AI-AGENTS.md)** - 通过 JSON API 以无头方式执行每一个操作。
-- **[架构](docs/ARCHITECTURE.md)** 和 **[文件结构](docs/FILE-STRUCTURE.md)** - 工作原理。
-- **[随附的二进制文件](docs/BINARIES.md)** - 每个预编译二进制文件的来源与 SHA-256，便于完整审计。
-- **[恢复](module/etc/RECOVERY.md)** - 无需模块即可在 PC 上打开并解密备份。
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: 可在线浏览的文档。
+- **[用户指南](docs/USER-GUIDE.md)**: 从安装到还原，端到端。
+- **[AI 代理](docs/AI-AGENTS.md)**: 通过 JSON API 以无头方式执行每一个操作。
+- **[架构](docs/ARCHITECTURE.md)** 和 **[文件结构](docs/FILE-STRUCTURE.md)**: 工作原理。
+- **[随附的二进制文件](docs/BINARIES.md)**: 每个预编译二进制文件的来源与 SHA-256，便于完整审计。
+- **[恢复](module/etc/RECOVERY.md)**: 无需模块即可在 PC 上打开并解密备份。
 - **[参与贡献](CONTRIBUTING.md)** 和 **[安全](SECURITY.md)**。
 - **[更新日志](CHANGELOG.md)** 和 **[行为准则](CODE_OF_CONDUCT.md)**。
 
@@ -102,7 +102,7 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 
 VDBackup 的构建目标是不仅欢迎人，也欢迎 AI 助手和代理。引擎讲 JSON (`helper.sh` 的每个 verb
 都返回单个 JSON 对象)，代码、文档和文件结构都为机器读取而布局，AI 辅助的贡献会像其他贡献一样
-被审查和接受。代理可以通过 WebUI 所用的同一 API，以无头方式管理模块的**每一个**操作 - 完整的
+被审查和接受。代理可以通过 WebUI 所用的同一 API，以无头方式管理模块的**每一个**操作, 完整的
 控制面请见 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**，参与贡献请见
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)。
 
@@ -121,9 +121,9 @@ VDBackup 的构建目标是不仅欢迎人，也欢迎 AI 助手和代理。引�
 
 同一作者的姊妹项目:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - 一个设备方法调试器: 通过每一种能读取某项的方法去读取它，并将结果并排比较。
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - 在你的设备上无需联网即可读取你的 Google 服务 (RCS、Wallet、Play Integrity 证明)。
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - 一个设备伪装器，把全新的指纹变成连贯一致的配置。
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: 一个设备方法调试器: 通过每一种能读取某项的方法去读取它，并将结果并排比较。
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: 在你的设备上无需联网即可读取你的 Google 服务 (RCS、Wallet、Play Integrity 证明)。
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: 一个设备伪装器，把全新的指纹变成连贯一致的配置。
 
 ## 许可证
 

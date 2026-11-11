@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - Argumente sind ein einzelnes JSON-Objekt, **base64-kodiert**, als ein argv-Token übergeben.
 - Der Befehl gibt **ein JSON-Objekt** auf stdout aus: `{"ok":true,...}` oder
   `{"ok":false,"code":"ERR_...","message":"..."}`. Parse das; scrape niemals Text.
-- Lange Operationen (`backup`, `restore`, `import`) geben sofort `{"ok":true,"opid":"..."}`
+- Lange Operationen (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) geben sofort `{"ok":true,"opid":"..."}`
   zurück und laufen **abgekoppelt** (sie überleben es, wenn der Aufrufer/die WebUI verschwindet).
   Frage ihren Fortschritt per Polling ab; sie sind nicht fertig, wenn der Aufruf zurückkehrt.
 - `progress` und `cancel` nehmen **base64 der rohen opid-Zeichenkette**, kein JSON-Objekt.
@@ -87,7 +87,15 @@ Backup/Restore benötigt; nur Cloud-Ziele (`rclone`/`restic`/ssh) sprechen mit d
 | `cloud-fetch` | `{}` | `{ok,opid}` (abgekoppelt) holt+verifiziert+installiert das `rclone`/`restic`-Addon in einer `lite`-Edition |
 | `schedule-set` / `schedule-list` / `schedule-delete` | siehe unten | geplante Aufträge (ein Backup oder eine Wiederherstellung; zielt auf eine App, einen Satz oder alle Apps) |
 | `scheduler-tick` | `{}` | führt fällige Aufträge aus + wendet Aufbewahrung an + den Auto-Backup-Beobachter (der Boot-Heartbeat ruft das auf) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (nicht abgekoppelt; kehrt sofort zurück; `ERR_UPDATE_CHECK` bei Fehlschlag - siehe unten) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (nicht abgekoppelt; kehrt sofort zurück; `ERR_UPDATE_CHECK` bei Fehlschlag, siehe unten) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) sichert viele Apps in einem abgekoppelten Vorgang; der Fortschritt führt `n`/`of`. Ein Fehler pro App stoppt den Stapel nicht. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) stellt viele Backups in einem abgekoppelten Vorgang wieder her; der Fortschritt führt `n`/`of`. Ein Fehler pro App stoppt den Stapel nicht. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` Speichervolumes für die Ordnerauswahl: intern plus wechselbare SD-Karte / USB. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) exportiert Konfig, Jobs, Ziele, Zugangsdaten und Schlüssel in eine einzige passphrase-verschlüsselte Datei im Backup-Verzeichnis. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) führt eine exportierte Konfigdatei wieder in dieses Gerät ein (überschreibt nie blind). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` listet die verschlüsselten Konfigdateien auf, die zum Import verfügbar sind. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` entfernt gespeicherte Remote-Passwörter und den Geräteverschlüsselungsschlüssel; Ziele, Jobs und Backups bleiben. |
+| `log-prune` | `{}` | `{ok}` beschneidet längst beendete Vorgangsprotokolle, begrenzt das Audit-Protokoll und entfernt veraltete Icons (der Boot-Dienst ruft dies auf). |
 
 ### `progress`-Felder
 
@@ -176,7 +184,7 @@ Ein geplanter Auftrag wählt **ein** Ziel und eine **Aktion**:
 Gib als Ziel genau **eines** von `package`, `packages` oder `all` an. Ein `backup`-Auftrag
 behält die üblichen `mode`/`dest`/`keep`/`items`. Ein `restore`-Auftrag (`action: "restore"`)
 stellt das **neueste** Backup jeder Ziel-App wieder her (oder eine explizite `ref`) und
-**überschreibt bei jedem Lauf die aktuellen Daten der App** - das ist beabsichtigt und opt-in,
+**überschreibt bei jedem Lauf die aktuellen Daten der App**: das ist beabsichtigt und opt-in,
 setze es also nur auf direkte Anforderung des Nutzers.
 
 ### Scheduler-Gating
@@ -222,13 +230,13 @@ gegen einen lokalen Callback-Server (`127.0.0.1:53682`) aus und öffnet den Brow
 selbst über einen Android-VIEW-Intent auf der Zustimmungsseite des Anbieters und gibt
 `{ok:true,url}` zurück (oder `{ok:false,code:"ERR_AUTHORIZE"}`). Frage `remote-authorize-poll`
 (`{}`) ab: es gibt `{ok:true,done:false,url}` während des Wartens und `{ok:true,done:true,token}`
-zurück, sobald der Nutzer zustimmt - übergib diesen `token` an `remote-add`.
+zurück, sobald der Nutzer zustimmt, übergib diesen `token` an `remote-add`.
 `remote-authorize-cancel` (`{}`) stoppt eine ausstehende Autorisierung (`{ok:true,cancelled:true}`).
 Das manuelle Einfügen der Ausgabe von `rclone authorize "<backend>"` von einem beliebigen
 Computer wird weiterhin als Fallback unterstützt.
 
 Google Drive hat zwei Wege: dieses `drive`-Remote (kein Google-Cloud-Projekt nötig, nutzt
-rclones eigenes OAuth - autorisiere On-Device mit `remote-authorize`, oder führe
+rclones eigenes OAuth, autorisiere On-Device mit `remote-authorize`, oder führe
 `rclone authorize "drive"` einmal auf einem beliebigen Computer aus und übergib den Token)
 oder die optionale Begleit-App (deine eigene OAuth-Client-ID). Beide enden als gewöhnliche Ziele.
 
@@ -238,7 +246,7 @@ Das config-Feld `network_policy` steuert, welche Verbindung Cloud-Transfers nutz
 `any` (Standard), `wifi` oder `mobile`. Setze es mit `config-set`. Wenn es `wifi` oder
 `mobile` ist, prüft jeder Cloud-Transfer (Full-`rclone`/Drive-Upload, Mirror-Sync,
 `restic`-Remote-Snapshot-Backup/-Restore, Mirror-Restore) zuerst den aktiven Transport und
-bricht mit `ERR_NET_POLICY` ab, wenn er nicht passt - sowohl für manuelle als auch für geplante
+bricht mit `ERR_NET_POLICY` ab, wenn er nicht passt, sowohl für manuelle als auch für geplante
 Aufträge. Lokale Ziele werden nie eingeschränkt.
 
 ### Cloud-Integrität und Kontingent
@@ -293,8 +301,8 @@ standardmäßig aus; nur auf eine direkte, bewusste Nutzeranfrage hin.
 
 ### Eigenständiges Pfad-Backup
 
-`path-backup` / `path-restore` sichern und stellen **jeden absoluten Pfad** wieder her - einen Ordner
-oder eine einzelne Datei - auf dem geteilten Speicher oder unter `/data`, außerhalb des
+`path-backup` / `path-restore` sichern und stellen **jeden absoluten Pfad** wieder her, einen Ordner
+oder eine einzelne Datei, auf dem geteilten Speicher oder unter `/data`, außerhalb des
 App-bezogenen Modells. Das Archiv wird als `tar.zst` plus eine `manifest.json` in VDBackups eigenem
 Format geschrieben (SHA-256-versiegelt, mit einem RECOVERY-Kit, wenn verschlüsselt) unter `.paths/`
 im Backup-Verzeichnis.
@@ -311,18 +319,18 @@ im Backup-Verzeichnis.
   `ERR_NO_PATH` fehl; ein Pfad außerhalb der erlaubten Roots oder einer, der `..` enthält, schlägt mit
   `ERR_BAD_PATH` fehl.
 - `path-restore` schreibt an den ursprünglichen Ort zurück, ist also destruktiv und erfordert
-  `"confirm": true` - eine reibungsstarke Sperre, wie `special-restore`. Ein `ref`, das kein gültiges
+  `"confirm": true`, eine reibungsstarke Sperre, wie `special-restore`. Ein `ref`, das kein gültiges
   Pfad-Backup ist, schlägt mit `ERR_BAD_REF` fehl.
 - Beide laufen **abgekoppelt**; frage `progress` mit der zurückgegebenen `opid` per Polling ab.
 
 ### `update-check`
 
 `update-check` meldet, ob eine neuere Version des Moduls veröffentlicht wurde, damit ein Agent
-(oder die WebUI) sie anzeigen kann. Es ist ein **Lese-Verb, das sofort zurückkehrt** - es ist
+(oder die WebUI) sie anzeigen kann. Es ist ein **Lese-Verb, das sofort zurückkehrt**: es ist
 **nicht** abgekoppelt, es gibt also keine `opid` zum Abfragen. Nur durch eine ausdrückliche
 Benutzeraktion ausgelöst, ruft es das veröffentlichte Update-Manifest des Moduls ab (die
 `updateJson`-URL aus `module.prop`) mit dem mitgelieferten `curl` über eine root-seitige
-HTTP-Anfrage - das läuft außerhalb des WebView und unterliegt daher nicht der CSP der WebUI - und
+HTTP-Anfrage, das läuft außerhalb des WebView und unterliegt daher nicht der CSP der WebUI, und
 vergleicht den veröffentlichten `versionCode` mit dem installierten. Es nimmt **keine Argumente**.
 
 Bei Erfolg gibt es zurück:
@@ -351,7 +359,7 @@ von diesem Verb.
 - **`ssaid` ist strikt Opt-in (standardmäßig aus).** Es sichert / stellt die ANDROID_ID des
   Geräts wieder her, indem es eine Systemdatei umschreibt; eine Wiederherstellung greift erst
   nach einem Neustart, und die vorherige Datei wird für ein Rollback immer zuerst gesichert.
-  Sende `"ssaid": true` nur auf eine direkte, bewusste Benutzeranfrage hin - niemals standardmäßig.
+  Sende `"ssaid": true` nur auf eine direkte, bewusste Benutzeranfrage hin, niemals standardmäßig.
 - **Mutierende Aktionen (restore, delete, import) sind destruktiv** und werden in einem lokalen
   Audit-Protokoll (`logs/audit.jsonl`) festgehalten. Restore ist originalgetreu
   (löschen-dann-extrahieren), sodass die App auf den exakten Zustand des Backups zurückgesetzt
@@ -360,8 +368,8 @@ von diesem Verb.
   überschreibt geräteweite Einstellungen, sende es also nur auf eine direkte Nutzeranfrage hin; es ist
   durch ausdrückliche Einwilligung abgesichert und wird im Audit-Trail festgehalten.
 - **Restore ist idempotent.** Rohe Provider-Restores (messages/contacts/wifi/bluetooth/calendar)
-  **ersetzen** statt zusammenzuführen - die Provider-Daten werden gelöscht und das Archiv wird darüber
-  extrahiert - sodass ein erneutes Wiederherstellen desselben Backups keine Zeilen duplizieren kann.
+  **ersetzen** statt zusammenzuführen, die Provider-Daten werden gelöscht und das Archiv wird darüber
+  extrahiert, sodass ein erneutes Wiederherstellen desselben Backups keine Zeilen duplizieren kann.
   `dns` und `system_settings` werden mit idempotentem `settings put` erneut angewendet.
 - **Die Archiv-Extraktion ist gegen Path-Traversal abgesichert.** Restore läuft als root, daher wird
   jedes Archiv (restore, import, special-restore, path-restore) vor jedem Schreibvorgang geprüft: eines,
@@ -378,4 +386,4 @@ Siehe [ARCHITECTURE.md](ARCHITECTURE.md) und
 
 ---
 
-*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen - siehe [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).*

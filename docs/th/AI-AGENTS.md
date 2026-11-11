@@ -19,7 +19,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - อาร์กิวเมนต์เป็นอ็อบเจกต์ JSON เดียว **เข้ารหัสแบบ base64** ส่งเป็น argv token เดียว
 - คำสั่งจะพิมพ์ **อ็อบเจกต์ JSON หนึ่งตัว** ออกทาง stdout: `{"ok":true,...}` หรือ
   `{"ok":false,"code":"ERR_...","message":"..."}` จง parse ค่านั้น อย่าขูดข้อความเด็ดขาด
-- การทำงานที่ใช้เวลานาน (`backup`, `restore`, `import`) จะคืนค่า `{"ok":true,"opid":"..."}`
+- การทำงานที่ใช้เวลานาน (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) จะคืนค่า `{"ok":true,"opid":"..."}`
   ทันทีและรันแบบ **แยกออก (detached)** (ยังทำงานต่อแม้ผู้เรียก/WebUI จะหายไป) จง poll
   ความคืบหน้าของมัน งานยังไม่เสร็จเมื่อการเรียกคืนค่า
 - `progress` และ `cancel` รับ **base64 ของสตริง opid ดิบ** ไม่ใช่อ็อบเจกต์ JSON
@@ -86,7 +86,15 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `cloud-fetch` | `{}` | `{ok,opid}` (detached) ดาวน์โหลด+ตรวจสอบ+ติดตั้งส่วนเสริม `rclone`/`restic` บนรุ่น `lite` |
 | `schedule-set` / `schedule-list` / `schedule-delete` | ดูด้านล่าง | งานที่ตั้งเวลาไว้ (การ backup หรือการกู้คืน; กำหนดเป้าหมายเป็นแอปเดียว ชุดของแอป หรือแอปทั้งหมด) |
 | `scheduler-tick` | `{}` | รันงานที่ถึงกำหนด + ใช้การเก็บรักษา (retention) + ตัวสังเกตการสำรองอัตโนมัติ (heartbeat ตอนบูตเรียกสิ่งนี้) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (ไม่ detached; คืนค่าทันที; `ERR_UPDATE_CHECK` เมื่อล้มเหลว - ดูด้านล่าง) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (ไม่ detached; คืนค่าทันที; `ERR_UPDATE_CHECK` เมื่อล้มเหลว, ดูด้านล่าง) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) สำรองข้อมูลหลายแอปในหนึ่งปฏิบัติการแบบแยก ความคืบหน้ามี `n`/`of` ความล้มเหลวรายแอปไม่หยุดชุด |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) กู้คืนหลายข้อมูลสำรองในหนึ่งปฏิบัติการแบบแยก ความคืบหน้ามี `n`/`of` ความล้มเหลวรายแอปไม่หยุดชุด |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` วอลุ่มที่จัดเก็บสำหรับตัวเลือกโฟลเดอร์: ภายในและการ์ด SD/USB แบบถอดได้ |
+| `config-export` | `{password}` | `{ok,opid}` (detached) ส่งออกการตั้งค่า งาน ปลายทาง ข้อมูลรับรอง และคีย์ไปยังไฟล์เข้ารหัสด้วยวลีรหัสผ่านไฟล์เดียวใต้โฟลเดอร์สำรอง |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) ผสานไฟล์การตั้งค่าที่ส่งออกกลับเข้าอุปกรณ์นี้ (ไม่เขียนทับแบบมืดบอด) |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` แสดงรายการไฟล์การตั้งค่าที่เข้ารหัสที่พร้อมนำเข้า |
+| `wipe-credentials` | `{}` | `{ok,wiped}` ลบรหัสผ่านระยะไกลที่บันทึกไว้และคีย์เข้ารหัสของอุปกรณ์ ปลายทาง งาน และข้อมูลสำรองยังคงอยู่ |
+| `log-prune` | `{}` | `{ok}` ตัดบันทึกปฏิบัติการที่เสร็จนานแล้ว จำกัดร่องรอยการตรวจสอบ และลบไอคอนที่ล้าสมัย (บริการบูตเรียกสิ่งนี้) |
 
 ### ฟิลด์ของ `progress`
 
@@ -196,7 +204,7 @@ Neo backup ที่เข้ารหัสไว้ จะรับ `"password
 ### อาร์กิวเมนต์ของ `remote-add`
 
 ปลายทางคลาวด์คือปลายทาง `type:"rclone"` ที่ระบุชื่อ `rclone` remote จงสร้าง remote นั้นก่อน
-ด้วย `remote-add` ค่า `backend` เป็น **rclone backend ใดก็ได้** - ไม่มี whitelist `remote-add`
+ด้วย `remote-add` ค่า `backend` เป็น **rclone backend ใดก็ได้**: ไม่มี whitelist `remote-add`
 รับชื่อ backend ใดก็ได้ (`dropbox`, `onedrive`, `box`, `pcloud`, `mega`, `b2`, `s3`, `sftp`,
 `smb`, `webdav`, `ftp`, `drive` และอีก ~70 ตัวที่ rclone รองรับ) และ `params` จะถูกส่งต่อตรงไป
 ยังคอนฟิก `rclone` เป็นคู่ `key=value` ช่องรหัสผ่านจะถูกเก็บแบบบดบัง (obscured) ไม่เคยเก็บแบบ
@@ -215,12 +223,12 @@ Dropbox, OneDrive, Box, pCloud) ไม่จำเป็นต้องใช้
 ในเครื่อง (`127.0.0.1:53682`) และเปิดเบราว์เซอร์ของโทรศัพท์เองไปยังหน้าขอความยินยอมของผู้ให้บริการ
 ผ่าน Android VIEW intent โดยคืนค่า `{ok:true,url}` (หรือ `{ok:false,code:"ERR_AUTHORIZE"}`) แล้ว
 poll `remote-authorize-poll` (`{}`): มันจะคืน `{ok:true,done:false,url}` ขณะกำลังรอ และ
-`{ok:true,done:true,token}` เมื่อผู้ใช้อนุมัติ - ส่ง `token` นั้นให้ `remote-add` ส่วน
+`{ok:true,done:true,token}` เมื่อผู้ใช้อนุมัติ, ส่ง `token` นั้นให้ `remote-add` ส่วน
 `remote-authorize-cancel` (`{}`) จะหยุดการอนุญาตที่ค้างอยู่ (`{ok:true,cancelled:true}`)
 การวางผลลัพธ์ของ `rclone authorize "<backend>"` จากคอมพิวเตอร์เครื่องใดก็ได้ด้วยมือยังคงรองรับเป็นทางเลือกสำรอง
 
 Google Drive มีสองเส้นทาง: `drive` remote นี้ (ไม่ต้องใช้โปรเจกต์ Google Cloud ใช้ OAuth ของ
-rclone เอง - อนุญาตบนอุปกรณ์ด้วย `remote-authorize` หรือรัน `rclone authorize "drive"` ครั้งเดียว
+rclone เอง, อนุญาตบนอุปกรณ์ด้วย `remote-authorize` หรือรัน `rclone authorize "drive"` ครั้งเดียว
 บนคอมพิวเตอร์เครื่องใดก็ได้แล้วส่ง token มา) หรือแอปคู่หู (companion) แบบ opt-in (OAuth client id
 ของคุณเอง) ทั้งสองทางลงเอยเป็นปลายทางธรรมดา
 
@@ -230,7 +238,7 @@ rclone เอง - อนุญาตบนอุปกรณ์ด้วย `re
 `any` (ค่าเริ่มต้น), `wifi`, หรือ `mobile` ตั้งค่าด้วย `config-set` เมื่อเป็น `wifi` หรือ
 `mobile` การโอนย้ายไปคลาวด์ทุกครั้ง (การอัปโหลด Full `rclone`/Drive, การ sync แบบ Mirror, การ
 backup/restore snapshot `restic` ระยะไกล, การ restore แบบ Mirror) จะตรวจทรานสปอร์ตที่ใช้งานอยู่ก่อน
-และยกเลิกด้วย `ERR_NET_POLICY` หากไม่ตรงกัน - ทั้งสำหรับงานที่ทำเองและงานที่ตั้งเวลา ปลายทางในเครื่อง
+และยกเลิกด้วย `ERR_NET_POLICY` หากไม่ตรงกัน, ทั้งสำหรับงานที่ทำเองและงานที่ตั้งเวลา ปลายทางในเครื่อง
 จะไม่ถูกจำกัดเลย
 
 ### ความถูกต้องและโควตาของคลาวด์
@@ -277,7 +285,7 @@ backup/restore snapshot `restic` ระยะไกล, การ restore แบ
 
 ### การสำรองพาธแบบ standalone
 
-`path-backup` / `path-restore` สำรองและกู้คืน **พาธสัมบูรณ์ใด ๆ** - โฟลเดอร์หรือไฟล์เดี่ยว - บนที่จัดเก็บ
+`path-backup` / `path-restore` สำรองและกู้คืน **พาธสัมบูรณ์ใด ๆ**: โฟลเดอร์หรือไฟล์เดี่ยว, บนที่จัดเก็บ
 ที่แชร์หรือใต้ `/data` นอกโมเดลต่อแอป archive ถูกเขียนเป็น `tar.zst` บวก `manifest.json` ในรูปแบบของ
 VDBackup เอง (ผนึกด้วย SHA-256 พร้อมชุด RECOVERY เมื่อเข้ารหัส) ใต้ `.paths/` ในไดเรกทอรี backups
 
@@ -299,10 +307,10 @@ VDBackup เอง (ผนึกด้วย SHA-256 พร้อมชุด RE
 ### `update-check`
 
 `update-check` รายงานว่ามีการเผยแพร่เวอร์ชันใหม่กว่าของโมดูลหรือไม่ เพื่อให้ agent (หรือ WebUI)
-แสดงได้ มันเป็น **read verb ที่คืนค่าทันที** - มัน**ไม่ใช่** detached จึงไม่มี `opid` ให้ poll
+แสดงได้ มันเป็น **read verb ที่คืนค่าทันที**: มัน**ไม่ใช่** detached จึงไม่มี `opid` ให้ poll
 มันถูกเรียกเฉพาะจากการกระทำที่ชัดเจนของผู้ใช้ และดึง manifest การอัปเดตที่เผยแพร่ของโมดูล
-(URL `updateJson` จาก `module.prop`) ด้วย `curl` ที่มาพร้อมกันผ่านคำขอ HTTP ฝั่ง root - สิ่งนี้
-ทำงานนอก WebView จึงไม่อยู่ภายใต้ CSP ของ WebUI - แล้วเปรียบเทียบ `versionCode` ที่เผยแพร่กับที่
+(URL `updateJson` จาก `module.prop`) ด้วย `curl` ที่มาพร้อมกันผ่านคำขอ HTTP ฝั่ง root, สิ่งนี้
+ทำงานนอก WebView จึงไม่อยู่ภายใต้ CSP ของ WebUI, แล้วเปรียบเทียบ `versionCode` ที่เผยแพร่กับที่
 ติดตั้งอยู่ มัน**ไม่รับอาร์กิวเมนต์ใด ๆ**
 
 เมื่อสำเร็จจะคืนค่า:
@@ -338,7 +346,7 @@ VDBackup เอง (ผนึกด้วย SHA-256 พร้อมชุด RE
   การตั้งค่าระดับทั้งอุปกรณ์ จงส่งมันเฉพาะเมื่อผู้ใช้ร้องขอโดยตรง; มันถูกกั้นด้วยความยินยอมที่ชัดแจ้งและถูกบันทึกใน
   audit trail
 - **การกู้คืนเป็นแบบ idempotent** การกู้คืน provider แบบดิบ (messages/contacts/wifi/bluetooth/
-  calendar) จะ **แทนที่** แทนที่จะผสาน - ข้อมูล provider ถูกล้างและ archive ถูกแตกทับลงไป - ดังนั้น
+  calendar) จะ **แทนที่** แทนที่จะผสาน, ข้อมูล provider ถูกล้างและ archive ถูกแตกทับลงไป, ดังนั้น
   การกู้คืน backup เดิมซ้ำจึงไม่สามารถสร้างแถวซ้ำได้ ส่วน `dns` และ `system_settings` ถูกนำกลับมาใช้ด้วย
   `settings put` แบบ idempotent
 - **การแตก archive มีการป้องกัน path traversal** การ restore รันเป็น root ดังนั้นทุก archive (restore,
@@ -355,4 +363,4 @@ VDBackup เอง (ผนึกด้วย SHA-256 พร้อมชุด RE
 
 ---
 
-*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง - ดู [CONTRIBUTING.md](CONTRIBUTING.md)*
+*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง, ดู [CONTRIBUTING.md](CONTRIBUTING.md)*

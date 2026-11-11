@@ -86,4 +86,4 @@ For the full technical design (archive format, metadata schema, pipelines, crypt
 destinations, importers) the maintainers keep detailed design notes; this file is the
 contributor-facing overview.
 
-*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome - see [CONTRIBUTING.md](../CONTRIBUTING.md).*
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome, see [CONTRIBUTING.md](../CONTRIBUTING.md).*

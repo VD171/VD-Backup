@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>root 권한으로 앱과 데이터를 완전하게 백업하고 복원 - 모든 작업을 WebUI에서 수행.</b><br>
+  <b>root 권한으로 앱과 데이터를 완전하게 백업하고 복원, 모든 작업을 WebUI에서 수행.</b><br>
   KernelSU / APatch / Magisk 모듈. "su 허용" 프롬프트 없음, <code>sucompat</code> 전환도 불필요.
 </p>
 
@@ -29,7 +29,7 @@
 ## 개요
 
 VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모듈**로, **핵심 기능에는 동반 앱이
-필요 없습니다** - 모듈 자체가 이미 root이므로 "허용"할 대상이 없기 때문입니다. 인기 있는 백업
+필요 없습니다**: 모듈 자체가 이미 root이므로 "허용"할 대상이 없기 때문입니다. 인기 있는 백업
 앱이 하는 모든 일을 깔끔한 WebUI 하나로 모으는 것을 목표로 합니다.
 
 이는 개방적이고 root 네이티브한 **Swift Backup, Neo-Backup, Android-DataBackup의 후계자**를
@@ -45,7 +45,7 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
   버전 관리), **Mirror** (`rclone`/`rsync`를 통한 1:1 동기화).
 - **충실한 보존:** SELinux 컨텍스트, uid/gid, 모드, xattr, 케이퍼빌리티.
 - **압축:** none / lz4 / zstd / gzip (gzip = "호환 모드", 어디서나 열림).
-- **암호화:** 선택적이며 이식 가능 (`age` + 암호구, 또는 AES-256 zip) - 기기 하드웨어에
+- **암호화:** 선택적이며 이식 가능 (`age` + 암호구, 또는 AES-256 zip), 기기 하드웨어에
   묶이지 않으므로 백업을 다른 기기에서 복원하거나 PC에서 열 수 있습니다.
 - **대상:** 로컬, SFTP, SCP, SMB, WebDAV, FTP, S3 및 70가지 이상 (`rclone`), 그리고 `rsync`
   와 `restic` 저장소. 작은 옵트인 동반 앱을 통한 Google Drive도 선택적으로 사용 가능.
@@ -77,12 +77,12 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
 
 1. [릴리스](https://github.com/VD171/VD-Backup/releases)에서 최신 `VD-Backup-vX.Y.zip`을
    다운로드합니다.
-2. KernelSU / APatch / Magisk 관리자에서 플래시합니다 - 즉시 사용 가능하며 재부팅이 필요 없습니다.
+2. KernelSU / APatch / Magisk 관리자에서 플래시합니다, 즉시 사용 가능하며 재부팅이 필요 없습니다.
 3. 모듈의 **WebUI**를 열어 설정하고 백업을 실행합니다. 이것으로 끝입니다.
 
-**에디션.** 릴리스마다 zip 6개. `universal-full` - 모든 아키텍처와 모든 바이너리를 내장(클라우드
+**에디션.** 릴리스마다 zip 6개. `universal-full`, 모든 아키텍처와 모든 바이너리를 내장(클라우드
 공급자용 `rclone`, 스냅샷용 `restic` 포함), 완전 오프라인으로 아무것도 다운로드하지 않음, 모든 기기,
-가장 큼. `universal-lite` - 모든 아키텍처에서 가장 큰 바이너리 두 개(`rclone`, `restic`)를 뺀 것,
+가장 큼. `universal-lite`, 모든 아키텍처에서 가장 큰 바이너리 두 개(`rclone`, `restic`)를 뺀 것,
 가장 작음. 로컬, SSH/SFTP, `rsync` 백업은 다운로드 없이 그대로 가능하며, 클라우드 대상(`rclone`)이나
 스냅샷 모드(`restic`)를 처음 사용할 때 해당 아키텍처용 작은 애드온을 한 번(SHA-256으로 검증) 내려받아
 캐시하도록 제안하므로 그 기능도 동작함. `<abi>-full`(`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) -
@@ -107,12 +107,12 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
 
 ## 문서
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - 온라인에서 둘러볼 수 있는 문서.
-- **[사용자 가이드](docs/USER-GUIDE.md)** - 설치부터 복원까지 처음부터 끝까지.
-- **[AI 에이전트](docs/AI-AGENTS.md)** - JSON API를 통해 모든 작업을 헤드리스로 수행.
-- **[아키텍처](docs/ARCHITECTURE.md)** 와 **[파일 구조](docs/FILE-STRUCTURE.md)** - 작동 방식.
-- **[포함된 바이너리](docs/BINARIES.md)** - 모든 사전 컴파일된 바이너리의 출처와 SHA-256, 전체 감사를 위해.
-- **[복구](module/etc/RECOVERY.md)** - 모듈 없이 PC에서 백업을 열고 복호화.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: 온라인에서 둘러볼 수 있는 문서.
+- **[사용자 가이드](docs/USER-GUIDE.md)**: 설치부터 복원까지 처음부터 끝까지.
+- **[AI 에이전트](docs/AI-AGENTS.md)**: JSON API를 통해 모든 작업을 헤드리스로 수행.
+- **[아키텍처](docs/ARCHITECTURE.md)** 와 **[파일 구조](docs/FILE-STRUCTURE.md)**: 작동 방식.
+- **[포함된 바이너리](docs/BINARIES.md)**: 모든 사전 컴파일된 바이너리의 출처와 SHA-256, 전체 감사를 위해.
+- **[복구](module/etc/RECOVERY.md)**: 모듈 없이 PC에서 백업을 열고 복호화.
 - **[기여](CONTRIBUTING.md)** 와 **[보안](SECURITY.md)**.
 - **[변경 이력](CHANGELOG.md)** 와 **[행동 강령](CODE_OF_CONDUCT.md)**.
 
@@ -122,7 +122,7 @@ VDBackup은 사람뿐 아니라 AI 어시스턴트와 에이전트에게도 친�
 JSON으로 말하고 (`helper.sh`의 모든 verb는 하나의 JSON 객체를 반환합니다), 코드, 문서, 파일
 구조는 기계 판독을 염두에 두고 배치되었으며, AI 지원 기여도 다른 기여와 똑같이 검토되고
 수용됩니다. 에이전트는 WebUI가 사용하는 것과 동일한 API를 통해 모듈의 **모든** 작업을 헤드리스로
-관리할 수 있습니다 - 전체 제어 표면은 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**를, 기여는
+관리할 수 있습니다, 전체 제어 표면은 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**를, 기여는
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)를 참고하세요.
 
 ## 연락처
@@ -140,9 +140,9 @@ JSON으로 말하고 (`helper.sh`의 모든 verb는 하나의 JSON 객체를 반
 
 같은 작성자의 자매 프로젝트:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - 기기 메서드 디버거. 각 항목을 그것을 읽을 수 있는 모든 메서드로 읽어 나란히 비교합니다.
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - 여러분의 Google 서비스 (RCS, Wallet, Play Integrity 증명)를 인터넷 없이 기기에서 읽습니다.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - 새 핑거프린트를 일관되고 정합성 있는 프로필로 바꾸는 기기 스푸퍼.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: 기기 메서드 디버거. 각 항목을 그것을 읽을 수 있는 모든 메서드로 읽어 나란히 비교합니다.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: 여러분의 Google 서비스 (RCS, Wallet, Play Integrity 증명)를 인터넷 없이 기기에서 읽습니다.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: 새 핑거프린트를 일관되고 정합성 있는 프로필로 바꾸는 기기 스푸퍼.
 
 ## 라이선스
 

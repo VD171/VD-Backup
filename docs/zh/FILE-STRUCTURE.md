@@ -71,4 +71,4 @@ docs/                               # all public documentation
 
 ---
 
-*本文档由 Claude（Anthropic）生成并由 VD171 维护。欢迎指正和改进 - 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*
+*本文档由 Claude（Anthropic）生成并由 VD171 维护。欢迎指正和改进, 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*

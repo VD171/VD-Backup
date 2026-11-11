@@ -6,6 +6,32 @@
 
 All notable changes to VDBackup are documented here. English only.
 
+## v1.05
+
+Reliability:
+
+- Batch backups no longer stop partway when you leave the app. A whole selection, a tag group or a scheduled run is now driven by one detached root process that keeps going when the WebUI is closed, and it is protected from being killed under memory pressure. The progress view reattaches when you come back.
+
+Settings:
+
+- Settings backup: export your destinations, schedules, presets and stored credentials to a single encrypted file, then import it onto another device or after a clean install. The file always asks for a passphrase because it carries remote passwords, and importing merges into the device without removing what is already there.
+- You can now wipe stored remote credentials and the device encryption key from Settings in one step, leaving your destinations, schedules and backups in place.
+
+Safety:
+
+- Backups can only be stored where they stay encrypted at rest. Destinations under paths that are readable before the first unlock, such as /data/adb or /data/system, are refused.
+- Saved credentials, the rclone config and the age key now live on credential-encrypted storage, locked until the first unlock, instead of a location that was readable before it; a module update moves them there permanently.
+- Backups now check for free space before they start and stop with a clear message instead of failing midway.
+
+Restore:
+
+- Restoring an app that is no longer installed now reinstalls its APK first, and the restore dialog offers the APK option whenever the backup has one. A restore that cannot install the app reports the failure instead of claiming success.
+- App, permission and setting operations now run in a clean environment, fixing "Failed transaction" errors that blocked restore, app-ops and settings on some ROMs.
+
+Destinations:
+
+- You can back up to an SD card or USB drive: the folder picker shows a shortcut to each storage volume and accepts removable-media paths.
+
 ## v1.04
 
 Fixes:
@@ -18,7 +44,7 @@ Privacy:
 
 Backups:
 
-- You can now set which items each app backs up - for example APK only, or APK + OBB - applied in bulk, automatic and scheduled backups. A single manual backup still lets you pick at the time, pre-filled from the app's set. Set it in Settings, next to the excluded-apps list.
+- You can now set which items each app backs up, for example APK only or APK + OBB, applied in bulk, automatic and scheduled backups. A single manual backup still lets you pick at the time, pre-filled from the app's set. Set it in Settings, next to the excluded-apps list.
 
 - Backup presets: save named sets of what to include and apply them with one pick in the backup dialog.
 - Multi-user: app backups, special backups and restores now all follow the Android user you select.
@@ -230,4 +256,4 @@ AI-friendly and i18n:
 - Rich app listing and Neo decryption run through a dex helper driven as root
   (`IPackageManager` via ServiceManager), so they work where ActivityThread hangs.
 
-*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome - see [CONTRIBUTING.md](CONTRIBUTING.md).*
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).*

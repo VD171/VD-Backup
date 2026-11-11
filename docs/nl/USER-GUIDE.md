@@ -7,7 +7,7 @@
 Een complete, vriendelijke rondleiding door VDBackup, van het installeren van de module tot
 het maken van je eerste backup, het herstellen ervan, het naar de cloud sturen, het inplannen
 en het jaren later openen op een pc. Als je eerder Swift Backup, Neo-Backup of
-Android-DataBackup hebt gebruikt, zal dit vertrouwd aanvoelen - alleen gebeurt alles op één
+Android-DataBackup hebt gebruikt, zal dit vertrouwd aanvoelen, alleen gebeurt alles op één
 plek, met niets om te "toestaan".
 
 ## Inhoudsopgave
@@ -26,6 +26,7 @@ plek, met niets om te "toestaan".
   - [5.7 Zelfstandige back-ups van mappen en bestanden](#57-zelfstandige-back-ups-van-mappen-en-bestanden)
 - [6. Een backup herstellen](#6-een-backup-herstellen)
 - [7. Bestemmingen: lokaal en op afstand](#7-bestemmingen-lokaal-en-op-afstand)
+  - [7.1 Je instellingen back-uppen](#71-je-instellingen-back-uppen)
 - [8. Inplannen en retentie](#8-inplannen-en-retentie)
 - [9. Inmigreren: Neo-Backup en Android-DataBackup importeren](#9-inmigreren-neo-backup-en-android-databackup-importeren)
 - [10. SSAID (apparaat-ANDROID_ID)](#10-ssaid-apparaat-android_id)
@@ -79,25 +80,25 @@ degraderen gracieus wanneer ze op jouw apparaat niet beschikbaar zijn.
 
 1. Download de nieuwste `VD-Backup-vX.Y.zip`-release.
 2. Flash in je KernelSU-/APatch-/Magisk-beheerder de module-zip zoals elke andere module.
-3. Het is onmiddellijk bruikbaar - **geen herstart nodig**. (Een herstart is alleen ooit
+3. Het is onmiddellijk bruikbaar, **geen herstart nodig**. (Een herstart is alleen ooit
    relevant bij het herstellen van SSAID; zie [sectie 10](#sectie-10).)
 4. Open de **WebUI** van de module vanuit de beheerder. Dat is de volledige interface.
 
 **Welke editie je downloadt.** Elke release wordt geleverd als meerdere flashbare zip-edities,
 zodat je alleen downloadt wat je nodig hebt. Kies er een:
 
-- **`VD-Backup-<ver>-universal-full.zip`** - elke CPU-architectuur en elke binary ingebouwd,
+- **`VD-Backup-<ver>-universal-full.zip`**: elke CPU-architectuur en elke binary ingebouwd,
   inclusief `rclone` (cloudproviders: Google Drive, S3 en 70+ andere rclone-backends) en
   `restic` (gededupliceerde snapshots). Volledig offline, er wordt nooit iets gedownload.
   Werkt op elk apparaat. Grootste download.
-- **`VD-Backup-<ver>-universal-lite.zip`** - elke architectuur, maar **zonder** de twee
+- **`VD-Backup-<ver>-universal-lite.zip`**: elke architectuur, maar **zonder** de twee
   grootste binaries (`rclone` en `restic`). Kleinste download; doet nog steeds lokale,
   SSH/SFTP- en rsync-backups zonder download, met overdraagbare `age`-versleuteling. De eerste
   keer dat je een cloud-bestemming (`rclone`) of snapshot-modus (`restic`) gebruikt, biedt de
   WebUI aan die kleine architectuurspecifieke add-on eenmalig te downloaden (geverifieerd met
   SHA-256) en te cachen; daarna werken die functies ook.
 - **`VD-Backup-<ver>-<abi>-full.zip`** (een van `arm64-v8a`, `armeabi-v7a`, `x86`,
-  `x86_64`) - één enkele architectuur met elke binary ingebouwd (dezelfde functies als
+  `x86_64`), één enkele architectuur met elke binary ingebouwd (dezelfde functies als
   `universal-full` maar alleen voor de architectuur van jouw apparaat, dus kleiner dan
   `universal-full`).
 
@@ -112,7 +113,7 @@ de architectuur van jouw apparaat over, ongeacht de editie die je flasht.
 Bij de eerste keer draaien zet de module een standaardconfiguratie neer (alleen als er nog
 geen bestaat), zodat je instellingen behouden blijven over module-updates heen.
 
-**Waar de status leeft.** VDBackups werkgegevens - je configuratie, geplande taken, opgeslagen
+**Waar de status leeft.** VDBackups werkgegevens, je configuratie, geplande taken, opgeslagen
 bestemmingen, versleutelde inloggegevens, logboeken en auditspoor, en het staging-gebied -
 bevinden zich onder:
 
@@ -135,20 +136,20 @@ Houd dit om twee redenen in gedachten: backups nemen ruimte in onder `/sdcard/VD
 
 De WebUI is georganiseerd in enkele tabbladen:
 
-- **Home** - een startoverzicht dat aantallen van je backups toont (apps, backups, mappen en geplande taken) en een opslagbalk voor hoeveel ruimte je backups gebruiken ten opzichte van de vrije ruimte, met statusbadges, kopiëren naar klembord van hashes en paden, en een actie **Check for updates**.
-- **Apps** - de lijst met geïnstalleerde apps (gebruiker en systeem), elk getoond met zijn
+- **Home**: een startoverzicht dat aantallen van je backups toont (apps, backups, mappen en geplande taken) en een opslagbalk voor hoeveel ruimte je backups gebruiken ten opzichte van de vrije ruimte, met statusbadges, kopiëren naar klembord van hashes en paden, en een actie **Check for updates**.
+- **Apps**: de lijst met geïnstalleerde apps (gebruiker en systeem), elk getoond met zijn
   echte naam, zijn pakketnaam en zijn pictogram (pictogrammen laden lui en worden gecachet,
   zodat de lijst responsief blijft). De knop op een rij back-upt de app; op de rij tikken opent
   de backup-geschiedenis van die app, waar je elke eerdere backup kunt herstellen.
-- **Backups** - de backups die je al hebt, elk toont de app-naam op één regel en het pakket op
+- **Backups**: de backups die je al hebt, elk toont de app-naam op één regel en het pakket op
   de volgende. Tik op een backup om de volledige details te zien (versie, datum, grootte,
   opgenomen items, machtigingstellingen en het apparaat waar het vandaan kwam). Hier herstel je
   ook, voer je een restore-test uit, verwijder je een backup of importeer je backups uit
   Neo-Backup of Android-DataBackup.
-- **Bestemmingen** - beheer waar backups naartoe gaan: lokale opslag plus eventuele
+- **Bestemmingen**: beheer waar backups naartoe gaan: lokale opslag plus eventuele
   remote-bestemmingen die je toevoegt (zie [sectie 7](#sectie-7)). Je
   kunt een bestemming hier testen voordat je erop vertrouwt.
-- **Instellingen** - een licht/donker-themaschakelaar, een accentkleurkiezer (presets, een aangepaste
+- **Instellingen**: een licht/donker-themaschakelaar, een accentkleurkiezer (presets, een aangepaste
   kleur, of resetten) en een taalkiezer (de interface wordt rechts-naar-links weergegeven voor
   Arabisch en Perzisch), een interfaceschaal-schuifregelaar die je sleept om de hele interface
   (header, inhoud en onderste navigatie samen) te herschalen van 85% tot 120% (100% is de standaard), voor schermen met
@@ -157,7 +158,7 @@ De WebUI is georganiseerd in enkele tabbladen:
   voor cloudoverdrachten (zie [sectie 7](#sectie-7)), automatische back-up en de lijst met uitgesloten
   apps, de installatiebron-optie, de
   versleutelingssleutel en het inplannen. Aan/uit-instellingen gebruiken schakelaars in Android-stijl.
-- **Over** - versie, links, de zusterprojecten (Zie ook), het auditmanifest van de gebundelde binaries, en een actie **Check for updates** die meldt of er een nieuwere versie is gepubliceerd (met de bijbehorende release-notes). Elke update installeer je via je root-manager, net zoals je de module hebt geflasht.
+- **Over**: versie, links, de zusterprojecten (Zie ook), het auditmanifest van de gebundelde binaries, en een actie **Check for updates** die meldt of er een nieuwere versie is gepubliceerd (met de bijbehorende release-notes). Elke update installeer je via je root-manager, net zoals je de module hebt geflasht.
 
 De app controleert ook zelf op een nieuwere versie telkens als je hem opent (hooguit eens per uur) en toont de updatebanner alleen als er een is; blijft stil als up-to-date of offline.
 
@@ -179,7 +180,7 @@ De basisstroom: open **Apps**, kies een app, selecteer wat je wilt opnemen, kies
 stel compressie en (optioneel) versleuteling in, voer dan uit. De voortgang verschijnt live en
 een melding vertelt je wanneer het klaar is.
 
-In het back-updialoogvenster kun je ook de **bestemming** voor deze back-up kiezen - lokale opslag of een toegevoegde cloud-/externe bestemming - zonder eerst de standaardbestemming in Instellingen te wijzigen.
+In het back-updialoogvenster kun je ook de **bestemming** voor deze back-up kiezen, lokale opslag of een toegevoegde cloud-/externe bestemming, zonder eerst de standaardbestemming in Instellingen te wijzigen.
 
 ### 5.1 Kiezen wat je back-upt
 
@@ -206,16 +207,16 @@ uid/gid-eigendom, bestandsmodi, uitgebreide attributen (xattr) en capabilities.
 VDBackup biedt drie modi. De WebUI selecteert **Full** vooraf, wat voor de meeste mensen de
 juiste keuze is.
 
-- **Full** - een complete, op zichzelf staande, overdraagbare backup geschreven als `tar.zst`
+- **Full**: een complete, op zichzelf staande, overdraagbare backup geschreven als `tar.zst`
   (of je gekozen compressie). Elke keer dat je het draait levert een alleenstaande backup op
   die je overal naartoe kunt kopiëren en op een pc kunt openen. Het best voor: een schone,
   overdraagbare snapshot van een app die je kunt archiveren en verplaatsen. Dit is de standaard
   en de meest overdraagbare optie.
-- **Snapshot** - incrementeel en geversioneerd, ondersteund door `restic`. Elke keer dat je het
+- **Snapshot**: incrementeel en geversioneerd, ondersteund door `restic`. Elke keer dat je het
   draait voegt een nieuwe moment-in-tijd-snapshot toe aan een repository, slaat alleen op wat
   veranderd is en dedupliceert over snapshots heen. Het best voor: een lopende geschiedenis van
   een app bijhouden zonder bij elke keer de volle grootte te betalen.
-- **Mirror** - een 1:1-synchronisatie van de live-gegevens naar de bestemming, ondersteund door
+- **Mirror**: een 1:1-synchronisatie van de live-gegevens naar de bestemming, ondersteund door
   `rclone`/`rsync`. Het houdt de bestemming identiek aan wat er op dit moment op het apparaat
   staat (gewijzigde bestanden worden gekopieerd, verwijderde bestanden worden op de bestemming
   verwijderd). Het best voor: een snelle, altijd actuele kopie, bijvoorbeeld naar een
@@ -225,11 +226,11 @@ juiste keuze is.
 
 Je kunt de compressie voor een Full-backup kiezen:
 
-- **none** - geen compressie (snelst, grootst).
-- **lz4** - zeer snel, lichte compressie.
-- **zstd** - de standaard, een sterke balans tussen snelheid en verhouding. Je kunt ook een
+- **none**: geen compressie (snelst, grootst).
+- **lz4**: zeer snel, lichte compressie.
+- **zstd**: de standaard, een sterke balans tussen snelheid en verhouding. Je kunt ook een
   niveau kiezen (bijvoorbeeld een hoger niveau voor een kleiner bestand).
-- **gzip** - de **"compatibiliteitsmodus"**. gzip opent met ingebouwde tools op praktisch elke
+- **gzip**: de **"compatibiliteitsmodus"**. gzip opent met ingebouwde tools op praktisch elke
   computer en in de meeste bestandsbeheerders, zonder iets extra's te installeren. Kies dit
   wanneer je er het meest om geeft het archief overal te kunnen openen.
 
@@ -248,7 +249,7 @@ dubbelklik en een wachtwoord wilt openen.)
 
 Om versleuteling te gebruiken, genereer je de versleutelingssleutel eenmaal (Instellingen),
 schakel je vervolgens versleuteling in voor je taak en stel je een wachtwoordzin in. De
-wachtwoordzin is wat de backup beschermt, kies er dus een sterke - er is geen hardwaresleutel
+wachtwoordzin is wat de backup beschermt, kies er dus een sterke, er is geen hardwaresleutel
 en geen herstelachterdeur.
 
 **De APK-regel (belangrijk):**
@@ -263,11 +264,11 @@ en geen herstelachterdeur.
 
 Twee veiligheidsopties helpen je een backup te vertrouwen voordat je erop vertrouwt:
 
-- **Verify** - na het schrijven re-hasht VDBackup elk archief en controleert het tegen het
+- **Verify**: na het schrijven re-hasht VDBackup elk archief en controleert het tegen het
   manifest. Dit staat **standaard aan voor Full**-backups. Als een bestand niet overeenkomt,
   mislukt de taak met een duidelijke fout in plaats van je met een stilzwijgend beschadigde
   backup achter te laten.
-- **Dry-run** - plant de taak en rapporteert de groottes die het zou produceren **zonder iets
+- **Dry-run**: plant de taak en rapporteert de groottes die het zou produceren **zonder iets
   te schrijven**. Gebruik het om ruimte in te schatten of je itemselectie te controleren
   voordat je het echte ding draait.
 
@@ -316,7 +317,7 @@ duplicaten maakt, en DNS en systeeminstellingen worden eenvoudigweg opnieuw toeg
 
 ### 5.7 Zelfstandige back-ups van mappen en bestanden
 
-Soms wil je een gewone map of een gewoon bestand back-uppen dat geen app is - een cameramap,
+Soms wil je een gewone map of een gewoon bestand back-uppen dat geen app is, een cameramap,
 een documentenmap, een enkele database. VDBackup kan **elk absoluut pad** op gedeelde opslag of
 onder `/data` back-uppen, met hetzelfde overdraagbare formaat als een app-backup: een
 `tar.zst`-archief plus een `manifest.json`, SHA-256-verzegeld, met een RECOVERY-notitie wanneer
@@ -340,7 +341,7 @@ vast in een lokaal auditlogboek.
 
 Een herstel is **getrouw**: VDBackup wist de huidige staat van de app en pakt de backup uit,
 zodat de app wordt teruggezet naar de **exacte staat** die in die backup is vastgelegd
-(inclusief eigendom, modi, SELinux-contexten en xattr). Het is geen samenvoeging - het is een
+(inclusief eigendom, modi, SELinux-contexten en xattr). Het is geen samenvoeging, het is een
 echt herstel naar het moment in de tijd van de backup. Omdat een herstel als root draait,
 controleert VDBackup ook elk archief voordat het iets uitpakt en weigert het een gemanipuleerd
 archief dat buiten zijn doel probeert te schrijven, zodat een aangepaste backup nooit de rest
@@ -348,17 +349,17 @@ van je systeem kan overschrijven.
 
 Nuttige herstelopties:
 
-- **Restore-test** - pakt de backup uit naar een tijdelijk staging-gebied en verifieert het
+- **Restore-test**: pakt de backup uit naar een tijdelijk staging-gebied en verifieert het
   **zonder de live-app aan te raken**. Dit is de veilige manier om te bevestigen dat een backup
   intact en herstelbaar is voordat je iets overschrijft. Als de test mislukt, krijg je een
   duidelijke fout en blijft je geïnstalleerde app onaangeraakt.
-- **Gedeeltelijk herstel** - herstel alleen enkele van de items die geback-upt zijn.
+- **Gedeeltelijk herstel**: herstel alleen enkele van de items die geback-upt zijn.
   Bijvoorbeeld alleen de app-gegevens herstellen zonder het APK opnieuw te installeren, of de
   save-bestanden herstellen zonder de grote OBB/media. Kies de gewenste items op het
   herstelscherm.
 - Voor **Snapshot**- en **Mirror**-backups haalt het herstel respectievelijk uit de
   geversioneerde repository of de gespiegelde kopie.
-- **Installatiebron** - standaard meldt een herstelde app de **Play Store** als zijn
+- **Installatiebron**: standaard meldt een herstelde app de **Play Store** als zijn
   installatiebron (in plaats van er sideloaded uit te zien), wat de meeste apps en app-controles
   verwachten. Je kunt dit globaal uitschakelen in Instellingen of per herstel, en wanneer het uit
   staat wordt de oorspronkelijke installatiebron behouden. Een geavanceerde, optionele
@@ -368,7 +369,7 @@ Nuttige herstelopties:
 
 **Herstel in batch.** Het **Backups**-tabblad heeft een **Select**-modus, net zoals het Apps-tabblad
 die heeft voor back-up in batch. Zet **Select** aan, vink met de selectievakjes de backups aan die je
-wilt, en herstel ze allemaal tegelijk. Eén optiedialoog dekt de hele selectie - de bevestiging van
+wilt, en herstel ze allemaal tegelijk. Eén optiedialoog dekt de hele selectie, de bevestiging van
 overschrijven, de restore-test en de keuze voor de installatiebron gelden voor elke backup die je koos -
 en ze worden de een na de ander hersteld.
 
@@ -379,7 +380,7 @@ activiteitenlogboek geschreven. Je kunt ook begrenzen hoeveel backups per app be
 
 **Een geïnstalleerde app als system-app aankoppelen.** Vanuit de backup-geschiedenis van een app
 stageert **Als systeem aankoppelen** de APK('s) van de app in een VDBackup-overlay-submodule,
-zodat de root-beheerder hem vanuit `/system/app` (of `/system/priv-app`) serveert - de echte
+zodat de root-beheerder hem vanuit `/system/app` (of `/system/priv-app`) serveert, de echte
 `/system`-partitie wordt nooit aangeraakt. Met **NoMount** op KernelSU wordt het live toegepast;
 anders wordt het na een herstart toegepast. Dit hangt nooit af van of NoMount geïnstalleerd is.
 
@@ -392,10 +393,10 @@ plaats van het pad te typen.
 
 Remote-transport wordt afgehandeld door de gebundelde tools:
 
-- **rclone** - de hub voor een enorm scala aan remotes: **SFTP, SMB, WebDAV, FTP, S3, Google
+- **rclone**: de hub voor een enorm scala aan remotes: **SFTP, SMB, WebDAV, FTP, S3, Google
   Drive** en 70+ meer diensten.
-- **rsync** en de **ssh/scp/sftp**-suite - voor delta-sync en gewone SSH-doelen.
-- **restic** - versleutelde, gededupliceerde **Snapshot**-repositories (lokaal of op afstand).
+- **rsync** en de **ssh/scp/sftp**-suite, voor delta-sync en gewone SSH-doelen.
+- **restic**: versleutelde, gededupliceerde **Snapshot**-repositories (lokaal of op afstand).
 
 **Een cloud-remote aanmaken (geen SSH nodig).** Kies in het Bestemmingen-tabblad het
 **rclone**-bestemmingstype en gebruik **Cloud-remote toevoegen**. Je kunt **elke rclone-backend**
@@ -420,17 +421,17 @@ Twee regels houden remote-gebruik veilig:
 **Netwerkbeleid (wifi versus mobiele data).** In Instellingen laat "Cloudoverdrachten via" je
 beperken welke verbinding cloudoverdrachten mogen gebruiken: **wifi en mobiele data** (de
 standaard), **alleen wifi** of **alleen mobiele data**. Wanneer je het beperkt, controleert
-elke cloudoverdracht - handmatig of gepland, upload of herstel - eerst de actieve verbinding en
+elke cloudoverdracht, handmatig of gepland, upload of herstel, eerst de actieve verbinding en
 weigert op de verkeerde te draaien, zodat een alleen-wifi-beleid nooit mobiele data verbruikt.
 Lokale backups worden nooit beïnvloed.
 
 **Google Drive.** Je hebt twee manieren om Google Drive te bereiken:
 
-1. **Via rclone** - voeg Drive toe als een rclone-remote zoals elke andere bestemming, zonder
+1. **Via rclone**: voeg Drive toe als een rclone-remote zoals elke andere bestemming, zonder
    extra app en **zonder Google Cloud-account**. Draai op een willekeurige computer eenmaal
    `rclone authorize "drive"`, log in op je Google-account in de browser en plak de token die
    het afdrukt in het tokenveld van de Drive-remote.
-2. **Via de optionele begeleider** - een piepkleine, opt-in-begeleidingsapp die de
+2. **Via de optionele begeleider**: een piepkleine, opt-in-begeleidingsapp die de
    Google-aanmelding en de Drive-upload afhandelt. Het wordt **alleen geïnstalleerd wanneer je
    expliciet de Google Drive-begeleidingsbestemming kiest**, nooit standaard, en het wordt
    verwijderd wanneer je het uitschakelt. Het eenmalige Google-toestemmingsscherm is de enige
@@ -438,17 +439,25 @@ Lokale backups worden nooit beïnvloed.
    je eraan hem **altijd te verbergen met [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** zodat zijn aanwezigheid geen root of een
    ontgrendelde bootloader verraadt, en het biedt aan hem voor je aan de HMA-OSS-lijst toe te voegen. VDBackup herinnert je er ook aan, wanneer je lokale back-ups hebt, om de back-upmap (/sdcard/VDBackup) om dezelfde reden met SUSFS te verbergen.
 
+### 7.1 Je instellingen back-uppen
+
+Je VDBackup-configuratie zelf, de bestemmingen, planningen, voorinstellingen en opgeslagen inloggegevens, kan naar één bestand worden geschreven en naar een ander apparaat worden meegenomen of na een schone installatie worden hersteld. In **Instellingen**, onder **Instellingen back-up**:
+
+- **Instellingen exporteren** schrijft een versleuteld bestand naar `VDBackup/.export`. Het vraagt altijd om een wachtwoordzin, omdat het bestand je externe wachtwoorden bevat.
+- **Instellingen importeren** leest zo'n bestand terug en voegt het samen met dit apparaat, zonder iets te verwijderen wat er al is.
+- **Opgeslagen inloggegevens wissen** verwijdert de opgeslagen externe wachtwoorden en de versleutelingssleutel van het apparaat in één stap; je bestemmingen, planningen en back-ups blijven op hun plaats.
+
 ## 8. Inplannen en retentie
 
-VDBackup kan backups - en herstelbewerkingen - automatisch volgens een schema uitvoeren. In de
+VDBackup kan backups, en herstelbewerkingen, automatisch volgens een schema uitvoeren. In de
 planner definieer je een taak met:
 
-- een **doel** - een enkele app, een set apps, of **alle apps** (minus de uitgesloten-apps-lijst)
+- een **doel**: een enkele app, een set apps, of **alle apps** (minus de uitgesloten-apps-lijst)
   - en de te gebruiken items/modus,
-- een **actie** - **Back up** (de standaard) of **Restore latest**, die de meest recente backup van
+- een **actie**: **Back up** (de standaard) of **Restore latest**, die de meest recente backup van
   elke doel-app herstelt,
 - een bestemming,
-- een **cron-achtig schema** - elk uur, dagelijks of wekelijks, op een tijd die je kiest (HH:MM),
+- een **cron-achtig schema**: elk uur, dagelijks of wekelijks, op een tijd die je kiest (HH:MM),
 - een **retentie**-instelling: **bewaar N** meest recente backups voor die taak, oudere worden
   automatisch gesnoeid,
 - optionele **uitvoeringsvoorwaarden**: alleen op **Wi-Fi**, alleen tijdens **opladen**, alleen
@@ -462,7 +471,7 @@ hebben geplande backups niet nodig dat de WebUI open is.
 **Uitvoeringsvoorwaarden (gates).** Een geplande taak kan voorwaarden dragen waaraan voldaan moet
 zijn voordat hij draait: alleen Wi-Fi, alleen opladen, een minimum accuniveau en specifieke
 weekdagen. Wanneer een taak verschuldigd is maar aan een voorwaarde niet is voldaan, wordt hij
-**overgeslagen en bij de volgende controle opnieuw geprobeerd** - zijn schema rukt niet op, zodat
+**overgeslagen en bij de volgende controle opnieuw geprobeerd**: zijn schema rukt niet op, zodat
 hij draait zodra de voorwaarde is vervuld. Een ingebouwde thermische veiligheidscontrole slaat een
 geplande taak ook over terwijl het apparaat te heet is. Elke dergelijke overslag wordt
 vastgelegd in het activiteitenlogboek.
@@ -470,7 +479,7 @@ vastgelegd in het activiteitenlogboek.
 **Gepland herstel overschrijft bij elke run.** Een **Restore latest**-taak herstelt bij elke keer dat
 hij afgaat opnieuw de meest recente backup van elke doel-app, en herstel is destructief: bij elke run
 **overschrijft het de huidige gegevens van de app** met de meest recente backup. Dit is bewust en
-opt-in - kies het alleen wanneer je de doelen op hun meest recente backup wilt houden.
+opt-in, kies het alleen wanneer je de doelen op hun meest recente backup wilt houden.
 
 **Automatische back-up bij installatie/update.** In Instellingen kun je **automatische back-up**
 inschakelen: dezelfde achtergrond-heartbeat merkt apps op die nieuw geïnstalleerd of bijgewerkt
@@ -481,15 +490,15 @@ er geïnstalleerd is, zodat het inschakelen nooit je hele apparaat in één keer
 wilt dat ze automatisch of volgens een schema geback-upt worden; je kunt er meerdere tegelijk
 toevoegen (multiselectie), en uitgesloten apps worden door beide overgeslagen.
 
-**Back-upvoorinstellingen.** Ook in Instellingen kun je benoemde voorinstellingen opslaan - sets van op te nemen items, zoals alleen APK of APK + OBB - en er een kiezen in het back-updialoog om de itemkeuzes in één keer te vullen.
+**Back-upvoorinstellingen.** Ook in Instellingen kun je benoemde voorinstellingen opslaan, sets van op te nemen items, zoals alleen APK of APK + OBB, en er een kiezen in het back-updialoog om de itemkeuzes in één keer te vullen.
 
-**Back-upitems per app.** Ook in Instellingen kun je precies kiezen welke items elke app back-upt in bulk-, automatische en geplande back-ups - bijvoorbeeld alleen APK, of APK + OBB. Bij een losse handmatige back-up kun je nog steeds kiezen, uitgaand van de set van de app. Apps die je hier niet instelt, back-uppen alles.
+**Back-upitems per app.** Ook in Instellingen kun je precies kiezen welke items elke app back-upt in bulk-, automatische en geplande back-ups, bijvoorbeeld alleen APK, of APK + OBB. Bij een losse handmatige back-up kun je nog steeds kiezen, uitgaand van de set van de app. Apps die je hier niet instelt, back-uppen alles.
 
-**App-tags.** Tik op een app in Instellingen (Items en tags per app) om deze vrije labels te geven - bijvoorbeeld games of work. Boven de app-lijst verschijnt dan een tagkiezer: kies een tag om alleen die apps te tonen en back-up de hele groep in één keer. Je kunt het ook openen via het tabblad Apps: tik op een app en dan op Items en tags.
+**App-tags.** Tik op een app in Instellingen (Items en tags per app) om deze vrije labels te geven, bijvoorbeeld games of work. Boven de app-lijst verschijnt dan een tagkiezer: kies een tag om alleen die apps te tonen en back-up de hele groep in één keer. Je kunt het ook openen via het tabblad Apps: tik op een app en dan op Items en tags.
 
 **Activiteitenlogboek.** Het Schema-tabblad heeft een knop **Activiteitenlogboek bekijken** die
-een volledig scherm (direct) opent met het lokale auditspoor - backups, herstelbewerkingen,
-verwijderingen, geplande en automatische runs, en snoeiingen - nieuwste eerst. Een actie
+een volledig scherm (direct) opent met het lokale auditspoor, backups, herstelbewerkingen,
+verwijderingen, geplande en automatische runs, en snoeiingen, nieuwste eerst. Een actie
 **Logboek exporteren** slaat een logbestand (onder de backupmap) op dat je aan een feedback- of
 bugrapport kunt toevoegen.
 
@@ -504,13 +513,13 @@ Als je van Neo-Backup of Android-DataBackup komt, hoef je niet opnieuw te beginn
 3. Start de import. Zoals andere langdurige operaties draait het losgekoppeld met live voortgang.
 
 **Wachtwoordversleutelde Neo-Backup-backups worden ondersteund.** De AES-256-versleutelde
-backups van Neo-Backup kunnen worden geïmporteerd - je wordt **om het wachtwoord gevraagd**
+backups van Neo-Backup kunnen worden geïmporteerd, je wordt **om het wachtwoord gevraagd**
 wanneer het nodig is, en het wachtwoord wordt alleen gebruikt om te ontsleutelen, nooit
 opgeslagen in de opdrachtregel.
 
 ## 10. SSAID (apparaat-ANDROID_ID)
 
-SSAID is de per-app-`ANDROID_ID` - een identificatie op apparaatniveau die sommige apps lezen.
+SSAID is de per-app-`ANDROID_ID`, een identificatie op apparaatniveau die sommige apps lezen.
 VDBackup kan er een back-up van maken en het herstellen, maar dit is het gevoeligste wat het
 aanraakt, dus het wordt met extra zorg behandeld:
 
@@ -555,7 +564,7 @@ kopieer-plak-commando's voor Windows, macOS en Linux bevat. Zie
 [`../module/etc/RECOVERY.md`](RECOVERY.md) voor de volledige, stap-voor-stap-kit.
 
 Merk op dat SELinux-contexten, uid/gid en modi binnen de tar worden opgeslagen en alleen
-correct opnieuw worden toegepast wanneer je op Android herstelt - op een pc krijg je nog steeds
+correct opnieuw worden toegepast wanneer je op Android herstelt, op een pc krijg je nog steeds
 al je bestanden, alleen zonder dat het Android-specifieke eigendom wordt afgedwongen.
 
 ## 12. VDBackup aansturen vanuit een AI-assistent
@@ -564,7 +573,7 @@ VDBackup is gebouwd om vriendelijk te zijn voor AI-assistenten en -agenten, niet
 mensen. De WebUI is slechts één client van een kleine JSON-API; een agent kan **elke** actie
 van de module headless beheren via diezelfde API (elk commando geeft een enkel JSON-object
 terug, langdurige operaties draaien losgekoppeld en je polt hun voortgang, en dezelfde
-veiligheidsrails gelden - SSAID blijft opt-in, muterende acties blijven bevestigd en
+veiligheidsrails gelden, SSAID blijft opt-in, muterende acties blijven bevestigd en
 geaudit).
 
 Als je wilt dat een assistent je backups en herstelbewerkingen voor je uitvoert, wijs hem dan
@@ -584,14 +593,14 @@ opnieuw aan bij elke lopende operatie en toont de huidige voortgang.
 
 **Ik kreeg een `ERR_...`-bericht.** Fouten worden gemeld met een duidelijke code. Een paar
 veelvoorkomende:
-- `ERR_VERIFY` - een geschreven archief kwam niet overeen met zijn manifest-hash (de
+- `ERR_VERIFY`, een geschreven archief kwam niet overeen met zijn manifest-hash (de
   verificatie ving een slechte backup op). Draai de backup opnieuw.
-- `ERR_RESTORE_TEST` - een restore-test is mislukt; de backup pakte niet schoon uit/verifieerde
+- `ERR_RESTORE_TEST`, een restore-test is mislukt; de backup pakte niet schoon uit/verifieerde
   niet schoon en je live-app bleef onaangeraakt.
-- `ERR_UNSAFE_ARCHIVE` - een archief werd geweigerd omdat het buiten zijn doelmap probeerde te
+- `ERR_UNSAFE_ARCHIVE`, een archief werd geweigerd omdat het buiten zijn doelmap probeerde te
   schrijven (absolute of `..`-paden). Dit beschermt je tegen een gemanipuleerde backup; er werd
   niets geschreven.
-- `ERR_QUOTA` - een cloud-remote had niet genoeg vrije ruimte voor een Full-upload; de backup
+- `ERR_QUOTA`, een cloud-remote had niet genoeg vrije ruimte voor een Full-upload; de backup
   werd gestopt voordat er iets werd geüpload.
 
 **Mijn remote-bestemming mislukt.** Gebruik de bestemmings-**test** in het Bestemmingen-tabblad
@@ -603,11 +612,11 @@ de build-tijd in de module gebundeld; niets wordt tijdens runtime naar het appar
 Alleen cloudbestemmingen (rclone/restic/ssh) praten met het netwerk, en alleen wanneer je ze
 gebruikt.
 
-**Herstelt mijn backup op een andere telefoon?** Ja - backups zijn overdraagbaar en niet
+**Herstelt mijn backup op een andere telefoon?** Ja, backups zijn overdraagbaar en niet
 gebonden aan apparaathardware. (SSAID is de enige apparaatspecifieke uitzondering, en het is
 opt-in en wordt bij herstart toegepast; zie [sectie 10](#sectie-10).)
 
-**Mijn versleutelde backup wil niet openen - ik ben de wachtwoordzin kwijt.** Er is door het
+**Mijn versleutelde backup wil niet openen, ik ben de wachtwoordzin kwijt.** Er is door het
 ontwerp geen herstelachterdeur; de wachtwoordzin is wat de backup beschermt. Bewaar hem veilig.
 
 ## 14. Verwijderen
@@ -615,10 +624,10 @@ ontwerp geen herstelachterdeur; de wachtwoordzin is wat de backup beschermt. Bew
 Verwijder VDBackup zoals elke andere module uit je KernelSU-/APatch-/Magisk-beheerder. Het
 verwijderen **behoudt je gebruikersconfiguratie** en verwijdert alleen tijdelijke status, zodat
 een latere herinstallatie je instellingen oppikt. Je werkelijke backups leven onder
-`/data/adb/vdbackup/` - als je ze ook wilt verwijderen, verwijder die map dan handmatig na het
+`/data/adb/vdbackup/`, als je ze ook wilt verwijderen, verwijder die map dan handmatig na het
 verwijderen; anders blijven ze beschikbaar (en, omdat het standaardformaten zijn, te openen op
 een pc) ook zonder de module.
 
 ---
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom - zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*

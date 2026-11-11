@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>Fullständig säkerhetskopiering och återställning av appar och data som root - helt styrd från ett WebUI.</b><br>
+  <b>Fullständig säkerhetskopiering och återställning av appar och data som root, helt styrd från ett WebUI.</b><br>
   KernelSU- / APatch- / Magisk-modul. Ingen "bevilja su"-fråga, ingen växling av <code>sucompat</code>.
 </p>
 
@@ -29,7 +29,7 @@
 ## Vad det är
 
 VDBackup är en root-**WebUI-modul** som säkerhetskopierar och återställer dina appar och
-deras data **utan en följeslagarapp för kärnfunktionerna** - eftersom modulen redan är
+deras data **utan en följeslagarapp för kärnfunktionerna**: eftersom modulen redan är
 root finns det inget att "tillåta". Målet är att täcka allt som de populära
 säkerhetskopieringsapparna gör, på ett ställe, med ett rent WebUI.
 
@@ -46,7 +46,7 @@ importera befintliga säkerhetskopior från Neo-Backup och Android-DataBackup s�
   versionshanterad, via `restic`) och **Mirror** (1:1-synkronisering, via `rclone`/`rsync`).
 - **Troget bevarande:** SELinux-kontexter, uid/gid, lägen, xattr och capabilities.
 - **Komprimering:** ingen / lz4 / zstd / gzip (gzip = "kompatibilitetsläge", öppnas överallt).
-- **Kryptering:** valfri och portabel (`age` + lösenfras eller AES-256-zip) - aldrig bunden
+- **Kryptering:** valfri och portabel (`age` + lösenfras eller AES-256-zip), aldrig bunden
   till enhetens hårdvara, så att en säkerhetskopia återställs på en annan enhet eller öppnas på en dator.
 - **Destinationer:** lokalt, SFTP, SCP, SMB, WebDAV, FTP, S3 och 70+ till (`rclone`),
   plus `rsync`- och `restic`-förråd. Valfritt Google Drive via en pytteliten valfri följeslagare.
@@ -80,18 +80,18 @@ importera befintliga säkerhetskopior från Neo-Backup och Android-DataBackup s�
 ## Installation
 
 1. Ladda ner den senaste `VD-Backup-vX.Y.zip` från [Utgåvor](https://github.com/VD171/VD-Backup/releases).
-2. Flasha den i KernelSU- / APatch- / Magisk-hanteraren - användbar direkt, ingen omstart behövs.
+2. Flasha den i KernelSU- / APatch- / Magisk-hanteraren, användbar direkt, ingen omstart behövs.
 3. Öppna modulens **WebUI** för att konfigurera och köra säkerhetskopior. Det är allt.
 
-**Utgåvor.** Sex zip-filer per release. `universal-full` - alla arkitekturer och alla
+**Utgåvor.** Sex zip-filer per release. `universal-full`, alla arkitekturer och alla
 binärer inbäddade (inkl. `rclone` för molnleverantörer, `restic` för ögonblicksbilder),
-helt offline, inget laddas någonsin ner, alla enheter, störst. `universal-lite` - alla
+helt offline, inget laddas någonsin ner, alla enheter, störst. `universal-lite`, alla
 arkitekturer utan de två största binärerna (`rclone`, `restic`), minst; klarar fortfarande
 lokala, SSH/SFTP och `rsync` utan nedladdning, och första gången du använder en
 molndestination (`rclone`) eller ögonblicksbildsläge (`restic`) erbjuder den sig att ladda
 ner det lilla arkitekturspecifika tillägget en gång (verifierat med SHA-256) och cachar det,
 så att även de funktionerna fungerar. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`,
-`x86_64`) - en enda arkitektur med alla binärer inbäddade, mindre än `universal-full`. Vet
+`x86_64`), en enda arkitektur med alla binärer inbäddade, mindre än `universal-full`. Vet
 du din arkitektur -> välj `<abi>-full`; vill du ha minst och har inget emot en
 engångsnedladdning för moln eller ögonblicksbilder -> `universal-lite`; vill du ha allt
 inbäddat utan några nedladdningar (offline / återställning) -> en full-utgåva. Se
@@ -114,12 +114,12 @@ Modulen är shell + WebUI plus statiska binärer per ABI (`tar`, `zstd`, `lz4`,
 
 ## Dokumentation
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - dokumentationen, att bläddra i online.
-- **[Användarguide](docs/USER-GUIDE.md)** - från början till slut, från installation till återställning.
-- **[AI-agenter](docs/AI-AGENTS.md)** - styr varje åtgärd huvudlöst via JSON-API:et.
-- **[Arkitektur](docs/ARCHITECTURE.md)** och **[Filstruktur](docs/FILE-STRUCTURE.md)** - hur det fungerar.
-- **[Medföljande binärer](docs/BINARIES.md)** - ursprung och SHA-256 för varje förkompilerad binär, för en fullständig granskning.
-- **[Återställning](module/etc/RECOVERY.md)** - öppna och dekryptera en säkerhetskopia på en dator, utan modulen.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentationen, att bläddra i online.
+- **[Användarguide](docs/USER-GUIDE.md)**: från början till slut, från installation till återställning.
+- **[AI-agenter](docs/AI-AGENTS.md)**: styr varje åtgärd huvudlöst via JSON-API:et.
+- **[Arkitektur](docs/ARCHITECTURE.md)** och **[Filstruktur](docs/FILE-STRUCTURE.md)**: hur det fungerar.
+- **[Medföljande binärer](docs/BINARIES.md)**: ursprung och SHA-256 för varje förkompilerad binär, för en fullständig granskning.
+- **[Återställning](module/etc/RECOVERY.md)**: öppna och dekryptera en säkerhetskopia på en dator, utan modulen.
 - **[Bidra](CONTRIBUTING.md)** och **[Säkerhet](SECURITY.md)**.
 - **[Ändringslogg](CHANGELOG.md)** och **[Uppförandekod](CODE_OF_CONDUCT.md)**.
 
@@ -129,7 +129,7 @@ VDBackup är byggt för att välkomna AI-assistenter och -agenter, inte bara mä
 Motorn talar JSON (varje `helper.sh`-verb returnerar ett enda JSON-objekt), koden,
 dokumentationen och filstrukturen är upplagda för maskinläsning, och AI-stödda bidrag
 granskas och accepteras som alla andra. En agent kan administrera **varje** åtgärd i
-modulen huvudlöst via samma API som WebUI använder - se
+modulen huvudlöst via samma API som WebUI använder, se
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** för hela styrytan, och
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) för att bidra.
 
@@ -148,9 +148,9 @@ modulen huvudlöst via samma API som WebUI använder - se
 
 Systerprojekt av samma författare:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - en felsökare för enhetsmetoder: läser varje objekt genom varje metod som kan läsa det och jämför dem sida vid sida.
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - dina Google-tjänster (RCS, Wallet, Play Integrity-attesteringar), lästa på din enhet utan internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - en enhetsspoofer som förvandlar ett färskt fingerprint till en sammanhängande, konsekvent profil.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: en felsökare för enhetsmetoder: läser varje objekt genom varje metod som kan läsa det och jämför dem sida vid sida.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: dina Google-tjänster (RCS, Wallet, Play Integrity-attesteringar), lästa på din enhet utan internet.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: en enhetsspoofer som förvandlar ett färskt fingerprint till en sammanhängande, konsekvent profil.
 
 ## Licens
 

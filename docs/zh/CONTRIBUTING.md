@@ -14,7 +14,7 @@ WebUI + 按 ABI 分的静态二进制文件。核心功能不需要任何应用�
 [ARCHITECTURE.md](ARCHITECTURE.md) 和 [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md)。
 
 它是开放的、root 原生的 **Swift Backup、Neo-Backup 和
-Android-DataBackup 的继任者** - 在 AGPLv3 下将它们的功能合并起来，并支持导入
+Android-DataBackup 的继任者**: 在 AGPLv3 下将它们的功能合并起来，并支持导入
 现有的 Neo-Backup 和 Android-DataBackup 备份，让人们可以迁移。
 
 ## 欢迎 AI 贡献者
@@ -27,7 +27,7 @@ AI 助手和智能体在这里是一等的贡献者，而非事后补充。
 - 智能体可以通过该 JSON API 无界面地管理模块的**每一项**内容和动作 -
   完整的控制面、动词和安全护栏都在
   [docs/AI-AGENTS.md](AI-AGENTS.md) 中。
-- AI 辅助的补丁与其他补丁按同样的标准审查和接受 - 依据
+- AI 辅助的补丁与其他补丁按同样的标准审查和接受, 依据
   正确性、清晰度和下面的约定，而不是由谁（或什么）编写。
 - 如果你从智能体驱动 VDBackup，请使用 `helper.sh` 的 JSON 输出作为
   契约；不要抓取 WebUI。
@@ -62,18 +62,18 @@ AI 助手和智能体在这里是一等的贡献者，而非事后补充。
 - 要添加或修改字符串：编辑 `en.js` **以及** `en.json`，然后更新每个
   `<code>.json`。改动一个可见的标签意味着要更新**所有**语言文件和
   **所有** `README.<code>.md`。
-- 翻译就是普通的 JSON - 很好的首次贡献。语言列表参见
+- 翻译就是普通的 JSON, 很好的首次贡献。语言列表参见
   `module/webroot/i18n.js`。
 
 ## 提交与 PR
 
 - 保持 PR 聚焦。说明做了什么以及为什么。
 - 为你的提交签署（DCO）：`git commit -s`（添加 `Signed-off-by:`）。
-- CI 必须保持通过。在审查中保持友善 - 参见 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。
+- CI 必须保持通过。在审查中保持友善, 参见 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。
 
 ## 适合新手的 issue
 
 寻找 `good first issue` 和 `help wanted` 标签。翻译、文档、新的
 `rclone` 目标预设和 WebUI 润色都是很好的起点。
 
-*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进 - 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*
+*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进, 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*

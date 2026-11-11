@@ -79,4 +79,4 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 報告してください ([SECURITY.md](SECURITY.md) を参照)。これはまさに、このマニフェストが
 可視化するために存在する種類の不一致です。
 
-*このドキュメントは Claude (Anthropic) で生成され、VD171 が保守しています。訂正や改善を歓迎します - [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。*
+*このドキュメントは Claude (Anthropic) で生成され、VD171 が保守しています。訂正や改善を歓迎します, [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。*

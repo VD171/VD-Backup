@@ -7,7 +7,7 @@
 Um passo a passo completo e amigável do VDBackup, da instalação do módulo até fazer
 seu primeiro backup, restaurá-lo, enviá-lo para a nuvem, agendá-lo, e abri-lo
 num PC anos depois. Se você já usou o Swift Backup, Neo-Backup ou
-Android-DataBackup antes, isto vai parecer familiar - só que tudo acontece num só
+Android-DataBackup antes, isto vai parecer familiar, só que tudo acontece num só
 lugar, sem nada para "permitir".
 
 ## Sumário
@@ -26,6 +26,7 @@ lugar, sem nada para "permitir".
   - [5.7 Backups avulsos de pastas e arquivos](#57-backups-avulsos-de-pastas-e-arquivos)
 - [6. Restaurando um backup](#6-restaurando-um-backup)
 - [7. Destinos: local e remoto](#7-destinos-local-e-remoto)
+  - [7.1 Backup das suas configurações](#71-backup-das-suas-configurações)
 - [8. Agendamento e retenção](#8-agendamento-e-retenção)
 - [9. Migrando para cá: importando Neo-Backup e Android-DataBackup](#9-migrando-para-cá-importando-neo-backup-e-android-databackup)
 - [10. SSAID (ANDROID_ID do dispositivo)](#10-ssaid-android_id-do-dispositivo)
@@ -80,25 +81,25 @@ eles degradam graciosamente quando não estão disponíveis no seu dispositivo.
 1. Baixe o release mais recente `VD-Backup-vX.Y.zip`.
 2. No seu gerenciador KernelSU / APatch / Magisk, faça flash do zip do módulo como qualquer outro
    módulo.
-3. Ele é usável imediatamente - **sem precisar de reboot**. (Um reboot só é relevante
+3. Ele é usável imediatamente, **sem precisar de reboot**. (Um reboot só é relevante
    ao restaurar SSAID; veja a [seção 10](#seção-10).)
 4. Abra a **WebUI** do módulo a partir do gerenciador. Essa é a interface inteira.
 
 **Qual edição baixar.** Cada release vem como várias edições de zip flasheáveis, então você
 baixa só o que precisa. Escolha uma:
 
-- **`VD-Backup-<ver>-universal-full.zip`** - todas as arquiteturas de CPU e todos os
+- **`VD-Backup-<ver>-universal-full.zip`**: todas as arquiteturas de CPU e todos os
   binários embutidos, incluindo `rclone` (provedores de nuvem: Google Drive, S3 e mais de 70
   outros backends do rclone) e `restic` (snapshots deduplicados). Totalmente offline, nada é
   baixado. Funciona em qualquer aparelho. O maior download.
-- **`VD-Backup-<ver>-universal-lite.zip`** - todas as arquiteturas, mas **sem** os dois
+- **`VD-Backup-<ver>-universal-lite.zip`**: todas as arquiteturas, mas **sem** os dois
   maiores binários (`rclone` e `restic`). O menor download; ainda faz backups locais, por
   SSH/SFTP e rsync sem baixar nada, com criptografia `age` portável. Na primeira vez que você
   usa um destino de nuvem (`rclone`) ou o modo snapshot (`restic`), a WebUI oferece baixar
   aquele pequeno complemento por arquitetura uma vez (verificado por SHA-256) e o guarda em
   cache; depois disso esses recursos também funcionam.
 - **`VD-Backup-<ver>-<abi>-full.zip`** (uma de `arm64-v8a`, `armeabi-v7a`, `x86`,
-  `x86_64`) - uma única arquitetura com todos os binários embutidos (os mesmos recursos da
+  `x86_64`), uma única arquitetura com todos os binários embutidos (os mesmos recursos da
   `universal-full`, mas só para a arquitetura do seu aparelho, então menor que a
   `universal-full`).
 
@@ -113,7 +114,7 @@ a arquitetura do seu aparelho, independentemente da edição que você flashar.
 Na primeira execução o módulo semeia uma configuração padrão (só se nenhuma existir ainda),
 então suas configurações são preservadas entre atualizações do módulo.
 
-**Onde o estado vive.** Os dados de trabalho do VDBackup - sua configuração, jobs agendados,
+**Onde o estado vive.** Os dados de trabalho do VDBackup, sua configuração, jobs agendados,
 destinos salvos, credenciais criptografadas, logs e trilha de auditoria, e área de staging -
 vivem sob:
 
@@ -136,20 +137,20 @@ Tenha isso em mente por dois motivos: backups ocupam espaço sob `/sdcard/VDBack
 
 A WebUI é organizada em algumas abas:
 
-- **Home** - um resumo inicial que mostra contagens dos seus backups (apps, backups, pastas e jobs agendados) e uma barra de armazenamento de quanto espaço seus backups usam em relação ao livre, com selos de status, copiar hashes e caminhos para a área de transferência, e uma ação **Check for updates**.
-- **Apps** - a lista de apps instalados (de usuário e de sistema), cada um mostrado com seu nome
+- **Home**: um resumo inicial que mostra contagens dos seus backups (apps, backups, pastas e jobs agendados) e uma barra de armazenamento de quanto espaço seus backups usam em relação ao livre, com selos de status, copiar hashes e caminhos para a área de transferência, e uma ação **Check for updates**.
+- **Apps**: a lista de apps instalados (de usuário e de sistema), cada um mostrado com seu nome
   real, seu nome de pacote, e seu ícone (os ícones carregam sob demanda e são cacheados, então a
   lista permanece responsiva). O botão numa linha faz backup do app; tocar na linha abre o
   histórico de backups daquele app, onde você pode restaurar qualquer backup anterior.
-- **Backups** - os backups que você já tem, cada um mostrando o nome do app numa linha e o
+- **Backups**: os backups que você já tem, cada um mostrando o nome do app numa linha e o
   pacote na seguinte. Toque num backup para ver seus detalhes completos (versão, data, tamanho,
   itens incluídos, contagens de permissão, e o dispositivo de onde veio). Também é aqui que
   você restaura, roda um restore-test, apaga um backup, ou importa backups do Neo-Backup ou do
   Android-DataBackup.
-- **Destinations** - gerencie para onde os backups vão: armazenamento local além de quaisquer
+- **Destinations**: gerencie para onde os backups vão: armazenamento local além de quaisquer
   destinos remotos que você adicionar (veja a [seção 7](#seção-7)). Você pode
   testar um destino aqui antes de depender dele.
-- **Settings** - um toggle de tema claro/escuro, um seletor de cor de destaque (presets, uma cor
+- **Settings**: um toggle de tema claro/escuro, um seletor de cor de destaque (presets, uma cor
   personalizada, ou reset), um seletor de idioma (a interface é renderizada da direita para a
   esquerda para árabe e persa), um controle deslizante de escala da interface que você arrasta
   para redimensionar toda a interface (cabeçalho, conteúdo e navegação inferior juntos) de 85% a 120% (100% é o padrão), para
@@ -158,7 +159,7 @@ A WebUI é organizada em algumas abas:
   transferências de nuvem (veja a [seção 7](#seção-7)), o backup automático e a lista de apps
   excluídos, a opção de fonte de instalação, a chave de criptografia,
   e agendamento. As configurações de ligar/desligar usam interruptores de alternância no estilo Android.
-- **About** - versão, links, os projetos irmãos (See also), o manifesto de auditoria dos binários embarcados, e uma ação **Check for updates** que informa se uma versão mais nova foi publicada (com suas notas de versão). Você instala qualquer atualização pelo seu gerenciador root, do mesmo jeito que você instalou o módulo.
+- **About**: versão, links, os projetos irmãos (See also), o manifesto de auditoria dos binários embarcados, e uma ação **Check for updates** que informa se uma versão mais nova foi publicada (com suas notas de versão). Você instala qualquer atualização pelo seu gerenciador root, do mesmo jeito que você instalou o módulo.
 
 O app também verifica por conta própria se há uma versão mais nova toda vez que você o abre (no máximo 1 vez por hora) e mostra o aviso de atualização só quando há uma; fica silencioso se estiver atualizado ou offline.
 
@@ -180,7 +181,7 @@ O fluxo básico: abra **Apps**, escolha um app, selecione o que incluir, escolha
 defina a compressão e (opcionalmente) a criptografia, depois execute. O progresso aparece ao vivo e uma
 notificação te avisa quando termina.
 
-No diálogo de backup você também pode escolher o **destino** deste backup - armazenamento local ou qualquer destino de nuvem/remoto que você adicionou - sem precisar mudar antes o destino padrão nas Configurações.
+No diálogo de backup você também pode escolher o **destino** deste backup, armazenamento local ou qualquer destino de nuvem/remoto que você adicionou, sem precisar mudar antes o destino padrão nas Configurações.
 
 ### 5.1 Escolhendo o que fazer backup
 
@@ -207,15 +208,15 @@ ownership uid/gid, modos de arquivo, atributos estendidos (xattr) e capabilities
 O VDBackup oferece três modos. A WebUI pré-seleciona **Full**, que é a escolha certa
 para a maioria das pessoas.
 
-- **Full** - um backup completo, autocontido e portável escrito como `tar.zst` (ou
+- **Full**: um backup completo, autocontido e portável escrito como `tar.zst` (ou
   a compressão que você escolher). Cada execução produz um backup standalone que você pode copiar
   para qualquer lugar e abrir num PC. Melhor para: um snapshot limpo e portável de um app que você pode
   arquivar e mover por aí. Este é o padrão e a opção mais portável.
-- **Snapshot** - incremental e versionado, apoiado por `restic`. Cada execução adiciona um novo
+- **Snapshot**: incremental e versionado, apoiado por `restic`. Cada execução adiciona um novo
   snapshot point-in-time a um repositório, guardando só o que mudou e
   de-duplicando entre snapshots. Melhor para: manter um histórico corrente de um app
   sem pagar o tamanho cheio a cada execução.
-- **Mirror** - um sync 1:1 dos dados vivos para o destino, apoiado por
+- **Mirror**: um sync 1:1 dos dados vivos para o destino, apoiado por
   `rclone`/`rsync`. Ele mantém o destino idêntico ao que está no dispositivo agora
   (arquivos alterados são copiados, arquivos removidos são apagados no destino). Melhor
   para: uma cópia rápida e sempre atual, por exemplo para um remoto de nuvem. Note que o APK
@@ -225,11 +226,11 @@ para a maioria das pessoas.
 
 Você pode escolher a compressão para um backup Full:
 
-- **none** - sem compressão (mais rápido, maior).
-- **lz4** - compressão muito rápida e leve.
-- **zstd** - o padrão, um forte equilíbrio de velocidade e razão. Você também pode escolher um
+- **none**: sem compressão (mais rápido, maior).
+- **lz4**: compressão muito rápida e leve.
+- **zstd**: o padrão, um forte equilíbrio de velocidade e razão. Você também pode escolher um
   nível (por exemplo um nível mais alto para um arquivo menor).
-- **gzip** - o **"modo de compatibilidade"**. gzip abre com ferramentas embutidas em
+- **gzip**: o **"modo de compatibilidade"**. gzip abre com ferramentas embutidas em
   praticamente qualquer computador e na maioria dos gerenciadores de arquivos, sem nada extra para instalar.
   Escolha isto quando o que mais te importa é poder abrir o archive em qualquer lugar.
 
@@ -246,7 +247,7 @@ disponível para archives criptografados que você quer abrir com um duplo-cliqu
 
 Para usar criptografia, gere a chave de criptografia uma vez (Settings), depois habilite a
 criptografia para seu job e defina uma passphrase. A passphrase é o que protege o
-backup, então escolha uma forte - não há chave de hardware e nenhum backdoor de recuperação.
+backup, então escolha uma forte, não há chave de hardware e nenhum backdoor de recuperação.
 
 **A regra do APK (importante):**
 
@@ -260,10 +261,10 @@ backup, então escolha uma forte - não há chave de hardware e nenhum backdoor 
 
 Duas opções de segurança te ajudam a confiar num backup antes de depender dele:
 
-- **Verify** - depois de escrever, o VDBackup re-hasheia cada archive e o confere contra
+- **Verify**: depois de escrever, o VDBackup re-hasheia cada archive e o confere contra
   o manifest. Isto está **ligado por padrão para backups Full**. Se um arquivo não casar,
   o job falha com um erro claro em vez de te deixar com um backup silenciosamente corrompido.
-- **Dry-run** - planeja o job e reporta os tamanhos que ele produziria **sem escrever
+- **Dry-run**: planeja o job e reporta os tamanhos que ele produziria **sem escrever
   nada**. Use-o para estimar espaço ou para conferir sua seleção de itens antes de rodar
   a coisa real.
 
@@ -309,7 +310,7 @@ vezes nunca cria duplicatas, e DNS e configurações do sistema são simplesment
 
 ### 5.7 Backups avulsos de pastas e arquivos
 
-Às vezes você quer fazer backup de uma pasta ou arquivo comum que não é um app - uma pasta de
+Às vezes você quer fazer backup de uma pasta ou arquivo comum que não é um app, uma pasta de
 câmera, um diretório de documentos, um único banco de dados. O VDBackup pode fazer backup de
 **qualquer caminho absoluto** no armazenamento compartilhado ou sob `/data`, com o mesmo formato
 portátil de um backup de app: um archive `tar.zst` mais um `manifest.json`, selado com SHA-256,
@@ -332,7 +333,7 @@ registra a ação num log de auditoria local.
 
 Uma restauração é **fiel**: o VDBackup apaga o estado atual do app e extrai o
 backup, então o app é revertido ao **estado exato** capturado naquele backup
-(incluindo ownership, modos, contextos SELinux e xattr). Não é um merge - é uma
+(incluindo ownership, modos, contextos SELinux e xattr). Não é um merge, é uma
 restauração verdadeira ao ponto no tempo do backup. Como uma restauração roda como root, o
 VDBackup também checa cada archive antes de extrair qualquer coisa e recusa um adulterado que
 tente escrever fora do seu destino, então um backup modificado nunca pode sobrescrever o resto
@@ -340,16 +341,16 @@ do seu sistema.
 
 Opções úteis de restauração:
 
-- **Restore-test** - extrai o backup para uma área de staging temporária e o verifica
+- **Restore-test**: extrai o backup para uma área de staging temporária e o verifica
   **sem tocar no app vivo**. Esta é a forma segura de confirmar que um backup está
   íntegro e restaurável antes de você sobrescrever qualquer coisa. Se o teste falhar você recebe um
   erro claro e seu app instalado fica intocado.
-- **Restauração parcial** - restaura só alguns dos itens que foram backupeados. Por
+- **Restauração parcial**: restaura só alguns dos itens que foram backupeados. Por
   exemplo, restaura só os dados do app sem reinstalar o APK, ou restaura os arquivos de
   save sem os grandes OBB/media. Escolha os itens que você quer na tela de restauração.
 - Para backups **Snapshot** e **Mirror**, a restauração puxa do repositório versionado
   ou da cópia espelhada respectivamente.
-- **Fonte de instalação** - por padrão um app restaurado reporta a **Play Store** como sua
+- **Fonte de instalação**: por padrão um app restaurado reporta a **Play Store** como sua
   fonte de instalação (em vez de parecer sideloaded), que é o que a maioria dos apps e
   verificações de app esperam. Você pode desligar isto globalmente em Settings ou por
   restauração, e quando desligado a fonte de instalação original é mantida. Um toggle avançado
@@ -360,8 +361,8 @@ Opções úteis de restauração:
 **Restauração em lote.** A aba **Backups** tem um modo **Select**, do mesmo jeito que a aba
 Apps tem para o backup em lote. Ligue o **Select**, marque os backups que você quer com suas
 caixas de seleção, e restaure todos de uma vez. Um único diálogo de opções cobre a seleção
-inteira - o reconhecimento de sobrescrita, o restore-test e a escolha de fonte de instalação
-se aplicam a cada backup que você escolheu - e eles são restaurados um após o outro.
+inteira, o reconhecimento de sobrescrita, o restore-test e a escolha de fonte de instalação
+se aplicam a cada backup que você escolheu, e eles são restaurados um após o outro.
 
 **Apagando um backup.** Abra os detalhes de um backup (ou o histórico de um app) e use
 **Delete**; você é solicitado a confirmar, e a exclusão é registrada no log de atividade.
@@ -370,7 +371,7 @@ podados automaticamente.
 
 **Montar um app instalado como app de sistema.** A partir do histórico de backups de um app,
 **Mount as system** prepara o APK do app num sub-módulo de overlay do VDBackup para que o
-gerenciador de root o sirva a partir de `/system/app` (ou `/system/priv-app`) - a partição
+gerenciador de root o sirva a partir de `/system/app` (ou `/system/priv-app`), a partição
 `/system` real nunca é tocada. Com **NoMount** no KernelSU ele se aplica ao vivo; caso
 contrário ele se aplica após um reboot. Isto nunca depende de o NoMount estar instalado.
 
@@ -383,10 +384,10 @@ armazenamento compartilhado (`/sdcard`) em vez de digitar o caminho.
 
 O transporte remoto é feito pelas ferramentas embarcadas:
 
-- **rclone** - o hub para uma vasta gama de remotos: **SFTP, SMB, WebDAV, FTP, S3,
+- **rclone**: o hub para uma vasta gama de remotos: **SFTP, SMB, WebDAV, FTP, S3,
   Google Drive** e mais de 70 outros serviços.
-- **rsync** e a suíte **ssh/scp/sftp** - para delta sync e alvos SSH simples.
-- **restic** - repositórios **Snapshot** criptografados e de-duplicados (locais ou remotos).
+- **rsync** e a suíte **ssh/scp/sftp**: para delta sync e alvos SSH simples.
+- **restic**: repositórios **Snapshot** criptografados e de-duplicados (locais ou remotos).
 
 **Criando um remoto de nuvem (sem SSH necessário).** Na aba Destinations, escolha o
 tipo de destino **rclone** e use **Add cloud remote**. Você pode conectar **qualquer backend
@@ -410,17 +411,17 @@ Duas regras mantêm o uso remoto seguro:
 **Política de rede (Wi-Fi vs dados móveis).** Em Settings, "Cloud transfers over" permite que você
 restrinja qual conexão as transferências de nuvem podem usar: **Wi-Fi e dados móveis** (o
 padrão), **só Wi-Fi**, ou **só dados móveis**. Quando você restringe, toda transferência de nuvem
-- manual ou agendada, upload ou restauração - checa a conexão ativa primeiro
+- manual ou agendada, upload ou restauração, checa a conexão ativa primeiro
 e se recusa a rodar na errada, então uma política só-Wi-Fi nunca gasta dados móveis.
 Backups locais nunca são afetados.
 
 **Google Drive.** Você tem duas maneiras de chegar ao Google Drive:
 
-1. **Via rclone** - adicione o Drive como um remoto rclone como qualquer outro destino, sem
+1. **Via rclone**: adicione o Drive como um remoto rclone como qualquer outro destino, sem
    app extra e **sem conta Google Cloud**. Em qualquer computador rode
    `rclone authorize "drive"` uma vez, faça login na sua conta Google no navegador, e
    cole o token que ele imprime no campo de token do remoto Drive.
-2. **Via o companheiro opcional** - um app companheiro minúsculo e opt-in que lida com o
+2. **Via o companheiro opcional**: um app companheiro minúsculo e opt-in que lida com o
    login do Google e o upload para o Drive. Ele é instalado **só quando você explicitamente escolhe
    o destino companheiro do Google Drive**, nunca por padrão, e é removido quando
    você o desabilita. A tela de consentimento Google única é o único passo que acontece
@@ -428,17 +429,25 @@ Backups locais nunca são afetados.
    **sempre ocultá-lo com o [HMA-OSS](https://github.com/frknkrc44/HMA-OSS)** para que a presença dele não revele root ou
    um bootloader desbloqueado, e ele se oferece para adicioná-lo à lista do HMA-OSS para você. O VDBackup também te lembra, quando você tem backups locais, de ocultar a pasta de backups (/sdcard/VDBackup) com o SUSFS pelo mesmo motivo.
 
+### 7.1 Backup das suas configurações
+
+A sua própria configuração do VDBackup, os destinos, agendamentos, predefinições e credenciais salvas, pode ser gravada num único arquivo e levada para outro aparelho ou restaurada após uma instalação limpa. Em **Configurações**, no **Backup das configurações**:
+
+- **Exportar configurações** grava um arquivo criptografado em `VDBackup/.export`. Ele sempre pede uma frase-senha, porque o arquivo carrega as suas senhas remotas.
+- **Importar configurações** lê esse arquivo de volta e o mescla neste aparelho, sem remover nada do que já existe.
+- **Apagar credenciais salvas** remove as senhas remotas salvas e a chave de criptografia do aparelho em um passo; seus destinos, agendamentos e backups permanecem no lugar.
+
 ## 8. Agendamento e retenção
 
-O VDBackup pode rodar backups - e restaurações - automaticamente num agendamento. No
+O VDBackup pode rodar backups, e restaurações, automaticamente num agendamento. No
 agendador você define um job com:
 
-- um **alvo** - um único app, um conjunto de apps, ou **todos os apps** (menos a lista de
-  apps excluídos) - e os itens/modo a usar,
-- uma **ação** - **Back up** (o padrão) ou **Restore latest**, que restaura o backup mais
+- um **alvo**: um único app, um conjunto de apps, ou **todos os apps** (menos a lista de
+  apps excluídos), e os itens/modo a usar,
+- uma **ação**: **Back up** (o padrão) ou **Restore latest**, que restaura o backup mais
   recente de cada app-alvo,
 - um destino,
-- um **agendamento tipo cron** - de hora em hora, diário ou semanal, num horário que você escolhe (HH:MM),
+- um **agendamento tipo cron**: de hora em hora, diário ou semanal, num horário que você escolhe (HH:MM),
 - uma configuração de **retenção**: **manter N** backups mais recentes para aquele job, os mais antigos são
   podados automaticamente,
 - **condições de execução** opcionais: só no **Wi-Fi**, só enquanto **carregando**, só com um
@@ -452,14 +461,14 @@ backups agendados não precisam da WebUI aberta.
 **Condições de execução (gates).** Um job agendado pode carregar condições que precisam valer
 para ele rodar: só Wi-Fi, só carregando, um nível mínimo de bateria, e dias específicos da
 semana. Quando um job está vencido mas uma condição não é atendida, ele é **pulado e tentado de
-novo na próxima checagem** - seu agendamento não avança, então ele roda assim que a condição for
+novo na próxima checagem**: seu agendamento não avança, então ele roda assim que a condição for
 satisfeita. Uma checagem embutida de segurança térmica também pula um job agendado enquanto o
 dispositivo está quente demais. Todo skip desses é registrado no log de atividade.
 
 **A restauração agendada sobrescreve a cada execução.** Um job **Restore latest** re-restaura
 o backup mais recente de cada app-alvo toda vez que dispara, e a restauração é destrutiva: a
 cada execução ela **sobrescreve os dados atuais do app** com o backup mais recente. Isto é
-deliberado e opt-in - escolha isto só quando você quer os alvos mantidos no seu backup mais
+deliberado e opt-in, escolha isto só quando você quer os alvos mantidos no seu backup mais
 recente.
 
 **Auto-backup ao instalar/atualizar.** Em Settings você pode ligar o **backup automático**: o
@@ -471,15 +480,15 @@ então habilitá-lo nunca faz backup do seu dispositivo inteiro de uma vez.
 backup automático ou agendado; você pode adicionar vários de uma vez (seleção múltipla), e apps
 excluídos são pulados por ambos.
 
-**Presets de backup.** Também em Ajustes, você pode salvar presets nomeados - conjuntos de itens a incluir, como só APK ou APK + OBB - e escolher um no diálogo de backup para preencher os itens de uma vez.
+**Presets de backup.** Também em Ajustes, você pode salvar presets nomeados, conjuntos de itens a incluir, como só APK ou APK + OBB, e escolher um no diálogo de backup para preencher os itens de uma vez.
 
-**Itens de backup por app.** Também em Ajustes, você pode escolher exatamente quais itens cada app faz backup em backups em massa, automáticos e agendados - por exemplo só APK, ou APK + OBB. Um backup manual individual ainda te deixa escolher na hora, partindo do conjunto do app. Apps que você não configurar aqui fazem backup de tudo.
+**Itens de backup por app.** Também em Ajustes, você pode escolher exatamente quais itens cada app faz backup em backups em massa, automáticos e agendados, por exemplo só APK, ou APK + OBB. Um backup manual individual ainda te deixa escolher na hora, partindo do conjunto do app. Apps que você não configurar aqui fazem backup de tudo.
 
-**Tags de app.** Toque num app em Ajustes (Itens e tags por app) para dar a ele rótulos livres - por exemplo games ou work. Um seletor de tags então aparece acima da lista de apps: escolha uma tag para mostrar só os apps dela e faça backup do grupo inteiro de uma vez. Você também chega nele pela aba Apps: toque num app e depois em Itens e tags.
+**Tags de app.** Toque num app em Ajustes (Itens e tags por app) para dar a ele rótulos livres, por exemplo games ou work. Um seletor de tags então aparece acima da lista de apps: escolha uma tag para mostrar só os apps dela e faça backup do grupo inteiro de uma vez. Você também chega nele pela aba Apps: toque num app e depois em Itens e tags.
 
 **Log de atividade.** A aba Schedule tem um botão **View activity log** que abre uma tela cheia
-(instantaneamente) mostrando a trilha de auditoria local - backups, restaurações, exclusões,
-execuções agendadas e automáticas, e podas - do mais recente para o mais antigo. Uma ação
+(instantaneamente) mostrando a trilha de auditoria local, backups, restaurações, exclusões,
+execuções agendadas e automáticas, e podas, do mais recente para o mais antigo. Uma ação
 **Export logs** salva um arquivo de log (sob a pasta de backups) que você pode anexar a um
 relatório de feedback ou bug.
 
@@ -494,12 +503,12 @@ do zero. A partir da aba **Backups** você pode **importar** seus backups existe
 3. Inicie o import. Como outras operações longas ele roda destacado com progresso ao vivo.
 
 **Backups do Neo-Backup criptografados por senha são suportados.** Os backups criptografados
-AES-256 do Neo-Backup podem ser importados - você é **solicitado pela senha** quando ela é
+AES-256 do Neo-Backup podem ser importados, você é **solicitado pela senha** quando ela é
 necessária, e a senha é usada só para descriptografar, nunca guardada na linha de comando.
 
 ## 10. SSAID (ANDROID_ID do dispositivo)
 
-SSAID é o `ANDROID_ID` por-app - um identificador em nível de dispositivo que alguns apps leem.
+SSAID é o `ANDROID_ID` por-app, um identificador em nível de dispositivo que alguns apps leem.
 O VDBackup pode fazer backup dele e restaurá-lo, mas esta é a coisa mais sensível que ele
 toca, então é tratada com cuidado extra:
 
@@ -542,7 +551,7 @@ de copiar-colar para Windows, macOS e Linux. Veja
 [`../module/etc/RECOVERY.md`](RECOVERY.md) para o kit completo, passo a passo.
 
 Note que contextos SELinux, uid/gid e modos são guardados dentro do tar e só são
-reaplicados corretamente quando você restaura no Android - num PC você ainda recebe todos os seus
+reaplicados corretamente quando você restaura no Android, num PC você ainda recebe todos os seus
 arquivos, só sem o ownership específico do Android sendo imposto.
 
 ## 12. Dirigindo o VDBackup a partir de um assistente de IA
@@ -551,7 +560,7 @@ O VDBackup é construído para ser amigável a assistentes e agentes de IA, não
 WebUI é apenas um cliente de uma pequena API JSON; um agente pode administrar **toda** ação
 do módulo de forma headless através dessa mesma API (todo comando retorna um único objeto JSON,
 operações longas rodam destacadas e você faz poll do progresso delas, e os mesmos trilhos de segurança
-se aplicam - SSAID fica opt-in, ações mutáveis ficam confirmadas e auditadas).
+se aplicam, SSAID fica opt-in, ações mutáveis ficam confirmadas e auditadas).
 
 Se você quer que um assistente rode seus backups e restaurações para você, aponte-o para
 [`AI-AGENTS.md`](AI-AGENTS.md), que documenta toda a superfície de controle: o contrato
@@ -570,14 +579,14 @@ fechar a WebUI não as para. Reabra a WebUI e ela reata a qualquer operação em
 andamento e mostra o progresso atual.
 
 **Recebi uma mensagem `ERR_...`.** Os erros são reportados com um código claro. Alguns comuns:
-- `ERR_VERIFY` - um archive escrito não casou com o hash do seu manifest (a verificação
+- `ERR_VERIFY`, um archive escrito não casou com o hash do seu manifest (a verificação
   pegou um backup ruim). Rode o backup de novo.
-- `ERR_RESTORE_TEST` - um restore-test falhou; o backup não extraiu/verificou
+- `ERR_RESTORE_TEST`, um restore-test falhou; o backup não extraiu/verificou
   de forma limpa e seu app vivo ficou intocado.
-- `ERR_UNSAFE_ARCHIVE` - um archive foi recusado porque tentou escrever fora do seu diretório de
+- `ERR_UNSAFE_ARCHIVE`, um archive foi recusado porque tentou escrever fora do seu diretório de
   destino (caminhos absolutos ou com `..`). Isto te protege de um backup adulterado; nada foi
   escrito.
-- `ERR_QUOTA` - um remoto de nuvem não tinha espaço livre suficiente para um upload Full; o
+- `ERR_QUOTA`, um remoto de nuvem não tinha espaço livre suficiente para um upload Full; o
   backup foi interrompido antes de enviar qualquer coisa.
 
 **Meu destino remoto falha.** Use o **teste** de destino na aba Destinations para
@@ -588,11 +597,11 @@ da rede; backup/restauração local é totalmente offline.
 no módulo no build; nada é buscado para o dispositivo em runtime. Só destinos de nuvem
 (rclone/restic/ssh) falam com a rede, e só quando você os usa.
 
-**Meu backup vai restaurar num celular diferente?** Sim - os backups são portáveis e não
+**Meu backup vai restaurar num celular diferente?** Sim, os backups são portáveis e não
 atrelados ao hardware do dispositivo. (O SSAID é a única exceção específica de dispositivo, e é opt-in
 e aplicado-no-reboot; veja a [seção 10](#seção-10).)
 
-**Meu backup criptografado não abre - eu perdi a passphrase.** Não há backdoor de recuperação
+**Meu backup criptografado não abre, eu perdi a passphrase.** Não há backdoor de recuperação
 por design; a passphrase é o que protege o backup. Mantenha-a segura.
 
 ## 14. Desinstalando
@@ -600,10 +609,10 @@ por design; a passphrase é o que protege o backup. Mantenha-a segura.
 Desinstale o VDBackup como qualquer outro módulo do seu gerenciador KernelSU / APatch / Magisk.
 Desinstalar **preserva sua configuração de usuário** e remove só o estado transiente,
 então reinstalar depois recupera suas configurações. Seus backups reais vivem sob
-`/data/adb/vdbackup/` - se você quiser removê-los também, apague esse diretório
+`/data/adb/vdbackup/`, se você quiser removê-los também, apague esse diretório
 manualmente depois de desinstalar; caso contrário eles permanecem disponíveis (e, sendo formatos
 padrão, abríveis num PC) mesmo sem o módulo.
 
 ---
 
-*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas - veja [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md).*

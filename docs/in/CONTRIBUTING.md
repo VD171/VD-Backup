@@ -14,7 +14,7 @@ vanilla-JS + biner statis per-ABI. Tidak ada aplikasi yang diperlukan untuk fitu
 [ARCHITECTURE.md](ARCHITECTURE.md) dan [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 
 Ia adalah **penerus** terbuka dan root-native dari **Swift Backup, Neo-Backup, dan
-Android-DataBackup** - gabungan fitur-fitur mereka di bawah AGPLv3, dengan impor backup
+Android-DataBackup**: gabungan fitur-fitur mereka di bawah AGPLv3, dengan impor backup
 Neo-Backup dan Android-DataBackup yang sudah ada sehingga orang dapat bermigrasi.
 
 ## Kontributor AI disambut
@@ -25,9 +25,9 @@ Asisten dan agen AI adalah kontributor kelas satu di sini, bukan sekadar pelengk
   objek JSON, mesinnya adalah shell POSIX biasa, dan tata letak berkas didokumentasikan di
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 - Sebuah agen dapat mengelola **setiap** konten dan aksi modul secara headless melalui
-  JSON API itu - permukaan kendali lengkap, verb dan pengaman keselamatan ada di
+  JSON API itu, permukaan kendali lengkap, verb dan pengaman keselamatan ada di
   [docs/AI-AGENTS.md](AI-AGENTS.md).
-- Patch dengan bantuan AI ditinjau dan diterima dengan syarat yang sama seperti lainnya - berdasarkan
+- Patch dengan bantuan AI ditinjau dan diterima dengan syarat yang sama seperti lainnya, berdasarkan
   kebenaran, kejelasan dan konvensi di bawah ini, bukan berdasarkan siapa (atau apa) yang menulisnya.
 - Jika Anda menjalankan VDBackup dari sebuah agen, gunakan keluaran JSON `helper.sh` sebagai
   kontrak; jangan scrape WebUI.
@@ -62,18 +62,18 @@ Asisten dan agen AI adalah kontributor kelas satu di sini, bukan sekadar pelengk
 - Untuk menambah atau mengubah string: edit `en.js` **dan** `en.json`, lalu perbarui setiap
   `<code>.json`. Menyentuh label yang terlihat berarti memperbarui **semua** berkas bahasa dan
   **semua** `README.<code>.md`.
-- Terjemahan adalah JSON biasa - kontribusi pertama yang bagus. Lihat daftar bahasa di
+- Terjemahan adalah JSON biasa, kontribusi pertama yang bagus. Lihat daftar bahasa di
   `module/webroot/i18n.js`.
 
 ## Commit & PR
 
 - Jaga PR tetap fokus. Jelaskan apa dan mengapa.
 - Sign off commit Anda (DCO): `git commit -s` (menambahkan `Signed-off-by:`).
-- CI harus tetap hijau. Bersikaplah baik dalam ulasan - lihat [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- CI harus tetap hijau. Bersikaplah baik dalam ulasan, lihat [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Good first issue
 
 Cari label `good first issue` dan `help wanted`. Terjemahan, dokumentasi, preset destinasi
 `rclone` baru dan pemolesan WebUI semuanya adalah titik awal yang bagus.
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan - lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*

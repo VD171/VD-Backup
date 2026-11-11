@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - 인자는 단일 JSON 객체이며, **base64로 인코딩**되어 하나의 argv 토큰으로 전달됩니다.
 - 명령은 stdout에 **하나의 JSON 객체**를 출력합니다: `{"ok":true,...}` 또는
   `{"ok":false,"code":"ERR_...","message":"..."}`. 이를 파싱하고, 절대 텍스트를 스크래핑하지 마세요.
-- 긴 작업(`backup`, `restore`, `import`)은 즉시 `{"ok":true,"opid":"..."}`를 반환하고
+- 긴 작업(`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`)은 즉시 `{"ok":true,"opid":"..."}`를 반환하고
   **분리된(detached)** 상태로 실행됩니다(호출자/WebUI가 사라져도 살아남습니다). 그 진행
   상황을 폴링하세요. 호출이 반환되었다고 해서 끝난 것이 아닙니다.
 - `progress`와 `cancel`은 JSON 객체가 아니라 **원시 opid 문자열의 base64**를 받습니다.
@@ -87,7 +87,15 @@ SSH-to-root 설정)을 통해 그 명령을 실행하세요. 모듈은 바이너
 | `cloud-fetch` | `{}` | `{ok,opid}` (detached) `lite` 에디션에서 `rclone`/`restic` 애드온을 다운로드+검증+설치 |
 | `schedule-set` / `schedule-list` / `schedule-delete` | 아래 참고 | 예약 작업 (백업 또는 복원; 단일 앱, 집합, 또는 모든 앱 대상) |
 | `scheduler-tick` | `{}` | 실행 예정인 작업을 수행하고 보존 정책을 적용하며 자동 백업 관찰자를 실행 (부팅 하트비트가 호출) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached 아님; 즉시 반환; 실패 시 `ERR_UPDATE_CHECK` - 아래 참고) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached 아님; 즉시 반환; 실패 시 `ERR_UPDATE_CHECK`, 아래 참고) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) 여러 앱을 하나의 분리된 작업으로 백업합니다. 진행 상태에 `n`/`of`가 포함됩니다. 앱별 실패가 배치를 멈추지 않습니다. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) 여러 백업을 하나의 분리된 작업으로 복원합니다. 진행 상태에 `n`/`of`가 포함됩니다. 앱별 실패가 배치를 멈추지 않습니다. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` 폴더 선택기용 저장소 볼륨: 내부 및 이동식 SD 카드/USB. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) 구성, 작업, 대상, 자격 증명, 키를 백업 폴더 아래 하나의 암호문 암호화 파일로 내보냅니다. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) 내보낸 구성 파일을 이 기기에 다시 병합합니다(절대 무작정 덮어쓰지 않음). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` 가져올 수 있는 암호화된 구성 파일을 나열합니다. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` 저장된 원격 비밀번호와 기기 암호화 키를 제거합니다. 대상, 작업, 백업은 유지됩니다. |
+| `log-prune` | `{}` | `{ok}` 오래전에 완료된 작업 로그를 정리하고 감사 추적을 제한하며 오래된 아이콘을 제거합니다(부팅 서비스가 호출). |
 
 ### `progress` 필드
 
@@ -215,13 +223,13 @@ Box, pCloud)는 데스크톱이나 수동으로 붙여넣는 token이 필요 없
 <backend>`를 실행하고 Android VIEW 인텐트를 통해 제공자의 동의 페이지를 휴대폰 자체 브라우저에서
 열며 `{ok:true,url}`(또는 `{ok:false,code:"ERR_AUTHORIZE"}`)을 반환합니다. `remote-authorize-poll`
 (`{}`)을 폴링하면 대기 중에는 `{ok:true,done:false,url}`을, 사용자가 승인하면
-`{ok:true,done:true,token}`을 반환합니다 - 그 `token`을 `remote-add`에 전달하세요.
+`{ok:true,done:true,token}`을 반환합니다, 그 `token`을 `remote-add`에 전달하세요.
 `remote-authorize-cancel`(`{}`)은 대기 중인 인가를 중지합니다(`{ok:true,cancelled:true}`). 아무
 컴퓨터에서나 `rclone authorize "<backend>"`의 출력을 수동으로 붙여넣는 방법도 폴백으로 계속
 지원됩니다.
 
 Google Drive에는 두 가지 경로가 있습니다: 이 `drive` 원격(Google Cloud 프로젝트가 필요 없고
-rclone 자체 OAuth를 사용 - `remote-authorize`로 기기에서 인가하거나, 아무 컴퓨터에서
+rclone 자체 OAuth를 사용, `remote-authorize`로 기기에서 인가하거나, 아무 컴퓨터에서
 `rclone authorize "drive"`를 한 번 실행하고 토큰을 전달)이나, 옵트인 방식의 컴패니언 앱(당신
 소유의 OAuth client id). 둘 다 결국 평범한 대상으로 귀결됩니다.
 
@@ -279,7 +287,7 @@ Mirror 복원)은 먼저 활성 전송 수단을 확인하고, 일치하지 않�
 ### 독립형 경로 백업
 
 `path-backup` / `path-restore`는 per-app 모델 밖에서, 공유 저장소나 `/data` 아래의 **임의의
-절대 경로** - 폴더나 단일 파일 - 를 백업하고 복원합니다. 아카이브는 backups 디렉터리의
+절대 경로**: 폴더나 단일 파일, 를 백업하고 복원합니다. 아카이브는 backups 디렉터리의
 `.paths/` 아래에 VDBackup 고유 형식의 `tar.zst`와 `manifest.json`로 기록됩니다(SHA-256으로
 봉인되며, 암호화된 경우 RECOVERY 키트 포함).
 
@@ -303,8 +311,8 @@ Mirror 복원)은 먼저 활성 전송 수단을 확인하고, 일치하지 않�
 `update-check`는 모듈의 더 새로운 버전이 게시되었는지 보고하여, 에이전트(또는 WebUI)가 이를
 표시할 수 있게 합니다. 이것은 **즉시 반환하는 읽기 verb**이며, **detached가 아니므로** 폴링할
 `opid`가 없습니다. 오직 사용자의 명시적 동작으로만 트리거되며, 번들된 `curl`로 root 측 HTTP
-요청을 통해 모듈의 게시된 업데이트 매니페스트(`module.prop`의 `updateJson` URL)를 가져오고 - 이는
-WebView 밖에서 실행되므로 WebUI의 CSP에 영향받지 않습니다 - 게시된 `versionCode`를 설치된 것과
+요청을 통해 모듈의 게시된 업데이트 매니페스트(`module.prop`의 `updateJson` URL)를 가져오고, 이는
+WebView 밖에서 실행되므로 WebUI의 CSP에 영향받지 않습니다, 게시된 `versionCode`를 설치된 것과
 비교합니다. **인자를 받지 않습니다**.
 
 성공 시 다음을 반환합니다:
@@ -340,7 +348,7 @@ WebView 밖에서 실행되므로 WebUI의 CSP에 영향받지 않습니다 - �
   전역 설정을 덮어쓰므로, 직접적인 사용자 요청이 있을 때만 보내세요. 명시적 동의 뒤에 막혀
   있고 감사 추적에 기록됩니다.
 - **복원은 멱등적입니다.** 원시 provider 복원(messages/contacts/wifi/bluetooth/calendar)은
-  병합이 아니라 **교체**합니다 - provider 데이터가 지워지고 그 위에 아카이브가 추출됩니다 -
+  병합이 아니라 **교체**합니다, provider 데이터가 지워지고 그 위에 아카이브가 추출됩니다 -
   그래서 같은 백업을 다시 복원해도 행이 중복될 수 없습니다. `dns`와 `system_settings`는
   멱등적 `settings put`으로 다시 적용됩니다.
 - **아카이브 추출은 경로 순회(path traversal)로부터 보호됩니다.** 복원은 root로 실행되므로,
@@ -358,4 +366,4 @@ WebView 밖에서 실행되므로 WebUI의 CSP에 영향받지 않습니다 - �
 
 ---
 
-*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다 - [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*
+*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다, [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*

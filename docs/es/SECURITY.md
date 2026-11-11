@@ -29,6 +29,8 @@ pronto como podamos y te daremos crédito si lo deseas.
   texto claro. Los backups nunca se atan a claves de hardware ligadas al dispositivo (así que se mantienen
   portables), lo que también significa que la frase de cifrado es lo que protege un backup cifrado -
   elige una fuerte.
+- Esas credenciales se guardan en almacenamiento cifrado por credencial (`/data/misc_ce`), bloqueado hasta el primer desbloqueo tras reiniciar, así que nunca son legibles antes de ese desbloqueo, a diferencia de `/data/adb`. Una actualización del módulo mueve allí las copias antiguas de forma permanente (verificando cada una antes de borrar el original), y persisten entre reinstalaciones.
+- Un destino de copia local debe permanecer cifrado en reposo: solo se permite almacenamiento interno y extraíble del usuario, nunca `/data/adb`, `/data/system` u otras rutas legibles antes del primer desbloqueo, ni un salto `..`. El medio extraíble SD/USB no está cifrado en reposo, por lo que se te avisa (no se bloquea) para activar el cifrado de la copia en él.
 - La aplicación complementaria opcional de Google Drive siempre debe ocultarse con [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) para que no
   revele root ni un bootloader desbloqueado.
 - La restauración se ejecuta como root, así que cada archivo comprimido se verifica antes de
@@ -39,4 +41,4 @@ pronto como podamos y te daremos crédito si lo deseas.
   SHA-256 registrado, y el manifiesto se incluye en el dispositivo, de modo que la carga empaquetada
   puede auditarse y reproducirse. Consulta [BINARIES.md](BINARIES.md).
 
-*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas - ve [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas, ve [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - PC에서 백업 복구하기 (Windows / macOS / Linux)
+# VDBackup, PC에서 백업 복구하기 (Windows / macOS / Linux)
 
 VDBackup 백업은 **표준 형식**을 사용하므로, 이 모듈 없이 어디서나 열 수 있습니다.
 백업 폴더에는 `manifest.json`, APK (`*.apk.zst`), 데이터 아카이브

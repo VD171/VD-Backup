@@ -17,4 +17,4 @@
 
 이것은 Contributor Covenant의 정신을 프로젝트에 맞게 요약하여 각색한 것입니다.
 
-*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다 - [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*
+*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다, [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*

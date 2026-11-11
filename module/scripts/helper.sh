@@ -29,7 +29,36 @@
 d="${0%/*}"; [ "$d" = "$0" ] && d="."; MODDIR="$(cd "$d/.." 2>/dev/null && pwd || echo "${d%/*}")"
 STATE=/data/adb/vdbackup
 bdir() { case "$1" in ''|*[!0-9]*) set -- 0 ;; esac; printf '/data/media/%s/VDBackup' "$1"; }  # /sdcard/VDBackup per Android user (credential-encrypted)
-export RCLONE_CONFIG="$STATE/rclone.conf"
+# Secrets (remote credentials, the age keypair, the rclone config) live on CREDENTIAL-
+# ENCRYPTED storage, locked until the user's first unlock (BFU), NOT in /data/adb which is
+# device-encrypted and readable before first unlock. Scheduled backups never need them
+# earlier: app data (/data/data, /data/app) is itself CE-locked before first unlock, so a
+# pre-unlock backup could read nothing anyway. secrets_init MOVES any legacy secrets out of
+# the DE tree permanently (historical installs kept them in /data/adb). See docs/SECURITY.md.
+SECRETS=/data/misc_ce/0/vdbackup
+ce_ready() { [ "$(getprop sys.user.0.ce_available)" = true ]; }
+secrets_init() {
+  [ -f "$SECRETS/.init" ] && return 0
+  ce_ready || return 1
+  mkdir -p "$SECRETS/creds" "$SECRETS/keys" 2>/dev/null || return 1
+  for _s in creds keys; do
+    _o="/data/adb/vdbackup/$_s"; [ -d "$_o" ] || continue
+    if [ -n "$(ls -A "$_o" 2>/dev/null)" ]; then
+      cp -a "$_o/." "$SECRETS/$_s/" 2>/dev/null || continue        # copy failed: keep the source
+      _ok=1; for _g in "$_o"/*; do [ -e "$_g" ] && { [ -e "$SECRETS/$_s/$(basename "$_g")" ] || _ok=0; }; done
+      [ "$_ok" = 1 ] && rm -rf "$_o"                               # only drop the source once every file landed
+    else rm -rf "$_o"; fi
+  done
+  if [ -f /data/adb/vdbackup/rclone.conf ]; then
+    cp -a /data/adb/vdbackup/rclone.conf "$SECRETS/rclone.conf" 2>/dev/null && [ -f "$SECRETS/rclone.conf" ] && rm -f /data/adb/vdbackup/rclone.conf
+  fi
+  chmod 700 "$SECRETS" "$SECRETS/creds" "$SECRETS/keys" 2>/dev/null
+  for _f in "$SECRETS/creds"/* "$SECRETS/keys"/* "$SECRETS/rclone.conf"; do [ -f "$_f" ] && chmod 600 "$_f" 2>/dev/null; done
+  restorecon -R "$SECRETS" 2>/dev/null
+  : > "$SECRETS/.init"
+}
+secrets_init 2>/dev/null
+export RCLONE_CONFIG="$SECRETS/rclone.conf"
 LOGS="$STATE/logs"
 
 # --- resolve ABI and bundled-binary PATH --------------------------------
@@ -45,6 +74,13 @@ BIN="$MODDIR/bin/$BINABI"
 export PATH="$BIN:$PATH"
 export LD_LIBRARY_PATH="$BIN/lib:${LD_LIBRARY_PATH:-}"
 
+# pm/dumpsys are app_process based: run them with a CLEAN env, or the bundled Termux
+# libs on LD_LIBRARY_PATH shadow ART's and binder marshalling fails on some ROMs
+# ("Failure calling service package: Failed transaction"). These wrappers shadow the
+# bare calls below; the bundled binaries keep LD_LIBRARY_PATH via their full $BIN path.
+pm()      { /system/bin/env -u LD_LIBRARY_PATH -u LD_PRELOAD PATH=/system/bin:/system_ext/bin:/vendor/bin:/product/bin /system/bin/pm "$@"; }
+dumpsys() { /system/bin/env -u LD_LIBRARY_PATH -u LD_PRELOAD PATH=/system/bin:/system_ext/bin:/vendor/bin:/product/bin /system/bin/dumpsys "$@"; }
+
 mkdir -p "$LOGS"
 
 # --- tiny JSON helpers (no jq dependency) -------------------------------
@@ -57,12 +93,30 @@ new_opid() { printf 'op-%s-%s' "$(date +%s)" "$$"; }
 # --- detach a long operation (survives WebUI close) ---------------------
 detach() {               # detach <opid> <worker-verb> <b64args>
   opid="$1"; wverb="$2"; wargs="$3"
+  # never spawn on an empty or garbage opid: it would write progress-.json and orphan a
+  # worker the UI can never track. opids come from new_opid() (op-<epoch>-<pid>).
+  case "$opid" in ''|*[!A-Za-z0-9._-]*) return 1 ;; esac
   # seed a concrete progress state so the UI shows "starting" instantly instead of
   # an empty file (the worker overwrites it with the first real phase right away).
   printf '{"opid":"%s","percent":0,"phase":"starting","item":"","done":false}\n' "$opid" > "$LOGS/progress-$opid.json"
   setsid nohup "$MODDIR/scripts/worker.sh" "$wverb" "$opid" "$wargs" \
       >"$LOGS/$opid.out" 2>&1 </dev/null &
   echo "$!" > "$LOGS/$opid.pid"
+}
+
+# Keep the state dir from growing without bound: drop long-finished per-op files, cap the
+# audit trail, and evict stale icons. Safe to call anytime (boot, periodically); never
+# touches config/jobs/dests/creds/keys or the backups themselves.
+log_prune() {
+  find "$LOGS" -maxdepth 1 -type f \( -name 'progress-*.json' -o -name '*.out' -o -name '*.pid' \) \
+       -mtime +7 -exec rm -f {} + 2>/dev/null
+  if [ -f "$LOGS/audit.jsonl" ]; then
+    _al="$(wc -l < "$LOGS/audit.jsonl" 2>/dev/null)"; case "$_al" in ''|*[!0-9]*) _al=0 ;; esac
+    [ "$_al" -gt 5000 ] && { tail -n 5000 "$LOGS/audit.jsonl" > "$LOGS/audit.jsonl.tmp" 2>/dev/null \
+        && mv "$LOGS/audit.jsonl.tmp" "$LOGS/audit.jsonl"; }
+  fi
+  find "$STATE/iconcache" -maxdepth 1 -type f -name '*.png' -mtime +30 -exec rm -f {} + 2>/dev/null
+  rm -f "$STATE/staging/authorize.pgid" 2>/dev/null
 }
 
 # --- scheduling helpers -------------------------------------------------
@@ -243,6 +297,9 @@ case "$verb" in
   ping)
     ok "\"version\":\"$(sed -n 's/^version=//p' "$MODDIR/module.prop")\",\"abi\":\"$abi\"" ;;
 
+  log-prune)
+    log_prune; ok '"pruned":true' ;;
+
   sanitize)
     # Re-assert backup-folder visibility across every Android user. A raw root copy
     # (or a backup made before v1.03.2) can leave 0700 dirs that a file manager cannot
@@ -299,20 +356,34 @@ case "$verb" in
     if [ -f "$STATE/config.json" ]; then cat "$STATE/config.json"; else echo '{}'; fi ;;
 
   config-set)
-    printf '%s' "$ARGS_B64" | base64 -d > "$STATE/config.json" && chmod 600 "$STATE/config.json" \
-      && ok '"saved":true' || err ERR_CONFIG_WRITE "could not write config" ;;
+    # MERGE the incoming config onto the stored one (never a blind overwrite): the WebUI may
+    # omit keys it does not manage (new defaults, format_version), and a full overwrite once
+    # reduced config.json to a {"blocklist":[]} stub. Always stamp format_version so a future
+    # schema migration has an anchor. jq `*` deep-merges; arrays (blocklist/presets/app_tags)
+    # are UI-authoritative and replace, which is what we want.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    [ -s "$STATE/config.json" ] || printf '{}\n' > "$STATE/config.json"   # slurpfile needs a file
+    _cfgnew="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    _cfgmerged="$(printf '%s' "$_cfgnew" | "$JQ" -c --slurpfile cur "$STATE/config.json" \
+       '(($cur[0] // {}) * .) | .format_version = (.format_version // $cur[0].format_version // 1)' 2>/dev/null)"
+    if [ -n "$_cfgmerged" ]; then
+      printf '%s\n' "$_cfgmerged" > "$STATE/config.json" && chmod 600 "$STATE/config.json" \
+        && ok '"saved":true' || err ERR_CONFIG_WRITE "could not write config"
+    else
+      err ERR_CONFIG_WRITE "config merge failed (invalid JSON?)"
+    fi ;;
 
   keygen)
     # device age keypair for unattended (recipient) encryption; private key stays local
     KG="$(command -v "$BIN/age-keygen" 2>/dev/null || echo age-keygen)"
-    mkdir -p "$STATE/keys"; chmod 700 "$STATE/keys"
-    if [ -f "$STATE/keys/age.key" ]; then
-      ok "\"exists\":true,\"public\":\"$(sed -n 's/^# public key: //p' "$STATE/keys/age.key" | head -1)\""
+    mkdir -p "$SECRETS/keys"; chmod 700 "$SECRETS/keys"
+    if [ -f "$SECRETS/keys/age.key" ]; then
+      ok "\"exists\":true,\"public\":\"$(sed -n 's/^# public key: //p' "$SECRETS/keys/age.key" | head -1)\""
     else
-      "$KG" -o "$STATE/keys/age.key" 2>/dev/null \
-        && sed -n 's/^# public key: //p' "$STATE/keys/age.key" | head -1 > "$STATE/keys/age.pub" \
-        && chmod 600 "$STATE/keys/age.key" "$STATE/keys/age.pub" \
-        && ok "\"created\":true,\"public\":\"$(cat "$STATE/keys/age.pub")\"" \
+      "$KG" -o "$SECRETS/keys/age.key" 2>/dev/null \
+        && sed -n 's/^# public key: //p' "$SECRETS/keys/age.key" | head -1 > "$SECRETS/keys/age.pub" \
+        && chmod 600 "$SECRETS/keys/age.key" "$SECRETS/keys/age.pub" \
+        && ok "\"created\":true,\"public\":\"$(cat "$SECRETS/keys/age.pub")\"" \
         || err ERR_KEYGEN "age-keygen failed (is the age binary bundled?)"
     fi ;;
 
@@ -402,10 +473,28 @@ case "$verb" in
     done
     printf '}}\n' ;;
 
-  backup|restore|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore)
+  backup|backup-batch|restore|restore-batch|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore|config-export|config-import)
     opid="$(new_opid)"
     detach "$opid" "$verb" "$ARGS_B64"
     ok "\"opid\":\"$opid\"" ;;
+
+  config-exports)
+    # list the encrypted config bundles available to import (newest first).
+    printf '{"ok":true,"exports":['
+    first=1
+    for f in $(ls -t /data/media/0/VDBackup/.export/vdbackup-config-*.tar.zst.age 2>/dev/null); do
+      [ -f "$f" ] || continue
+      sz="$(stat -c %s "$f" 2>/dev/null || echo 0)"
+      [ "$first" = 1 ] || printf ','; first=0
+      printf '{"ref":"%s","name":"%s","size":%s}' "$(jstr "$f")" "$(jstr "$(basename "$f")")" "$sz"
+    done
+    printf ']}\n' ;;
+
+  wipe-credentials)
+    # remove stored remote credentials and the device encryption key. Destinations and
+    # jobs stay, but they will need their passwords re-entered; backups are untouched.
+    rm -f "$SECRETS/creds"/* "$SECRETS/keys"/* 2>/dev/null
+    ok '"wiped":true' ;;
 
   cloud-status)
     # what cloud binaries are available (embedded in bin/ or fetched into $STATE/bin),
@@ -533,11 +622,16 @@ case "$verb" in
       [ -f "$m" ] || continue
       [ "$first" = 1 ] || printf ','; first=0
       ref="$(dirname "$m")"
-      "$JQ" -c --arg ref "$ref" \
+      # the APK is stored as base*.apk.zst (recorded under package.apk.files), not as a
+      # manifest items[] entry, so surface it as a selectable "apk" item when present -
+      # otherwise the restore dialog can never offer it and an uninstalled app is never
+      # reinstalled. Detect by disk so imported (Neo/DataBackup) backups count too.
+      _hasapk=false; ls "$ref"/base*.apk.zst* >/dev/null 2>&1 && _hasapk=true
+      "$JQ" -c --arg ref "$ref" --argjson hasapk "$_hasapk" \
         '{ref:$ref, package:.package.name, label:(.package.label // .package.name),
           versionName:.package.versionName,
           versionCode:.package.versionCode, created_at:.created_at, mode:.mode,
-          items:[.items[].type]}' "$m" 2>/dev/null
+          items:((if $hasapk then ["apk"] else [] end) + [.items[].type])}' "$m" 2>/dev/null
     done
     printf ']}\n' ;;
 
@@ -641,17 +735,42 @@ case "$verb" in
     j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
     id="$(printf '%s' "$j" | "$JQ" -r '.id // empty' 2>/dev/null)"
     case "$id" in ""|*/*|*' '*) err ERR_DEST_ID "invalid or missing dest id"; exit 0 ;; esac
-    mkdir -p "$STATE/dests" "$STATE/creds"
+    # A local destination must stay encrypted at rest before first unlock (BFU). Allowlist
+    # (deny by default): only credential-encrypted internal storage (/sdcard, /data/media)
+    # and removable media (/storage, /mnt/media_rw) are allowed; EVERY other path is refused,
+    # so the device-encrypted / system trees readable in the BFU state (/data/adb,
+    # /data/system, /data/misc, /data/user_de, /data/local, /metadata, /cache, /persist, ...)
+    # can never be a destination. `..` is rejected first so /data/media/../adb and similar
+    # traversals cannot escape the allowlist into a pre-BFU tree.
+    _dt="$(printf '%s' "$j" | "$JQ" -r '.type // "local"' 2>/dev/null)"
+    _dp="$(printf '%s' "$j" | "$JQ" -r '.path // empty' 2>/dev/null)"
+    if [ "$_dt" = local ] && [ -n "$_dp" ]; then
+      case "$_dp" in *..*) err ERR_DEST_UNSAFE "refusing a backup destination with '..' (path traversal); use an absolute path under user storage"; exit 0 ;; esac
+      case "$_dp" in
+        /data/media/*|/storage/*|/mnt/media_rw/*|/sdcard/*|/sdcard) : ;;
+        *) err ERR_DEST_UNSAFE "refusing a backup destination outside user storage: only internal storage (/sdcard, /data/media) and removable SD/USB (/storage, /mnt/media_rw) stay encrypted before first unlock; system / pre-BFU paths like /data/adb or /data/system are not allowed"; exit 0 ;;
+      esac
+    fi
+    # removable media (SD card / USB) is portable storage: plaintext at rest, not encrypted
+    # at all (not just before BFU). Flag it so the UI can warn that a backup there is only
+    # protected if the backup itself is encrypted. Internal /storage/emulated is CE, not this.
+    _rem=false
+    if [ "$_dt" = local ]; then case "$_dp" in
+        /mnt/media_rw/*) _rem=true ;;
+        /storage/emulated/*|/storage/self/*) : ;;
+        /storage/*) _rem=true ;;
+      esac; fi
+    mkdir -p "$STATE/dests" "$SECRETS/creds"
     printf '%s' "$j" | "$JQ" 'del(.password)' > "$STATE/dests/$id.json" && chmod 600 "$STATE/dests/$id.json"
     pw="$(printf '%s' "$j" | "$JQ" -r '.password // empty' 2>/dev/null)"
-    [ -n "$pw" ] && { printf '%s' "$pw" > "$STATE/creds/$id.pass"; chmod 600 "$STATE/creds/$id.pass"; }
-    ok "\"saved\":\"$(jstr "$id")\"" ;;
+    [ -n "$pw" ] && { printf '%s' "$pw" > "$SECRETS/creds/$id.pass"; chmod 600 "$SECRETS/creds/$id.pass"; }
+    ok "\"saved\":\"$(jstr "$id")\",\"removable\":$_rem" ;;
 
   dest-del)
     id="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | \
           "$(command -v "$BIN/jq" 2>/dev/null || echo jq)" -r '.id // empty' 2>/dev/null)"
     case "$id" in ""|*/*) err ERR_DEST_ID "invalid id" ;; *)
-      rm -f "$STATE/dests/$id.json" "$STATE/creds/$id.pass"; ok "\"deleted\":\"$(jstr "$id")\"" ;; esac ;;
+      rm -f "$STATE/dests/$id.json" "$SECRETS/creds/$id.pass"; ok "\"deleted\":\"$(jstr "$id")\"" ;; esac ;;
 
   remote-add)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
@@ -669,9 +788,9 @@ case "$verb" in
       case "$k" in pass|password) OBS=--obscure; k=pass ;; esac
       set -- "$@" "$k=$v"
     done
-    "$BIN/rclone" --config "$STATE/rclone.conf" config create "$name" "$be" "$@" $OBS --non-interactive >/dev/null 2>&1
-    if "$BIN/rclone" --config "$STATE/rclone.conf" listremotes 2>/dev/null | grep -qx "$name:"; then
-      chmod 600 "$STATE/rclone.conf" 2>/dev/null; ok "\"name\":\"$(jstr "$name")\",\"backend\":\"$(jstr "$be")\""
+    "$BIN/rclone" --config "$SECRETS/rclone.conf" config create "$name" "$be" "$@" $OBS --non-interactive >/dev/null 2>&1
+    if "$BIN/rclone" --config "$SECRETS/rclone.conf" listremotes 2>/dev/null | grep -qx "$name:"; then
+      chmod 600 "$SECRETS/rclone.conf" 2>/dev/null; ok "\"name\":\"$(jstr "$name")\",\"backend\":\"$(jstr "$be")\""
     else err ERR_REMOTE_ADD "could not create the rclone remote"; fi ;;
 
   remote-authorize)
@@ -722,7 +841,7 @@ case "$verb" in
   remote-list)
     printf '{"ok":true,"remotes":['
     first=1
-    "$BIN/rclone" --config "$STATE/rclone.conf" listremotes --long 2>/dev/null | while IFS= read -r line; do
+    "$BIN/rclone" --config "$SECRETS/rclone.conf" listremotes --long 2>/dev/null | while IFS= read -r line; do
       nm="${line%%:*}"; ty="$(printf '%s' "${line#*:}" | sed 's/^ *//; s/ *$//')"
       [ -n "$nm" ] || continue
       [ "$first" = 1 ] || printf ','; first=0
@@ -734,7 +853,7 @@ case "$verb" in
     name="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | \
             "$(command -v "$BIN/jq" 2>/dev/null || echo jq)" -r '.name // empty' 2>/dev/null)"
     case "$name" in ''|*/*|*' '*|*:*) err ERR_REMOTE_NAME "invalid name" ;; *)
-      "$BIN/rclone" --config "$STATE/rclone.conf" config delete "$name" >/dev/null 2>&1
+      "$BIN/rclone" --config "$SECRETS/rclone.conf" config delete "$name" >/dev/null 2>&1
       ok "\"deleted\":\"$(jstr "$name")\"" ;; esac ;;
 
   dest-test)
@@ -744,8 +863,8 @@ case "$verb" in
     t="$("$JQ" -r '.type // "local"' "$f")"
     case "$t" in
       local)  p="$("$JQ" -r '.path // empty' "$f")"; [ -d "${p:-$(bdir 0)}" ] && ok '"reachable":true' || err ERR_DEST_UNREACH "path not found" ;;
-      rclone) rem="$("$JQ" -r '.remote // empty' "$f")"; "$BIN/rclone" --config "$STATE/rclone.conf" lsd "$rem:" >/dev/null 2>&1 && ok '"reachable":true' || err ERR_DEST_AUTH "rclone remote unreachable" ;;
-      restic) repo="$("$JQ" -r '.repo // empty' "$f")"; RESTIC_PASSWORD_FILE="$STATE/creds/$id.pass" "$BIN/restic" -r "$repo" snapshots >/dev/null 2>&1 && ok '"reachable":true' || err ERR_DEST_AUTH "restic repo unreachable" ;;
+      rclone) rem="$("$JQ" -r '.remote // empty' "$f")"; "$BIN/rclone" --config "$SECRETS/rclone.conf" lsd "$rem:" >/dev/null 2>&1 && ok '"reachable":true' || err ERR_DEST_AUTH "rclone remote unreachable" ;;
+      restic) repo="$("$JQ" -r '.repo // empty' "$f")"; RESTIC_PASSWORD_FILE="$SECRETS/creds/$id.pass" "$BIN/restic" -r "$repo" snapshots >/dev/null 2>&1 && ok '"reachable":true' || err ERR_DEST_AUTH "restic repo unreachable" ;;
       gdrive) cp="ru.vd171.vdbackup"; pm path "$cp" >/dev/null 2>&1 || { err ERR_COMPANION "Google Drive companion not installed"; exit 0; }
         drv="/data/data/$cp/files"; au="$(stat -c %u "/data/data/$cp" 2>/dev/null)"; mkdir -p "$drv" 2>/dev/null
         case "$au" in ''|*[!0-9]*) : ;; *) chown "$au:$au" "$drv" 2>/dev/null ;; esac; restorecon "$drv" 2>/dev/null
@@ -814,6 +933,10 @@ case "$verb" in
   scheduler-tick)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
     now="$(date +%s)"
+    # before the first unlock, remote credentials (CE storage) AND app data (/data/data,
+    # CE) are both locked: a scheduled backup could neither authenticate nor read anything,
+    # so skip the whole tick until the user has unlocked once.
+    ce_ready || { printf '{"ok":true,"skipped":"ce_locked"}\n'; exit 0; }
     mkdir -p "$STATE/jobs"
     RAN=""; PRUNED=""; checked=0; launchn=0
     # a transient gate skips the job WITHOUT stamping last_run (retries next tick) + audits
@@ -899,11 +1022,17 @@ case "$verb" in
     p="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.path // empty' 2>/dev/null)"
     case "$p" in ""|null) p=/storage/emulated/0 ;; esac
     case "$p" in *..*) err ERR_BAD_PATH "invalid path"; exit 0 ;; esac
-    case "$p" in /storage/emulated/*|/data/media/*) : ;; *) err ERR_BAD_PATH "outside shared storage"; exit 0 ;; esac
+    # internal shared storage plus external removable volumes (SD card / USB), so a backup
+    # destination can live on an SD card or USB stick. Never a system / pre-BFU path.
+    case "$p" in /storage|/storage/*|/mnt/media_rw|/mnt/media_rw/*|/data/media/*) : ;; *) err ERR_BAD_PATH "outside storage"; exit 0 ;; esac
     [ -d "$p" ] || { err ERR_NO_DIR "no such folder"; exit 0; }
-    # parent, unless already at a storage root
-    parent=""
-    case "$p" in /storage/emulated/*/?*|/data/media/*/?*) parent="${p%/*}" ;; esac
+    # parent (up), clamped so it never climbs above a storage root (the volumes list)
+    parent="${p%/*}"
+    case "$p" in
+      /storage|/mnt/media_rw) parent="" ;;
+      /storage/emulated|/storage/emulated/0|/data/media/0) parent="/storage" ;;
+    esac
+    case "$parent" in /storage|/storage/*|/mnt/media_rw|/mnt/media_rw/*|/data/media/*) : ;; *) parent="" ;; esac
     printf '{"ok":true,"path":"%s","parent":"%s","dirs":[' "$(jstr "$p")" "$(jstr "$parent")"
     first=1
     for d in "$p"/*/; do
@@ -912,6 +1041,25 @@ case "$verb" in
       case "$name" in .*) continue ;; esac   # skip dotfolders
       [ "$first" = 1 ] || printf ','; first=0
       printf '"%s"' "$(jstr "$name")"
+    done
+    printf ']}\n' ;;
+
+  list-volumes)
+    # storage volumes a local destination can live on: internal shared storage plus any
+    # mounted removable media (SD card / USB), so the picker can jump straight to the card.
+    # A volume often appears under both /mnt/media_rw/<id> and /storage/<id>; /mnt/media_rw
+    # is the root-writable mount, so prefer it and dedup by id. emulated/self are not volumes.
+    printf '{"ok":true,"volumes":[{"path":"/storage/emulated/0","removable":false}'
+    seen=" "
+    for base in /mnt/media_rw /storage; do
+      for v in "$base"/*; do
+        [ -d "$v" ] || continue
+        id="$(basename "$v")"
+        case "$id" in emulated|self) continue ;; esac
+        case "$seen" in *" $id "*) continue ;; esac
+        seen="$seen$id "
+        printf ',{"path":"%s","removable":true,"id":"%s"}' "$(jstr "$v")" "$(jstr "$id")"
+      done
     done
     printf ']}\n' ;;
 

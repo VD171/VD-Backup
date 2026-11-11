@@ -6,6 +6,32 @@
 
 Všechny podstatné změny ve VDBackup jsou zdokumentovány zde. Pouze anglicky.
 
+## v1.05
+
+Spolehlivost:
+
+- Dávkové zálohy se po opuštění aplikace již nezastaví v polovině. Celý výběr, skupinu štítků nebo naplánované spuštění teď řídí jeden oddělený root proces, který pokračuje i při zavřeném WebUI a je chráněn před ukončením při nedostatku paměti. Zobrazení průběhu se po návratu znovu připojí.
+
+Nastavení:
+
+- Záloha nastavení: exportujte své cíle, plány, předvolby a uložené přihlašovací údaje do jednoho šifrovaného souboru a importujte jej na jiné zařízení nebo po čisté instalaci. Soubor vždy vyžaduje heslovou frázi, protože obsahuje vzdálená hesla, a import se sloučí se zařízením, aniž by odstranil to, co už tam je.
+- Uložené vzdálené přihlašovací údaje a šifrovací klíč zařízení teď můžete vymazat z nastavení jedním krokem, přičemž vaše cíle, plány a zálohy zůstanou zachovány.
+
+Bezpečnost:
+
+- Zálohy lze ukládat jen tam, kde zůstávají zašifrované v klidu. Cíle pod cestami čitelnými před prvním odemknutím, jako /data/adb nebo /data/system, jsou odmítnuty.
+- Uložené přihlašovací údaje, rclone.conf a klíč age nyní leží na úložišti šifrovaném přihlašovacími údaji, zamčeném až do prvního odemknutí, místo na dříve čitelném místě; aktualizace modulu je tam přesune trvale.
+- Zálohy teď před spuštěním kontrolují volné místo a zastaví se s jasnou zprávou místo selhání v polovině.
+
+Obnovení:
+
+- Obnovení aplikace, která už není nainstalovaná, nyní nejprve přeinstaluje její APK a dialog obnovení nabízí možnost APK, kdykoli ji záloha obsahuje. Obnovení, které aplikaci nedokáže nainstalovat, nahlásí selhání místo předstírání úspěchu.
+- Operace s aplikacemi, oprávněními a nastavením nyní běží v čistém prostředí, což opravuje chyby "Failed transaction", které na některých ROM blokovaly obnovení, app-ops a nastavení.
+
+Cíle:
+
+- Zálohovat lze na SD kartu nebo USB disk: výběr složky zobrazuje zkratku ke každému úložnému svazku a přijímá cesty na vyměnitelných médiích.
+
 ## v1.04
 
 Opravy:
@@ -18,7 +44,7 @@ Soukromí:
 
 Zálohy:
 
-- Teď můžete nastavit, které položky každá aplikace zálohuje - například jen APK, nebo APK + OBB - a to se použije v hromadných, automatických a naplánovaných zálohách. Jednotlivá ruční záloha vám stále umožní výběr, předvyplněný podle sady aplikace. Nastavíte to v Nastavení, vedle seznamu vyloučených aplikací.
+- Teď můžete nastavit, které položky každá aplikace zálohuje, například jen APK, nebo APK + OBB, a to se použije v hromadných, automatických a naplánovaných zálohách. Jednotlivá ruční záloha vám stále umožní výběr, předvyplněný podle sady aplikace. Nastavíte to v Nastavení, vedle seznamu vyloučených aplikací.
 
 - Předvolby zálohy: uložte pojmenované sady toho, co zahrnout, a použijte je jedním výběrem v dialogu zálohy.
 - Více uživatelů: zálohy aplikací, speciální zálohy i obnovení nyní sledují zvoleného uživatele Androidu.
@@ -227,4 +253,4 @@ Vstřícné k AI a i18n:
 - Bohatý výpis aplikací a dešifrování Neo probíhají přes pomocný nástroj dex řízený jako root
   (`IPackageManager` přes ServiceManager), takže fungují i tam, kde ActivityThread zamrzá.
 
-*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány - viz [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>Úplné zálohování a obnova aplikací a dat jako root - plně ovládané přes WebUI.</b><br>
+  <b>Úplné zálohování a obnova aplikací a dat jako root, plně ovládané přes WebUI.</b><br>
   Modul KernelSU / APatch / Magisk. Žádná výzva "udělit su", žádné přepínání <code>sucompat</code>.
 </p>
 
@@ -29,7 +29,7 @@
 ## Co to je
 
 VDBackup je root-**modul WebUI**, který zálohuje a obnovuje vaše aplikace a jejich data
-**bez doprovodné aplikace pro základní funkce** - protože modul už běží jako root, není co
+**bez doprovodné aplikace pro základní funkce**: protože modul už běží jako root, není co
 "povolovat". Jeho cílem je pokrýt vše, co dělají oblíbené zálohovací aplikace, na jednom
 místě a s přehledným WebUI.
 
@@ -46,7 +46,7 @@ importovat existující zálohy Neo-Backup a Android-DataBackup, abyste mohli p�
   verzovaný, přes `restic`) a **Mirror** (synchronizace 1:1, přes `rclone`/`rsync`).
 - **Věrné zachování:** kontexty SELinux, uid/gid, režimy, xattr a capabilities.
 - **Komprese:** žádná / lz4 / zstd / gzip (gzip = "režim kompatibility", otevře se kdekoli).
-- **Šifrování:** volitelné a přenosné (`age` + heslo nebo AES-256 zip) - nikdy nevázané
+- **Šifrování:** volitelné a přenosné (`age` + heslo nebo AES-256 zip), nikdy nevázané
   na hardware zařízení, takže se záloha obnoví na jiném zařízení nebo otevře na počítači.
 - **Cíle:** místní, SFTP, SCP, SMB, WebDAV, FTP, S3 a dalších 70+ (`rclone`),
   plus repozitáře `rsync` a `restic`. Volitelně Google Drive přes drobného volitelného společníka.
@@ -80,10 +80,10 @@ importovat existující zálohy Neo-Backup a Android-DataBackup, abyste mohli p�
 ## Instalace
 
 1. Stáhněte nejnovější `VD-Backup-vX.Y.zip` z [Vydání](https://github.com/VD171/VD-Backup/releases).
-2. Nainstalujte jej ve správci KernelSU / APatch / Magisk - použitelný okamžitě, restart není potřeba.
+2. Nainstalujte jej ve správci KernelSU / APatch / Magisk, použitelný okamžitě, restart není potřeba.
 3. Otevřete **WebUI** modulu, abyste nakonfigurovali a spouštěli zálohy. A je to.
 
-**Edice.** Každé vydání se dodává jako šest zipů. `universal-full` - každá architektura a každá binárka zabudovaná (včetně `rclone` pro cloudové poskytovatele a `restic` pro snímky), plně offline, nikdy se nic nestahuje, jakékoli zařízení, největší. `universal-lite` - každá architektura bez dvou největších binárek (`rclone`, `restic`), nejmenší; stále zvládá lokální zálohy, SSH/SFTP a `rsync` bez jakéhokoli stahování a při prvním použití cloudového cíle (`rclone`) nebo režimu snímků (`restic`) nabídne jednorázové stažení onoho malého doplňku pro danou architekturu (ověřeného přes SHA-256) a uloží jej do mezipaměti, takže poté fungují i tyto funkce. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - jediná architektura se všemi binárkami zabudovanými, menší než `universal-full`. Znáte svou architekturu -> zvolte `<abi>-full`; chcete nejmenší a nevadí vám jednorázové stažení pro cloud nebo snímky -> `universal-lite`; chcete vše zabudované bez jakéhokoli stahování (offline / obnova) -> edici full. Viz [Vydání](https://github.com/VD171/VD-Backup/releases).
+**Edice.** Každé vydání se dodává jako šest zipů. `universal-full`, každá architektura a každá binárka zabudovaná (včetně `rclone` pro cloudové poskytovatele a `restic` pro snímky), plně offline, nikdy se nic nestahuje, jakékoli zařízení, největší. `universal-lite`, každá architektura bez dvou největších binárek (`rclone`, `restic`), nejmenší; stále zvládá lokální zálohy, SSH/SFTP a `rsync` bez jakéhokoli stahování a při prvním použití cloudového cíle (`rclone`) nebo režimu snímků (`restic`) nabídne jednorázové stažení onoho malého doplňku pro danou architekturu (ověřeného přes SHA-256) a uloží jej do mezipaměti, takže poté fungují i tyto funkce. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), jediná architektura se všemi binárkami zabudovanými, menší než `universal-full`. Znáte svou architekturu -> zvolte `<abi>-full`; chcete nejmenší a nevadí vám jednorázové stažení pro cloud nebo snímky -> `universal-lite`; chcete vše zabudované bez jakéhokoli stahování (offline / obnova) -> edici full. Viz [Vydání](https://github.com/VD171/VD-Backup/releases).
 
 Jste tu noví? [Uživatelská příručka](docs/USER-GUIDE.md) vás provede od instalace až po obnovu.
 
@@ -102,12 +102,12 @@ Modul tvoří shell + WebUI plus statické binárky pro každou ABI (`tar`, `zst
 
 ## Dokumentace
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - dokumentace k procházení online.
-- **[Uživatelská příručka](docs/USER-GUIDE.md)** - od začátku do konce, od instalace po obnovu.
-- **[AI agenti](docs/AI-AGENTS.md)** - řiďte každou akci bezhlavě přes JSON API.
-- **[Architektura](docs/ARCHITECTURE.md)** a **[Struktura souborů](docs/FILE-STRUCTURE.md)** - jak to funguje.
-- **[Přibalené binárky](docs/BINARIES.md)** - původ a SHA-256 každé předkompilované binárky, pro úplný audit.
-- **[Obnovení](module/etc/RECOVERY.md)** - otevřete a dešifrujte zálohu na počítači, bez modulu.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentace k procházení online.
+- **[Uživatelská příručka](docs/USER-GUIDE.md)**: od začátku do konce, od instalace po obnovu.
+- **[AI agenti](docs/AI-AGENTS.md)**: řiďte každou akci bezhlavě přes JSON API.
+- **[Architektura](docs/ARCHITECTURE.md)** a **[Struktura souborů](docs/FILE-STRUCTURE.md)**: jak to funguje.
+- **[Přibalené binárky](docs/BINARIES.md)**: původ a SHA-256 každé předkompilované binárky, pro úplný audit.
+- **[Obnovení](module/etc/RECOVERY.md)**: otevřete a dešifrujte zálohu na počítači, bez modulu.
 - **[Přispívání](CONTRIBUTING.md)** a **[Bezpečnost](SECURITY.md)**.
 - **[Seznam změn](CHANGELOG.md)** a **[Kodex chování](CODE_OF_CONDUCT.md)**.
 
@@ -117,7 +117,7 @@ VDBackup je postaven tak, aby byl vstřícný k asistentům a agentům AI, nejen
 Engine mluví JSON (každé sloveso `helper.sh` vrací jediný objekt JSON), kód, dokumentace
 a struktura souborů jsou uspořádány pro strojové čtení a příspěvky s pomocí AI se posuzují
 a přijímají jako kterékoli jiné. Agent může spravovat **každou** akci modulu bezhlavě přes
-stejné API, které používá WebUI - úplnou řídicí plochu najdete v
+stejné API, které používá WebUI, úplnou řídicí plochu najdete v
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** a chcete-li přispět, v
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
 
@@ -136,9 +136,9 @@ stejné API, které používá WebUI - úplnou řídicí plochu najdete v
 
 Sesterské projekty téhož autora:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - debugger metod zařízení: čte každou položku všemi metodami, které ji dokážou přečíst, a porovnává je vedle sebe.
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - vaše služby Google (RCS, Wallet, atestace Play Integrity) čtené na vašem zařízení bez internetu.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - nástroj pro podvržení zařízení, který promění čerstvý fingerprint v soudržný, konzistentní profil.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: debugger metod zařízení: čte každou položku všemi metodami, které ji dokážou přečíst, a porovnává je vedle sebe.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: vaše služby Google (RCS, Wallet, atestace Play Integrity) čtené na vašem zařízení bez internetu.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: nástroj pro podvržení zařízení, který promění čerstvý fingerprint v soudržný, konzistentní profil.
 
 ## Licence
 

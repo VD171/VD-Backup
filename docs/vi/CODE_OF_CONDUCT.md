@@ -18,4 +18,4 @@ issue và đóng góp vi phạm quy tắc này, và có thể cấm những ngư
 Đây là một bản điều chỉnh cô đọng, phù hợp với dự án, theo tinh thần của Contributor
 Covenant.
 
-*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến - xem [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md).*

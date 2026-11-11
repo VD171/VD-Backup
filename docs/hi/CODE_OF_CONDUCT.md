@@ -18,4 +18,4 @@ issues और contributions को हटा सकते हैं जो इ�
 
 यह Contributor Covenant की भावना का एक संक्षिप्त, project-appropriate रूपांतरण है।
 
-*यह दस्तावेज़ीकरण Claude (Anthropic) के साथ तैयार किया गया था और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और बेहतरी का स्वागत है - [CONTRIBUTING.md](CONTRIBUTING.md) देखें।*
+*यह दस्तावेज़ीकरण Claude (Anthropic) के साथ तैयार किया गया था और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और बेहतरी का स्वागत है, [CONTRIBUTING.md](CONTRIBUTING.md) देखें।*

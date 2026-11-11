@@ -21,7 +21,7 @@ buram yang diselipkan.
   lantang, ia tidak pernah berimprovisasi.
 - **Dapat direproduksi.** Jalankan ulang build dan Anda mendapatkan berkas yang sama; ambil
    ulang sumber yang disematkan dan nilai SHA-256 cocok.
-- **Jejak audit dikirim bersama modul.** Bukan hanya di situs web - ia ikut bepergian di
+- **Jejak audit dikirim bersama modul.** Bukan hanya di situs web, ia ikut bepergian di
   dalam modul yang terpasang, di perangkat Anda, sehingga Anda bisa mengaudit secara luring.
 
 ## Apa yang dikirim, dan dari mana
@@ -81,4 +81,4 @@ Jika ada berkas yang dikirim tidak cocok dengan sumber tercatatnya, perlakukan s
 masalah keamanan dan laporkan (lihat [SECURITY.md](SECURITY.md)). Ini persis jenis
 ketidaksesuaian yang karenanya manifes ini ada untuk membuatnya terlihat.
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan - lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*

@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - Argumenty to pojedynczy obiekt JSON, **zakodowany w base64**, przekazany jako jeden token argv.
 - Polecenie wypisuje **jeden obiekt JSON** na stdout: `{"ok":true,...}` lub
   `{"ok":false,"code":"ERR_...","message":"..."}`. Parsuj to; nigdy nie scrapuj tekstu.
-- Długie operacje (`backup`, `restore`, `import`) zwracają `{"ok":true,"opid":"..."}`
+- Długie operacje (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) zwracają `{"ok":true,"opid":"..."}`
   natychmiast i działają **odłączone** (przeżywają zamknięcie wywołującego/WebUI). Odpytuj
   ich postęp; nie są zakończone, gdy wywołanie powraca.
 - `progress` i `cancel` biorą **base64 surowego łańcucha opid**, nie obiekt JSON.
@@ -87,7 +87,15 @@ chmurowe (`rclone`/`restic`/ssh) komunikują się z siecią.
 | `cloud-fetch` | `{}` | `{ok,opid}` (odłączone) pobiera+weryfikuje+instaluje dodatek `rclone`/`restic` w edycji `lite` |
 | `schedule-set` / `schedule-list` / `schedule-delete` | zobacz poniżej | zaplanowane zadania (kopia lub przywracanie; cel to jedna aplikacja, zestaw lub wszystkie aplikacje) |
 | `scheduler-tick` | `{}` | uruchamia należne zadania + stosuje retencję + obserwator automatycznej kopii (wywołuje to heartbeat rozruchowy) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (nieodłączone; zwraca natychmiast; `ERR_UPDATE_CHECK` przy niepowodzeniu - patrz poniżej) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (nieodłączone; zwraca natychmiast; `ERR_UPDATE_CHECK` przy niepowodzeniu, patrz poniżej) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) tworzy kopię wielu aplikacji w jednej odłączonej operacji; postęp niesie `n`/`of`. Błąd jednej aplikacji nie zatrzymuje partii. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) przywraca wiele kopii w jednej odłączonej operacji; postęp niesie `n`/`of`. Błąd jednej aplikacji nie zatrzymuje partii. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` woluminy pamięci dla selektora folderów: wewnętrzna plus wymienna karta SD / USB. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) eksportuje konfigurację, zadania, miejsca docelowe, dane logowania i klucze do jednego pliku zaszyfrowanego hasłem, w folderze kopii. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) scala wyeksportowany plik konfiguracji z powrotem na to urządzenie (nigdy nie nadpisuje na ślepo). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` wypisuje zaszyfrowane pliki konfiguracji dostępne do importu. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` usuwa zapisane hasła zdalne i klucz szyfrowania urządzenia; miejsca docelowe, zadania i kopie pozostają. |
+| `log-prune` | `{}` | `{ok}` przycina dawno zakończone logi operacji, ogranicza dziennik audytu i usuwa nieaktualne ikony (wywołuje to usługa rozruchu). |
 
 ### Pola `progress`
 
@@ -174,7 +182,7 @@ Zadanie harmonogramu wybiera **jeden** cel i **akcję**:
 Podaj dokładnie **jeden** z `package`, `packages` lub `all` jako cel. Zadanie `backup` zachowuje zwykłe
 `mode`/`dest`/`keep`/`items`. Zadanie `restore` (`action: "restore"`) przywraca **najnowszą** kopię
 każdej aplikacji docelowej (lub jawny `ref`) i **nadpisuje bieżące dane aplikacji przy każdym
-uruchomieniu** - jest to zamierzone i opcjonalne (opt-in), więc ustawiaj je tylko na bezpośrednie
+uruchomieniu**: jest to zamierzone i opcjonalne (opt-in), więc ustawiaj je tylko na bezpośrednie
 żądanie użytkownika.
 
 ### Bramkowanie harmonogramu
@@ -220,13 +228,13 @@ serwera zwrotnego (`127.0.0.1:53682`) i otwiera własną przeglądarkę telefonu
 dostawcy przez intencję VIEW systemu Android, zwracając `{ok:true,url}` (lub
 `{ok:false,code:"ERR_AUTHORIZE"}`). Odpytuj `remote-authorize-poll` (`{}`): zwraca
 `{ok:true,done:false,url}` podczas oczekiwania i `{ok:true,done:true,token}` gdy użytkownik
-zatwierdzi - przekaż ten `token` do `remote-add`. `remote-authorize-cancel` (`{}`) zatrzymuje
+zatwierdzi, przekaż ten `token` do `remote-add`. `remote-authorize-cancel` (`{}`) zatrzymuje
 oczekującą autoryzację (`{ok:true,cancelled:true}`). Ręczne wklejenie wyniku
 `rclone authorize "<backend>"` z dowolnego komputera jest nadal obsługiwane jako rozwiązanie
 zapasowe.
 
 Google Drive ma dwie ścieżki: ten zdalny `drive` (nie wymaga projektu Google Cloud, używa
-własnego OAuth rclone - autoryzuj na urządzeniu za pomocą `remote-authorize`, lub uruchom
+własnego OAuth rclone, autoryzuj na urządzeniu za pomocą `remote-authorize`, lub uruchom
 `rclone authorize "drive"` raz na dowolnym komputerze i przekaż token) lub opcjonalną aplikację
 towarzyszącą (własne OAuth client id). Oba kończą jako zwykłe cele.
 
@@ -236,7 +244,7 @@ Pole konfiguracji `network_policy` kontroluje, które połączenie mogą wykorzy
 `any` (domyślnie), `wifi`, lub `mobile`. Ustaw je za pomocą `config-set`. Gdy jest `wifi` lub
 `mobile`, każdy przesył chmurowy (Full `rclone`/Drive upload, Mirror sync, zdalna
 `restic` kopia/przywracanie snapshota, Mirror przywracanie) najpierw sprawdza aktywny transport i
-przerywa z `ERR_NET_POLICY`, jeśli nie pasuje - zarówno dla zadań ręcznych, jak i zaplanowanych.
+przerywa z `ERR_NET_POLICY`, jeśli nie pasuje, zarówno dla zadań ręcznych, jak i zaplanowanych.
 Cele lokalne nigdy nie są ograniczane.
 
 ### Integralność i limit miejsca w chmurze
@@ -288,7 +296,7 @@ na bezpośrednie, zamierzone żądanie użytkownika.
 ### Samodzielna kopia ścieżki
 
 `path-backup` / `path-restore` tworzą kopię i przywracają **dowolną ścieżkę bezwzględną** -
-folder lub pojedynczy plik - w pamięci współdzielonej lub pod `/data`, poza modelem per-aplikacja.
+folder lub pojedynczy plik, w pamięci współdzielonej lub pod `/data`, poza modelem per-aplikacja.
 Archiwum jest zapisywane jako `tar.zst` plus `manifest.json` we własnym formacie VDBackup
 (zapieczętowane SHA-256, z zestawem RECOVERY przy szyfrowaniu) pod `.paths/` w katalogu kopii.
 
@@ -304,18 +312,18 @@ Archiwum jest zapisywane jako `tar.zst` plus `manifest.json` we własnym formaci
   się błędem `ERR_NO_PATH`; ścieżka poza dozwolonymi roots lub zawierająca `..` kończy się
   błędem `ERR_BAD_PATH`.
 - `path-restore` zapisuje z powrotem do oryginalnej lokalizacji, więc jest destrukcyjne i
-  wymaga `"confirm": true` - bramki o dużym tarciu, jak `special-restore`. `ref`, który nie jest
+  wymaga `"confirm": true`, bramki o dużym tarciu, jak `special-restore`. `ref`, który nie jest
   prawidłową kopią ścieżki, kończy się błędem `ERR_BAD_REF`.
 - Oba działają **odłączone**; odpytuj `progress` zwróconym `opid`.
 
 ### `update-check`
 
 `update-check` zgłasza, czy opublikowano nowszą wersję modułu, aby agent (lub WebUI) mógł ją
-pokazać. To **czasownik odczytu, który zwraca natychmiast** - **nie** jest odłączony, więc nie ma
+pokazać. To **czasownik odczytu, który zwraca natychmiast**: **nie** jest odłączony, więc nie ma
 `opid` do odpytywania. Uruchamiany wyłącznie przez wyraźne działanie użytkownika, pobiera
 opublikowany manifest aktualizacji modułu (adres URL `updateJson` z `module.prop`) za pomocą
-dołączonego `curl` przez żądanie HTTP po stronie roota - działa to poza WebView, więc nie podlega
-CSP WebUI - i porównuje opublikowany `versionCode` z zainstalowanym. Nie przyjmuje **żadnych
+dołączonego `curl` przez żądanie HTTP po stronie roota, działa to poza WebView, więc nie podlega
+CSP WebUI, i porównuje opublikowany `versionCode` z zainstalowanym. Nie przyjmuje **żadnych
 argumentów**.
 
 W razie powodzenia zwraca:
@@ -343,7 +351,7 @@ menedżer roota (KernelSU / APatch / Magisk) poprzez `updateJson` modułu, nigdy
 - **`ssaid` jest ściśle opt-in (domyślnie wyłączone).** Tworzy kopię / przywraca
   ANDROID_ID urządzenia przez przepisanie pliku systemowego; przywracanie stosuje się dopiero po restarcie, a
   poprzedni plik jest zawsze najpierw zapisywany dla rollbacku. Wysyłaj `"ssaid": true`
-  tylko na bezpośrednie, zamierzone żądanie użytkownika - nigdy domyślnie.
+  tylko na bezpośrednie, zamierzone żądanie użytkownika, nigdy domyślnie.
 - **Akcje modyfikujące (restore, delete, import) są destrukcyjne** i są logowane do
   lokalnej ścieżki audytu (`logs/audit.jsonl`). Przywracanie jest wierne (wipe-then-extract), więc
   przywraca aplikację do dokładnego stanu kopii. Potwierdź zamiar, zanim je wywołasz.
@@ -351,8 +359,8 @@ menedżer roota (KernelSU / APatch / Magisk) poprzez `updateJson` modułu, nigdy
   nadpisuje ustawienia całego urządzenia, więc wysyłaj je tylko na bezpośrednie żądanie
   użytkownika; jest zabezpieczone jawną zgodą i zapisywane w ścieżce audytu.
 - **Przywracanie jest idempotentne.** Surowe przywracania providera (messages/contacts/wifi/
-  bluetooth/calendar) **zastępują** zamiast scalać - dane providera są czyszczone, a archiwum
-  jest rozpakowywane na wierzch - więc ponowne przywrócenie tej samej kopii nie może zduplikować
+  bluetooth/calendar) **zastępują** zamiast scalać, dane providera są czyszczone, a archiwum
+  jest rozpakowywane na wierzch, więc ponowne przywrócenie tej samej kopii nie może zduplikować
   wierszy. `dns` i `system_settings` są ponownie stosowane idempotentnym `settings put`.
 - **Rozpakowywanie archiwów jest zabezpieczone przed path traversal.** Przywracanie działa jako
   root, więc każde archiwum (restore, import, special-restore, path-restore) jest sprawdzane
@@ -370,4 +378,4 @@ Zobacz [ARCHITECTURE.md](ARCHITECTURE.md) i
 
 ---
 
-*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane - zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*

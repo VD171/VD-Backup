@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - recuperar um backup num PC (Windows / macOS / Linux)
+# VDBackup, recuperar um backup num PC (Windows / macOS / Linux)
 
 Seus backups do VDBackup usam **formatos padrão**, então você pode abri-los em qualquer lugar,
 sem este módulo. Uma pasta de backup contém um `manifest.json`, os APKs

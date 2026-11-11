@@ -18,4 +18,4 @@ issues e contribuições que violem este código, e podem banir reincidentes.
 Esta é uma adaptação condensada e apropriada ao projeto do espírito do Contributor
 Covenant.
 
-*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas - veja [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md).*

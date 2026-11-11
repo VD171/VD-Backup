@@ -29,6 +29,8 @@ que possible et vous créditerons si vous le souhaitez.
   clair. Les backups ne sont jamais liés à des clés matérielles propres à l'appareil (afin de rester
   portables), ce qui signifie aussi que la phrase de passe est ce qui protège un backup chiffré -
   choisissez-en une solide.
+- Ces identifiants résident sur un stockage chiffré par identifiant (`/data/misc_ce`), verrouillé jusqu'au premier déverrouillage après un redémarrage, donc jamais lisibles avant ce déverrouillage, contrairement à `/data/adb`. Une mise à jour du module y déplace les anciennes copies de façon permanente (en vérifiant chacune avant de supprimer l'original), et elles persistent à travers les réinstallations.
+- Une destination de sauvegarde locale doit elle-même rester chiffrée au repos : seuls le stockage utilisateur interne et amovible sont autorisés, jamais `/data/adb`, `/data/system` ou d'autres chemins lisibles avant le premier déverrouillage, ni un parcours `..`. Le support amovible SD/USB n'est pas chiffré au repos, vous êtes donc averti (sans blocage) d'activer le chiffrement de la sauvegarde pour lui.
 - L'application compagnon Google Drive optionnelle devrait toujours être masquée avec [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) afin qu'elle ne
   révèle ni le root ni un bootloader déverrouillé.
 - La restauration s'exécute en tant que root, donc chaque archive est vérifiée avant toute
@@ -39,4 +41,4 @@ que possible et vous créditerons si vous le souhaitez.
   avec un SHA-256 enregistré, et le manifeste est embarqué sur l'appareil, de sorte que la charge
   fournie peut être auditée et reproduite. Voir [BINARIES.md](BINARIES.md).
 
-*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues - voir [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md).*

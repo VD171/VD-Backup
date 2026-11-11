@@ -86,4 +86,4 @@ Untuk desain teknis lengkap (format arsip, skema metadata, pipeline, kripto,
 tujuan, importer) para maintainer menyimpan catatan desain terperinci; file ini adalah
 ringkasan yang ditujukan untuk kontributor.
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan - lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*

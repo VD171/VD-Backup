@@ -6,6 +6,32 @@
 
 Toutes les modifications notables de VDBackup sont documentées ici. En anglais uniquement.
 
+## v1.05
+
+Fiabilité:
+
+- Les sauvegardes par lots ne s'arrêtent plus en cours de route lorsque vous quittez l'application. Une sélection entière, un groupe d'étiquettes ou une exécution planifiée est désormais pilotée par un unique processus root détaché qui continue lorsque la WebUI est fermée, et qui est protégé contre l'arrêt sous pression mémoire. La progression se rattache lorsque vous revenez.
+
+Réglages:
+
+- Sauvegarde des réglages : exportez vos destinations, planifications, préréglages et identifiants enregistrés vers un seul fichier chiffré, puis importez-le sur un autre appareil ou après une réinstallation. Le fichier demande toujours une phrase secrète car il contient des mots de passe distants, et l'importation fusionne dans l'appareil sans supprimer ce qui s'y trouve déjà.
+- Vous pouvez désormais effacer les identifiants distants enregistrés et la clé de chiffrement de l'appareil depuis les réglages en une seule étape, tout en conservant vos destinations, planifications et sauvegardes.
+
+Sécurité:
+
+- Les sauvegardes ne peuvent être stockées que là où elles restent chiffrées au repos. Les destinations sous des chemins lisibles avant le premier déverrouillage, comme /data/adb ou /data/system, sont refusées.
+- Les identifiants enregistrés, le rclone.conf et la clé age résident désormais sur un stockage chiffré par identifiant, verrouillé jusqu'au premier déverrouillage, au lieu d'un emplacement lisible auparavant ; une mise à jour du module les y déplace de façon permanente.
+- Les sauvegardes vérifient désormais l'espace libre avant de démarrer et s'arrêtent avec un message clair au lieu d'échouer en cours de route.
+
+Restauration:
+
+- La restauration d'une application qui n'est plus installée réinstalle désormais d'abord son APK, et la boîte de dialogue de restauration propose l'option APK dès que la sauvegarde en contient une. Une restauration qui ne parvient pas à installer l'application signale l'échec au lieu de prétendre réussir.
+- Les opérations d'application, d'autorisation et de réglage s'exécutent désormais dans un environnement propre, corrigeant les erreurs "Failed transaction" qui bloquaient la restauration, les app-ops et les réglages sur certaines ROM.
+
+Destinations:
+
+- Vous pouvez sauvegarder sur une carte SD ou une clé USB : le sélecteur de dossiers affiche un raccourci vers chaque volume de stockage et accepte les chemins sur support amovible.
+
 ## v1.04
 
 Corrections:
@@ -18,7 +44,7 @@ Confidentialité:
 
 Sauvegardes:
 
-- Vous pouvez maintenant définir quels éléments chaque app sauvegarde - par exemple APK seul, ou APK + OBB - appliqué dans les sauvegardes en masse, automatiques et planifiées. Une sauvegarde manuelle individuelle vous laisse toujours choisir sur le moment, pré-rempli depuis l'ensemble de l'app. Réglez-le dans les Réglages, à côté de la liste des apps exclues.
+- Vous pouvez maintenant définir quels éléments chaque app sauvegarde, par exemple APK seul, ou APK + OBB, appliqué dans les sauvegardes en masse, automatiques et planifiées. Une sauvegarde manuelle individuelle vous laisse toujours choisir sur le moment, pré-rempli depuis l'ensemble de l'app. Réglez-le dans les Réglages, à côté de la liste des apps exclues.
 
 - Préréglages de sauvegarde : enregistrez des ensembles nommés de ce qu'il faut inclure et appliquez-les d'un choix dans la boîte de sauvegarde.
 - Multi-utilisateur : les sauvegardes d'apps, les sauvegardes spéciales et les restaurations suivent désormais l'utilisateur Android choisi.
@@ -240,4 +266,4 @@ AI-friendly et i18n :
 - Le listage riche des apps et le déchiffrement Neo passent par un helper dex piloté en root
   (`IPackageManager` via ServiceManager), de sorte qu'ils fonctionnent là où ActivityThread se bloque.
 
-*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues - voir [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md).*

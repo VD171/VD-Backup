@@ -20,7 +20,7 @@ e como verificar que nada opaco foi inserido às escondidas.
   improvisa.
 - **Reproduzível.** Refaça o build e você obtém os mesmos arquivos; rebusque as fontes fixadas
    e os valores de SHA-256 batem.
-- **A trilha de auditoria viaja com o módulo.** Ela não está apenas no site - ela viaja
+- **A trilha de auditoria viaja com o módulo.** Ela não está apenas no site, ela viaja
   dentro do módulo instalado, no seu dispositivo, para que você possa auditar offline.
 
 ## O que é distribuído, e de onde
@@ -82,4 +82,4 @@ Se algum arquivo distribuído não corresponder à sua origem registrada, trate 
 segurança e reporte (veja [SECURITY.md](SECURITY.md)). Este é exatamente o tipo de divergência que este
 manifesto existe para tornar visível.
 
-*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas - veja [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md).*

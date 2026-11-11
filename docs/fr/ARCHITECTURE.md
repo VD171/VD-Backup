@@ -86,4 +86,4 @@ Pour la conception technique complète (format d'archive, schéma de métadonné
 destinations, importateurs) les mainteneurs tiennent des notes de conception détaillées ; ce fichier est la
 vue d'ensemble destinée aux contributeurs.
 
-*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues - voir [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md).*

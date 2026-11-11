@@ -14,7 +14,7 @@ WebUI in vanilla JS + binari statici per ABI. Nessuna app è richiesta per le fu
 [ARCHITECTURE.md](ARCHITECTURE.md) e [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 
 È il **successore** aperto e root-native di **Swift Backup, Neo-Backup e
-Android-DataBackup** - l'unione delle loro funzionalità sotto AGPLv3, con l'importazione dei backup
+Android-DataBackup**: l'unione delle loro funzionalità sotto AGPLv3, con l'importazione dei backup
 esistenti di Neo-Backup e Android-DataBackup così che le persone possano migrare.
 
 ## Contributori IA benvenuti
@@ -25,9 +25,9 @@ Gli assistenti e gli agenti IA sono qui contributori di prima classe, non un rip
   oggetto JSON, il motore è pura shell POSIX e la disposizione dei file è documentata in
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md).
 - Un agente può amministrare **ogni** contenuto e azione del modulo in modo headless attraverso
-  quell'API JSON - l'intera superficie di controllo, i verbi e le protezioni di sicurezza sono in
+  quell'API JSON, l'intera superficie di controllo, i verbi e le protezioni di sicurezza sono in
   [docs/AI-AGENTS.md](AI-AGENTS.md).
-- Le patch assistite da IA vengono riviste e accettate alle stesse condizioni di qualsiasi altra - per
+- Le patch assistite da IA vengono riviste e accettate alle stesse condizioni di qualsiasi altra, per
   correttezza, chiarezza e le convenzioni qui sotto, non per chi (o cosa) le ha scritte.
 - Se guidi VDBackup da un agente, usa l'output JSON di `helper.sh` come
   contratto; non fare scraping della WebUI.
@@ -62,18 +62,18 @@ Gli assistenti e gli agenti IA sono qui contributori di prima classe, non un rip
 - Per aggiungere o modificare una stringa: modifica `en.js` **e** `en.json`, poi aggiorna ogni
   `<code>.json`. Toccare un'etichetta visibile significa aggiornare **tutti** i file di lingua e
   **tutti** i `README.<code>.md`.
-- Le traduzioni sono semplice JSON - un ottimo primo contributo. Vedi l'elenco delle lingue in
+- Le traduzioni sono semplice JSON, un ottimo primo contributo. Vedi l'elenco delle lingue in
   `module/webroot/i18n.js`.
 
 ## Commit e PR
 
 - Mantieni le PR focalizzate. Descrivi cosa e perché.
 - Firma i tuoi commit (DCO): `git commit -s` (aggiunge `Signed-off-by:`).
-- La CI deve restare verde. Sii gentile nelle revisioni - vedi [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- La CI deve restare verde. Sii gentile nelle revisioni, vedi [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Buone prime issue
 
 Cerca le etichette `good first issue` e `help wanted`. Traduzioni, documentazione, nuovi
 preset di destinazione `rclone` e rifiniture della WebUI sono tutti ottimi punti di partenza.
 
-*Questa documentazione è stata generata con Claude (Anthropic) ed è mantenuta da VD171. Correzioni e miglioramenti sono benvenuti - vedi [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Questa documentazione è stata generata con Claude (Anthropic) ed è mantenuta da VD171. Correzioni e miglioramenti sono benvenuti, vedi [CONTRIBUTING.md](CONTRIBUTING.md).*

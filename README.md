@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>Full app &amp; data backup and restore as root - driven entirely from a WebUI.</b><br>
+  <b>Full app &amp; data backup and restore as root, driven entirely from a WebUI.</b><br>
   KernelSU / APatch / Magisk module. No "grant su" prompt, no toggling <code>sucompat</code>.
 </p>
 
@@ -29,7 +29,7 @@
 ## What it is
 
 VDBackup is a root **WebUI module** that backs up and restores your apps and their
-data **without a companion app for the core features** - because the module is
+data **without a companion app for the core features**, because the module is
 already root, there is nothing to "allow". It aims to cover everything the popular
 backup apps do, in one place, with a clean WebUI.
 
@@ -46,7 +46,7 @@ import existing Neo-Backup and Android-DataBackup backups so you can move over.
   versioned, via `restic`) and **Mirror** (1:1 sync, via `rclone`/`rsync`).
 - **Faithful preservation:** SELinux contexts, uid/gid, modes, xattr and capabilities.
 - **Compression:** none / lz4 / zstd / gzip (gzip = "compatibility mode", opens anywhere).
-- **Encryption:** optional and portable (`age` + passphrase, or AES-256 zip) - never
+- **Encryption:** optional and portable (`age` + passphrase, or AES-256 zip), never
   tied to device hardware, so a backup restores on another device or opens on a PC.
 - **Destinations:** local, SFTP, SCP, SMB, WebDAV, FTP, S3 and 70+ more (`rclone`),
   plus `rsync` and `restic` repos. Optional Google Drive via a tiny opt-in companion.
@@ -80,18 +80,18 @@ import existing Neo-Backup and Android-DataBackup backups so you can move over.
 ## Install
 
 1. Download the latest `VD-Backup-vX.Y.zip` from [Releases](https://github.com/VD171/VD-Backup/releases).
-2. Flash it in the KernelSU / APatch / Magisk manager - usable immediately, no reboot needed.
+2. Flash it in the KernelSU / APatch / Magisk manager, usable immediately, no reboot needed.
 3. Open the module's **WebUI** to configure and run backups. That's it.
 
-**Editions.** Six zips per release. `universal-full` - every architecture and
+**Editions.** Six zips per release. `universal-full`: every architecture and
 every binary embedded (incl. `rclone` for cloud providers, `restic` for
 snapshots), fully offline, nothing ever downloaded, any device, largest.
-`universal-lite` - every architecture without the two biggest binaries
+`universal-lite`: every architecture without the two biggest binaries
 (`rclone`, `restic`), smallest; still does local, SSH/SFTP and `rsync` with no
 download, and the first time you use a cloud destination (`rclone`) or snapshot
 mode (`restic`) it offers to download that small per-architecture addon once
 (verified by SHA-256) and caches it, so those features work too. `<abi>-full`
-(`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - a single architecture with every
+(`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`): a single architecture with every
 binary embedded, smaller than `universal-full`. Know your arch -> pick
 `<abi>-full`; want the smallest and do not mind a one-time download for cloud or
 snapshots -> `universal-lite`; want everything embedded with zero downloads
@@ -114,12 +114,12 @@ The module is shell + WebUI plus per-ABI static binaries (`tar`, `zstd`, `lz4`,
 
 ## Documentation
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - the docs, browsable online.
-- **[User guide](docs/USER-GUIDE.md)** - end to end, from install to restore.
-- **[AI agents](docs/AI-AGENTS.md)** - drive every action headlessly over the JSON API.
-- **[Architecture](docs/ARCHITECTURE.md)** and **[File structure](docs/FILE-STRUCTURE.md)** - how it works.
-- **[Bundled binaries](docs/BINARIES.md)** - provenance and SHA-256 of every prebuilt binary, for full auditing.
-- **[Recovery](module/etc/RECOVERY.md)** - open and decrypt a backup on a PC, no module needed.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: the docs, browsable online.
+- **[User guide](docs/USER-GUIDE.md)**: end to end, from install to restore.
+- **[AI agents](docs/AI-AGENTS.md)**: drive every action headlessly over the JSON API.
+- **[Architecture](docs/ARCHITECTURE.md)** and **[File structure](docs/FILE-STRUCTURE.md)**: how it works.
+- **[Bundled binaries](docs/BINARIES.md)**: provenance and SHA-256 of every prebuilt binary, for full auditing.
+- **[Recovery](module/etc/RECOVERY.md)**: open and decrypt a backup on a PC, no module needed.
 - **[Contributing](CONTRIBUTING.md)** and **[Security](SECURITY.md)**.
 - **[Changelog](CHANGELOG.md)** and **[Code of Conduct](CODE_OF_CONDUCT.md)**.
 
@@ -148,9 +148,9 @@ see **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** for the full control surface, and
 
 Sibling projects by the same author:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - a device method debugger: reads each item through every method that can read it and compares them side by side.
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - your Google services (RCS, Wallet, Play Integrity attestations), read on your device with no internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - a device spoofer that turns a fresh fingerprint into a coherent, consistent profile.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: a device method debugger that reads each item through every method that can read it and compares them side by side.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: your Google services (RCS, Wallet, Play Integrity attestations), read on your device with no internet.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: a device spoofer that turns a fresh fingerprint into a coherent, consistent profile.
 
 ## License
 

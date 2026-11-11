@@ -71,4 +71,4 @@ docs/                               # all public documentation
 
 ---
 
-*Tài liệu này được tạo ra với Claude (Anthropic) và được bảo trì bởi VD171. Hoan nghênh các chỉnh sửa và cải thiện - xem [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Tài liệu này được tạo ra với Claude (Anthropic) và được bảo trì bởi VD171. Hoan nghênh các chỉnh sửa và cải thiện, xem [CONTRIBUTING.md](CONTRIBUTING.md).*

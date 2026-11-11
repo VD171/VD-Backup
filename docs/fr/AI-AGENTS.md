@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - Les arguments forment un seul objet JSON, **encodé en base64**, passé comme un unique jeton argv.
 - La commande affiche **un seul objet JSON** sur stdout : `{"ok":true,...}` ou
   `{"ok":false,"code":"ERR_...","message":"..."}`. Analysez-le ; ne grattez jamais le texte.
-- Les opérations longues (`backup`, `restore`, `import`) renvoient `{"ok":true,"opid":"..."}`
+- Les opérations longues (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) renvoient `{"ok":true,"opid":"..."}`
   immédiatement et s'exécutent **détachées** (elles survivent à la disparition de l'appelant/de la WebUI).
   Interrogez leur progression ; elles ne sont pas terminées quand l'appel revient.
 - `progress` et `cancel` prennent le **base64 de la chaîne opid brute**, pas un objet JSON.
@@ -87,7 +87,15 @@ destinations cloud (`rclone`/`restic`/ssh) communiquent avec le réseau.
 | `cloud-fetch` | `{}` | `{ok,opid}` (détaché) télécharge+vérifie+installe l'addon `rclone`/`restic` sur une édition `lite` |
 | `schedule-set` / `schedule-list` / `schedule-delete` | voir ci-dessous | tâches planifiées (une sauvegarde ou une restauration ; ciblant une seule app, un ensemble, ou toutes les apps) |
 | `scheduler-tick` | `{}` | exécute les tâches dues + applique la rétention + l'observateur de sauvegarde automatique (le battement de cœur au démarrage appelle ceci) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (non détaché ; retourne immédiatement ; `ERR_UPDATE_CHECK` en cas d'échec - voir ci-dessous) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (non détaché ; retourne immédiatement ; `ERR_UPDATE_CHECK` en cas d'échec, voir ci-dessous) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) sauvegarde plusieurs applis en une op détachée ; la progression porte `n`/`of`. Un échec par appli n'arrête pas le lot. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) restaure plusieurs sauvegardes en une op détachée ; la progression porte `n`/`of`. Un échec par appli n'arrête pas le lot. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` volumes de stockage pour le sélecteur de dossiers : interne plus carte SD / USB amovible. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) exporte config, tâches, destinations, identifiants et clés vers un seul fichier chiffré par phrase secrète, sous le dossier des sauvegardes. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) fusionne un fichier de config exporté dans cet appareil (n'écrase jamais à l'aveugle). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` liste les fichiers de config chiffrés disponibles à l'import. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` supprime les mots de passe distants enregistrés et la clé de chiffrement de l'appareil ; destinations, tâches et sauvegardes restent. |
+| `log-prune` | `{}` | `{ok}` élague les journaux d'ops terminées depuis longtemps, limite le journal d'audit et supprime les icônes obsolètes (le service de démarrage l'appelle). |
 
 ### Champs de `progress`
 
@@ -177,7 +185,7 @@ Une tâche planifiée choisit **une** cible et une **action** :
 Donnez exactement **un** parmi `package`, `packages` ou `all` pour la cible. Une tâche `backup` conserve les
 habituels `mode`/`dest`/`keep`/`items`. Une tâche `restore` (`action: "restore"`) restaure la sauvegarde la
 **plus récente** de chaque app ciblée (ou une `ref` explicite) et **écrase les données actuelles de l'app à
-chaque exécution** - c'est délibéré et opt-in, ne la définissez donc que sur demande directe de l'utilisateur.
+chaque exécution**: c'est délibéré et opt-in, ne la définissez donc que sur demande directe de l'utilisateur.
 
 ### Conditionnement du planificateur
 
@@ -201,7 +209,7 @@ piste d'audit comme `op:"scheduler-gated"` avec un `reason` parmi `wifi` / `char
 ### Args de `remote-add`
 
 Une destination cloud est une destination `type:"rclone"` qui nomme un remote `rclone` ; créez
-ce remote d'abord avec `remote-add`. Le `backend` peut être **n'importe quel backend rclone** - il
+ce remote d'abord avec `remote-add`. Le `backend` peut être **n'importe quel backend rclone**: il
 n'y a pas de liste blanche. `remote-add` accepte n'importe quel nom de backend (`dropbox`,
 `onedrive`, `box`, `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` et les
 ~70 autres pris en charge par rclone), et les `params` sont transmis directement à la configuration
@@ -222,12 +230,12 @@ contre un serveur de rappel local (`127.0.0.1:53682`) et ouvre le navigateur du 
 de consentement du fournisseur via un intent VIEW Android, en renvoyant `{ok:true,url}` (ou
 `{ok:false,code:"ERR_AUTHORIZE"}`). Interrogez `remote-authorize-poll` (`{}`) : il renvoie
 `{ok:true,done:false,url}` pendant l'attente et `{ok:true,done:true,token}` une fois que l'utilisateur
-a approuvé - passez ce `token` à `remote-add`. `remote-authorize-cancel` (`{}`) arrête une autorisation
+a approuvé, passez ce `token` à `remote-add`. `remote-authorize-cancel` (`{}`) arrête une autorisation
 en attente (`{ok:true,cancelled:true}`). Coller à la main la sortie de `rclone authorize "<backend>"`
 depuis n'importe quel ordinateur reste pris en charge comme solution de repli.
 
 Google Drive a deux voies : ce remote `drive` (aucun projet Google Cloud requis, utilise
-l'OAuth propre de rclone - autorisez sur l'appareil avec `remote-authorize`, ou lancez
+l'OAuth propre de rclone, autorisez sur l'appareil avec `remote-authorize`, ou lancez
 `rclone authorize "drive"` une fois sur n'importe quel ordinateur et passez le token) ou l'application
 compagnon optionnelle (votre propre id client OAuth). Les deux finissent comme des destinations
 ordinaires.
@@ -238,7 +246,7 @@ Le champ de configuration `network_policy` contrôle quelle connexion les transf
 `any` (par défaut), `wifi`, ou `mobile`. Définissez-le avec `config-set`. Lorsqu'il est `wifi` ou
 `mobile`, chaque transfert cloud (téléversement Full `rclone`/Drive, synchro Mirror, sauvegarde/restauration de
 snapshot `restic` distant, restauration Mirror) vérifie d'abord le transport actif et
-avorte avec `ERR_NET_POLICY` s'il ne correspond pas - pour les tâches manuelles comme planifiées.
+avorte avec `ERR_NET_POLICY` s'il ne correspond pas, pour les tâches manuelles comme planifiées.
 Les destinations locales ne sont jamais soumises à cette règle.
 
 ### Intégrité et quota cloud
@@ -291,8 +299,8 @@ par défaut ; uniquement sur une demande directe et délibérée de l'utilisateu
 
 ### Sauvegarde de chemin autonome
 
-`path-backup` / `path-restore` sauvegardent et restaurent **n'importe quel chemin absolu** - un
-dossier ou un seul fichier - sur le stockage partagé ou sous `/data`, en dehors du modèle par app.
+`path-backup` / `path-restore` sauvegardent et restaurent **n'importe quel chemin absolu**: un
+dossier ou un seul fichier, sur le stockage partagé ou sous `/data`, en dehors du modèle par app.
 L'archive est écrite en `tar.zst` plus un `manifest.json` au format propre de VDBackup (scellé en
 SHA-256, avec un kit RECOVERY quand elle est chiffrée) sous `.paths/` dans le répertoire des
 sauvegardes.
@@ -309,18 +317,18 @@ sauvegardes.
   avec `ERR_NO_PATH` ; un chemin hors des racines autorisées, ou contenant `..`, échoue avec
   `ERR_BAD_PATH`.
 - `path-restore` réécrit vers l'emplacement d'origine, il est donc destructif et requiert
-  `"confirm": true` - un garde-fou à forte friction, comme `special-restore`. Une `ref` qui n'est
+  `"confirm": true`, un garde-fou à forte friction, comme `special-restore`. Une `ref` qui n'est
   pas une sauvegarde de chemin valide échoue avec `ERR_BAD_REF`.
 - Les deux s'exécutent **détachés** ; interrogez `progress` avec l'`opid` renvoyé.
 
 ### `update-check`
 
 `update-check` indique si une version plus récente du module a été publiée, afin qu'un agent
-(ou la WebUI) puisse l'afficher. C'est un **verbe de lecture qui retourne immédiatement** - il
+(ou la WebUI) puisse l'afficher. C'est un **verbe de lecture qui retourne immédiatement**: il
 n'est **pas** détaché, il n'y a donc pas d'`opid` à interroger. Déclenché uniquement par une
 action explicite de l'utilisateur, il récupère le manifeste de mise à jour publié du module
 (l'URL `updateJson` de `module.prop`) avec le `curl` empaqueté via une requête HTTP côté root -
-cela s'exécute hors du WebView, donc n'est pas soumis à la CSP de la WebUI - et compare le
+cela s'exécute hors du WebView, donc n'est pas soumis à la CSP de la WebUI, et compare le
 `versionCode` publié avec celui installé. Il ne prend **aucun argument**.
 
 En cas de succès, il retourne :
@@ -349,7 +357,7 @@ elle-même est effectuée par votre gestionnaire root (KernelSU / APatch / Magis
 - **`ssaid` est strictement opt-in (désactivé par défaut).** Il sauvegarde / restaure l'ANDROID_ID
   de l'appareil en réécrivant un fichier système ; une restauration ne s'applique qu'après un redémarrage, et
   le fichier précédent est toujours enregistré d'abord pour permettre un retour en arrière. N'envoyez `"ssaid": true`
-  que sur une demande directe et délibérée de l'utilisateur - jamais par défaut.
+  que sur une demande directe et délibérée de l'utilisateur, jamais par défaut.
 - **Les actions mutantes (restore, delete, import) sont destructrices** et sont consignées dans une
   piste d'audit locale (`logs/audit.jsonl`). La restauration est fidèle (effacement puis extraction), elle
   ramène donc l'app à l'état exact de la sauvegarde. Confirmez l'intention avant de les appeler.
@@ -357,8 +365,8 @@ elle-même est effectuée par votre gestionnaire root (KernelSU / APatch / Magis
   écrase les réglages à l'échelle de l'appareil, ne l'envoyez donc que sur une demande directe de
   l'utilisateur ; il est protégé par le consentement explicite et consigné dans la piste d'audit.
 - **La restauration est idempotente.** Les restaurations brutes de fournisseur (messages/contacts/
-  wifi/bluetooth/calendar) **remplacent** au lieu de fusionner - les données du fournisseur sont
-  effacées et l'archive est extraite par-dessus - de sorte que re-restaurer la même sauvegarde ne
+  wifi/bluetooth/calendar) **remplacent** au lieu de fusionner, les données du fournisseur sont
+  effacées et l'archive est extraite par-dessus, de sorte que re-restaurer la même sauvegarde ne
   peut pas dupliquer de lignes. `dns` et `system_settings` sont réappliqués avec un `settings put`
   idempotent.
 - **L'extraction d'archive est protégée contre la traversée de chemin.** La restauration s'exécute
@@ -377,4 +385,4 @@ Voir [ARCHITECTURE.md](ARCHITECTURE.md) et
 
 ---
 
-*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues - voir [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md).*

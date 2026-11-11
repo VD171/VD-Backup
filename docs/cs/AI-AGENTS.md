@@ -20,7 +20,7 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 - Argumenty jsou jeden JSON objekt, **zakódovaný v base64**, předaný jako jeden argv token.
 - Příkaz vytiskne **jeden JSON objekt** na stdout: `{"ok":true,...}` nebo
   `{"ok":false,"code":"ERR_...","message":"..."}`. Ten parsujte; nikdy nescrapujte text.
-- Dlouhé operace (`backup`, `restore`, `import`) vracejí `{"ok":true,"opid":"..."}`
+- Dlouhé operace (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) vracejí `{"ok":true,"opid":"..."}`
   okamžitě a běží **oddělené** (přežijí odchod volajícího/WebUI). Dotazujte se
   na jejich průběh; nejsou dokončené, když se volání vrátí.
 - `progress` a `cancel` berou **base64 surového řetězce opid**, ne JSON objekt.
@@ -87,7 +87,15 @@ cíle (`rclone`/`restic`/ssh) komunikují se sítí.
 | `cloud-fetch` | `{}` | `{ok,opid}` (oddělené) stáhne+ověří+nainstaluje `rclone`/`restic` doplněk v edici `lite` |
 | `schedule-set` / `schedule-list` / `schedule-delete` | viz níže | naplánované úlohy (záloha nebo obnova; cílí na jednu aplikaci, sadu nebo všechny aplikace) |
 | `scheduler-tick` | `{}` | spustí splatné úlohy + aplikuje retenci + pozorovatel automatické zálohy (volá to bootovací heartbeat) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (neoddělené; vrací se okamžitě; `ERR_UPDATE_CHECK` při selhání - viz níže) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (neoddělené; vrací se okamžitě; `ERR_UPDATE_CHECK` při selhání, viz níže) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) zálohuje mnoho aplikací v jedné oddělené operaci; průběh nese `n`/`of`. Selhání jedné aplikace dávku nezastaví. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) obnoví mnoho záloh v jedné oddělené operaci; průběh nese `n`/`of`. Selhání jedné aplikace dávku nezastaví. |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` svazky úložiště pro výběr složky: vnitřní plus vyměnitelná SD karta / USB. |
+| `config-export` | `{password}` | `{ok,opid}` (detached) exportuje konfiguraci, úlohy, cíle, přihlašovací údaje a klíče do jednoho souboru šifrovaného heslovou frází ve složce záloh. |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) sloučí exportovaný konfigurační soubor zpět do tohoto zařízení (nikdy slepě nepřepisuje). |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` vypíše šifrované konfigurační soubory dostupné k importu. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` odstraní uložená vzdálená hesla a šifrovací klíč zařízení; cíle, úlohy a zálohy zůstávají. |
+| `log-prune` | `{}` | `{ok}` prořeže dávno dokončené protokoly operací, omezí auditní stopu a odstraní zastaralé ikony (volá to spouštěcí služba). |
 
 ### Pole `progress`
 
@@ -174,7 +182,7 @@ Naplánovaná úloha volí **jeden** cíl a jednu **akci**:
 Jako cíl zadejte přesně **jeden** z `package`, `packages` nebo `all`. Úloha `backup` si
 ponechává obvyklé `mode`/`dest`/`keep`/`items`. Úloha `restore` (`action: "restore"`) obnoví
 **nejnovější** zálohu každé cílové aplikace (nebo explicitní `ref`) a **přepíše aktuální data
-aplikace při každém běhu** - je záměrná a volitelná, takže ji nastavte jen na přímou žádost
+aplikace při každém běhu**: je záměrná a volitelná, takže ji nastavte jen na přímou žádost
 uživatele.
 
 ### Brány plánovače
@@ -219,12 +227,12 @@ proti místnímu callback serveru (`127.0.0.1:53682`) a otevře prohlížeč sam
 na stránce souhlasu poskytovatele přes Android VIEW intent, přičemž vrátí `{ok:true,url}`
 (nebo `{ok:false,code:"ERR_AUTHORIZE"}`). Dotazujte `remote-authorize-poll` (`{}`): vrací
 `{ok:true,done:false,url}` během čekání a `{ok:true,done:true,token}` jakmile uživatel
-potvrdí - tento `token` předejte do `remote-add`. `remote-authorize-cancel` (`{}`) zastaví
+potvrdí, tento `token` předejte do `remote-add`. `remote-authorize-cancel` (`{}`) zastaví
 probíhající autorizaci (`{ok:true,cancelled:true}`). Ruční vložení výstupu
 `rclone authorize "<backend>"` z libovolného počítače je stále podporováno jako záložní řešení.
 
 Google Drive má dvě cesty: tento `drive` remote (nepotřebuje projekt Google Cloud, používá
-vlastní OAuth rclone - autorizujte na zařízení pomocí `remote-authorize`, nebo spusťte
+vlastní OAuth rclone, autorizujte na zařízení pomocí `remote-authorize`, nebo spusťte
 `rclone authorize "drive"` jednou na libovolném počítači a předejte token) nebo volitelná
 doprovodná aplikace (vlastní OAuth client id). Oba skončí jako obyčejné cíle.
 
@@ -234,7 +242,7 @@ Konfigurační pole `network_policy` řídí, které připojení smějí cloudov
 `any` (výchozí), `wifi`, nebo `mobile`. Nastavte ji pomocí `config-set`. Když je `wifi` nebo
 `mobile`, každý cloudový přenos (Full `rclone`/Drive upload, Mirror sync, vzdálená
 `restic` snapshot záloha/obnova, Mirror obnova) nejprve zkontroluje aktivní transport a
-přeruší s `ERR_NET_POLICY`, pokud neodpovídá - jak pro manuální, tak pro naplánované úlohy.
+přeruší s `ERR_NET_POLICY`, pokud neodpovídá, jak pro manuální, tak pro naplánované úlohy.
 Lokální cíle nejsou nikdy omezeny.
 
 ### Cloudová integrita a kvóta
@@ -285,8 +293,8 @@ uživatele.
 
 ### Samostatná záloha cesty
 
-`path-backup` / `path-restore` zálohují a obnovují **libovolnou absolutní cestu** - složku nebo
-jeden soubor - na sdíleném úložišti nebo pod `/data`, mimo per-aplikační model. Archiv je zapsán
+`path-backup` / `path-restore` zálohují a obnovují **libovolnou absolutní cestu**: složku nebo
+jeden soubor, na sdíleném úložišti nebo pod `/data`, mimo per-aplikační model. Archiv je zapsán
 jako `tar.zst` plus `manifest.json` ve vlastním formátu VDBackup (zapečetěný SHA-256, s RECOVERY
 sadou při šifrování) pod `.paths/` v adresáři záloh.
 
@@ -301,17 +309,17 @@ sadou při šifrování) pod `.paths/` v adresáři záloh.
   `/storage/emulated`, `/data/media`, `/sdcard`, `/data`. Cesta, která neexistuje, selže s
   `ERR_NO_PATH`; cesta mimo povolené rooty nebo cesta obsahující `..` selže s `ERR_BAD_PATH`.
 - `path-restore` zapisuje zpět na původní umístění, je tedy destruktivní a vyžaduje
-  `"confirm": true` - silně frikční zábrana, jako `special-restore`. `ref`, který není platná
+  `"confirm": true`, silně frikční zábrana, jako `special-restore`. `ref`, který není platná
   záloha cesty, selže s `ERR_BAD_REF`.
 - Oba běží **oddělené**; dotazujte se na `progress` s vráceným `opid`.
 
 ### `update-check`
 
 `update-check` hlásí, zda byla zveřejněna novější verze modulu, aby ji agent (nebo WebUI) mohl
-zobrazit. Je to **čtecí sloveso, které se vrací okamžitě** - **není** oddělené, takže není žádné
+zobrazit. Je to **čtecí sloveso, které se vrací okamžitě**: **není** oddělené, takže není žádné
 `opid` k dotazování. Spouští se pouze výslovnou akcí uživatele a stahuje zveřejněný manifest
 aktualizace modulu (URL `updateJson` z `module.prop`) pomocí přibaleného `curl` přes HTTP požadavek
-na straně root - to běží mimo WebView, a nepodléhá tedy CSP WebUI - a porovnává zveřejněný
+na straně root, to běží mimo WebView, a nepodléhá tedy CSP WebUI, a porovnává zveřejněný
 `versionCode` s nainstalovaným. Nepřijímá **žádné argumenty**.
 
 Při úspěchu vrací:
@@ -339,7 +347,7 @@ root manažer (KernelSU / APatch / Magisk) přes `updateJson` modulu, nikdy toto
 - **`ssaid` je striktně opt-in (výchozí vypnuto).** Zálohuje / obnovuje
   ANDROID_ID zařízení přepsáním systémového souboru; obnova se uplatní až po restartu, a
   předchozí soubor je vždy nejprve uložen pro rollback. Posílejte `"ssaid": true`
-  pouze na přímý, záměrný požadavek uživatele - nikdy ve výchozím stavu.
+  pouze na přímý, záměrný požadavek uživatele, nikdy ve výchozím stavu.
 - **Mutující akce (restore, delete, import) jsou destruktivní** a jsou zalogovány do
   lokální auditní stopy (`logs/audit.jsonl`). Obnova je věrná (wipe-then-extract), takže
   vrátí aplikaci do přesného stavu zálohy. Potvrďte záměr, než je zavoláte.
@@ -347,7 +355,7 @@ root manažer (KernelSU / APatch / Magisk) přes `updateJson` modulu, nikdy toto
   přepíše celosystémová nastavení, takže jej posílejte jen na přímou žádost uživatele; je chráněn
   výslovným souhlasem a zaznamenán do auditní stopy.
 - **Obnova je idempotentní.** Surové obnovy provideru (messages/contacts/wifi/bluetooth/calendar)
-  data **nahrazují** místo slučování - data provideru jsou vymazána a archiv je přes ně extrahován -
+  data **nahrazují** místo slučování, data provideru jsou vymazána a archiv je přes ně extrahován -
   takže opakovaná obnova téže zálohy nemůže duplikovat řádky. `dns` a `system_settings` jsou znovu
   aplikovány idempotentním `settings put`.
 - **Extrakce archivu je chráněna proti path traversal.** Obnova běží jako root, takže každý archiv
@@ -365,4 +373,4 @@ Viz [ARCHITECTURE.md](ARCHITECTURE.md) a
 
 ---
 
-*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány - viz [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md).*

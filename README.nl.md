@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>Volledige back-up en herstel van apps en gegevens als root - volledig aangestuurd vanuit een WebUI.</b><br>
+  <b>Volledige back-up en herstel van apps en gegevens als root, volledig aangestuurd vanuit een WebUI.</b><br>
   KernelSU- / APatch- / Magisk-module. Geen "su verlenen"-prompt, geen omschakelen van <code>sucompat</code>.
 </p>
 
@@ -29,7 +29,7 @@
 ## Wat het is
 
 VDBackup is een root-**WebUI-module** die je apps en hun gegevens back-upt en herstelt
-**zonder begeleidende app voor de kernfuncties** - omdat de module al root is, valt er
+**zonder begeleidende app voor de kernfuncties**: omdat de module al root is, valt er
 niets te "toestaan". Het doel is om alles te dekken wat de populaire back-upapps doen, op
 één plek, met een overzichtelijke WebUI.
 
@@ -46,7 +46,7 @@ bestaande back-ups van Neo-Backup en Android-DataBackup importeren zodat je kunt
   geversioneerd, via `restic`) en **Mirror** (1:1-synchronisatie, via `rclone`/`rsync`).
 - **Getrouw behoud:** SELinux-contexten, uid/gid, modi, xattr en capabilities.
 - **Compressie:** geen / lz4 / zstd / gzip (gzip = "compatibiliteitsmodus", opent overal).
-- **Versleuteling:** optioneel en draagbaar (`age` + wachtwoordzin of AES-256-zip) - nooit
+- **Versleuteling:** optioneel en draagbaar (`age` + wachtwoordzin of AES-256-zip), nooit
   gebonden aan de apparaathardware, zodat een back-up op een ander apparaat wordt hersteld of op een pc wordt geopend.
 - **Bestemmingen:** lokaal, SFTP, SCP, SMB, WebDAV, FTP, S3 en 70+ meer (`rclone`),
   plus `rsync`- en `restic`-repository's. Optioneel Google Drive via een piepkleine optionele begeleider.
@@ -80,18 +80,18 @@ bestaande back-ups van Neo-Backup en Android-DataBackup importeren zodat je kunt
 ## Installatie
 
 1. Download de nieuwste `VD-Backup-vX.Y.zip` van [Releases](https://github.com/VD171/VD-Backup/releases).
-2. Flash het in de KernelSU- / APatch- / Magisk-manager - meteen bruikbaar, geen herstart nodig.
+2. Flash het in de KernelSU- / APatch- / Magisk-manager, meteen bruikbaar, geen herstart nodig.
 3. Open de **WebUI** van de module om back-ups te configureren en uit te voeren. Dat is alles.
 
-**Edities.** Zes zips per release. `universal-full` - elke architectuur en elke binary
+**Edities.** Zes zips per release. `universal-full`, elke architectuur en elke binary
 ingebouwd (incl. `rclone` voor cloud-providers, `restic` voor snapshots), volledig offline,
-er wordt nooit iets gedownload, elk apparaat, grootst. `universal-lite` - elke architectuur
+er wordt nooit iets gedownload, elk apparaat, grootst. `universal-lite`, elke architectuur
 zonder de twee grootste binaries (`rclone`, `restic`), kleinst; doet nog steeds lokale,
 SSH/SFTP- en `rsync`-back-ups zonder download, en de eerste keer dat je een cloud-bestemming
 (`rclone`) of snapshot-modus (`restic`) gebruikt, biedt het aan die kleine
 architectuurspecifieke add-on eenmalig te downloaden (geverifieerd met SHA-256) en te
 cachen, zodat die functies ook werken. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`,
-`x86_64`) - één architectuur met elke binary ingebouwd, kleiner dan `universal-full`. Ken je
+`x86_64`), één architectuur met elke binary ingebouwd, kleiner dan `universal-full`. Ken je
 je architectuur -> kies `<abi>-full`; wil je de kleinste en vind je een eenmalige download
 voor cloud of snapshots geen bezwaar -> `universal-lite`; wil je alles ingebouwd zonder
 downloads (offline / herstel) -> een full-editie. Zie
@@ -114,12 +114,12 @@ De module is shell + WebUI plus statische binaries per ABI (`tar`, `zstd`, `lz4`
 
 ## Documentatie
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - de documentatie, online te doorbladeren.
-- **[Gebruikershandleiding](docs/USER-GUIDE.md)** - van begin tot eind, van installatie tot herstel.
-- **[AI-agenten](docs/AI-AGENTS.md)** - stuur elke actie headless aan via de JSON-API.
-- **[Architectuur](docs/ARCHITECTURE.md)** en **[Bestandsstructuur](docs/FILE-STRUCTURE.md)** - hoe het werkt.
-- **[Meegeleverde binaries](docs/BINARIES.md)** - herkomst en SHA-256 van elke voorgecompileerde binary, voor een volledige audit.
-- **[Herstel](module/etc/RECOVERY.md)** - een backup op een pc openen en ontsleutelen, zonder de module.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: de documentatie, online te doorbladeren.
+- **[Gebruikershandleiding](docs/USER-GUIDE.md)**: van begin tot eind, van installatie tot herstel.
+- **[AI-agenten](docs/AI-AGENTS.md)**: stuur elke actie headless aan via de JSON-API.
+- **[Architectuur](docs/ARCHITECTURE.md)** en **[Bestandsstructuur](docs/FILE-STRUCTURE.md)**: hoe het werkt.
+- **[Meegeleverde binaries](docs/BINARIES.md)**: herkomst en SHA-256 van elke voorgecompileerde binary, voor een volledige audit.
+- **[Herstel](module/etc/RECOVERY.md)**: een backup op een pc openen en ontsleutelen, zonder de module.
 - **[Bijdragen](CONTRIBUTING.md)** en **[Beveiliging](SECURITY.md)**.
 - **[Changelog](CHANGELOG.md)** en **[Gedragscode](CODE_OF_CONDUCT.md)**.
 
@@ -129,7 +129,7 @@ VDBackup is gebouwd om AI-assistenten en -agenten welkom te heten, niet alleen m
 De engine spreekt JSON (elk `helper.sh`-werkwoord geeft één JSON-object terug), de code,
 documentatie en bestandsstructuur zijn ingericht voor machinaal lezen, en bijdragen met
 AI-hulp worden net als alle andere beoordeeld en geaccepteerd. Een agent kan **elke**
-actie van de module headless beheren via dezelfde API die de WebUI gebruikt - zie
+actie van de module headless beheren via dezelfde API die de WebUI gebruikt, zie
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** voor het volledige besturingsoppervlak, en
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) om bij te dragen.
 
@@ -148,9 +148,9 @@ actie van de module headless beheren via dezelfde API die de WebUI gebruikt - zi
 
 Zusterprojecten van dezelfde auteur:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - een debugger voor apparaatmethoden: leest elk item via elke methode die het kan lezen en vergelijkt ze naast elkaar.
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - je Google-diensten (RCS, Wallet, Play Integrity-attestaties), op je apparaat gelezen zonder internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - een apparaatspoofer die een verse fingerprint omzet in een coherent, consistent profiel.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: een debugger voor apparaatmethoden: leest elk item via elke methode die het kan lezen en vergelijkt ze naast elkaar.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: je Google-diensten (RCS, Wallet, Play Integrity-attestaties), op je apparaat gelezen zonder internet.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: een apparaatspoofer die een verse fingerprint omzet in een coherent, consistent profiel.
 
 ## Licentie
 

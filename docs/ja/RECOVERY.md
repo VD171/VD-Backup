@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - PC でバックアップを復元する（Windows / macOS / Linux）
+# VDBackup, PC でバックアップを復元する（Windows / macOS / Linux）
 
 VDBackup のバックアップは **標準フォーマット** を使うため、このモジュールなしで
 どこでも開けます。バックアップのフォルダには、`manifest.json`、APK

@@ -14,7 +14,7 @@ WebUI + per-ABI static binaries। Core features के लिए किसी a
 [ARCHITECTURE.md](ARCHITECTURE.md) और [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md)।
 
 यह **Swift Backup, Neo-Backup और Android-DataBackup** का खुला, root-native **उत्तराधिकारी**
-है - AGPLv3 के तहत उनकी features का संघ, मौजूदा Neo-Backup और Android-DataBackup backups
+है, AGPLv3 के तहत उनकी features का संघ, मौजूदा Neo-Backup और Android-DataBackup backups
 के import के साथ ताकि लोग migrate कर सकें।
 
 ## AI योगदानकर्ताओं का स्वागत है
@@ -25,10 +25,10 @@ AI assistants और agents यहाँ first-class योगदानकर्
   JSON object प्रिंट करता है, engine साधारण POSIX shell है, और file layout
   [docs/FILE-STRUCTURE.md](FILE-STRUCTURE.md) में documented है।
 - एक agent उस JSON API के माध्यम से मॉड्यूल के **हर** content और action को headlessly
-  administer कर सकता है - पूरा control surface, verbs और safety rails
+  administer कर सकता है, पूरा control surface, verbs और safety rails
   [docs/AI-AGENTS.md](AI-AGENTS.md) में हैं।
 - AI-assisted patches की समीक्षा और स्वीकृति किसी भी अन्य की तरह उन्हीं शर्तों पर की जाती
-  है - correctness, clarity और नीचे दी गई conventions से, न कि किसने (या किसने) इसे लिखा।
+  है, correctness, clarity और नीचे दी गई conventions से, न कि किसने (या किसने) इसे लिखा।
 - अगर आप VDBackup को एक agent से चलाते हैं, तो contract के रूप में `helper.sh` के JSON
   output का उपयोग करें; WebUI को scrape न करें।
 - सबके लिए समान मानक: real features कभी कमजोर नहीं की जातीं, secrets और device data
@@ -62,18 +62,18 @@ AI assistants और agents यहाँ first-class योगदानकर्
 - एक string जोड़ने या बदलने के लिए: `en.js` **और** `en.json` संपादित करें, फिर हर
   `<code>.json` अपडेट करें। एक visible label को छूने का मतलब है **सभी** language files और
   **सभी** `README.<code>.md` अपडेट करना।
-- Translations साधारण JSON हैं - एक शानदार पहला योगदान। `module/webroot/i18n.js` में
+- Translations साधारण JSON हैं, एक शानदार पहला योगदान। `module/webroot/i18n.js` में
   language list देखें।
 
 ## Commits और PRs
 
 - PRs को focused रखें। क्या और क्यों का वर्णन करें।
 - अपने commits को sign off करें (DCO): `git commit -s` (`Signed-off-by:` जोड़ता है)।
-- CI green रहना चाहिए। reviews में दयालु रहें - देखें [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)।
+- CI green रहना चाहिए। reviews में दयालु रहें, देखें [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)।
 
 ## अच्छे पहले issues
 
 `good first issue` और `help wanted` labels देखें। Translations, docs, नए
 `rclone` destination presets और WebUI polish सभी बेहतरीन शुरुआती बिंदु हैं।
 
-*यह दस्तावेज़ीकरण Claude (Anthropic) के साथ तैयार किया गया था और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और बेहतरी का स्वागत है - [CONTRIBUTING.md](CONTRIBUTING.md) देखें।*
+*यह दस्तावेज़ीकरण Claude (Anthropic) के साथ तैयार किया गया था और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और बेहतरी का स्वागत है, [CONTRIBUTING.md](CONTRIBUTING.md) देखें।*

@@ -79,4 +79,4 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 (ดู [SECURITY.md](SECURITY.md)) นี่คือความไม่สอดคล้องชนิดที่ Manifest นี้มีอยู่เพื่อทำให้มองเห็นได้
 อย่างแท้จริง
 
-*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง - ดู [CONTRIBUTING.md](CONTRIBUTING.md)*
+*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง, ดู [CONTRIBUTING.md](CONTRIBUTING.md)*

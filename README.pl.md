@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>Pełna kopia zapasowa i przywracanie aplikacji oraz danych jako root - w całości sterowane przez WebUI.</b><br>
+  <b>Pełna kopia zapasowa i przywracanie aplikacji oraz danych jako root, w całości sterowane przez WebUI.</b><br>
   Moduł KernelSU / APatch / Magisk. Bez monitu "przyznaj su", bez przełączania <code>sucompat</code>.
 </p>
 
@@ -47,7 +47,7 @@ importować istniejące kopie zapasowe Neo-Backup i Android-DataBackup, abyś m�
   wersjonowany, przez `restic`) i **Mirror** (synchronizacja 1:1, przez `rclone`/`rsync`).
 - **Wierne zachowanie:** konteksty SELinux, uid/gid, tryby, xattr i capabilities.
 - **Kompresja:** brak / lz4 / zstd / gzip (gzip = "tryb zgodności", otwiera się wszędzie).
-- **Szyfrowanie:** opcjonalne i przenośne (`age` + hasło lub AES-256 zip) - nigdy nie
+- **Szyfrowanie:** opcjonalne i przenośne (`age` + hasło lub AES-256 zip), nigdy nie
   powiązane ze sprzętem urządzenia, więc kopia przywraca się na innym urządzeniu lub otwiera na komputerze.
 - **Miejsca docelowe:** lokalnie, SFTP, SCP, SMB, WebDAV, FTP, S3 i ponad 70 innych (`rclone`),
   a także repozytoria `rsync` i `restic`. Opcjonalnie Dysk Google przez malutki opcjonalny komponent towarzyszący.
@@ -81,10 +81,10 @@ importować istniejące kopie zapasowe Neo-Backup i Android-DataBackup, abyś m�
 ## Instalacja
 
 1. Pobierz najnowszy `VD-Backup-vX.Y.zip` z [Wydań](https://github.com/VD171/VD-Backup/releases).
-2. Zainstaluj go w menedżerze KernelSU / APatch / Magisk - gotowy do użycia od razu, bez ponownego uruchamiania.
+2. Zainstaluj go w menedżerze KernelSU / APatch / Magisk, gotowy do użycia od razu, bez ponownego uruchamiania.
 3. Otwórz **WebUI** modułu, aby skonfigurować i uruchamiać kopie zapasowe. To wszystko.
 
-**Edycje.** Sześć plików zip na wydanie. `universal-full` - każda architektura i każdy plik
+**Edycje.** Sześć plików zip na wydanie. `universal-full`, każda architektura i każdy plik
 binarny wbudowany (w tym `rclone` dla dostawców chmury i `restic` dla migawek), w pełni
 offline, nic nigdy nie jest pobierane, dowolne urządzenie, największy. `universal-lite` -
 każda architektura bez dwóch największych plików binarnych (`rclone`, `restic`), najmniejszy;
@@ -92,7 +92,7 @@ nadal obsługuje kopie lokalne, SSH/SFTP i `rsync` bez pobierania, a przy pierws
 miejsca docelowego w chmurze (`rclone`) lub trybu migawek (`restic`) proponuje jednorazowe
 pobranie tego małego dodatku dla danej architektury (zweryfikowanego przez SHA-256) i
 zapisuje go w pamięci podręcznej, więc te funkcje też działają.
-`<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - pojedyncza architektura z każdym
+`<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), pojedyncza architektura z każdym
 plikiem binarnym wbudowanym, mniejszy niż `universal-full`. Znasz swoją architekturę -> wybierz
 `<abi>-full`; chcesz najmniejszy i nie przeszkadza ci jednorazowe pobranie dla chmury lub
 migawek -> `universal-lite`; chcesz wszystko wbudowane bez pobierania (offline / odzyskiwanie)
@@ -116,12 +116,12 @@ Moduł to shell + WebUI oraz statyczne pliki binarne dla każdej ABI (`tar`, `zs
 
 ## Dokumentacja
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - dokumentacja do przeglądania online.
-- **[Przewodnik użytkownika](docs/USER-GUIDE.md)** - od początku do końca, od instalacji do przywracania.
-- **[Agenci AI](docs/AI-AGENTS.md)** - steruj każdym działaniem bezgłowo przez API JSON.
-- **[Architektura](docs/ARCHITECTURE.md)** i **[Struktura plików](docs/FILE-STRUCTURE.md)** - jak to działa.
-- **[Dołączone pliki binarne](docs/BINARIES.md)** - pochodzenie i SHA-256 każdego prekompilowanego pliku binarnego, do pełnego audytu.
-- **[Odzyskiwanie](module/etc/RECOVERY.md)** - otwórz i odszyfruj kopię zapasową na komputerze, bez modułu.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentacja do przeglądania online.
+- **[Przewodnik użytkownika](docs/USER-GUIDE.md)**: od początku do końca, od instalacji do przywracania.
+- **[Agenci AI](docs/AI-AGENTS.md)**: steruj każdym działaniem bezgłowo przez API JSON.
+- **[Architektura](docs/ARCHITECTURE.md)** i **[Struktura plików](docs/FILE-STRUCTURE.md)**: jak to działa.
+- **[Dołączone pliki binarne](docs/BINARIES.md)**: pochodzenie i SHA-256 każdego prekompilowanego pliku binarnego, do pełnego audytu.
+- **[Odzyskiwanie](module/etc/RECOVERY.md)**: otwórz i odszyfruj kopię zapasową na komputerze, bez modułu.
 - **[Współtworzenie](CONTRIBUTING.md)** i **[Bezpieczeństwo](SECURITY.md)**.
 - **[Dziennik zmian](CHANGELOG.md)** i **[Kodeks postępowania](CODE_OF_CONDUCT.md)**.
 
@@ -132,8 +132,8 @@ dla ludzi. Silnik mówi w JSON (każdy czasownik `helper.sh` zwraca pojedynczy o
 kod, dokumentacja i struktura plików są ułożone pod kątem odczytu maszynowego, a wkład
 wspomagany przez AI jest recenzowany i przyjmowany jak każdy inny. Agent może
 administrować **każdym** działaniem modułu bezgłowo przez to samo API, którego używa
-WebUI - pełną powierzchnię sterowania znajdziesz w **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**,
-a aby współtworzyć - w [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
+WebUI, pełną powierzchnię sterowania znajdziesz w **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**,
+a aby współtworzyć, w [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
 
 ## Kontakty
 
@@ -150,9 +150,9 @@ a aby współtworzyć - w [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welc
 
 Projekty siostrzane tego samego autora:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - debugger metod urządzenia: odczytuje każdy element wszystkimi metodami, które mogą go odczytać, i porównuje je obok siebie.
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - Twoje usługi Google (RCS, Wallet, atestacje Play Integrity) odczytywane na Twoim urządzeniu bez internetu.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - narzędzie do podszywania się urządzenia, które zamienia świeży fingerprint w spójny, konsekwentny profil.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: debugger metod urządzenia: odczytuje każdy element wszystkimi metodami, które mogą go odczytać, i porównuje je obok siebie.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: Twoje usługi Google (RCS, Wallet, atestacje Play Integrity) odczytywane na Twoim urządzeniu bez internetu.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: narzędzie do podszywania się urządzenia, które zamienia świeży fingerprint w spójny, konsekwentny profil.
 
 ## Licencja
 

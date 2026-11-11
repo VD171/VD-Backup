@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - obnova zálohy na PC (Windows / macOS / Linux)
+# VDBackup, obnova zálohy na PC (Windows / macOS / Linux)
 
 Vaše zálohy VDBackup používají **standardní formáty**, takže je můžete otevřít kdekoli,
 bez tohoto modulu. Složka zálohy obsahuje `manifest.json`, APK

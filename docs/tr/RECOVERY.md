@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - bir yedeği bir PC'de kurtarma (Windows / macOS / Linux)
+# VDBackup, bir yedeği bir PC'de kurtarma (Windows / macOS / Linux)
 
 VDBackup yedekleriniz **standart biçimler** kullanır, dolayısıyla onları bu modül olmadan
 her yerde açabilirsiniz. Bir yedek klasörü bir `manifest.json`, APK'ları (`*.apk.zst`) ve

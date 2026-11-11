@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - восстановление резервной копии на ПК (Windows / macOS / Linux)
+# VDBackup, восстановление резервной копии на ПК (Windows / macOS / Linux)
 
 Ваши резервные копии VDBackup используют **стандартные форматы**, поэтому вы можете открыть их где угодно,
 без этого модуля. Папка резервной копии содержит `manifest.json`, APK
@@ -54,7 +54,7 @@ zstd -d --format=lz4 data.tar.lz4 -o data.tar
 tar  -xf data.tar
 ```
 
-APK - это просто сжатые zstd файлы APK (ZIP):
+APK, это просто сжатые zstd файлы APK (ZIP):
 
 ```
 zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)

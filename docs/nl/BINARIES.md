@@ -20,7 +20,7 @@ vandaan komt en hoe je kunt verifiëren dat er niets ondoorzichtigs is binnenges
   luidruchtig, hij improviseert nooit.
 - **Reproduceerbaar.** Voer de build opnieuw uit en je krijgt dezelfde bestanden; haal de
    vastgezette bronnen opnieuw op en de SHA-256-waarden komen overeen.
-- **Het auditspoor wordt met de module meegeleverd.** Het staat niet alleen op de website - het
+- **Het auditspoor wordt met de module meegeleverd.** Het staat niet alleen op de website, het
   reist mee binnen de geïnstalleerde module, op je apparaat, zodat je offline kunt auditen.
 
 ## Wat wordt meegeleverd, en vanwaar
@@ -83,4 +83,4 @@ Als een meegeleverd bestand niet overeenkomt met de vastgelegde bron, behandel h
 beveiligingsprobleem en meld het (zie [SECURITY.md](SECURITY.md)). Dit is precies het soort
 discrepantie dat dit manifest bestaat om zichtbaar te maken.
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom - zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*

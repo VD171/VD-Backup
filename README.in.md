@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>Pencadangan dan pemulihan penuh aplikasi &amp; data sebagai root - sepenuhnya dikendalikan dari sebuah WebUI.</b><br>
+  <b>Pencadangan dan pemulihan penuh aplikasi &amp; data sebagai root, sepenuhnya dikendalikan dari sebuah WebUI.</b><br>
   Modul KernelSU / APatch / Magisk. Tanpa permintaan "grant su", tanpa mengalihkan <code>sucompat</code>.
 </p>
 
@@ -29,7 +29,7 @@
 ## Apa ini
 
 VDBackup adalah **modul WebUI** root yang mencadangkan dan memulihkan aplikasi Anda beserta
-datanya **tanpa aplikasi pendamping untuk fitur inti** - karena modulnya sudah root, tidak ada yang
+datanya **tanpa aplikasi pendamping untuk fitur inti**: karena modulnya sudah root, tidak ada yang
 perlu "diizinkan". Tujuannya mencakup segala hal yang dilakukan aplikasi pencadangan populer, dalam
 satu tempat, dengan WebUI yang rapi.
 
@@ -46,7 +46,7 @@ mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada agar Anda bi
   berversi, via `restic`) dan **Mirror** (sinkronisasi 1:1, via `rclone`/`rsync`).
 - **Pelestarian setia:** konteks SELinux, uid/gid, mode, xattr dan kapabilitas.
 - **Kompresi:** tidak ada / lz4 / zstd / gzip (gzip = "mode kompatibilitas", terbuka di mana saja).
-- **Enkripsi:** opsional dan portabel (`age` + frasa sandi, atau zip AES-256) - tidak pernah
+- **Enkripsi:** opsional dan portabel (`age` + frasa sandi, atau zip AES-256), tidak pernah
   terikat ke perangkat keras, sehingga sebuah cadangan dapat dipulihkan di perangkat lain atau dibuka di PC.
 - **Tujuan:** lokal, SFTP, SCP, SMB, WebDAV, FTP, S3 dan 70+ lainnya (`rclone`),
   ditambah repo `rsync` dan `restic`. Google Drive opsional melalui pendamping kecil yang opt-in.
@@ -80,10 +80,10 @@ mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada agar Anda bi
 ## Pemasangan
 
 1. Unduh `VD-Backup-vX.Y.zip` terbaru dari [Rilis](https://github.com/VD171/VD-Backup/releases).
-2. Flash di manajer KernelSU / APatch / Magisk - langsung bisa dipakai, tanpa perlu reboot.
+2. Flash di manajer KernelSU / APatch / Magisk, langsung bisa dipakai, tanpa perlu reboot.
 3. Buka **WebUI** modul untuk mengonfigurasi dan menjalankan pencadangan. Selesai.
 
-**Edisi.** Setiap rilis hadir sebagai enam zip. `universal-full` - setiap arsitektur dan setiap biner tertanam (termasuk `rclone` untuk penyedia cloud dan `restic` untuk snapshot), sepenuhnya offline, tidak pernah ada yang diunduh, perangkat apa pun, terbesar. `universal-lite` - setiap arsitektur tanpa dua biner terbesar (`rclone`, `restic`), terkecil; tetap bisa backup lokal, SSH/SFTP dan `rsync` tanpa unduhan, dan pertama kali kamu memakai tujuan cloud (`rclone`) atau mode snapshot (`restic`) ia menawarkan untuk mengunduh addon kecil per-arsitektur itu sekali (diverifikasi dengan SHA-256) lalu menyimpannya di cache, sehingga fitur-fitur itu pun berfungsi. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) - satu arsitektur dengan setiap biner tertanam, lebih kecil dari `universal-full`. Tahu arsitekturmu -> pilih `<abi>-full`; mau yang terkecil dan tidak keberatan dengan satu kali unduhan untuk cloud atau snapshot -> `universal-lite`; mau semuanya tertanam tanpa unduhan apa pun (offline / pemulihan) -> edisi full. Lihat [Rilis](https://github.com/VD171/VD-Backup/releases).
+**Edisi.** Setiap rilis hadir sebagai enam zip. `universal-full`, setiap arsitektur dan setiap biner tertanam (termasuk `rclone` untuk penyedia cloud dan `restic` untuk snapshot), sepenuhnya offline, tidak pernah ada yang diunduh, perangkat apa pun, terbesar. `universal-lite`, setiap arsitektur tanpa dua biner terbesar (`rclone`, `restic`), terkecil; tetap bisa backup lokal, SSH/SFTP dan `rsync` tanpa unduhan, dan pertama kali kamu memakai tujuan cloud (`rclone`) atau mode snapshot (`restic`) ia menawarkan untuk mengunduh addon kecil per-arsitektur itu sekali (diverifikasi dengan SHA-256) lalu menyimpannya di cache, sehingga fitur-fitur itu pun berfungsi. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), satu arsitektur dengan setiap biner tertanam, lebih kecil dari `universal-full`. Tahu arsitekturmu -> pilih `<abi>-full`; mau yang terkecil dan tidak keberatan dengan satu kali unduhan untuk cloud atau snapshot -> `universal-lite`; mau semuanya tertanam tanpa unduhan apa pun (offline / pemulihan) -> edisi full. Lihat [Rilis](https://github.com/VD171/VD-Backup/releases).
 
 Baru di sini? [Panduan pengguna](docs/USER-GUIDE.md) memandu Anda dari pemasangan hingga pemulihan.
 
@@ -102,12 +102,12 @@ Modul ini adalah shell + WebUI ditambah biner statis per-ABI (`tar`, `zstd`, `lz
 
 ## Dokumentasi
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)** - dokumentasi, dapat dijelajahi daring.
-- **[Panduan pengguna](docs/USER-GUIDE.md)** - menyeluruh, dari pemasangan hingga pemulihan.
-- **[Agen AI](docs/AI-AGENTS.md)** - kendalikan setiap tindakan tanpa antarmuka melalui JSON API.
-- **[Arsitektur](docs/ARCHITECTURE.md)** dan **[Struktur berkas](docs/FILE-STRUCTURE.md)** - cara kerjanya.
-- **[Biner bawaan](docs/BINARIES.md)** - asal-usul dan SHA-256 setiap biner prakompilasi, untuk audit penuh.
-- **[Pemulihan](module/etc/RECOVERY.md)** - buka dan dekripsi cadangan di PC, tanpa modul.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentasi, dapat dijelajahi daring.
+- **[Panduan pengguna](docs/USER-GUIDE.md)**: menyeluruh, dari pemasangan hingga pemulihan.
+- **[Agen AI](docs/AI-AGENTS.md)**: kendalikan setiap tindakan tanpa antarmuka melalui JSON API.
+- **[Arsitektur](docs/ARCHITECTURE.md)** dan **[Struktur berkas](docs/FILE-STRUCTURE.md)**: cara kerjanya.
+- **[Biner bawaan](docs/BINARIES.md)**: asal-usul dan SHA-256 setiap biner prakompilasi, untuk audit penuh.
+- **[Pemulihan](module/etc/RECOVERY.md)**: buka dan dekripsi cadangan di PC, tanpa modul.
 - **[Berkontribusi](CONTRIBUTING.md)** dan **[Keamanan](SECURITY.md)**.
 - **[Changelog](CHANGELOG.md)** dan **[Pedoman Perilaku](CODE_OF_CONDUCT.md)**.
 
@@ -117,7 +117,7 @@ VDBackup dibangun agar menyambut asisten dan agen AI, bukan hanya orang. Mesinny
 (setiap verba `helper.sh` mengembalikan satu objek JSON), kode, dokumentasi, dan struktur berkasnya
 ditata untuk pembacaan mesin, dan kontribusi berbantuan AI ditinjau serta diterima seperti kontribusi
 lainnya. Sebuah agen dapat mengelola **setiap** tindakan modul tanpa antarmuka melalui API yang sama
-yang digunakan WebUI - lihat **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** untuk permukaan kendali
+yang digunakan WebUI, lihat **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** untuk permukaan kendali
 lengkap, dan [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) untuk berkontribusi.
 
 ## Kontak
@@ -135,9 +135,9 @@ lengkap, dan [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) untuk be
 
 Proyek saudara dari penulis yang sama:
 
-- **[VDInfos](https://github.com/VD171/VD-Infos)** - sebuah debugger metode perangkat: membaca setiap item melalui setiap metode yang dapat membacanya dan membandingkannya berdampingan.
-- **[VDGoogle](https://github.com/VD171/VD-Google)** - layanan Google Anda (RCS, Wallet, atestasi Play Integrity), dibaca di perangkat Anda tanpa internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)** - sebuah pemalsu perangkat yang mengubah fingerprint baru menjadi profil yang koheren dan konsisten.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: sebuah debugger metode perangkat: membaca setiap item melalui setiap metode yang dapat membacanya dan membandingkannya berdampingan.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: layanan Google Anda (RCS, Wallet, atestasi Play Integrity), dibaca di perangkat Anda tanpa internet.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: sebuah pemalsu perangkat yang mengubah fingerprint baru menjadi profil yang koheren dan konsisten.
 
 ## Lisensi
 

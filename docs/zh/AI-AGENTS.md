@@ -85,7 +85,15 @@ SSH-to-root 配置）来执行该命令。模块附带捆绑的二进制文件�
 | `cloud-fetch` | `{}` | `{ok,opid}`（detached）在 `lite` 版本上下载+校验+安装 `rclone`/`restic` 附加包 |
 | `schedule-set` / `schedule-list` / `schedule-delete` | 见下文 | 计划任务（备份或恢复；针对单个应用、一组应用，或所有应用） |
 | `scheduler-tick` | `{}` | 运行到期任务 + 应用保留策略 + 自动备份观察器（开机心跳会调用它） |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}`（非 detached；立即返回；失败时返回 `ERR_UPDATE_CHECK` - 见下文） |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}`（非 detached；立即返回；失败时返回 `ERR_UPDATE_CHECK`, 见下文） |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) 在单个分离的操作中备份多个应用；进度包含 `n`/`of`。单个应用失败不会中止批处理。 |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) 在单个分离的操作中恢复多个备份；进度包含 `n`/`of`。单个应用失败不会中止批处理。 |
+| `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` 文件夹选择器的存储卷：内部以及可移动的 SD 卡/USB。 |
+| `config-export` | `{password}` | `{ok,opid}` (detached) 将配置、任务、目标位置、凭据和密钥导出到备份目录下的单个密码短语加密文件。 |
+| `config-import` | `{ref,password}` | `{ok,opid}` (detached) 将导出的配置文件合并回本设备（绝不盲目覆盖）。 |
+| `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` 列出可供导入的加密配置文件。 |
+| `wipe-credentials` | `{}` | `{ok,wiped}` 删除已保存的远程密码和设备加密密钥；目标位置、任务和备份保留。 |
+| `log-prune` | `{}` | `{ok}` 修剪早已完成的操作日志，限制审计记录，并清除过时图标（由启动服务调用）。 |
 
 ### `progress` 字段
 
@@ -163,7 +171,7 @@ SSH-to-root 配置）来执行该命令。模块附带捆绑的二进制文件�
 }
 ```
 
-为目标恰好提供 `package`、`packages` 或 `all` 三者**之一**。一个 `backup` 任务保留通常的 `mode`/`dest`/`keep`/`items`。一个 `restore` 任务（`action: "restore"`）会恢复每个目标应用的**最近**备份（或一个明确的 `ref`），并在**每次运行时覆盖应用的当前数据** - 这是有意为之且需主动选择的，所以只在用户直接请求时才进行设置。
+为目标恰好提供 `package`、`packages` 或 `all` 三者**之一**。一个 `backup` 任务保留通常的 `mode`/`dest`/`keep`/`items`。一个 `restore` 任务（`action: "restore"`）会恢复每个目标应用的**最近**备份（或一个明确的 `ref`），并在**每次运行时覆盖应用的当前数据**: 这是有意为之且需主动选择的，所以只在用户直接请求时才进行设置。
 
 ### 调度器门控
 
@@ -181,7 +189,7 @@ SSH-to-root 配置）来执行该命令。模块附带捆绑的二进制文件�
 ### `remote-add` 参数
 
 云端目标是一个指定某个 `rclone` 远端的 `type:"rclone"` 目标；请先用 `remote-add` 创建该远端。
-`backend` 可以是**任意 rclone 后端** - 没有白名单。`remote-add` 接受任意后端名称（`dropbox`、
+`backend` 可以是**任意 rclone 后端**: 没有白名单。`remote-add` 接受任意后端名称（`dropbox`、
 `onedrive`、`box`、`pcloud`、`mega`、`b2`、`s3`、`sftp`、`smb`、`webdav`、`ftp`、`drive` 以及
 rclone 支持的另外约 ~70 个），而 `params` 会作为 `key=value` 对直接传递给 `rclone` 配置。
 密码字段以混淆形式存储，绝不以明文保存。常见后端及其 `params`：
@@ -198,12 +206,12 @@ pCloud）无需桌面电脑，也无需手动粘贴 token。用 `{backend}` 调�
 一个本地回调服务器（`127.0.0.1:53682`）运行 `rclone authorize <backend>`，并通过 Android VIEW
 intent 将手机自己的浏览器打开到提供商的同意页面，返回 `{ok:true,url}`（或
 `{ok:false,code:"ERR_AUTHORIZE"}`）。轮询 `remote-authorize-poll`（`{}`）：等待时返回
-`{ok:true,done:false,url}`，用户批准后返回 `{ok:true,done:true,token}` - 将该 `token` 传给
+`{ok:true,done:false,url}`，用户批准后返回 `{ok:true,done:true,token}`, 将该 `token` 传给
 `remote-add`。`remote-authorize-cancel`（`{}`）会停止一个待处理的授权（`{ok:true,cancelled:true}`）。
 从任意电脑手动粘贴 `rclone authorize "<backend>"` 的输出仍作为后备方式受支持。
 
 Google Drive 有两条路径：这个 `drive` 远端（无需 Google Cloud 项目，使用 rclone 自带的
-OAuth - 用 `remote-authorize` 在设备端授权，或在任意一台电脑上运行一次 `rclone authorize "drive"`
+OAuth, 用 `remote-authorize` 在设备端授权，或在任意一台电脑上运行一次 `rclone authorize "drive"`
 并传入 token），或者选用的配套应用（使用你自己的 OAuth client id）。两者最终都成为普通的目标。
 
 ### 网络策略
@@ -211,7 +219,7 @@ OAuth - 用 `remote-authorize` 在设备端授权，或在任意一台电脑上�
 config 字段 `network_policy` 控制云端传输可使用哪种连接：`any`（默认）、`wifi` 或 `mobile`。
 用 `config-set` 设置。当其值为 `wifi` 或 `mobile` 时，每一次云端传输（Full 的 `rclone`/Drive
 上传、Mirror 同步、远端 `restic` 快照备份/恢复、Mirror 恢复）都会先检查当前使用的传输方式，
-若不匹配则以 `ERR_NET_POLICY` 中止 - 对手动和计划任务均适用。本地目标从不受此限制。
+若不匹配则以 `ERR_NET_POLICY` 中止, 对手动和计划任务均适用。本地目标从不受此限制。
 
 ### 云端完整性与配额
 
@@ -265,16 +273,16 @@ config 字段 `network_policy` 控制云端传输可使用哪种连接：`any`�
 - 源路径必须是**绝对的**，且位于允许的根之一下：`/storage/emulated`、`/data/media`、`/sdcard`、
   `/data`。不存在的路径会以 `ERR_NO_PATH` 失败；位于允许的根之外、或包含 `..` 的路径会以
   `ERR_BAD_PATH` 失败。
-- `path-restore` 写回原始位置，因此具有破坏性并要求 `"confirm": true` - 一道高摩擦的关卡，就像
+- `path-restore` 写回原始位置，因此具有破坏性并要求 `"confirm": true`, 一道高摩擦的关卡，就像
   `special-restore`。不是有效路径备份的 `ref` 会以 `ERR_BAD_REF` 失败。
 - 两者都以 **detached** 方式运行；用返回的 `opid` 轮询 `progress`。
 
 ### `update-check`
 
 `update-check` 报告是否已发布模块的更新版本，以便智能体（或 WebUI）可以展示它。它是一个
-**立即返回的读取 verb** - 它**不是** detached 的，因此没有 `opid` 可供轮询。它仅由用户的显式操作
+**立即返回的读取 verb**: 它**不是** detached 的，因此没有 `opid` 可供轮询。它仅由用户的显式操作
 触发，使用内置的 `curl` 通过 root 侧的 HTTP 请求获取模块已发布的更新清单（`module.prop` 中的
-`updateJson` URL）- 这在 WebView 之外运行，因此不受 WebUI 的 CSP 约束 - 并将已发布的 `versionCode`
+`updateJson` URL）- 这在 WebView 之外运行，因此不受 WebUI 的 CSP 约束, 并将已发布的 `versionCode`
 与已安装的进行比较。它**不接受任何参数**。
 
 成功时返回：
@@ -301,14 +309,14 @@ config 字段 `network_policy` 控制云端传输可使用哪种连接：`any`�
 
 - **`ssaid` 严格为选用（默认关闭）。** 它通过改写一个系统文件来备份/恢复设备
   ANDROID_ID；恢复仅在重启后生效，并且为便于回滚，总会先保存原文件。只有在用户直接、
-  审慎地提出请求时才发送 `"ssaid": true` - 绝不要默认发送。
+  审慎地提出请求时才发送 `"ssaid": true`, 绝不要默认发送。
 - **变更性操作（restore、delete、import）具有破坏性**，并会记录到本地审计轨迹
   （`logs/audit.jsonl`）。恢复是忠实的（wipe-then-extract），会把应用还原到备份所捕获的确切
   状态。调用它们之前请先确认意图。
 - **`system_settings` 是选用的且具有破坏性，与 `ssaid` 完全一样。** 恢复它会覆盖设备全局设置，因此
   仅在用户直接请求时才发送它；它由明确同意把关，并记录到审计轨迹中。
 - **恢复是幂等的。** 原始 provider 恢复（messages/contacts/wifi/bluetooth/calendar）是**替换**而非
-  合并 - provider 数据被清除，归档在其上提取 - 因此重新恢复同一个备份不会产生重复行。`dns` 和
+  合并, provider 数据被清除，归档在其上提取, 因此重新恢复同一个备份不会产生重复行。`dns` 和
   `system_settings` 以幂等的 `settings put` 重新应用。
 - **归档提取受到防路径遍历保护。** 恢复以 root 运行，因此在任何写入之前都会检查每个归档（restore、
   import、special-restore、path-restore）：其成员使用绝对路径或包含 `..` 的归档，会在发生任何一次
@@ -324,4 +332,4 @@ config 字段 `network_policy` 控制云端传输可使用哪种连接：`any`�
 
 ---
 
-*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进 - 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*
+*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进, 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*

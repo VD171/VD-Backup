@@ -71,4 +71,4 @@ docs/                               # all public documentation
 
 ---
 
-*این مستندات با Claude (Anthropic) تولید شده و توسط VD171 نگهداری می‌شود. اصلاحات و بهبودها پذیرفته می‌شوند - ببینید [CONTRIBUTING.md](CONTRIBUTING.md).*
+*این مستندات با Claude (Anthropic) تولید شده و توسط VD171 نگهداری می‌شود. اصلاحات و بهبودها پذیرفته می‌شوند, ببینید [CONTRIBUTING.md](CONTRIBUTING.md).*

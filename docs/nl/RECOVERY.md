@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - een backup herstellen op een pc (Windows / macOS / Linux)
+# VDBackup, een backup herstellen op een pc (Windows / macOS / Linux)
 
 Je VDBackup-backups gebruiken **standaardformaten**, zodat je ze overal kunt openen,
 zonder deze module. Een backupmap bevat een `manifest.json`, de APK's

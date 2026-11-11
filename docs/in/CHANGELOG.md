@@ -6,6 +6,32 @@
 
 Semua perubahan penting pada VDBackup didokumentasikan di sini. Hanya dalam bahasa Inggris.
 
+## v1.05
+
+Keandalan:
+
+- Pencadangan massal tidak lagi berhenti di tengah jalan saat Anda meninggalkan aplikasi. Seluruh pilihan, grup tag, atau proses terjadwal kini dijalankan oleh satu proses root terpisah yang terus berjalan saat WebUI ditutup dan terlindungi dari penghentian saat tekanan memori. Tampilan progres terhubung kembali saat Anda kembali.
+
+Pengaturan:
+
+- Cadangan pengaturan: ekspor tujuan, jadwal, prasetel, dan kredensial tersimpan Anda ke satu berkas terenkripsi, lalu impor ke perangkat lain atau setelah pemasangan bersih. Berkas selalu meminta frasa sandi karena berisi kata sandi jarak jauh, dan impor menggabungkan ke perangkat tanpa menghapus yang sudah ada.
+- Kini Anda dapat menghapus kredensial jarak jauh tersimpan dan kunci enkripsi perangkat dari pengaturan dalam satu langkah, sementara tujuan, jadwal, dan cadangan Anda tetap ada.
+
+Keamanan:
+
+- Cadangan hanya dapat disimpan di tempat yang tetap terenkripsi saat diam. Tujuan di bawah jalur yang dapat dibaca sebelum pembukaan kunci pertama, seperti /data/adb atau /data/system, ditolak.
+- Kredensial tersimpan, rclone.conf, dan kunci age kini berada di penyimpanan terenkripsi-kredensial, terkunci hingga pembukaan kunci pertama, alih-alih lokasi yang sebelumnya terbaca; pembaruan modul memindahkannya ke sana secara permanen.
+- Cadangan kini memeriksa ruang kosong sebelum mulai dan berhenti dengan pesan yang jelas alih-alih gagal di tengah jalan.
+
+Pemulihan:
+
+- Memulihkan aplikasi yang tidak lagi terpasang kini memasang ulang APK-nya terlebih dahulu, dan dialog pemulihan menawarkan opsi APK setiap kali cadangan memilikinya. Pemulihan yang tidak dapat memasang aplikasi melaporkan kegagalan alih-alih mengaku berhasil.
+- Operasi aplikasi, izin, dan pengaturan kini berjalan di lingkungan bersih, memperbaiki galat "Failed transaction" yang memblokir pemulihan, app-ops, dan pengaturan pada sebagian ROM.
+
+Tujuan:
+
+- Anda dapat mencadangkan ke kartu SD atau drive USB: pemilih folder menampilkan pintasan ke setiap volume penyimpanan dan menerima jalur media lepasan.
+
 ## v1.04
 
 Perbaikan:
@@ -18,7 +44,7 @@ Privasi:
 
 Cadangan:
 
-- Anda kini bisa menentukan item mana yang dicadangkan setiap aplikasi - misalnya hanya APK, atau APK + OBB - yang diterapkan di cadangan massal, otomatis, dan terjadwal. Cadangan manual tunggal tetap membiarkan Anda memilih saat itu, terisi otomatis dari set aplikasi. Aturlah di Pengaturan, di samping daftar aplikasi yang dikecualikan.
+- Anda kini bisa menentukan item mana yang dicadangkan setiap aplikasi, misalnya hanya APK, atau APK + OBB, yang diterapkan di cadangan massal, otomatis, dan terjadwal. Cadangan manual tunggal tetap membiarkan Anda memilih saat itu, terisi otomatis dari set aplikasi. Aturlah di Pengaturan, di samping daftar aplikasi yang dikecualikan.
 
 - Praset cadangan: simpan kumpulan bernama dari apa yang disertakan dan terapkan dengan satu pilihan di dialog cadangan.
 - Multi-pengguna: cadangan aplikasi, cadangan khusus, dan pemulihan kini semuanya mengikuti pengguna Android yang Anda pilih.
@@ -232,4 +258,4 @@ Ramah-AI dan i18n:
 - Daftar aplikasi yang kaya dan dekripsi Neo berjalan melalui helper dex yang dijalankan sebagai root
   (`IPackageManager` via ServiceManager), sehingga berfungsi di tempat ActivityThread menggantung.
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan - lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*

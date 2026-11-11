@@ -2,7 +2,7 @@
 
 ---
 
-# VDBackup - återskapa en säkerhetskopia på en PC (Windows / macOS / Linux)
+# VDBackup, återskapa en säkerhetskopia på en PC (Windows / macOS / Linux)
 
 Dina VDBackup-säkerhetskopior använder **standardformat**, så du kan öppna dem var som helst,
 utan den här modulen. En säkerhetskopiemapp innehåller en `manifest.json`, APK:erna
