@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ko-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ko-USER-GUIDE">사용자 가이드</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ko-AI-AGENTS">AI 에이전트</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ko-ARCHITECTURE">아키텍처</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ko-BINARIES">포함된 바이너리</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ko-CHANGELOG">변경 이력</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -124,14 +124,14 @@ JSON으로 말하고 (`helper.sh`의 모든 verb는 하나의 JSON 객체를 반
 
 ## 문서
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: 온라인에서 둘러볼 수 있는 문서.
-- **[사용자 가이드](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: 설치부터 복원까지 처음부터 끝까지.
-- **[AI 에이전트](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: JSON API를 통해 모든 작업을 헤드리스로 수행.
-- **[아키텍처](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** 와 **[파일 구조](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: 작동 방식.
-- **[포함된 바이너리](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: 모든 사전 컴파일된 바이너리의 출처와 SHA-256, 전체 감사를 위해.
-- **[복구](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: 모듈 없이 PC에서 백업을 열고 복호화.
-- **[기여](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** 와 **[보안](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[변경 이력](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** 와 **[행동 강령](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki/ko-Home)**: 온라인에서 둘러볼 수 있는 문서.
+- **[사용자 가이드](https://github.com/VD171/VD-Backup/wiki/ko-USER-GUIDE)**: 설치부터 복원까지 처음부터 끝까지.
+- **[AI 에이전트](https://github.com/VD171/VD-Backup/wiki/ko-AI-AGENTS)**: JSON API를 통해 모든 작업을 헤드리스로 수행.
+- **[아키텍처](https://github.com/VD171/VD-Backup/wiki/ko-ARCHITECTURE)** 와 **[파일 구조](https://github.com/VD171/VD-Backup/wiki/ko-FILE-STRUCTURE)**: 작동 방식.
+- **[포함된 바이너리](https://github.com/VD171/VD-Backup/wiki/ko-BINARIES)**: 모든 사전 컴파일된 바이너리의 출처와 SHA-256, 전체 감사를 위해.
+- **[복구](https://github.com/VD171/VD-Backup/wiki/ko-RECOVERY)**: 모듈 없이 PC에서 백업을 열고 복호화.
+- **[기여](https://github.com/VD171/VD-Backup/wiki/ko-CONTRIBUTING)** 와 **[보안](https://github.com/VD171/VD-Backup/wiki/ko-SECURITY)**.
+- **[변경 이력](https://github.com/VD171/VD-Backup/wiki/ko-CHANGELOG)** 와 **[행동 강령](https://github.com/VD171/VD-Backup/wiki/ko-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

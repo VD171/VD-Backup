@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ar-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ar-USER-GUIDE">دليل المستخدم</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ar-AI-AGENTS">وكلاء الذكاء الاصطناعي</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ar-ARCHITECTURE">البنية</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ar-BINARIES">الملفات الثنائية المُضمَّنة</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ar-CHANGELOG">سجل التغييرات</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -118,14 +118,14 @@ Neo-Backup وAndroid-DataBackup الموجودة كي تنتقل إليها.
 
 ## التوثيق
 
-- **[الويكي](https://github.com/VD171/VD-Backup/wiki)**: التوثيق، قابل للتصفح على الإنترنت.
-- **[دليل المستخدم](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: من البداية إلى النهاية، من التثبيت حتى الاستعادة.
-- **[وكلاء الذكاء الاصطناعي](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: قُد كل إجراء بلا واجهة عبر واجهة JSON البرمجية.
-- **[البنية](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** و**[هيكل الملفات](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: كيف تعمل.
-- **[الملفات الثنائية المُضمَّنة](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: المصدر وبصمة SHA-256 لكل ملف ثنائي مُترجَم مسبقًا، للتدقيق الكامل.
-- **[الاستعادة](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: افتح وفك تشفير نسخة احتياطية على حاسوب دون الوحدة.
-- **[المساهمة](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** و**[الأمان](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[سجل التغييرات](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** و**[مدونة السلوك](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[الويكي](https://github.com/VD171/VD-Backup/wiki/ar-Home)**: التوثيق، قابل للتصفح على الإنترنت.
+- **[دليل المستخدم](https://github.com/VD171/VD-Backup/wiki/ar-USER-GUIDE)**: من البداية إلى النهاية، من التثبيت حتى الاستعادة.
+- **[وكلاء الذكاء الاصطناعي](https://github.com/VD171/VD-Backup/wiki/ar-AI-AGENTS)**: قُد كل إجراء بلا واجهة عبر واجهة JSON البرمجية.
+- **[البنية](https://github.com/VD171/VD-Backup/wiki/ar-ARCHITECTURE)** و**[هيكل الملفات](https://github.com/VD171/VD-Backup/wiki/ar-FILE-STRUCTURE)**: كيف تعمل.
+- **[الملفات الثنائية المُضمَّنة](https://github.com/VD171/VD-Backup/wiki/ar-BINARIES)**: المصدر وبصمة SHA-256 لكل ملف ثنائي مُترجَم مسبقًا، للتدقيق الكامل.
+- **[الاستعادة](https://github.com/VD171/VD-Backup/wiki/ar-RECOVERY)**: افتح وفك تشفير نسخة احتياطية على حاسوب دون الوحدة.
+- **[المساهمة](https://github.com/VD171/VD-Backup/wiki/ar-CONTRIBUTING)** و**[الأمان](https://github.com/VD171/VD-Backup/wiki/ar-SECURITY)**.
+- **[سجل التغييرات](https://github.com/VD171/VD-Backup/wiki/ar-CHANGELOG)** و**[مدونة السلوك](https://github.com/VD171/VD-Backup/wiki/ar-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

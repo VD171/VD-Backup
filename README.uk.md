@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/uk-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/uk-USER-GUIDE">Посібник користувача</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/uk-AI-AGENTS">Агенти ШІ</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/uk-ARCHITECTURE">Архітектура</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/uk-BINARIES">Вбудовані бінарники</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/uk-CHANGELOG">Changelog</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -129,14 +129,14 @@ VDBackup створений так, щоб бути привітним до AI-�
 
 ## Документація
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: документація для перегляду онлайн.
-- **[Посібник користувача](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: від початку до кінця, від встановлення до відновлення.
-- **[Агенти ШІ](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: керуйте кожною дією без інтерфейсу через JSON API.
-- **[Архітектура](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** та **[Структура файлів](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: як це працює.
-- **[Вбудовані бінарники](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: походження та SHA-256 кожного попередньо зібраного бінарника, для повного аудиту.
-- **[Відновлення](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: відкрийте та розшифруйте резервну копію на ПК, без модуля.
-- **[Внесок](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** та **[Безпека](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[Changelog](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** та **[Кодекс поведінки](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki/uk-Home)**: документація для перегляду онлайн.
+- **[Посібник користувача](https://github.com/VD171/VD-Backup/wiki/uk-USER-GUIDE)**: від початку до кінця, від встановлення до відновлення.
+- **[Агенти ШІ](https://github.com/VD171/VD-Backup/wiki/uk-AI-AGENTS)**: керуйте кожною дією без інтерфейсу через JSON API.
+- **[Архітектура](https://github.com/VD171/VD-Backup/wiki/uk-ARCHITECTURE)** та **[Структура файлів](https://github.com/VD171/VD-Backup/wiki/uk-FILE-STRUCTURE)**: як це працює.
+- **[Вбудовані бінарники](https://github.com/VD171/VD-Backup/wiki/uk-BINARIES)**: походження та SHA-256 кожного попередньо зібраного бінарника, для повного аудиту.
+- **[Відновлення](https://github.com/VD171/VD-Backup/wiki/uk-RECOVERY)**: відкрийте та розшифруйте резервну копію на ПК, без модуля.
+- **[Внесок](https://github.com/VD171/VD-Backup/wiki/uk-CONTRIBUTING)** та **[Безпека](https://github.com/VD171/VD-Backup/wiki/uk-SECURITY)**.
+- **[Changelog](https://github.com/VD171/VD-Backup/wiki/uk-CHANGELOG)** та **[Кодекс поведінки](https://github.com/VD171/VD-Backup/wiki/uk-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/sv-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/sv-USER-GUIDE">Användarguide</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/sv-AI-AGENTS">AI-agenter</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/sv-ARCHITECTURE">Arkitektur</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/sv-BINARIES">Medföljande binärer</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/sv-CHANGELOG">Ändringslogg</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -132,14 +132,14 @@ modulen huvudlöst via samma API som WebUI använder, se
 
 ## Dokumentation
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentationen, att bläddra i online.
-- **[Användarguide](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: från början till slut, från installation till återställning.
-- **[AI-agenter](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: styr varje åtgärd huvudlöst via JSON-API:et.
-- **[Arkitektur](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** och **[Filstruktur](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: hur det fungerar.
-- **[Medföljande binärer](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: ursprung och SHA-256 för varje förkompilerad binär, för en fullständig granskning.
-- **[Återställning](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: öppna och dekryptera en säkerhetskopia på en dator, utan modulen.
-- **[Bidra](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** och **[Säkerhet](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[Ändringslogg](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** och **[Uppförandekod](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki/sv-Home)**: dokumentationen, att bläddra i online.
+- **[Användarguide](https://github.com/VD171/VD-Backup/wiki/sv-USER-GUIDE)**: från början till slut, från installation till återställning.
+- **[AI-agenter](https://github.com/VD171/VD-Backup/wiki/sv-AI-AGENTS)**: styr varje åtgärd huvudlöst via JSON-API:et.
+- **[Arkitektur](https://github.com/VD171/VD-Backup/wiki/sv-ARCHITECTURE)** och **[Filstruktur](https://github.com/VD171/VD-Backup/wiki/sv-FILE-STRUCTURE)**: hur det fungerar.
+- **[Medföljande binärer](https://github.com/VD171/VD-Backup/wiki/sv-BINARIES)**: ursprung och SHA-256 för varje förkompilerad binär, för en fullständig granskning.
+- **[Återställning](https://github.com/VD171/VD-Backup/wiki/sv-RECOVERY)**: öppna och dekryptera en säkerhetskopia på en dator, utan modulen.
+- **[Bidra](https://github.com/VD171/VD-Backup/wiki/sv-CONTRIBUTING)** och **[Säkerhet](https://github.com/VD171/VD-Backup/wiki/sv-SECURITY)**.
+- **[Ändringslogg](https://github.com/VD171/VD-Backup/wiki/sv-CHANGELOG)** och **[Uppförandekod](https://github.com/VD171/VD-Backup/wiki/sv-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

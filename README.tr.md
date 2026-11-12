@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/tr-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/tr-USER-GUIDE">Kullanıcı kılavuzu</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/tr-AI-AGENTS">Yapay zeka aracıları</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/tr-ARCHITECTURE">Mimari</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/tr-BINARIES">Paket içi ikili dosyalar</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/tr-CHANGELOG">Değişiklik günlüğü</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -121,14 +121,14 @@ diğerleri gibi incelenip kabul edilir. Bir aracı, WebUI'nin kullandığı ayn�
 
 ## Belgeler
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: belgeler, çevrimiçi göz atılabilir.
-- **[Kullanıcı kılavuzu](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: baştan sona, kurulumdan geri yüklemeye.
-- **[Yapay zeka aracıları](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: her eylemi JSON API üzerinden arayüzsüz yönetin.
-- **[Mimari](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** ve **[Dosya yapısı](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: nasıl çalışır.
-- **[Paket içi ikili dosyalar](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: her önceden derlenmiş ikili dosyanın kaynağı ve SHA-256 değeri, tam denetim için.
-- **[Kurtarma](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: bir yedeği modül olmadan bilgisayarda açın ve şifresini çözün.
-- **[Katkıda bulunma](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** ve **[Güvenlik](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[Değişiklik günlüğü](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** ve **[Davranış kuralları](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki/tr-Home)**: belgeler, çevrimiçi göz atılabilir.
+- **[Kullanıcı kılavuzu](https://github.com/VD171/VD-Backup/wiki/tr-USER-GUIDE)**: baştan sona, kurulumdan geri yüklemeye.
+- **[Yapay zeka aracıları](https://github.com/VD171/VD-Backup/wiki/tr-AI-AGENTS)**: her eylemi JSON API üzerinden arayüzsüz yönetin.
+- **[Mimari](https://github.com/VD171/VD-Backup/wiki/tr-ARCHITECTURE)** ve **[Dosya yapısı](https://github.com/VD171/VD-Backup/wiki/tr-FILE-STRUCTURE)**: nasıl çalışır.
+- **[Paket içi ikili dosyalar](https://github.com/VD171/VD-Backup/wiki/tr-BINARIES)**: her önceden derlenmiş ikili dosyanın kaynağı ve SHA-256 değeri, tam denetim için.
+- **[Kurtarma](https://github.com/VD171/VD-Backup/wiki/tr-RECOVERY)**: bir yedeği modül olmadan bilgisayarda açın ve şifresini çözün.
+- **[Katkıda bulunma](https://github.com/VD171/VD-Backup/wiki/tr-CONTRIBUTING)** ve **[Güvenlik](https://github.com/VD171/VD-Backup/wiki/tr-SECURITY)**.
+- **[Değişiklik günlüğü](https://github.com/VD171/VD-Backup/wiki/tr-CHANGELOG)** ve **[Davranış kuralları](https://github.com/VD171/VD-Backup/wiki/tr-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/fa-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/fa-USER-GUIDE">راهنمای کاربر</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/fa-AI-AGENTS">عامل‌های هوش مصنوعی</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/fa-ARCHITECTURE">معماری</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/fa-BINARIES">باینری‌های همراه</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/fa-CHANGELOG">تغییرات</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -120,14 +120,14 @@ VDBackup طوری ساخته شده که نه‌فقط برای مردم، بل�
 
 ## مستندات
 
-- **[ویکی](https://github.com/VD171/VD-Backup/wiki)**: مستندات، قابل مرور به‌صورت آنلاین.
-- **[راهنمای کاربر](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: سرتاسری، از نصب تا بازیابی.
-- **[عامل‌های هوش مصنوعی](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: هر عمل را بدون رابط از طریق API مبتنی بر JSON هدایت کنید.
-- **[معماری](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** و **[ساختار فایل](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: چگونه کار می‌کند.
-- **[باینری‌های همراه](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: منشأ و SHA-256 هر باینری از پیش‌کامپایل‌شده، برای حسابرسی کامل.
-- **[بازیابی](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: یک پشتیبان را روی رایانه و بدون ماژول باز و رمزگشایی کنید.
-- **[مشارکت](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** و **[امنیت](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[تغییرات](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** و **[مرامنامه](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[ویکی](https://github.com/VD171/VD-Backup/wiki/fa-Home)**: مستندات، قابل مرور به‌صورت آنلاین.
+- **[راهنمای کاربر](https://github.com/VD171/VD-Backup/wiki/fa-USER-GUIDE)**: سرتاسری، از نصب تا بازیابی.
+- **[عامل‌های هوش مصنوعی](https://github.com/VD171/VD-Backup/wiki/fa-AI-AGENTS)**: هر عمل را بدون رابط از طریق API مبتنی بر JSON هدایت کنید.
+- **[معماری](https://github.com/VD171/VD-Backup/wiki/fa-ARCHITECTURE)** و **[ساختار فایل](https://github.com/VD171/VD-Backup/wiki/fa-FILE-STRUCTURE)**: چگونه کار می‌کند.
+- **[باینری‌های همراه](https://github.com/VD171/VD-Backup/wiki/fa-BINARIES)**: منشأ و SHA-256 هر باینری از پیش‌کامپایل‌شده، برای حسابرسی کامل.
+- **[بازیابی](https://github.com/VD171/VD-Backup/wiki/fa-RECOVERY)**: یک پشتیبان را روی رایانه و بدون ماژول باز و رمزگشایی کنید.
+- **[مشارکت](https://github.com/VD171/VD-Backup/wiki/fa-CONTRIBUTING)** و **[امنیت](https://github.com/VD171/VD-Backup/wiki/fa-SECURITY)**.
+- **[تغییرات](https://github.com/VD171/VD-Backup/wiki/fa-CHANGELOG)** و **[مرامنامه](https://github.com/VD171/VD-Backup/wiki/fa-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

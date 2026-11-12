@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ja-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ja-USER-GUIDE">ユーザーガイド</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ja-AI-AGENTS">AI エージェント</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ja-ARCHITECTURE">アーキテクチャ</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ja-BINARIES">同梱バイナリ</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ja-CHANGELOG">変更履歴</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -121,14 +121,14 @@ VDBackup は、人だけでなく AI アシスタントやエージェントに�
 
 ## ドキュメント
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: オンラインで閲覧できるドキュメント。
-- **[ユーザーガイド](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: インストールから復元まで、一通り解説。
-- **[AI エージェント](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: JSON API を通じてすべてのアクションをヘッドレスで操作。
-- **[アーキテクチャ](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** と **[ファイル構成](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: 仕組みの解説。
-- **[同梱バイナリ](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: すべてのビルド済みバイナリの出所と SHA-256、完全な監査のため。
-- **[復元](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: モジュールなしで PC 上でバックアップを開いて復号。
-- **[貢献](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** と **[セキュリティ](https://github.com/VD171/VD-Backup/wiki/SECURITY)**。
-- **[変更履歴](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** と **[行動規範](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**。
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki/ja-Home)**: オンラインで閲覧できるドキュメント。
+- **[ユーザーガイド](https://github.com/VD171/VD-Backup/wiki/ja-USER-GUIDE)**: インストールから復元まで、一通り解説。
+- **[AI エージェント](https://github.com/VD171/VD-Backup/wiki/ja-AI-AGENTS)**: JSON API を通じてすべてのアクションをヘッドレスで操作。
+- **[アーキテクチャ](https://github.com/VD171/VD-Backup/wiki/ja-ARCHITECTURE)** と **[ファイル構成](https://github.com/VD171/VD-Backup/wiki/ja-FILE-STRUCTURE)**: 仕組みの解説。
+- **[同梱バイナリ](https://github.com/VD171/VD-Backup/wiki/ja-BINARIES)**: すべてのビルド済みバイナリの出所と SHA-256、完全な監査のため。
+- **[復元](https://github.com/VD171/VD-Backup/wiki/ja-RECOVERY)**: モジュールなしで PC 上でバックアップを開いて復号。
+- **[貢献](https://github.com/VD171/VD-Backup/wiki/ja-CONTRIBUTING)** と **[セキュリティ](https://github.com/VD171/VD-Backup/wiki/ja-SECURITY)**。
+- **[変更履歴](https://github.com/VD171/VD-Backup/wiki/ja-CHANGELOG)** と **[行動規範](https://github.com/VD171/VD-Backup/wiki/ja-CODE_OF_CONDUCT)**。
 
 <!-- /vd-docs -->
 

@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/vi-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/vi-USER-GUIDE">Hướng dẫn người dùng</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/vi-AI-AGENTS">Tác nhân AI</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/vi-ARCHITECTURE">Kiến trúc</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/vi-BINARIES">Tệp nhị phân đi kèm</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/vi-CHANGELOG">Nhật ký thay đổi</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -119,14 +119,14 @@ API mà WebUI dùng, xem toàn bộ bề mặt điều khiển tại **[docs/AI-
 
 ## Tài liệu
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: tài liệu, duyệt trực tuyến.
-- **[Hướng dẫn người dùng](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: từ đầu đến cuối, từ cài đặt đến khôi phục.
-- **[Tác nhân AI](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: điều khiển mọi hành động không giao diện qua JSON API.
-- **[Kiến trúc](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** và **[Cấu trúc tệp](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: cách nó hoạt động.
-- **[Tệp nhị phân đi kèm](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: nguồn gốc và SHA-256 của mọi tệp nhị phân biên dịch sẵn, để kiểm tra đầy đủ.
-- **[Khôi phục](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: mở và giải mã bản sao lưu trên PC, không cần mô-đun.
-- **[Đóng góp](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** và **[Bảo mật](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[Nhật ký thay đổi](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** và **[Quy tắc ứng xử](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki/vi-Home)**: tài liệu, duyệt trực tuyến.
+- **[Hướng dẫn người dùng](https://github.com/VD171/VD-Backup/wiki/vi-USER-GUIDE)**: từ đầu đến cuối, từ cài đặt đến khôi phục.
+- **[Tác nhân AI](https://github.com/VD171/VD-Backup/wiki/vi-AI-AGENTS)**: điều khiển mọi hành động không giao diện qua JSON API.
+- **[Kiến trúc](https://github.com/VD171/VD-Backup/wiki/vi-ARCHITECTURE)** và **[Cấu trúc tệp](https://github.com/VD171/VD-Backup/wiki/vi-FILE-STRUCTURE)**: cách nó hoạt động.
+- **[Tệp nhị phân đi kèm](https://github.com/VD171/VD-Backup/wiki/vi-BINARIES)**: nguồn gốc và SHA-256 của mọi tệp nhị phân biên dịch sẵn, để kiểm tra đầy đủ.
+- **[Khôi phục](https://github.com/VD171/VD-Backup/wiki/vi-RECOVERY)**: mở và giải mã bản sao lưu trên PC, không cần mô-đun.
+- **[Đóng góp](https://github.com/VD171/VD-Backup/wiki/vi-CONTRIBUTING)** và **[Bảo mật](https://github.com/VD171/VD-Backup/wiki/vi-SECURITY)**.
+- **[Nhật ký thay đổi](https://github.com/VD171/VD-Backup/wiki/vi-CHANGELOG)** và **[Quy tắc ứng xử](https://github.com/VD171/VD-Backup/wiki/vi-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/pl-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/pl-USER-GUIDE">Przewodnik użytkownika</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/pl-AI-AGENTS">Agenci AI</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/pl-ARCHITECTURE">Architektura</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/pl-BINARIES">Dołączone pliki binarne</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/pl-CHANGELOG">Dziennik zmian</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -134,14 +134,14 @@ a aby współtworzyć, w [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welco
 
 ## Dokumentacja
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentacja do przeglądania online.
-- **[Przewodnik użytkownika](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: od początku do końca, od instalacji do przywracania.
-- **[Agenci AI](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: steruj każdym działaniem bezgłowo przez API JSON.
-- **[Architektura](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** i **[Struktura plików](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: jak to działa.
-- **[Dołączone pliki binarne](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: pochodzenie i SHA-256 każdego prekompilowanego pliku binarnego, do pełnego audytu.
-- **[Odzyskiwanie](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: otwórz i odszyfruj kopię zapasową na komputerze, bez modułu.
-- **[Współtworzenie](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** i **[Bezpieczeństwo](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[Dziennik zmian](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** i **[Kodeks postępowania](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki/pl-Home)**: dokumentacja do przeglądania online.
+- **[Przewodnik użytkownika](https://github.com/VD171/VD-Backup/wiki/pl-USER-GUIDE)**: od początku do końca, od instalacji do przywracania.
+- **[Agenci AI](https://github.com/VD171/VD-Backup/wiki/pl-AI-AGENTS)**: steruj każdym działaniem bezgłowo przez API JSON.
+- **[Architektura](https://github.com/VD171/VD-Backup/wiki/pl-ARCHITECTURE)** i **[Struktura plików](https://github.com/VD171/VD-Backup/wiki/pl-FILE-STRUCTURE)**: jak to działa.
+- **[Dołączone pliki binarne](https://github.com/VD171/VD-Backup/wiki/pl-BINARIES)**: pochodzenie i SHA-256 każdego prekompilowanego pliku binarnego, do pełnego audytu.
+- **[Odzyskiwanie](https://github.com/VD171/VD-Backup/wiki/pl-RECOVERY)**: otwórz i odszyfruj kopię zapasową na komputerze, bez modułu.
+- **[Współtworzenie](https://github.com/VD171/VD-Backup/wiki/pl-CONTRIBUTING)** i **[Bezpieczeństwo](https://github.com/VD171/VD-Backup/wiki/pl-SECURITY)**.
+- **[Dziennik zmian](https://github.com/VD171/VD-Backup/wiki/pl-CHANGELOG)** i **[Kodeks postępowania](https://github.com/VD171/VD-Backup/wiki/pl-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

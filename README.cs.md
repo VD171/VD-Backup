@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/cs-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/cs-USER-GUIDE">Uživatelská příručka</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/cs-AI-AGENTS">AI agenti</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/cs-ARCHITECTURE">Architektura</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/cs-BINARIES">Přibalené binárky</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/cs-CHANGELOG">Seznam změn</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -120,14 +120,14 @@ stejné API, které používá WebUI, úplnou řídicí plochu najdete v
 
 ## Dokumentace
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentace k procházení online.
-- **[Uživatelská příručka](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: od začátku do konce, od instalace po obnovu.
-- **[AI agenti](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: řiďte každou akci bezhlavě přes JSON API.
-- **[Architektura](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** a **[Struktura souborů](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: jak to funguje.
-- **[Přibalené binárky](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: původ a SHA-256 každé předkompilované binárky, pro úplný audit.
-- **[Obnovení](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: otevřete a dešifrujte zálohu na počítači, bez modulu.
-- **[Přispívání](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** a **[Bezpečnost](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[Seznam změn](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** a **[Kodex chování](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki/cs-Home)**: dokumentace k procházení online.
+- **[Uživatelská příručka](https://github.com/VD171/VD-Backup/wiki/cs-USER-GUIDE)**: od začátku do konce, od instalace po obnovu.
+- **[AI agenti](https://github.com/VD171/VD-Backup/wiki/cs-AI-AGENTS)**: řiďte každou akci bezhlavě přes JSON API.
+- **[Architektura](https://github.com/VD171/VD-Backup/wiki/cs-ARCHITECTURE)** a **[Struktura souborů](https://github.com/VD171/VD-Backup/wiki/cs-FILE-STRUCTURE)**: jak to funguje.
+- **[Přibalené binárky](https://github.com/VD171/VD-Backup/wiki/cs-BINARIES)**: původ a SHA-256 každé předkompilované binárky, pro úplný audit.
+- **[Obnovení](https://github.com/VD171/VD-Backup/wiki/cs-RECOVERY)**: otevřete a dešifrujte zálohu na počítači, bez modulu.
+- **[Přispívání](https://github.com/VD171/VD-Backup/wiki/cs-CONTRIBUTING)** a **[Bezpečnost](https://github.com/VD171/VD-Backup/wiki/cs-SECURITY)**.
+- **[Seznam změn](https://github.com/VD171/VD-Backup/wiki/cs-CHANGELOG)** a **[Kodex chování](https://github.com/VD171/VD-Backup/wiki/cs-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

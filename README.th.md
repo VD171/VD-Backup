@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/th-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/th-USER-GUIDE">คู่มือผู้ใช้</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/th-AI-AGENTS">เอเจนต์ AI</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/th-ARCHITECTURE">สถาปัตยกรรม</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/th-BINARIES">ไบนารีที่มาพร้อมกัน</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/th-CHANGELOG">บันทึกการเปลี่ยนแปลง</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -127,14 +127,14 @@ VDBackup สร้างขึ้นให้ต้อนรับผู้ช�
 
 ## เอกสาร
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: เอกสาร เรียกดูออนไลน์ได้.
-- **[คู่มือผู้ใช้](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: ครบวงจร ตั้งแต่ติดตั้งจนถึงกู้คืน.
-- **[เอเจนต์ AI](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: สั่งการทุกการกระทำแบบ headless ผ่าน JSON API.
-- **[สถาปัตยกรรม](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** และ **[โครงสร้างไฟล์](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: วิธีการทำงาน.
-- **[ไบนารีที่มาพร้อมกัน](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: ที่มาและ SHA-256 ของไบนารีที่คอมไพล์ไว้ล่วงหน้าทุกไฟล์ เพื่อการตรวจสอบอย่างครบถ้วน.
-- **[การกู้คืน](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: เปิดและถอดรหัสข้อมูลสำรองบนพีซีโดยไม่ต้องใช้โมดูล.
-- **[การมีส่วนร่วม](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** และ **[ความปลอดภัย](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[บันทึกการเปลี่ยนแปลง](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** และ **[หลักปฏิบัติ](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki/th-Home)**: เอกสาร เรียกดูออนไลน์ได้.
+- **[คู่มือผู้ใช้](https://github.com/VD171/VD-Backup/wiki/th-USER-GUIDE)**: ครบวงจร ตั้งแต่ติดตั้งจนถึงกู้คืน.
+- **[เอเจนต์ AI](https://github.com/VD171/VD-Backup/wiki/th-AI-AGENTS)**: สั่งการทุกการกระทำแบบ headless ผ่าน JSON API.
+- **[สถาปัตยกรรม](https://github.com/VD171/VD-Backup/wiki/th-ARCHITECTURE)** และ **[โครงสร้างไฟล์](https://github.com/VD171/VD-Backup/wiki/th-FILE-STRUCTURE)**: วิธีการทำงาน.
+- **[ไบนารีที่มาพร้อมกัน](https://github.com/VD171/VD-Backup/wiki/th-BINARIES)**: ที่มาและ SHA-256 ของไบนารีที่คอมไพล์ไว้ล่วงหน้าทุกไฟล์ เพื่อการตรวจสอบอย่างครบถ้วน.
+- **[การกู้คืน](https://github.com/VD171/VD-Backup/wiki/th-RECOVERY)**: เปิดและถอดรหัสข้อมูลสำรองบนพีซีโดยไม่ต้องใช้โมดูล.
+- **[การมีส่วนร่วม](https://github.com/VD171/VD-Backup/wiki/th-CONTRIBUTING)** และ **[ความปลอดภัย](https://github.com/VD171/VD-Backup/wiki/th-SECURITY)**.
+- **[บันทึกการเปลี่ยนแปลง](https://github.com/VD171/VD-Backup/wiki/th-CHANGELOG)** และ **[หลักปฏิบัติ](https://github.com/VD171/VD-Backup/wiki/th-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

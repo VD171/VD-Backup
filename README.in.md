@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/in-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/in-USER-GUIDE">Panduan pengguna</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/in-AI-AGENTS">Agen AI</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/in-ARCHITECTURE">Arsitektur</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/in-BINARIES">Biner bawaan</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/in-CHANGELOG">Changelog</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -119,14 +119,14 @@ lengkap, dan [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) untuk be
 
 ## Dokumentasi
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentasi, dapat dijelajahi daring.
-- **[Panduan pengguna](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: menyeluruh, dari pemasangan hingga pemulihan.
-- **[Agen AI](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: kendalikan setiap tindakan tanpa antarmuka melalui JSON API.
-- **[Arsitektur](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** dan **[Struktur berkas](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: cara kerjanya.
-- **[Biner bawaan](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: asal-usul dan SHA-256 setiap biner prakompilasi, untuk audit penuh.
-- **[Pemulihan](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: buka dan dekripsi cadangan di PC, tanpa modul.
-- **[Berkontribusi](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** dan **[Keamanan](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[Changelog](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** dan **[Pedoman Perilaku](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki/in-Home)**: dokumentasi, dapat dijelajahi daring.
+- **[Panduan pengguna](https://github.com/VD171/VD-Backup/wiki/in-USER-GUIDE)**: menyeluruh, dari pemasangan hingga pemulihan.
+- **[Agen AI](https://github.com/VD171/VD-Backup/wiki/in-AI-AGENTS)**: kendalikan setiap tindakan tanpa antarmuka melalui JSON API.
+- **[Arsitektur](https://github.com/VD171/VD-Backup/wiki/in-ARCHITECTURE)** dan **[Struktur berkas](https://github.com/VD171/VD-Backup/wiki/in-FILE-STRUCTURE)**: cara kerjanya.
+- **[Biner bawaan](https://github.com/VD171/VD-Backup/wiki/in-BINARIES)**: asal-usul dan SHA-256 setiap biner prakompilasi, untuk audit penuh.
+- **[Pemulihan](https://github.com/VD171/VD-Backup/wiki/in-RECOVERY)**: buka dan dekripsi cadangan di PC, tanpa modul.
+- **[Berkontribusi](https://github.com/VD171/VD-Backup/wiki/in-CONTRIBUTING)** dan **[Keamanan](https://github.com/VD171/VD-Backup/wiki/in-SECURITY)**.
+- **[Changelog](https://github.com/VD171/VD-Backup/wiki/in-CHANGELOG)** dan **[Pedoman Perilaku](https://github.com/VD171/VD-Backup/wiki/in-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

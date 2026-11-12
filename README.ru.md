@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ru-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ru-USER-GUIDE">Руководство пользователя</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ru-AI-AGENTS">ИИ-агенты</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ru-ARCHITECTURE">Архитектура</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ru-BINARIES">Встроенные бинарные файлы</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ru-CHANGELOG">История изменений</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -133,14 +133,14 @@ VDBackup создан, чтобы быть дружелюбным к ИИ-асс
 
 ## Документация
 
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: документация для просмотра онлайн.
-- **[Руководство пользователя](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: от начала до конца, от установки до восстановления.
-- **[ИИ-агенты](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: управляйте каждым действием в headless-режиме через JSON API.
-- **[Архитектура](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** и **[Структура файлов](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: как это работает.
-- **[Встроенные бинарные файлы](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: происхождение и SHA-256 каждого предкомпилированного бинарного файла, для полного аудита.
-- **[Восстановление](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: откройте и расшифруйте резервную копию на ПК, без модуля.
-- **[Участие](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** и **[Безопасность](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
-- **[История изменений](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** и **[Кодекс поведения](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki/ru-Home)**: документация для просмотра онлайн.
+- **[Руководство пользователя](https://github.com/VD171/VD-Backup/wiki/ru-USER-GUIDE)**: от начала до конца, от установки до восстановления.
+- **[ИИ-агенты](https://github.com/VD171/VD-Backup/wiki/ru-AI-AGENTS)**: управляйте каждым действием в headless-режиме через JSON API.
+- **[Архитектура](https://github.com/VD171/VD-Backup/wiki/ru-ARCHITECTURE)** и **[Структура файлов](https://github.com/VD171/VD-Backup/wiki/ru-FILE-STRUCTURE)**: как это работает.
+- **[Встроенные бинарные файлы](https://github.com/VD171/VD-Backup/wiki/ru-BINARIES)**: происхождение и SHA-256 каждого предкомпилированного бинарного файла, для полного аудита.
+- **[Восстановление](https://github.com/VD171/VD-Backup/wiki/ru-RECOVERY)**: откройте и расшифруйте резервную копию на ПК, без модуля.
+- **[Участие](https://github.com/VD171/VD-Backup/wiki/ru-CONTRIBUTING)** и **[Безопасность](https://github.com/VD171/VD-Backup/wiki/ru-SECURITY)**.
+- **[История изменений](https://github.com/VD171/VD-Backup/wiki/ru-CHANGELOG)** и **[Кодекс поведения](https://github.com/VD171/VD-Backup/wiki/ru-CODE_OF_CONDUCT)**.
 
 <!-- /vd-docs -->
 

@@ -23,12 +23,12 @@
 
 <p align="center">
   <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
-  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/hi-Home">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/hi-USER-GUIDE">उपयोक्ता मार्गदर्शिका</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/hi-AI-AGENTS">एआई एजेंट</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/hi-ARCHITECTURE">आर्किटेक्चर</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/hi-BINARIES">साथ दी गई बाइनरी</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/hi-CHANGELOG">बदलाव सूची</a> ·
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
@@ -118,14 +118,14 @@ VDBackup को केवल लोगों के लिए ही नही�
 
 ## दस्तावेज़ीकरण
 
-- **[विकी](https://github.com/VD171/VD-Backup/wiki)**: दस्तावेज़, ऑनलाइन ब्राउज़ करने योग्य।
-- **[उपयोक्ता मार्गदर्शिका](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: आद्योपांत, स्थापना से पुनर्स्थापना तक।
-- **[एआई एजेंट](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: JSON API के ज़रिए हर क्रिया को बिना इंटरफ़ेस के चलाएँ।
-- **[आर्किटेक्चर](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** और **[फ़ाइल संरचना](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: यह कैसे काम करता है।
-- **[साथ दी गई बाइनरी](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: हर पूर्व-संकलित बाइनरी का स्रोत और SHA-256, पूर्ण ऑडिट के लिए।
-- **[रिकवरी](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: मॉड्यूल के बिना PC पर बैकअप खोलें और डिक्रिप्ट करें।
-- **[योगदान](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** और **[सुरक्षा](https://github.com/VD171/VD-Backup/wiki/SECURITY)**।
-- **[बदलाव सूची](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** और **[आचार संहिता](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**।
+- **[विकी](https://github.com/VD171/VD-Backup/wiki/hi-Home)**: दस्तावेज़, ऑनलाइन ब्राउज़ करने योग्य।
+- **[उपयोक्ता मार्गदर्शिका](https://github.com/VD171/VD-Backup/wiki/hi-USER-GUIDE)**: आद्योपांत, स्थापना से पुनर्स्थापना तक।
+- **[एआई एजेंट](https://github.com/VD171/VD-Backup/wiki/hi-AI-AGENTS)**: JSON API के ज़रिए हर क्रिया को बिना इंटरफ़ेस के चलाएँ।
+- **[आर्किटेक्चर](https://github.com/VD171/VD-Backup/wiki/hi-ARCHITECTURE)** और **[फ़ाइल संरचना](https://github.com/VD171/VD-Backup/wiki/hi-FILE-STRUCTURE)**: यह कैसे काम करता है।
+- **[साथ दी गई बाइनरी](https://github.com/VD171/VD-Backup/wiki/hi-BINARIES)**: हर पूर्व-संकलित बाइनरी का स्रोत और SHA-256, पूर्ण ऑडिट के लिए।
+- **[रिकवरी](https://github.com/VD171/VD-Backup/wiki/hi-RECOVERY)**: मॉड्यूल के बिना PC पर बैकअप खोलें और डिक्रिप्ट करें।
+- **[योगदान](https://github.com/VD171/VD-Backup/wiki/hi-CONTRIBUTING)** और **[सुरक्षा](https://github.com/VD171/VD-Backup/wiki/hi-SECURITY)**।
+- **[बदलाव सूची](https://github.com/VD171/VD-Backup/wiki/hi-CHANGELOG)** और **[आचार संहिता](https://github.com/VD171/VD-Backup/wiki/hi-CODE_OF_CONDUCT)**।
 
 <!-- /vd-docs -->
 
