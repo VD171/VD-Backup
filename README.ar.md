@@ -116,6 +116,19 @@ Neo-Backup وAndroid-DataBackup الموجودة كي تنتقل إليها.
 راجع **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** لسطح التحكم الكامل، و
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) للمساهمة.
 
+## التوثيق
+
+- **[الويكي](https://github.com/VD171/VD-Backup/wiki)**: التوثيق، قابل للتصفح على الإنترنت.
+- **[دليل المستخدم](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: من البداية إلى النهاية، من التثبيت حتى الاستعادة.
+- **[وكلاء الذكاء الاصطناعي](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: قُد كل إجراء بلا واجهة عبر واجهة JSON البرمجية.
+- **[البنية](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** و**[هيكل الملفات](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: كيف تعمل.
+- **[الملفات الثنائية المُضمَّنة](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: المصدر وبصمة SHA-256 لكل ملف ثنائي مُترجَم مسبقًا، للتدقيق الكامل.
+- **[الاستعادة](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: افتح وفك تشفير نسخة احتياطية على حاسوب دون الوحدة.
+- **[المساهمة](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** و**[الأمان](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[سجل التغييرات](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** و**[مدونة السلوك](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## انظر أيضًا
 
 مشاريع شقيقة للمؤلف نفسه:

@@ -125,6 +125,19 @@ VDBackup สร้างขึ้นให้ต้อนรับผู้ช�
 ทั้งหมดได้ที่ **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** และดูการมีส่วนร่วมได้ที่
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
 
+## เอกสาร
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: เอกสาร เรียกดูออนไลน์ได้.
+- **[คู่มือผู้ใช้](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: ครบวงจร ตั้งแต่ติดตั้งจนถึงกู้คืน.
+- **[เอเจนต์ AI](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: สั่งการทุกการกระทำแบบ headless ผ่าน JSON API.
+- **[สถาปัตยกรรม](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** และ **[โครงสร้างไฟล์](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: วิธีการทำงาน.
+- **[ไบนารีที่มาพร้อมกัน](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: ที่มาและ SHA-256 ของไบนารีที่คอมไพล์ไว้ล่วงหน้าทุกไฟล์ เพื่อการตรวจสอบอย่างครบถ้วน.
+- **[การกู้คืน](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: เปิดและถอดรหัสข้อมูลสำรองบนพีซีโดยไม่ต้องใช้โมดูล.
+- **[การมีส่วนร่วม](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** และ **[ความปลอดภัย](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[บันทึกการเปลี่ยนแปลง](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** และ **[หลักปฏิบัติ](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## ดูเพิ่มเติม
 
 โปรเจกต์พี่น้องโดยผู้เขียนคนเดียวกัน:

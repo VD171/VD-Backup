@@ -130,6 +130,19 @@ modulen huvudlöst via samma API som WebUI använder, se
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** för hela styrytan, och
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) för att bidra.
 
+## Dokumentation
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentationen, att bläddra i online.
+- **[Användarguide](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: från början till slut, från installation till återställning.
+- **[AI-agenter](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: styr varje åtgärd huvudlöst via JSON-API:et.
+- **[Arkitektur](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** och **[Filstruktur](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: hur det fungerar.
+- **[Medföljande binärer](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: ursprung och SHA-256 för varje förkompilerad binär, för en fullständig granskning.
+- **[Återställning](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: öppna och dekryptera en säkerhetskopia på en dator, utan modulen.
+- **[Bidra](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** och **[Säkerhet](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[Ändringslogg](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** och **[Uppförandekod](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## Se även
 
 Systerprojekt av samma författare:

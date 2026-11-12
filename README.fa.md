@@ -118,6 +118,19 @@ VDBackup طوری ساخته شده که نه‌فقط برای مردم، بل�
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** و برای مشارکت به
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) نگاه کنید.
 
+## مستندات
+
+- **[ویکی](https://github.com/VD171/VD-Backup/wiki)**: مستندات، قابل مرور به‌صورت آنلاین.
+- **[راهنمای کاربر](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: سرتاسری، از نصب تا بازیابی.
+- **[عامل‌های هوش مصنوعی](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: هر عمل را بدون رابط از طریق API مبتنی بر JSON هدایت کنید.
+- **[معماری](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** و **[ساختار فایل](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: چگونه کار می‌کند.
+- **[باینری‌های همراه](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: منشأ و SHA-256 هر باینری از پیش‌کامپایل‌شده، برای حسابرسی کامل.
+- **[بازیابی](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: یک پشتیبان را روی رایانه و بدون ماژول باز و رمزگشایی کنید.
+- **[مشارکت](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** و **[امنیت](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[تغییرات](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** و **[مرامنامه](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## همچنین ببینید
 
 پروژه‌های خواهرِ همین نویسنده:

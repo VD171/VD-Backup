@@ -131,6 +131,19 @@ VDBackup создан, чтобы быть дружелюбным к ИИ-асс
 поверхность управления см. в **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**, а чтобы внести
 вклад, в [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
 
+## Документация
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: документация для просмотра онлайн.
+- **[Руководство пользователя](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: от начала до конца, от установки до восстановления.
+- **[ИИ-агенты](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: управляйте каждым действием в headless-режиме через JSON API.
+- **[Архитектура](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** и **[Структура файлов](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: как это работает.
+- **[Встроенные бинарные файлы](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: происхождение и SHA-256 каждого предкомпилированного бинарного файла, для полного аудита.
+- **[Восстановление](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: откройте и расшифруйте резервную копию на ПК, без модуля.
+- **[Участие](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** и **[Безопасность](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[История изменений](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** и **[Кодекс поведения](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## Смотрите также
 
 Родственные проекты того же автора:

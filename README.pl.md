@@ -132,6 +132,19 @@ administrować **każdym** działaniem modułu bezgłowo przez to samo API, któ
 WebUI, pełną powierzchnię sterowania znajdziesz w **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**,
 a aby współtworzyć, w [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
 
+## Dokumentacja
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentacja do przeglądania online.
+- **[Przewodnik użytkownika](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: od początku do końca, od instalacji do przywracania.
+- **[Agenci AI](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: steruj każdym działaniem bezgłowo przez API JSON.
+- **[Architektura](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** i **[Struktura plików](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: jak to działa.
+- **[Dołączone pliki binarne](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: pochodzenie i SHA-256 każdego prekompilowanego pliku binarnego, do pełnego audytu.
+- **[Odzyskiwanie](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: otwórz i odszyfruj kopię zapasową na komputerze, bez modułu.
+- **[Współtworzenie](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** i **[Bezpieczeństwo](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[Dziennik zmian](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** i **[Kodeks postępowania](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## Zobacz także
 
 Projekty siostrzane tego samego autora:

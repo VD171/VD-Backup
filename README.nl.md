@@ -130,6 +130,19 @@ actie van de module headless beheren via dezelfde API die de WebUI gebruikt, zie
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** voor het volledige besturingsoppervlak, en
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) om bij te dragen.
 
+## Documentatie
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: de documentatie, online te doorbladeren.
+- **[Gebruikershandleiding](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: van begin tot eind, van installatie tot herstel.
+- **[AI-agenten](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: stuur elke actie headless aan via de JSON-API.
+- **[Architectuur](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** en **[Bestandsstructuur](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: hoe het werkt.
+- **[Meegeleverde binaries](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: herkomst en SHA-256 van elke voorgecompileerde binary, voor een volledige audit.
+- **[Herstel](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: een backup op een pc openen en ontsleutelen, zonder de module.
+- **[Bijdragen](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** en **[Beveiliging](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[Changelog](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** en **[Gedragscode](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## Zie ook
 
 Zusterprojecten van dezelfde auteur:

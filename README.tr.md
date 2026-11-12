@@ -119,6 +119,19 @@ diğerleri gibi incelenip kabul edilir. Bir aracı, WebUI'nin kullandığı ayn�
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**'ye, katkıda bulunmak için ise
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)'ye bakın.
 
+## Belgeler
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: belgeler, çevrimiçi göz atılabilir.
+- **[Kullanıcı kılavuzu](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: baştan sona, kurulumdan geri yüklemeye.
+- **[Yapay zeka aracıları](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: her eylemi JSON API üzerinden arayüzsüz yönetin.
+- **[Mimari](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** ve **[Dosya yapısı](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: nasıl çalışır.
+- **[Paket içi ikili dosyalar](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: her önceden derlenmiş ikili dosyanın kaynağı ve SHA-256 değeri, tam denetim için.
+- **[Kurtarma](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: bir yedeği modül olmadan bilgisayarda açın ve şifresini çözün.
+- **[Katkıda bulunma](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** ve **[Güvenlik](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[Değişiklik günlüğü](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** ve **[Davranış kuralları](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## Ayrıca bakınız
 
 Aynı yazarın kardeş projeleri:

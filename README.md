@@ -130,6 +130,19 @@ contributions are reviewed and accepted like any other. An agent can administer
 see **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** for the full control surface, and
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) to contribute.
 
+## Documentation
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: the docs, browsable online.
+- **[User guide](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: end to end, from install to restore.
+- **[AI agents](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: drive every action headlessly over the JSON API.
+- **[Architecture](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** and **[File structure](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: how it works.
+- **[Bundled binaries](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: provenance and SHA-256 of every prebuilt binary, for full auditing.
+- **[Recovery](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: open and decrypt a backup on a PC, no module needed.
+- **[Contributing](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** and **[Security](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[Changelog](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** and **[Code of Conduct](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## See also
 
 Sibling projects by the same author:

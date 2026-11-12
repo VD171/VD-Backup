@@ -117,6 +117,19 @@ khác. Một tác nhân có thể quản trị **mọi** hành động của mô
 API mà WebUI dùng, xem toàn bộ bề mặt điều khiển tại **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**, và
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) để đóng góp.
 
+## Tài liệu
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: tài liệu, duyệt trực tuyến.
+- **[Hướng dẫn người dùng](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: từ đầu đến cuối, từ cài đặt đến khôi phục.
+- **[Tác nhân AI](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: điều khiển mọi hành động không giao diện qua JSON API.
+- **[Kiến trúc](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** và **[Cấu trúc tệp](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: cách nó hoạt động.
+- **[Tệp nhị phân đi kèm](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: nguồn gốc và SHA-256 của mọi tệp nhị phân biên dịch sẵn, để kiểm tra đầy đủ.
+- **[Khôi phục](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: mở và giải mã bản sao lưu trên PC, không cần mô-đun.
+- **[Đóng góp](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** và **[Bảo mật](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[Nhật ký thay đổi](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** và **[Quy tắc ứng xử](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## Xem thêm
 
 Các dự án anh em của cùng tác giả:

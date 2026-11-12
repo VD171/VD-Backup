@@ -117,6 +117,19 @@ lainnya. Sebuah agen dapat mengelola **setiap** tindakan modul tanpa antarmuka m
 yang digunakan WebUI, lihat **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** untuk permukaan kendali
 lengkap, dan [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) untuk berkontribusi.
 
+## Dokumentasi
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentasi, dapat dijelajahi daring.
+- **[Panduan pengguna](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: menyeluruh, dari pemasangan hingga pemulihan.
+- **[Agen AI](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: kendalikan setiap tindakan tanpa antarmuka melalui JSON API.
+- **[Arsitektur](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** dan **[Struktur berkas](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: cara kerjanya.
+- **[Biner bawaan](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: asal-usul dan SHA-256 setiap biner prakompilasi, untuk audit penuh.
+- **[Pemulihan](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: buka dan dekripsi cadangan di PC, tanpa modul.
+- **[Berkontribusi](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** dan **[Keamanan](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[Changelog](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** dan **[Pedoman Perilaku](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## Lihat juga
 
 Proyek saudara dari penulis yang sama:

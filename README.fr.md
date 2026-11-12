@@ -118,6 +118,19 @@ les contributions assistées par IA sont examinées et acceptées comme toute au
 voir **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** pour la surface de contrôle complète, et
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) pour contribuer.
 
+## Documentation
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: la documentation, consultable en ligne.
+- **[Guide de l'utilisateur](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: de bout en bout, de l'installation à la restauration.
+- **[Agents d'IA](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: pilotez chaque action sans interface via l'API JSON.
+- **[Architecture](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** et **[Structure des fichiers](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: comment ça marche.
+- **[Binaires inclus](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: provenance et SHA-256 de chaque binaire précompilé, pour un audit complet.
+- **[Récupération](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: ouvrir et déchiffrer une sauvegarde sur un PC, sans le module.
+- **[Comment contribuer](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** et **[Sécurité](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[Journal des modifications](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** et **[Code de conduite](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## Voir aussi
 
 Projets frères du même auteur :

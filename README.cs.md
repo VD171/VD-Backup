@@ -118,6 +118,19 @@ stejné API, které používá WebUI, úplnou řídicí plochu najdete v
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** a chcete-li přispět, v
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
 
+## Dokumentace
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentace k procházení online.
+- **[Uživatelská příručka](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: od začátku do konce, od instalace po obnovu.
+- **[AI agenti](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: řiďte každou akci bezhlavě přes JSON API.
+- **[Architektura](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** a **[Struktura souborů](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: jak to funguje.
+- **[Přibalené binárky](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: původ a SHA-256 každé předkompilované binárky, pro úplný audit.
+- **[Obnovení](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: otevřete a dešifrujte zálohu na počítači, bez modulu.
+- **[Přispívání](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** a **[Bezpečnost](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[Seznam změn](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** a **[Kodex chování](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## Viz také
 
 Sesterské projekty téhož autora:

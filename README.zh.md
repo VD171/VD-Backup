@@ -103,6 +103,19 @@ VDBackup 的构建目标是不仅欢迎人，也欢迎 AI 助手和代理。引�
 控制面请见 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**，参与贡献请见
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)。
 
+## 文档
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: 可在线浏览的文档。
+- **[用户指南](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: 从安装到还原，端到端。
+- **[AI 代理](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: 通过 JSON API 以无头方式执行每一个操作。
+- **[架构](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** 和 **[文件结构](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: 工作原理。
+- **[随附的二进制文件](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: 每个预编译二进制文件的来源与 SHA-256，便于完整审计。
+- **[恢复](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: 无需模块即可在 PC 上打开并解密备份。
+- **[参与贡献](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** 和 **[安全](https://github.com/VD171/VD-Backup/wiki/SECURITY)**。
+- **[更新日志](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** 和 **[行为准则](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**。
+
+<!-- /vd-docs -->
+
 ## 另见
 
 同一作者的姊妹项目:

@@ -122,6 +122,19 @@ JSON으로 말하고 (`helper.sh`의 모든 verb는 하나의 JSON 객체를 반
 관리할 수 있습니다, 전체 제어 표면은 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**를, 기여는
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)를 참고하세요.
 
+## 문서
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: 온라인에서 둘러볼 수 있는 문서.
+- **[사용자 가이드](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: 설치부터 복원까지 처음부터 끝까지.
+- **[AI 에이전트](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: JSON API를 통해 모든 작업을 헤드리스로 수행.
+- **[아키텍처](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** 와 **[파일 구조](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: 작동 방식.
+- **[포함된 바이너리](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: 모든 사전 컴파일된 바이너리의 출처와 SHA-256, 전체 감사를 위해.
+- **[복구](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: 모듈 없이 PC에서 백업을 열고 복호화.
+- **[기여](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** 와 **[보안](https://github.com/VD171/VD-Backup/wiki/SECURITY)**.
+- **[변경 이력](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** 와 **[행동 강령](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**.
+
+<!-- /vd-docs -->
+
 ## 함께 보기
 
 같은 작성자의 자매 프로젝트:

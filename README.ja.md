@@ -119,6 +119,19 @@ VDBackup は、人だけでなく AI アシスタントやエージェントに�
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** を、貢献については
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) を参照してください。
 
+## ドキュメント
+
+- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: オンラインで閲覧できるドキュメント。
+- **[ユーザーガイド](https://github.com/VD171/VD-Backup/wiki/USER-GUIDE)**: インストールから復元まで、一通り解説。
+- **[AI エージェント](https://github.com/VD171/VD-Backup/wiki/AI-AGENTS)**: JSON API を通じてすべてのアクションをヘッドレスで操作。
+- **[アーキテクチャ](https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE)** と **[ファイル構成](https://github.com/VD171/VD-Backup/wiki/FILE-STRUCTURE)**: 仕組みの解説。
+- **[同梱バイナリ](https://github.com/VD171/VD-Backup/wiki/BINARIES)**: すべてのビルド済みバイナリの出所と SHA-256、完全な監査のため。
+- **[復元](https://github.com/VD171/VD-Backup/wiki/RECOVERY)**: モジュールなしで PC 上でバックアップを開いて復号。
+- **[貢献](https://github.com/VD171/VD-Backup/wiki/CONTRIBUTING)** と **[セキュリティ](https://github.com/VD171/VD-Backup/wiki/SECURITY)**。
+- **[変更履歴](https://github.com/VD171/VD-Backup/wiki/CHANGELOG)** と **[行動規範](https://github.com/VD171/VD-Backup/wiki/CODE_OF_CONDUCT)**。
+
+<!-- /vd-docs -->
+
 ## 関連項目
 
 同じ作者による姉妹プロジェクト:
