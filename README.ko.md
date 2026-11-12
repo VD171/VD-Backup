@@ -3,8 +3,17 @@
   Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
+# VD Backup
+
 <p align="center">
-  <img src="module/webroot/assets/logo-wordmark.png" alt="VDBackup" width="320">
+  <img src="module/webroot/assets/logo-wordmark.png" alt="VD Backup" width="320">
+</p>
+
+<p align="center">
+  <a href="https://github.com/VD171/VD-Backup/releases/latest"><img src="https://img.shields.io/github/v/release/VD171/VD-Backup?label=release&color=0969da" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-1a7f37" alt="License"></a>
+  <a href="https://github.com/VD171/VD-Backup/releases"><img src="https://img.shields.io/github/downloads/VD171/VD-Backup/total?label=downloads&color=8250df" alt="Downloads"></a>
+  <a href="https://github.com/VD171/VD-Backup/stargazers"><img src="https://img.shields.io/github/stars/VD171/VD-Backup?color=d29922" alt="Stars"></a>
 </p>
 
 <p align="center">
@@ -13,16 +22,23 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/VD171/VD-Backup/releases">릴리스</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">위키</a> ·
-  <a href="docs/USER-GUIDE.md">사용자 가이드</a> ·
-  <a href="docs/AI-AGENTS.md">AI 에이전트</a> ·
-  <a href="CHANGELOG.md">변경 이력</a> ·
-  <a href="CONTRIBUTING.md">기여</a> ·
-  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA 스레드</a>
+  <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+
+| Home | Apps | Schedule |
+|:---:|:---:|:---:|
+| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| **Destinations** | **Settings** | **Activity log** |
+| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
 
 ---
 
@@ -65,14 +81,6 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
 - **마이그레이션 (가져오기):** 기존 Neo-Backup 및 Android-DataBackup 백업을, 암호로 암호화된
   것을 포함하여 가져옵니다.
 
-## 스크린샷
-
-| 홈 | 앱 | 예약 |
-|:---:|:---:|:---:|
-| ![홈](docs/screenshots/ko/home-dark.png) | ![앱](docs/screenshots/ko/apps-dark.png) | ![예약](docs/screenshots/ko/schedule-dark.png) |
-| **대상** | **설정** | **활동 로그** |
-| ![대상](docs/screenshots/ko/destinations-dark.png) | ![설정](docs/screenshots/ko/settings-dark.png) | ![활동 로그](docs/screenshots/ko/activitylog-dark.png) |
-
 ## 설치
 
 1. [릴리스](https://github.com/VD171/VD-Backup/releases)에서 최신 `VD-Backup-vX.Y.zip`을
@@ -105,17 +113,6 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
 정적 바이너리 (`tar`, `zstd`, `lz4`, `rclone`, `rsync`, ssh, `restic`)로 구성됩니다.
 [CONTRIBUTING.md](CONTRIBUTING.md)와 CI 워크플로를 참고하세요.
 
-## 문서
-
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: 온라인에서 둘러볼 수 있는 문서.
-- **[사용자 가이드](docs/USER-GUIDE.md)**: 설치부터 복원까지 처음부터 끝까지.
-- **[AI 에이전트](docs/AI-AGENTS.md)**: JSON API를 통해 모든 작업을 헤드리스로 수행.
-- **[아키텍처](docs/ARCHITECTURE.md)** 와 **[파일 구조](docs/FILE-STRUCTURE.md)**: 작동 방식.
-- **[포함된 바이너리](docs/BINARIES.md)**: 모든 사전 컴파일된 바이너리의 출처와 SHA-256, 전체 감사를 위해.
-- **[복구](module/etc/RECOVERY.md)**: 모듈 없이 PC에서 백업을 열고 복호화.
-- **[기여](CONTRIBUTING.md)** 와 **[보안](SECURITY.md)**.
-- **[변경 이력](CHANGELOG.md)** 와 **[행동 강령](CODE_OF_CONDUCT.md)**.
-
 ## AI 친화적
 
 VDBackup은 사람뿐 아니라 AI 어시스턴트와 에이전트에게도 친근하도록 만들어졌습니다. 엔진은
@@ -124,6 +121,14 @@ JSON으로 말하고 (`helper.sh`의 모든 verb는 하나의 JSON 객체를 반
 수용됩니다. 에이전트는 WebUI가 사용하는 것과 동일한 API를 통해 모듈의 **모든** 작업을 헤드리스로
 관리할 수 있습니다, 전체 제어 표면은 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**를, 기여는
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)를 참고하세요.
+
+## 함께 보기
+
+같은 작성자의 자매 프로젝트:
+
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: 기기 메서드 디버거. 각 항목을 그것을 읽을 수 있는 모든 메서드로 읽어 나란히 비교합니다.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: 여러분의 Google 서비스 (RCS, Wallet, Play Integrity 증명)를 인터넷 없이 기기에서 읽습니다.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: 새 핑거프린트를 일관되고 정합성 있는 프로필로 바꾸는 기기 스푸퍼.
 
 ## 연락처
 
@@ -134,21 +139,18 @@ JSON으로 말하고 (`helper.sh`의 모든 verb는 하나의 JSON 객체를 반
 * **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
 * **E-mail:** vd.priv8@pm.me
 * **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
+* **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
 * **GitHub:** @VD171 https://github.com/VD171
-
-## 함께 보기
-
-같은 작성자의 자매 프로젝트:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: 기기 메서드 디버거. 각 항목을 그것을 읽을 수 있는 모든 메서드로 읽어 나란히 비교합니다.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: 여러분의 Google 서비스 (RCS, Wallet, Play Integrity 증명)를 인터넷 없이 기기에서 읽습니다.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: 새 핑거프린트를 일관되고 정합성 있는 프로필로 바꾸는 기기 스푸퍼.
 
 ## 라이선스
 
 [GNU AGPL-3.0-or-later](LICENSE). 네트워크 카피레프트: 수정한 버전을 서비스로 실행하더라도 그
 소스를 제공해야 합니다.
 
----
+## 상표
+
+VD Backup은 독립적인 비공식 프로젝트입니다. Google LLC 또는 다른 어떤 공급업체와도 제휴, 보증, 후원 관계가 없습니다. "Google Drive", "Android" 및 관련 이름과 로고는 각 소유자의 상표입니다. VD Backup은 여러분의 기기에서 실행되며 설정한 대상으로만 업로드합니다.
+
+## 태그
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `vdbackup`

@@ -3,8 +3,17 @@
   Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
+# VD Backup
+
 <p align="center">
-  <img src="module/webroot/assets/logo-wordmark.png" alt="VDBackup" width="320">
+  <img src="module/webroot/assets/logo-wordmark.png" alt="VD Backup" width="320">
+</p>
+
+<p align="center">
+  <a href="https://github.com/VD171/VD-Backup/releases/latest"><img src="https://img.shields.io/github/v/release/VD171/VD-Backup?label=release&color=0969da" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-1a7f37" alt="License"></a>
+  <a href="https://github.com/VD171/VD-Backup/releases"><img src="https://img.shields.io/github/downloads/VD171/VD-Backup/total?label=downloads&color=8250df" alt="Downloads"></a>
+  <a href="https://github.com/VD171/VD-Backup/stargazers"><img src="https://img.shields.io/github/stars/VD171/VD-Backup?color=d29922" alt="Stars"></a>
 </p>
 
 <p align="center">
@@ -13,16 +22,23 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/VD171/VD-Backup/releases">Vydání</a> ·
+  <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="docs/USER-GUIDE.md">Uživatelská příručka</a> ·
-  <a href="docs/AI-AGENTS.md">AI agenti</a> ·
-  <a href="CHANGELOG.md">Seznam změn</a> ·
-  <a href="CONTRIBUTING.md">Přispívání</a> ·
-  <a href="https://xdaforums.com/t/VD-Backup.4807267/">Vlákno na XDA</a>
+  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+
+| Home | Apps | Schedule |
+|:---:|:---:|:---:|
+| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| **Destinations** | **Settings** | **Activity log** |
+| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
 
 ---
 
@@ -69,14 +85,6 @@ importovat existující zálohy Neo-Backup a Android-DataBackup, abyste mohli p�
 - **Migrace:** importuje existující zálohy Neo-Backup a Android-DataBackup, včetně těch
   zašifrovaných heslem.
 
-## Snímky obrazovky
-
-| Domů | Aplikace | Plán |
-|:---:|:---:|:---:|
-| ![Domů](docs/screenshots/cs/home-dark.png) | ![Aplikace](docs/screenshots/cs/apps-dark.png) | ![Plán](docs/screenshots/cs/schedule-dark.png) |
-| **Cíle** | **Nastavení** | **Protokol aktivity** |
-| ![Cíle](docs/screenshots/cs/destinations-dark.png) | ![Nastavení](docs/screenshots/cs/settings-dark.png) | ![Protokol aktivity](docs/screenshots/cs/activitylog-dark.png) |
-
 ## Instalace
 
 1. Stáhněte nejnovější `VD-Backup-vX.Y.zip` z [Vydání](https://github.com/VD171/VD-Backup/releases).
@@ -100,17 +108,6 @@ Modul tvoří shell + WebUI plus statické binárky pro každou ABI (`tar`, `zst
 `rclone`, `rsync`, ssh, `restic`) sestavené pro `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Viz [CONTRIBUTING.md](CONTRIBUTING.md) a pracovní postupy CI.
 
-## Dokumentace
-
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentace k procházení online.
-- **[Uživatelská příručka](docs/USER-GUIDE.md)**: od začátku do konce, od instalace po obnovu.
-- **[AI agenti](docs/AI-AGENTS.md)**: řiďte každou akci bezhlavě přes JSON API.
-- **[Architektura](docs/ARCHITECTURE.md)** a **[Struktura souborů](docs/FILE-STRUCTURE.md)**: jak to funguje.
-- **[Přibalené binárky](docs/BINARIES.md)**: původ a SHA-256 každé předkompilované binárky, pro úplný audit.
-- **[Obnovení](module/etc/RECOVERY.md)**: otevřete a dešifrujte zálohu na počítači, bez modulu.
-- **[Přispívání](CONTRIBUTING.md)** a **[Bezpečnost](SECURITY.md)**.
-- **[Seznam změn](CHANGELOG.md)** a **[Kodex chování](CODE_OF_CONDUCT.md)**.
-
 ## Přívětivý k AI
 
 VDBackup je postaven tak, aby byl vstřícný k asistentům a agentům AI, nejen k lidem.
@@ -121,6 +118,14 @@ stejné API, které používá WebUI, úplnou řídicí plochu najdete v
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** a chcete-li přispět, v
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
 
+## Viz také
+
+Sesterské projekty téhož autora:
+
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: debugger metod zařízení: čte každou položku všemi metodami, které ji dokážou přečíst, a porovnává je vedle sebe.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: vaše služby Google (RCS, Wallet, atestace Play Integrity) čtené na vašem zařízení bez internetu.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: nástroj pro podvržení zařízení, který promění čerstvý fingerprint v soudržný, konzistentní profil.
+
 ## Kontakty
 
 * https://vd171.ru
@@ -130,21 +135,18 @@ stejné API, které používá WebUI, úplnou řídicí plochu najdete v
 * **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
 * **E-mail:** vd.priv8@pm.me
 * **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
+* **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
 * **GitHub:** @VD171 https://github.com/VD171
-
-## Viz také
-
-Sesterské projekty téhož autora:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: debugger metod zařízení: čte každou položku všemi metodami, které ji dokážou přečíst, a porovnává je vedle sebe.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: vaše služby Google (RCS, Wallet, atestace Play Integrity) čtené na vašem zařízení bez internetu.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: nástroj pro podvržení zařízení, který promění čerstvý fingerprint v soudržný, konzistentní profil.
 
 ## Licence
 
 [GNU AGPL-3.0-or-later](LICENSE). Síťový copyleft: pokud provozujete upravenou verzi,
 i jako službu, musíte nabídnout její zdrojový kód.
 
----
+## Ochranné známky
+
+VD Backup je nezávislý, neoficiální projekt. Není spojen se společností Google LLC ani s žádným jiným dodavatelem, není jí podporován ani sponzorován. "Google Drive", "Android" a související názvy a loga jsou ochranné známky příslušných vlastníků. VD Backup běží na vašem zařízení a nahrává pouze do cílů, které nastavíte.
+
+## Tagy
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `vdbackup`

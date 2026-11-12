@@ -3,8 +3,17 @@
   Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
+# VD Backup
+
 <p align="center">
-  <img src="module/webroot/assets/logo-wordmark.png" alt="VDBackup" width="320">
+  <img src="module/webroot/assets/logo-wordmark.png" alt="VD Backup" width="320">
+</p>
+
+<p align="center">
+  <a href="https://github.com/VD171/VD-Backup/releases/latest"><img src="https://img.shields.io/github/v/release/VD171/VD-Backup?label=release&color=0969da" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-1a7f37" alt="License"></a>
+  <a href="https://github.com/VD171/VD-Backup/releases"><img src="https://img.shields.io/github/downloads/VD171/VD-Backup/total?label=downloads&color=8250df" alt="Downloads"></a>
+  <a href="https://github.com/VD171/VD-Backup/stargazers"><img src="https://img.shields.io/github/stars/VD171/VD-Backup?color=d29922" alt="Stars"></a>
 </p>
 
 <p align="center">
@@ -13,16 +22,23 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/VD171/VD-Backup/releases">Rilis</a> ·
+  <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="docs/USER-GUIDE.md">Panduan pengguna</a> ·
-  <a href="docs/AI-AGENTS.md">Agen AI</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
   <a href="CHANGELOG.md">Changelog</a> ·
-  <a href="CONTRIBUTING.md">Berkontribusi</a> ·
-  <a href="https://xdaforums.com/t/VD-Backup.4807267/">Utas XDA</a>
+  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+
+| Home | Apps | Schedule |
+|:---:|:---:|:---:|
+| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| **Destinations** | **Settings** | **Activity log** |
+| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
 
 ---
 
@@ -69,14 +85,6 @@ mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada agar Anda bi
 - **Impor masuk:** mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada,
   termasuk yang terenkripsi dengan kata sandi.
 
-## Tangkapan layar
-
-| Beranda | Aplikasi | Jadwal |
-|:---:|:---:|:---:|
-| ![Beranda](docs/screenshots/in/home-dark.png) | ![Aplikasi](docs/screenshots/in/apps-dark.png) | ![Jadwal](docs/screenshots/in/schedule-dark.png) |
-| **Tujuan** | **Pengaturan** | **Log aktivitas** |
-| ![Tujuan](docs/screenshots/in/destinations-dark.png) | ![Pengaturan](docs/screenshots/in/settings-dark.png) | ![Log aktivitas](docs/screenshots/in/activitylog-dark.png) |
-
 ## Pemasangan
 
 1. Unduh `VD-Backup-vX.Y.zip` terbaru dari [Rilis](https://github.com/VD171/VD-Backup/releases).
@@ -100,17 +108,6 @@ Modul ini adalah shell + WebUI ditambah biner statis per-ABI (`tar`, `zstd`, `lz
 `rclone`, `rsync`, ssh, `restic`) yang dibangun untuk `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Lihat [CONTRIBUTING.md](CONTRIBUTING.md) dan alur kerja CI.
 
-## Dokumentasi
-
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentasi, dapat dijelajahi daring.
-- **[Panduan pengguna](docs/USER-GUIDE.md)**: menyeluruh, dari pemasangan hingga pemulihan.
-- **[Agen AI](docs/AI-AGENTS.md)**: kendalikan setiap tindakan tanpa antarmuka melalui JSON API.
-- **[Arsitektur](docs/ARCHITECTURE.md)** dan **[Struktur berkas](docs/FILE-STRUCTURE.md)**: cara kerjanya.
-- **[Biner bawaan](docs/BINARIES.md)**: asal-usul dan SHA-256 setiap biner prakompilasi, untuk audit penuh.
-- **[Pemulihan](module/etc/RECOVERY.md)**: buka dan dekripsi cadangan di PC, tanpa modul.
-- **[Berkontribusi](CONTRIBUTING.md)** dan **[Keamanan](SECURITY.md)**.
-- **[Changelog](CHANGELOG.md)** dan **[Pedoman Perilaku](CODE_OF_CONDUCT.md)**.
-
 ## Ramah AI
 
 VDBackup dibangun agar menyambut asisten dan agen AI, bukan hanya orang. Mesinnya berbicara JSON
@@ -119,6 +116,14 @@ ditata untuk pembacaan mesin, dan kontribusi berbantuan AI ditinjau serta diteri
 lainnya. Sebuah agen dapat mengelola **setiap** tindakan modul tanpa antarmuka melalui API yang sama
 yang digunakan WebUI, lihat **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** untuk permukaan kendali
 lengkap, dan [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) untuk berkontribusi.
+
+## Lihat juga
+
+Proyek saudara dari penulis yang sama:
+
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: sebuah debugger metode perangkat: membaca setiap item melalui setiap metode yang dapat membacanya dan membandingkannya berdampingan.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: layanan Google Anda (RCS, Wallet, atestasi Play Integrity), dibaca di perangkat Anda tanpa internet.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: sebuah pemalsu perangkat yang mengubah fingerprint baru menjadi profil yang koheren dan konsisten.
 
 ## Kontak
 
@@ -129,21 +134,18 @@ lengkap, dan [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) untuk be
 * **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
 * **E-mail:** vd.priv8@pm.me
 * **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
+* **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
 * **GitHub:** @VD171 https://github.com/VD171
-
-## Lihat juga
-
-Proyek saudara dari penulis yang sama:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: sebuah debugger metode perangkat: membaca setiap item melalui setiap metode yang dapat membacanya dan membandingkannya berdampingan.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: layanan Google Anda (RCS, Wallet, atestasi Play Integrity), dibaca di perangkat Anda tanpa internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: sebuah pemalsu perangkat yang mengubah fingerprint baru menjadi profil yang koheren dan konsisten.
 
 ## Lisensi
 
 [GNU AGPL-3.0-or-later](LICENSE). Copyleft jaringan: jika Anda menjalankan versi yang dimodifikasi,
 bahkan sebagai layanan, Anda harus menyediakan sumbernya.
 
----
+## Merek Dagang
+
+VD Backup adalah proyek independen dan tidak resmi. Proyek ini tidak berafiliasi dengan, didukung oleh, atau disponsori oleh Google LLC maupun vendor lainnya. "Google Drive", "Android", serta nama dan logo terkait adalah merek dagang dari pemiliknya masing-masing. VD Backup berjalan di perangkat Anda dan hanya mengunggah ke tujuan yang Anda konfigurasikan.
+
+## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `vdbackup`

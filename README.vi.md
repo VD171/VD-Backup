@@ -3,8 +3,17 @@
   Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
+# VD Backup
+
 <p align="center">
-  <img src="module/webroot/assets/logo-wordmark.png" alt="VDBackup" width="320">
+  <img src="module/webroot/assets/logo-wordmark.png" alt="VD Backup" width="320">
+</p>
+
+<p align="center">
+  <a href="https://github.com/VD171/VD-Backup/releases/latest"><img src="https://img.shields.io/github/v/release/VD171/VD-Backup?label=release&color=0969da" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-1a7f37" alt="License"></a>
+  <a href="https://github.com/VD171/VD-Backup/releases"><img src="https://img.shields.io/github/downloads/VD171/VD-Backup/total?label=downloads&color=8250df" alt="Downloads"></a>
+  <a href="https://github.com/VD171/VD-Backup/stargazers"><img src="https://img.shields.io/github/stars/VD171/VD-Backup?color=d29922" alt="Stars"></a>
 </p>
 
 <p align="center">
@@ -13,16 +22,23 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/VD171/VD-Backup/releases">Bản phát hành</a> ·
+  <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="docs/USER-GUIDE.md">Hướng dẫn người dùng</a> ·
-  <a href="docs/AI-AGENTS.md">Tác nhân AI</a> ·
-  <a href="CHANGELOG.md">Nhật ký thay đổi</a> ·
-  <a href="CONTRIBUTING.md">Đóng góp</a> ·
-  <a href="https://xdaforums.com/t/VD-Backup.4807267/">Chủ đề XDA</a>
+  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+
+| Home | Apps | Schedule |
+|:---:|:---:|:---:|
+| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| **Destinations** | **Settings** | **Activity log** |
+| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
 
 ---
 
@@ -69,14 +85,6 @@ các bản sao lưu Neo-Backup và Android-DataBackup hiện có để bạn chu
 - **Di chuyển vào (nhập):** nhập các bản sao lưu Neo-Backup và Android-DataBackup hiện có, kể cả
   các bản được mã hóa bằng mật khẩu.
 
-## Ảnh chụp màn hình
-
-| Trang chủ | Ứng dụng | Lên lịch |
-|:---:|:---:|:---:|
-| ![Trang chủ](docs/screenshots/vi/home-dark.png) | ![Ứng dụng](docs/screenshots/vi/apps-dark.png) | ![Lên lịch](docs/screenshots/vi/schedule-dark.png) |
-| **Đích** | **Cài đặt** | **Nhật ký hoạt động** |
-| ![Đích](docs/screenshots/vi/destinations-dark.png) | ![Cài đặt](docs/screenshots/vi/settings-dark.png) | ![Nhật ký hoạt động](docs/screenshots/vi/activitylog-dark.png) |
-
 ## Cài đặt
 
 1. Tải `VD-Backup-vX.Y.zip` mới nhất từ [Bản phát hành](https://github.com/VD171/VD-Backup/releases).
@@ -100,17 +108,6 @@ Mô-đun gồm shell + WebUI cộng với các tệp nhị phân tĩnh theo từ
 `rclone`, `rsync`, ssh, `restic`) được xây dựng cho `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Xem [CONTRIBUTING.md](CONTRIBUTING.md) và các quy trình CI.
 
-## Tài liệu
-
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: tài liệu, duyệt trực tuyến.
-- **[Hướng dẫn người dùng](docs/USER-GUIDE.md)**: từ đầu đến cuối, từ cài đặt đến khôi phục.
-- **[Tác nhân AI](docs/AI-AGENTS.md)**: điều khiển mọi hành động không giao diện qua JSON API.
-- **[Kiến trúc](docs/ARCHITECTURE.md)** và **[Cấu trúc tệp](docs/FILE-STRUCTURE.md)**: cách nó hoạt động.
-- **[Tệp nhị phân đi kèm](docs/BINARIES.md)**: nguồn gốc và SHA-256 của mọi tệp nhị phân biên dịch sẵn, để kiểm tra đầy đủ.
-- **[Khôi phục](module/etc/RECOVERY.md)**: mở và giải mã bản sao lưu trên PC, không cần mô-đun.
-- **[Đóng góp](CONTRIBUTING.md)** và **[Bảo mật](SECURITY.md)**.
-- **[Nhật ký thay đổi](CHANGELOG.md)** và **[Quy tắc ứng xử](CODE_OF_CONDUCT.md)**.
-
 ## Thân thiện với AI
 
 VDBackup được xây dựng để chào đón các trợ lý và tác nhân AI, không chỉ con người. Engine nói JSON
@@ -120,17 +117,6 @@ khác. Một tác nhân có thể quản trị **mọi** hành động của mô
 API mà WebUI dùng, xem toàn bộ bề mặt điều khiển tại **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**, và
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) để đóng góp.
 
-## Liên hệ
-
-* https://vd171.ru
-* https://vd.priv8.ru
-* **Telegram:** @VD_Priv8 https://t.me/VD_Priv8
-* **Channel:** @Priv8_VD https://t.me/Priv8_VD
-* **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
-* **E-mail:** vd.priv8@pm.me
-* **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
-* **GitHub:** @VD171 https://github.com/VD171
-
 ## Xem thêm
 
 Các dự án anh em của cùng tác giả:
@@ -139,11 +125,27 @@ Các dự án anh em của cùng tác giả:
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: các dịch vụ Google của bạn (RCS, Wallet, các chứng thực Play Integrity), đọc ngay trên thiết bị của bạn mà không cần internet.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: một trình giả lập thiết bị biến một fingerprint mới thành một hồ sơ mạch lạc, nhất quán.
 
+## Contacts
+
+* https://vd171.ru
+* https://vd.priv8.ru
+* **Telegram:** @VD_Priv8 https://t.me/VD_Priv8
+* **Channel:** @Priv8_VD https://t.me/Priv8_VD
+* **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
+* **E-mail:** vd.priv8@pm.me
+* **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
+* **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
+* **GitHub:** @VD171 https://github.com/VD171
+
 ## Giấy phép
 
 [GNU AGPL-3.0-or-later](LICENSE). Copyleft mạng: nếu bạn chạy một phiên bản đã sửa đổi, kể cả dưới
 dạng một dịch vụ, bạn phải cung cấp mã nguồn của nó.
 
----
+## Thương hiệu
+
+VD Backup là một dự án độc lập, không chính thức. Nó không liên kết với, không được chứng thực hay tài trợ bởi Google LLC hoặc bất kỳ nhà cung cấp nào khác. "Google Drive", "Android" cùng các tên gọi và logo liên quan là thương hiệu của các chủ sở hữu tương ứng. VD Backup chạy trên thiết bị của bạn và chỉ tải lên các đích đến mà bạn cấu hình.
+
+## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `vdbackup`

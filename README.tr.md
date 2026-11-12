@@ -3,8 +3,17 @@
   Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
+# VD Backup
+
 <p align="center">
-  <img src="module/webroot/assets/logo-wordmark.png" alt="VDBackup" width="320">
+  <img src="module/webroot/assets/logo-wordmark.png" alt="VD Backup" width="320">
+</p>
+
+<p align="center">
+  <a href="https://github.com/VD171/VD-Backup/releases/latest"><img src="https://img.shields.io/github/v/release/VD171/VD-Backup?label=release&color=0969da" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-1a7f37" alt="License"></a>
+  <a href="https://github.com/VD171/VD-Backup/releases"><img src="https://img.shields.io/github/downloads/VD171/VD-Backup/total?label=downloads&color=8250df" alt="Downloads"></a>
+  <a href="https://github.com/VD171/VD-Backup/stargazers"><img src="https://img.shields.io/github/stars/VD171/VD-Backup?color=d29922" alt="Stars"></a>
 </p>
 
 <p align="center">
@@ -13,16 +22,23 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/VD171/VD-Backup/releases">Sürümler</a> ·
+  <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="docs/USER-GUIDE.md">Kullanıcı kılavuzu</a> ·
-  <a href="docs/AI-AGENTS.md">Yapay zeka aracıları</a> ·
-  <a href="CHANGELOG.md">Değişiklik günlüğü</a> ·
-  <a href="CONTRIBUTING.md">Katkıda bulunma</a> ·
-  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA konusu</a>
+  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+
+| Home | Apps | Schedule |
+|:---:|:---:|:---:|
+| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| **Destinations** | **Settings** | **Activity log** |
+| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
 
 ---
 
@@ -70,14 +86,6 @@ Neo-Backup ve Android-DataBackup yedeklerini içe aktarabilir.
 - **İçe taşıma:** mevcut Neo-Backup ve Android-DataBackup yedeklerini, parolayla şifrelenenler
   dahil, içe aktarır.
 
-## Ekran görüntüleri
-
-| Ana ekran | Uygulamalar | Zamanlama |
-|:---:|:---:|:---:|
-| ![Ana ekran](docs/screenshots/tr/home-dark.png) | ![Uygulamalar](docs/screenshots/tr/apps-dark.png) | ![Zamanlama](docs/screenshots/tr/schedule-dark.png) |
-| **Hedefler** | **Ayarlar** | **Etkinlik günlüğü** |
-| ![Hedefler](docs/screenshots/tr/destinations-dark.png) | ![Ayarlar](docs/screenshots/tr/settings-dark.png) | ![Etkinlik günlüğü](docs/screenshots/tr/activitylog-dark.png) |
-
 ## Kurulum
 
 1. En son `VD-Backup-vX.Y.zip` dosyasını [Sürümler](https://github.com/VD171/VD-Backup/releases) sayfasından indirin.
@@ -101,17 +109,6 @@ Modül, shell + WebUI'nin yanı sıra `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64
 ABI başına statik ikili dosyalardan (`tar`, `zstd`, `lz4`, `rclone`, `rsync`, ssh, `restic`) oluşur.
 [CONTRIBUTING.md](CONTRIBUTING.md) dosyasına ve CI iş akışlarına bakın.
 
-## Belgeler
-
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: belgeler, çevrimiçi göz atılabilir.
-- **[Kullanıcı kılavuzu](docs/USER-GUIDE.md)**: baştan sona, kurulumdan geri yüklemeye.
-- **[Yapay zeka aracıları](docs/AI-AGENTS.md)**: her eylemi JSON API üzerinden arayüzsüz yönetin.
-- **[Mimari](docs/ARCHITECTURE.md)** ve **[Dosya yapısı](docs/FILE-STRUCTURE.md)**: nasıl çalışır.
-- **[Paket içi ikili dosyalar](docs/BINARIES.md)**: her önceden derlenmiş ikili dosyanın kaynağı ve SHA-256 değeri, tam denetim için.
-- **[Kurtarma](module/etc/RECOVERY.md)**: bir yedeği modül olmadan bilgisayarda açın ve şifresini çözün.
-- **[Katkıda bulunma](CONTRIBUTING.md)** ve **[Güvenlik](SECURITY.md)**.
-- **[Değişiklik günlüğü](CHANGELOG.md)** ve **[Davranış kuralları](CODE_OF_CONDUCT.md)**.
-
 ## Yapay zeka dostu
 
 VDBackup, yalnızca insanlara değil, yapay zeka asistanlarına ve aracılarına da kucak açacak
@@ -122,6 +119,14 @@ diğerleri gibi incelenip kabul edilir. Bir aracı, WebUI'nin kullandığı ayn�
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**'ye, katkıda bulunmak için ise
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)'ye bakın.
 
+## Ayrıca bakınız
+
+Aynı yazarın kardeş projeleri:
+
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: bir cihaz yöntem hata ayıklayıcısı: her öğeyi, onu okuyabilen her yöntemle okur ve bunları yan yana karşılaştırır.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: Google hizmetleriniz (RCS, Wallet, Play Integrity doğrulamaları), internet olmadan cihazınızda okunur.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: taze bir parmak izini tutarlı, uyumlu bir profile dönüştüren bir cihaz sahteleyici.
+
 ## İletişim
 
 * https://vd171.ru
@@ -131,21 +136,18 @@ diğerleri gibi incelenip kabul edilir. Bir aracı, WebUI'nin kullandığı ayn�
 * **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
 * **E-mail:** vd.priv8@pm.me
 * **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
+* **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
 * **GitHub:** @VD171 https://github.com/VD171
-
-## Ayrıca bakınız
-
-Aynı yazarın kardeş projeleri:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: bir cihaz yöntem hata ayıklayıcısı: her öğeyi, onu okuyabilen her yöntemle okur ve bunları yan yana karşılaştırır.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: Google hizmetleriniz (RCS, Wallet, Play Integrity doğrulamaları), internet olmadan cihazınızda okunur.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: taze bir parmak izini tutarlı, uyumlu bir profile dönüştüren bir cihaz sahteleyici.
 
 ## Lisans
 
 [GNU AGPL-3.0-or-later](LICENSE). Ağ copyleft'i: değiştirilmiş bir sürümü, bir hizmet olarak bile
 çalıştırırsanız, kaynağını sunmak zorundasınız.
 
----
+## Ticari markalar
+
+VD Backup bağımsız, resmi olmayan bir projedir. Google LLC veya başka herhangi bir satıcıyla bağlantılı değildir, onlar tarafından onaylanmamış veya desteklenmemiştir. "Google Drive", "Android" ve ilgili adlar ile logolar, ilgili sahiplerinin ticari markalarıdır. VD Backup cihazınızda çalışır ve yalnızca yapılandırdığınız hedeflere yükleme yapar.
+
+## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `vdbackup`

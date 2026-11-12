@@ -3,8 +3,17 @@
   Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
+# VD Backup
+
 <p align="center">
-  <img src="module/webroot/assets/logo-wordmark.png" alt="VDBackup" width="320">
+  <img src="module/webroot/assets/logo-wordmark.png" alt="VD Backup" width="320">
+</p>
+
+<p align="center">
+  <a href="https://github.com/VD171/VD-Backup/releases/latest"><img src="https://img.shields.io/github/v/release/VD171/VD-Backup?label=release&color=0969da" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-1a7f37" alt="License"></a>
+  <a href="https://github.com/VD171/VD-Backup/releases"><img src="https://img.shields.io/github/downloads/VD171/VD-Backup/total?label=downloads&color=8250df" alt="Downloads"></a>
+  <a href="https://github.com/VD171/VD-Backup/stargazers"><img src="https://img.shields.io/github/stars/VD171/VD-Backup?color=d29922" alt="Stars"></a>
 </p>
 
 <p align="center">
@@ -13,16 +22,23 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/VD171/VD-Backup/releases">Utgåvor</a> ·
+  <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="docs/USER-GUIDE.md">Användarguide</a> ·
-  <a href="docs/AI-AGENTS.md">AI-agenter</a> ·
-  <a href="CHANGELOG.md">Ändringslogg</a> ·
-  <a href="CONTRIBUTING.md">Bidra</a> ·
-  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA-tråd</a>
+  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+
+| Home | Apps | Schedule |
+|:---:|:---:|:---:|
+| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| **Destinations** | **Settings** | **Activity log** |
+| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
 
 ---
 
@@ -69,14 +85,6 @@ importera befintliga säkerhetskopior från Neo-Backup och Android-DataBackup s�
 - **Migrera in:** importerar befintliga säkerhetskopior från Neo-Backup och
   Android-DataBackup, inklusive lösenordskrypterade.
 
-## Skärmbilder
-
-| Start | Appar | Schema |
-|:---:|:---:|:---:|
-| ![Start](docs/screenshots/sv/home-dark.png) | ![Appar](docs/screenshots/sv/apps-dark.png) | ![Schema](docs/screenshots/sv/schedule-dark.png) |
-| **Mål** | **Inställningar** | **Aktivitetslogg** |
-| ![Mål](docs/screenshots/sv/destinations-dark.png) | ![Inställningar](docs/screenshots/sv/settings-dark.png) | ![Aktivitetslogg](docs/screenshots/sv/activitylog-dark.png) |
-
 ## Installation
 
 1. Ladda ner den senaste `VD-Backup-vX.Y.zip` från [Utgåvor](https://github.com/VD171/VD-Backup/releases).
@@ -112,17 +120,6 @@ Modulen är shell + WebUI plus statiska binärer per ABI (`tar`, `zstd`, `lz4`,
 `rclone`, `rsync`, ssh, `restic`) byggda för `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Se [CONTRIBUTING.md](CONTRIBUTING.md) och CI-arbetsflödena.
 
-## Dokumentation
-
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: dokumentationen, att bläddra i online.
-- **[Användarguide](docs/USER-GUIDE.md)**: från början till slut, från installation till återställning.
-- **[AI-agenter](docs/AI-AGENTS.md)**: styr varje åtgärd huvudlöst via JSON-API:et.
-- **[Arkitektur](docs/ARCHITECTURE.md)** och **[Filstruktur](docs/FILE-STRUCTURE.md)**: hur det fungerar.
-- **[Medföljande binärer](docs/BINARIES.md)**: ursprung och SHA-256 för varje förkompilerad binär, för en fullständig granskning.
-- **[Återställning](module/etc/RECOVERY.md)**: öppna och dekryptera en säkerhetskopia på en dator, utan modulen.
-- **[Bidra](CONTRIBUTING.md)** och **[Säkerhet](SECURITY.md)**.
-- **[Ändringslogg](CHANGELOG.md)** och **[Uppförandekod](CODE_OF_CONDUCT.md)**.
-
 ## AI-vänligt
 
 VDBackup är byggt för att välkomna AI-assistenter och -agenter, inte bara människor.
@@ -133,6 +130,14 @@ modulen huvudlöst via samma API som WebUI använder, se
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** för hela styrytan, och
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) för att bidra.
 
+## Se även
+
+Systerprojekt av samma författare:
+
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: en felsökare för enhetsmetoder: läser varje objekt genom varje metod som kan läsa det och jämför dem sida vid sida.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: dina Google-tjänster (RCS, Wallet, Play Integrity-attesteringar), lästa på din enhet utan internet.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: en enhetsspoofer som förvandlar ett färskt fingerprint till en sammanhängande, konsekvent profil.
+
 ## Kontakter
 
 * https://vd171.ru
@@ -142,21 +147,18 @@ modulen huvudlöst via samma API som WebUI använder, se
 * **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
 * **E-mail:** vd.priv8@pm.me
 * **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
+* **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
 * **GitHub:** @VD171 https://github.com/VD171
-
-## Se även
-
-Systerprojekt av samma författare:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: en felsökare för enhetsmetoder: läser varje objekt genom varje metod som kan läsa det och jämför dem sida vid sida.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: dina Google-tjänster (RCS, Wallet, Play Integrity-attesteringar), lästa på din enhet utan internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: en enhetsspoofer som förvandlar ett färskt fingerprint till en sammanhängande, konsekvent profil.
 
 ## Licens
 
 [GNU AGPL-3.0-or-later](LICENSE). Nätverkscopyleft: om du kör en modifierad version,
 även som en tjänst, måste du erbjuda dess källkod.
 
----
+## Varumärken
+
+VD Backup är ett oberoende, inofficiellt projekt. Det är inte anslutet till, rekommenderat av eller sponsrat av Google LLC eller någon annan leverantör. "Google Drive", "Android" och relaterade namn och logotyper är varumärken som tillhör sina respektive ägare. VD Backup körs på din enhet och laddar bara upp till de destinationer du konfigurerar.
+
+## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `vdbackup`

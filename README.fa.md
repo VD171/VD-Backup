@@ -3,8 +3,17 @@
   Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
+# VD Backup
+
 <p align="center">
-  <img src="module/webroot/assets/logo-wordmark.png" alt="VDBackup" width="320">
+  <img src="module/webroot/assets/logo-wordmark.png" alt="VD Backup" width="320">
+</p>
+
+<p align="center">
+  <a href="https://github.com/VD171/VD-Backup/releases/latest"><img src="https://img.shields.io/github/v/release/VD171/VD-Backup?label=release&color=0969da" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-1a7f37" alt="License"></a>
+  <a href="https://github.com/VD171/VD-Backup/releases"><img src="https://img.shields.io/github/downloads/VD171/VD-Backup/total?label=downloads&color=8250df" alt="Downloads"></a>
+  <a href="https://github.com/VD171/VD-Backup/stargazers"><img src="https://img.shields.io/github/stars/VD171/VD-Backup?color=d29922" alt="Stars"></a>
 </p>
 
 <p align="center">
@@ -13,16 +22,23 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/VD171/VD-Backup/releases">نسخه‌ها</a> ·
-  <a href="https://github.com/VD171/VD-Backup/wiki">ویکی</a> ·
-  <a href="docs/USER-GUIDE.md">راهنمای کاربر</a> ·
-  <a href="docs/AI-AGENTS.md">عامل‌های هوش مصنوعی</a> ·
-  <a href="CHANGELOG.md">تغییرات</a> ·
-  <a href="CONTRIBUTING.md">مشارکت</a> ·
-  <a href="https://xdaforums.com/t/VD-Backup.4807267/">رشتهٔ XDA</a>
+  <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+
+| Home | Apps | Schedule |
+|:---:|:---:|:---:|
+| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| **Destinations** | **Settings** | **Activity log** |
+| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
 
 ---
 
@@ -69,14 +85,6 @@ Android-DataBackup** طراحی شده است: اجتماعِ کاری که آن
 - **ورود (کوچ):** پشتیبان‌های موجودِ Neo-Backup و Android-DataBackup را وارد می‌کند،
   از جمله موارد رمزنگاری‌شده با گذرواژه.
 
-## اسکرین‌شات‌ها
-
-| خانه | برنامه‌ها | زمان‌بندی |
-|:---:|:---:|:---:|
-| ![خانه](docs/screenshots/fa/home-dark.png) | ![برنامه‌ها](docs/screenshots/fa/apps-dark.png) | ![زمان‌بندی](docs/screenshots/fa/schedule-dark.png) |
-| **مقصدها** | **تنظیمات** | **گزارش فعالیت** |
-| ![مقصدها](docs/screenshots/fa/destinations-dark.png) | ![تنظیمات](docs/screenshots/fa/settings-dark.png) | ![گزارش فعالیت](docs/screenshots/fa/activitylog-dark.png) |
-
 ## نصب
 
 1. آخرین `VD-Backup-vX.Y.zip` را از [نسخه‌ها](https://github.com/VD171/VD-Backup/releases) دانلود کنید.
@@ -100,17 +108,6 @@ Android-DataBackup** طراحی شده است: اجتماعِ کاری که آن
 `rclone`، `rsync`، ssh، `restic`) که برای `armeabi-v7a`، `arm64-v8a`، `x86`،
 `x86_64` ساخته شده‌اند. به [CONTRIBUTING.md](CONTRIBUTING.md) و گردش‌کارهای CI نگاه کنید.
 
-## مستندات
-
-- **[ویکی](https://github.com/VD171/VD-Backup/wiki)**: مستندات، قابل مرور به‌صورت آنلاین.
-- **[راهنمای کاربر](docs/USER-GUIDE.md)**: سرتاسری، از نصب تا بازیابی.
-- **[عامل‌های هوش مصنوعی](docs/AI-AGENTS.md)**: هر عمل را بدون رابط از طریق API مبتنی بر JSON هدایت کنید.
-- **[معماری](docs/ARCHITECTURE.md)** و **[ساختار فایل](docs/FILE-STRUCTURE.md)**: چگونه کار می‌کند.
-- **[باینری‌های همراه](docs/BINARIES.md)**: منشأ و SHA-256 هر باینری از پیش‌کامپایل‌شده، برای حسابرسی کامل.
-- **[بازیابی](module/etc/RECOVERY.md)**: یک پشتیبان را روی رایانه و بدون ماژول باز و رمزگشایی کنید.
-- **[مشارکت](CONTRIBUTING.md)** و **[امنیت](SECURITY.md)**.
-- **[تغییرات](CHANGELOG.md)** و **[مرامنامه](CODE_OF_CONDUCT.md)**.
-
 ## سازگار با هوش مصنوعی
 
 VDBackup طوری ساخته شده که نه‌فقط برای مردم، بلکه برای دستیارها و عامل‌های هوش مصنوعی نیز
@@ -121,6 +118,14 @@ VDBackup طوری ساخته شده که نه‌فقط برای مردم، بل�
 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** و برای مشارکت به
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) نگاه کنید.
 
+## همچنین ببینید
+
+پروژه‌های خواهرِ همین نویسنده:
+
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: یک اشکال‌زدای روش‌های دستگاه: هر مورد را از طریق هر روشی که می‌تواند آن را بخواند می‌خواند و آن‌ها را کنار هم مقایسه می‌کند.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: سرویس‌های Google شما (RCS، Wallet، گواهی‌های Play Integrity)، روی دستگاهتان و بدون اینترنت خوانده می‌شوند.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: یک جاعلِ دستگاه که یک اثرانگشت تازه را به یک پروفایلِ منسجم و یکدست تبدیل می‌کند.
+
 ## تماس
 
 * https://vd171.ru
@@ -130,21 +135,18 @@ VDBackup طوری ساخته شده که نه‌فقط برای مردم، بل�
 * **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
 * **E-mail:** vd.priv8@pm.me
 * **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
+* **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
 * **GitHub:** @VD171 https://github.com/VD171
-
-## همچنین ببینید
-
-پروژه‌های خواهرِ همین نویسنده:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: یک اشکال‌زدای روش‌های دستگاه: هر مورد را از طریق هر روشی که می‌تواند آن را بخواند می‌خواند و آن‌ها را کنار هم مقایسه می‌کند.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: سرویس‌های Google شما (RCS، Wallet، گواهی‌های Play Integrity)، روی دستگاهتان و بدون اینترنت خوانده می‌شوند.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: یک جاعلِ دستگاه که یک اثرانگشت تازه را به یک پروفایلِ منسجم و یکدست تبدیل می‌کند.
 
 ## مجوز
 
 [GNU AGPL-3.0-or-later](LICENSE). کپی‌لفتِ شبکه‌ای: اگر نسخه‌ای تغییریافته را اجرا کنید،
 حتی به‌صورت یک سرویس، باید منبع آن را عرضه کنید.
 
----
+## علائم تجاری
+
+VD Backup یک پروژهٔ مستقل و غیررسمی است. این پروژه به Google LLC یا هیچ فروشندهٔ دیگری وابسته نیست و مورد تأیید یا پشتیبانی مالی آن‌ها نیز قرار ندارد. "Google Drive"، "Android" و نام‌ها و نشان‌های مرتبط، علامت‌های تجاری صاحبان مربوط به خود هستند. VD Backup روی دستگاه شما اجرا می‌شود و فقط در مقصدهایی که پیکربندی می‌کنید بارگذاری می‌کند.
+
+## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `vdbackup`

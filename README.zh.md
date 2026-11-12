@@ -3,8 +3,17 @@
   Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
+# VD Backup
+
 <p align="center">
-  <img src="module/webroot/assets/logo-wordmark.png" alt="VDBackup" width="320">
+  <img src="module/webroot/assets/logo-wordmark.png" alt="VD Backup" width="320">
+</p>
+
+<p align="center">
+  <a href="https://github.com/VD171/VD-Backup/releases/latest"><img src="https://img.shields.io/github/v/release/VD171/VD-Backup?label=release&color=0969da" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-1a7f37" alt="License"></a>
+  <a href="https://github.com/VD171/VD-Backup/releases"><img src="https://img.shields.io/github/downloads/VD171/VD-Backup/total?label=downloads&color=8250df" alt="Downloads"></a>
+  <a href="https://github.com/VD171/VD-Backup/stargazers"><img src="https://img.shields.io/github/stars/VD171/VD-Backup?color=d29922" alt="Stars"></a>
 </p>
 
 <p align="center">
@@ -13,16 +22,23 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/VD171/VD-Backup/releases">发布</a> ·
+  <a href="https://github.com/VD171/VD-Backup/releases">Releases</a> ·
   <a href="https://github.com/VD171/VD-Backup/wiki">Wiki</a> ·
-  <a href="docs/USER-GUIDE.md">用户指南</a> ·
-  <a href="docs/AI-AGENTS.md">AI 代理</a> ·
-  <a href="CHANGELOG.md">更新日志</a> ·
-  <a href="CONTRIBUTING.md">参与贡献</a> ·
-  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA 主题帖</a>
+  <a href="https://github.com/VD171/VD-Backup/wiki/USER-GUIDE">User guide</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/AI-AGENTS">AI agents</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/ARCHITECTURE">Architecture</a> ·
+  <a href="https://github.com/VD171/VD-Backup/wiki/BINARIES">Bundled binaries</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
+  <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.in.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+
+| Home | Apps | Schedule |
+|:---:|:---:|:---:|
+| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| **Destinations** | **Settings** | **Activity log** |
+| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
 
 ---
 
@@ -57,14 +73,6 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 - **后台:** 备份/还原以分离方式运行，关闭 WebUI 后仍会继续，并在开始和完成时发送通知。
 - **迁移导入:** 导入现有的 Neo-Backup 和 Android-DataBackup 备份，包括用密码加密的备份。
 
-## 截图
-
-| 主页 | 应用 | 计划 |
-|:---:|:---:|:---:|
-| ![主页](docs/screenshots/zh/home-dark.png) | ![应用](docs/screenshots/zh/apps-dark.png) | ![计划](docs/screenshots/zh/schedule-dark.png) |
-| **目标** | **设置** | **活动日志** |
-| ![目标](docs/screenshots/zh/destinations-dark.png) | ![设置](docs/screenshots/zh/settings-dark.png) | ![活动日志](docs/screenshots/zh/activitylog-dark.png) |
-
 ## 安装
 
 1. 从 [发布](https://github.com/VD171/VD-Backup/releases) 下载最新的 `VD-Backup-vX.Y.zip`。
@@ -87,17 +95,6 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 (`tar`、`zstd`、`lz4`、`rclone`、`rsync`、ssh、`restic`) 组成。请参阅
 [CONTRIBUTING.md](CONTRIBUTING.md) 和 CI 工作流。
 
-## 文档
-
-- **[Wiki](https://github.com/VD171/VD-Backup/wiki)**: 可在线浏览的文档。
-- **[用户指南](docs/USER-GUIDE.md)**: 从安装到还原，端到端。
-- **[AI 代理](docs/AI-AGENTS.md)**: 通过 JSON API 以无头方式执行每一个操作。
-- **[架构](docs/ARCHITECTURE.md)** 和 **[文件结构](docs/FILE-STRUCTURE.md)**: 工作原理。
-- **[随附的二进制文件](docs/BINARIES.md)**: 每个预编译二进制文件的来源与 SHA-256，便于完整审计。
-- **[恢复](module/etc/RECOVERY.md)**: 无需模块即可在 PC 上打开并解密备份。
-- **[参与贡献](CONTRIBUTING.md)** 和 **[安全](SECURITY.md)**。
-- **[更新日志](CHANGELOG.md)** 和 **[行为准则](CODE_OF_CONDUCT.md)**。
-
 ## 对 AI 友好
 
 VDBackup 的构建目标是不仅欢迎人，也欢迎 AI 助手和代理。引擎讲 JSON (`helper.sh` 的每个 verb
@@ -105,17 +102,6 @@ VDBackup 的构建目标是不仅欢迎人，也欢迎 AI 助手和代理。引�
 被审查和接受。代理可以通过 WebUI 所用的同一 API，以无头方式管理模块的**每一个**操作, 完整的
 控制面请见 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**，参与贡献请见
 [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)。
-
-## 联系方式
-
-* https://vd171.ru
-* https://vd.priv8.ru
-* **Telegram:** @VD_Priv8 https://t.me/VD_Priv8
-* **Channel:** @Priv8_VD https://t.me/Priv8_VD
-* **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
-* **E-mail:** vd.priv8@pm.me
-* **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
-* **GitHub:** @VD171 https://github.com/VD171
 
 ## 另见
 
@@ -125,11 +111,27 @@ VDBackup 的构建目标是不仅欢迎人，也欢迎 AI 助手和代理。引�
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: 在你的设备上无需联网即可读取你的 Google 服务 (RCS、Wallet、Play Integrity 证明)。
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: 一个设备伪装器，把全新的指纹变成连贯一致的配置。
 
+## Contacts
+
+* https://vd171.ru
+* https://vd.priv8.ru
+* **Telegram:** @VD_Priv8 https://t.me/VD_Priv8
+* **Channel:** @Priv8_VD https://t.me/Priv8_VD
+* **Discord:** @VD.Priv8 https://discord.com/users/1296831918989639721
+* **E-mail:** vd.priv8@pm.me
+* **XDA-Developers:** @VD171 https://xdaforums.com/m/vd171.4699873/
+* **XDA thread:** https://xdaforums.com/t/VD-Backup.4807267/
+* **GitHub:** @VD171 https://github.com/VD171
+
 ## 许可证
 
 [GNU AGPL-3.0-or-later](LICENSE)。网络 copyleft: 如果你运行修改后的版本，即使作为服务运行，
 也必须提供其源代码。
 
----
+## 商标
+
+VD Backup 是一个独立的非官方项目。它与 Google LLC 或任何其他厂商没有关联，未获其认可或赞助。「Google Drive」、「Android」及相关名称和标志是其各自所有者的商标。VD Backup 在你的设备上运行，仅上传到你所配置的目标位置。
+
+## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `vdbackup`
