@@ -102,12 +102,6 @@
         </div>
       </div>
       <div class="toolbar">
-        <button id="bk-tg-cloud" class="btn" type="button">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="color:#229ED9; flex:none;">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-          </svg>
-          <span data-i18n="ui_tg_cloud_btn">Telegram Cloud</span>
-        </button>
         <span class="grow"></span>
         <button id="bk-select" class="btn" data-i18n="ui_select">Select</button>
       </div>
@@ -164,34 +158,6 @@
     </section>
 
     <section id="dests" class="panel">
-      <!-- Telegram Cloud Storage Feature Card (only shown when connected) -->
-      <div class="tg-card" id="tg-card" hidden>
-        <div class="tg-card-header">
-          <div class="tg-icon-badge">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-            </svg>
-          </div>
-          <div class="grow" style="min-width:0;">
-            <div class="tg-card-title">
-              <span data-i18n="tg_vault_title">Telegram Cloud Vault</span>
-              <span id="tg-card-badge" class="badge info"><span class="dot"></span><span id="tg-card-status-text">Unlinked</span></span>
-            </div>
-            <div class="tg-card-sub" id="tg-card-sub" data-i18n="tg_vault_sub">Encrypted, unlimited app & data cloud backup container</div>
-          </div>
-          <div class="tg-actions">
-            <button id="tg-link-btn" class="btn go small" type="button" data-i18n="tg_btn_connect">Connect</button>
-            <button id="tg-browse-btn" class="btn go small" type="button" data-i18n="tg_browse_cloud" hidden>Browse</button>
-            <button id="tg-manage-btn" class="btn small" type="button" data-i18n="tg_btn_manage" hidden>Manage</button>
-          </div>
-        </div>
-        <div class="tg-meta-tags">
-          <span class="tg-meta-tag"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span data-i18n="tg_tag_unlimited">Free Unlimited Cloud</span></span>
-          <span class="tg-meta-tag"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-i18n="tg_tag_mtproto">Client-Side MTProto</span></span>
-          <span class="tg-meta-tag"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg><span data-i18n="tg_tag_granular">Granular Restores</span></span>
-        </div>
-      </div>
-
       <ul id="destlist" class="list"></ul>
       <h2 class="section-head"><span class="sh-ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="13" width="16" height="7" rx="2"/><path d="M8 7.5h.01"/><path d="M8 16.5h.01"/></svg></span><span class="sh-t" data-i18n="dest_add">Add destination</span></h2>
       <div class="field">
@@ -207,6 +173,10 @@
         <div id="d-rclone-hint" class="notice" hidden>
           <div class="notice-msg" data-i18n="ui_dest_rclone_hint">rclone needs a remote. Pick one below, or add a new one:</div>
           <button id="d-add-remote" class="btn small" type="button" data-i18n="ui_dest_add_remote_btn">Add a remote</button>
+        </div>
+        <div id="d-telegram-hint" class="notice" hidden>
+          <div class="notice-msg" data-i18n="ui_dest_telegram_hint">Telegram storage requires connecting your account:</div>
+          <button id="d-tg-connect-btn" class="btn small" type="button" data-i18n="tg_btn_connect">Connect Telegram</button>
         </div>
         <input id="d-path" type="text" data-i18n-ph="ph_dest_path" placeholder="path / sub-folder">
         <button id="d-browse" class="btn" data-i18n="ui_browse">Browse</button>
@@ -991,11 +961,7 @@
           </div>
         </div>
 
-        <div class="modal-actions" style="flex-wrap: wrap;">
-          <button class="btn go" id="tg-view-backups-btn" type="button" style="flex:1 1 100%; margin-bottom:4px;">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span data-i18n="tg_view_backups">Browse Cloud Backups</span>
-          </button>
+        <div class="modal-actions">
           <button class="btn danger" id="tg-logout-btn" type="button" style="flex:1;">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             <span data-i18n="tg_disconnect">Disconnect</span>
@@ -1004,52 +970,6 @@
         </div>
       </div>
 
-    </div>
-  </div>
-
-  <!-- Telegram Cloud Backups Modal -->
-  <div id="tg-backups-modal" class="modal" hidden role="dialog" aria-modal="true">
-    <div class="modal-card wide">
-      <div class="tg-browser-header">
-        <div class="row align-center" style="gap:10px;">
-          <div class="tg-icon-badge" style="width:34px; height:34px; border-radius:8px;">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-            </svg>
-          </div>
-          <div>
-            <div class="modal-title" style="font-size:17px;" data-i18n="ui_tg_cloud_backups">Telegram Cloud Backups</div>
-            <div class="muted" style="font-size:12px;" id="tg-bk-subtitle" data-i18n="ui_tg_backups_sub">Stored in your dedicated private channel</div>
-          </div>
-        </div>
-        <span id="tg-bk-count-badge" class="badge ok" style="font-size:11px;">0 apps</span>
-      </div>
-
-      <!-- Search & Filter Filter Input -->
-      <div class="tg-browser-search">
-        <svg class="tg-search-ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input id="tg-bk-search" type="text" placeholder="Search cloud backups by app name or package..." data-i18n-ph="tg_search_placeholder">
-      </div>
-
-      <!-- Backups list -->
-      <ul id="tg-bk-list" class="list" style="max-height: 52vh; overflow-y: auto; margin-bottom:12px; gap:8px;"></ul>
-      
-      <!-- Empty state -->
-      <div id="tg-bk-empty" class="tg-empty-state" hidden>
-        <div class="tg-empty-icon">
-          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
-        </div>
-        <div style="font-weight:650; font-size:15px; margin-bottom:4px;" data-i18n="ui_tg_no_backups">No backups found on Telegram.</div>
-        <div class="muted" style="font-size:13px; max-width:280px;" data-i18n="tg_empty_hint">Backups uploaded with destination "telegram" will appear here.</div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn" id="tg-bk-refresh" type="button">
-          <svg id="tg-bk-refresh-ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          <span data-i18n="refresh">Refresh</span>
-        </button>
-        <button class="btn" id="tg-bk-close" type="button" data-i18n="ui_close">Close</button>
-      </div>
     </div>
   </div>
 

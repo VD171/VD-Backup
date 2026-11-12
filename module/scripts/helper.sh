@@ -478,7 +478,7 @@ case "$verb" in
     done
     printf '}}\n' ;;
 
-  backup|backup-batch|restore|restore-batch|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore|config-export|config-import|telegram-download)
+  backup|backup-batch|restore|restore-batch|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore|config-export|config-import)
     opid="$(new_opid)"
     detach "$opid" "$verb" "$ARGS_B64"
     ok "\"opid\":\"$opid\"" ;;
@@ -937,15 +937,6 @@ case "$verb" in
     else
       "$MODDIR/scripts/telegram.sh" init-storage
     fi ;;
-
-  telegram-list-remote)
-    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
-    j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
-    cid="$(printf '%s' "$j" | "$JQ" -r '.channel_id // empty' 2>/dev/null)"
-    if [ -z "$cid" ] && [ -f "$STATE/dests/telegram.json" ]; then
-      cid="$("$JQ" -r '.channel_id // empty' "$STATE/dests/telegram.json" 2>/dev/null)"
-    fi
-    "$MODDIR/scripts/telegram.sh" list-remote --dest "${cid:-telegram}" ;;
 
   telegram-logout)
     "$MODDIR/scripts/telegram.sh" logout ;;

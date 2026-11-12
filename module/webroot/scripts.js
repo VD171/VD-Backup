@@ -1001,11 +1001,13 @@ function syncDestFields() {
   set("#d-browse", type === "local");   // folder browser only makes sense for a local path
   set("#remote-box", type === "rclone");
   var hint = $("#d-rclone-hint"); if (hint) hint.hidden = (type !== "rclone");
-  if (type === "telegram") {
-    checkTelegramStatus().then(function (st) {
-      var isAuth = st && (st.authorized || st.is_auth);
-      if (!isAuth) openTelegramModal();
-    });
+  var tgHint = $("#d-telegram-hint");
+  if (tgHint) {
+    if (type !== "telegram") tgHint.hidden = true;
+    else {
+      var isAuth = TG_STATE && (TG_STATE.authorized || TG_STATE.is_auth);
+      tgHint.hidden = !!isAuth;
+    }
   }
 }
 // jump to the Add-cloud-remote section and briefly highlight it, so choosing the
@@ -1131,31 +1133,10 @@ function checkTelegramStatus() {
 
 function updateTelegramUI() {
   var isAuth = TG_STATE && (TG_STATE.authorized || TG_STATE.is_auth);
-  var tgCard = $("#tg-card");
-  if (tgCard) tgCard.hidden = !isAuth;
-  var linkBtn = $("#tg-link-btn");
-  var browseBtn = $("#tg-browse-btn");
-  var manageBtn = $("#tg-manage-btn");
-  var sub = $("#tg-card-sub");
-  var badge = $("#tg-card-badge");
-  var statusTxt = $("#tg-card-status-text");
-
-  if (isAuth) {
-    if (linkBtn) linkBtn.hidden = true;
-    if (browseBtn) browseBtn.hidden = false;
-    if (manageBtn) manageBtn.hidden = false;
-    if (badge) badge.className = "badge ok";
-    if (statusTxt) statusTxt.textContent = I18N.t("tg_status_ready") || "Ready";
-    var user = (TG_STATE.user && (TG_STATE.user.first_name || TG_STATE.user.username)) || "";
-    var chTitle = (TG_STATE.channel && TG_STATE.channel.title) || (TG_STATE.dest && TG_STATE.dest.channel_title) || "VD_Backup";
-    if (sub) sub.textContent = I18N.t("tg_status_connected", { user: user, channel: chTitle });
-  } else {
-    if (linkBtn) linkBtn.hidden = false;
-    if (browseBtn) browseBtn.hidden = true;
-    if (manageBtn) manageBtn.hidden = true;
-    if (badge) badge.className = "badge info";
-    if (statusTxt) statusTxt.textContent = I18N.t("tg_status_unlinked") || "Unlinked";
-    if (sub) sub.textContent = I18N.t("tg_vault_sub") || I18N.t("tg_storage_sub");
+  var tgHint = $("#d-telegram-hint");
+  if (tgHint) {
+    var type = $("#d-type") ? $("#d-type").value : "";
+    tgHint.hidden = (type !== "telegram") || !!isAuth;
   }
 }
 
@@ -1413,134 +1394,7 @@ function logoutTelegram() {
   });
 }
 
-function openTelegramBackupsModal() {
-  checkTelegramStatus().then(function (st) {
-    var isAuth = st && (st.authorized || st.is_auth);
-    if (!isAuth) {
-      openTelegramModal();
-      return;
-    }
-    $("#tg-backups-modal").hidden = false;
-    setupTelegramInteractiveInputs();
-    var s = $("#tg-bk-search");
-    if (s) s.value = "";
-    loadTelegramBackups();
-  });
-}
 
-function loadTelegramBackups() {
-  var ul = $("#tg-bk-list");
-  var empty = $("#tg-bk-empty");
-  var refIc = $("#tg-bk-refresh-ic");
-  if (refIc) refIc.style.animation = "spin .7s linear infinite";
-
-  ul.innerHTML = "<li class='log-loading'><span class='spinner'></span><span>" + I18N.t("apps_loading") + "</span></li>";
-  empty.hidden = true;
-
-  helper("telegram-list-remote").then(function (r) {
-    if (refIc) refIc.style.animation = "";
-    _tgLoadedBackups = (r && r.backups) ? r.backups : [];
-    renderTelegramBackups("");
-  }).catch(function (e) {
-    if (refIc) refIc.style.animation = "";
-    ul.innerHTML = "<li class='muted' style='color:var(--err); padding:16px 0; text-align:center;'>" + String(e) + "</li>";
-  });
-}
-
-function renderTelegramBackups(query) {
-  var ul = $("#tg-bk-list");
-  var empty = $("#tg-bk-empty");
-  var badge = $("#tg-bk-count-badge");
-  ul.innerHTML = "";
-
-  var q = (query || "").trim().toLowerCase();
-  var filtered = _tgLoadedBackups.filter(function (b) {
-    if (!q) return true;
-    var name = (b.name || (b.meta && b.meta.app) || "").toLowerCase();
-    var msgId = String(b.message_id || "");
-    return name.indexOf(q) !== -1 || msgId.indexOf(q) !== -1;
-  });
-
-  if (badge) {
-    badge.textContent = filtered.length + " " + (filtered.length === 1 ? "app" : "apps");
-  }
-
-  if (!filtered.length) {
-    empty.hidden = false;
-    return;
-  }
-  empty.hidden = true;
-
-  filtered.forEach(function (b) {
-    var li = el("li", "tg-backup-item");
-
-    var appName = b.name || (b.meta && b.meta.app) || ("Backup #" + b.message_id);
-    var avatarInitial = (appName.replace(/[^a-zA-Z0-9]/g, "")[0] || "A").toUpperCase();
-    var avatar = el("div", "tg-app-avatar", avatarInitial);
-
-    var info = el("div", "tg-backup-info");
-    var titleRow = el("div", "tg-backup-title");
-    titleRow.appendChild(document.createTextNode(appName));
-
-    var pkgRow = el("div", "tg-backup-pkg", "Message #" + b.message_id);
-
-    var metaRow = el("div", "tg-backup-meta");
-    var sizePill = el("span", "tg-pill-size", fmtSize(b.size || 0));
-    metaRow.appendChild(sizePill);
-    if (b.date) {
-      var dateSpan = el("span", "tg-pill-date", "• " + shortDate(new Date(b.date * 1000).toISOString()));
-      metaRow.appendChild(dateSpan);
-    }
-
-    info.appendChild(titleRow);
-    info.appendChild(pkgRow);
-    info.appendChild(metaRow);
-
-    var actions = el("div", "tg-backup-actions");
-    var dlBtn = el("button", "btn small", I18N.t("tg_download_single_btn") || I18N.t("download"));
-    dlBtn.onclick = function () {
-      downloadTelegramBackup(String(b.message_id), false);
-    };
-
-    var resBtn = el("button", "btn go small", I18N.t("tg_restore_single_btn") || I18N.t("restore"));
-    resBtn.onclick = function () {
-      downloadTelegramBackup(String(b.message_id), true);
-    };
-
-    actions.appendChild(dlBtn);
-    actions.appendChild(resBtn);
-
-    li.appendChild(avatar);
-    li.appendChild(info);
-    li.appendChild(actions);
-    ul.appendChild(li);
-  });
-}
-
-function downloadTelegramBackup(ref, autoRestore) {
-  var promptMsg = autoRestore ? I18N.t("tg_confirm_restore_cloud", { ref: ref }) : I18N.t("tg_confirm_download_cloud", { ref: ref });
-  modalConfirm(promptMsg).then(function (ok) {
-    if (!ok) return;
-    $("#tg-backups-modal").hidden = true;
-    var args = {
-      dest: "telegram",
-      ref: ref,
-      user: activeUser,
-      auto_restore: !!autoRestore
-    };
-    helper("telegram-download", args).then(function (r) {
-      if (r && r.opid) {
-        trackOp(r.opid, {
-          retry: function () {
-            helper("telegram-download", args).then(function (rr) { if (rr && rr.opid) trackOp(rr.opid); });
-          }
-        });
-      } else {
-        modalAlert(errMsg(r));
-      }
-    });
-  });
-}
 
 // --- Google Drive companion (opt-in, on-demand) -------------------------
 function showCompanionHma() {
@@ -2871,9 +2725,7 @@ function boot() {
   setupBackNav();
 
   // Telegram Cloud Storage event listeners
-  if ($("#tg-link-btn")) $("#tg-link-btn").onclick = openTelegramModal;
-  if ($("#tg-manage-btn")) $("#tg-manage-btn").onclick = openTelegramModal;
-  if ($("#tg-browse-btn")) $("#tg-browse-btn").onclick = openTelegramBackupsModal;
+  if ($("#d-tg-connect-btn")) $("#d-tg-connect-btn").onclick = openTelegramModal;
   if ($("#tg-modal-close-x")) $("#tg-modal-close-x").onclick = function () { $("#tg-modal").hidden = true; };
   if ($("#tg-phone-cancel")) $("#tg-phone-cancel").onclick = function () { $("#tg-modal").hidden = true; };
   if ($("#tg-notice-cancel")) $("#tg-notice-cancel").onclick = function () { $("#tg-modal").hidden = true; };
@@ -2883,10 +2735,6 @@ function boot() {
   if ($("#tg-code-verify")) $("#tg-code-verify").onclick = submitTelegramCode;
   if ($("#tg-create-channel-btn")) $("#tg-create-channel-btn").onclick = createTelegramChannel;
   if ($("#tg-logout-btn")) $("#tg-logout-btn").onclick = logoutTelegram;
-  if ($("#tg-view-backups-btn")) $("#tg-view-backups-btn").onclick = function () { $("#tg-modal").hidden = true; openTelegramBackupsModal(); };
-  if ($("#tg-bk-close")) $("#tg-bk-close").onclick = function () { $("#tg-backups-modal").hidden = true; };
-  if ($("#tg-bk-refresh")) $("#tg-bk-refresh").onclick = loadTelegramBackups;
-  if ($("#bk-tg-cloud")) $("#bk-tg-cloud").onclick = openTelegramBackupsModal;
 
   helper("config-get").then(function (c) { CFG = c || {}; activeUser = (CFG.user != null) ? (CFG.user | 0) : 0; return I18N.init(CFG.language || "auto"); })
     .then(function () { I18N.apply(); loadDests(); loadSettings(); loadUsers(); loadOverview(); reattachOps(); recoverPendingAuth(); autoCheckUpdates(); });

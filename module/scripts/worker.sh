@@ -2090,33 +2090,9 @@ config_import() {
   finish true ERR_NONE
 }
 
-do_telegram_download() {
-  DESTID="$(jget "$ARGS" '.dest')"; { [ -z "$DESTID" ] || [ "$DESTID" = null ]; } && DESTID=telegram
-  resolve_dest
-  REF="$(jget "$ARGS" '.ref')"
-  case "$REF" in ''|*..*|*/*/*) : ;; esac
-  PKG="$(jget "$ARGS" '.package')"
-  U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
-  [ -n "$REF" ] || { finish false ERR_BAD_REF; return; }
-  TARGET="$(backups_dir "$U")/$REF"
-  prog 5 downloading "telegram"
-  audit "telegram-download start $REF -> $TARGET"
-  "$MODDIR/scripts/telegram.sh" download "$DCHAT" "$REF" "$TARGET" "$OPID" \
-    || { audit "telegram-download failed $REF"; finish false ERR_TG_DOWNLOAD; return; }
-  media_own -R "$TARGET" 2>/dev/null
-  audit "telegram-download done $REF"
-  if [ "$(jget "$ARGS" '.auto_restore // false')" = true ]; then
-    # update ARGS ref to local target and run restore
-    ARGS="$(printf '%s' "$ARGS" | "$JQ" -c --arg target "$TARGET" '.ref = $target')"
-    restore
-  else
-    finish true ERR_NONE
-  fi
-}
-
 # mark the operation live immediately, before any (possibly slow) validation, so the
 # UI never sits on a stale "starting" while the first guard/dumpsys runs.
-case "$VERB" in backup|backup-batch|restore|restore-batch|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore|config-export|config-import|telegram-download) prog 2 preparing "" ;; esac
+case "$VERB" in backup|backup-batch|restore|restore-batch|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore|config-export|config-import) prog 2 preparing "" ;; esac
 case "$VERB" in
   backup)            backup ;;
   backup-batch)      backup_batch ;;
@@ -2130,6 +2106,5 @@ case "$VERB" in
   cloud-fetch)       do_cloud_fetch ;;
   path-backup)       do_path_backup ;;
   path-restore)      do_path_restore ;;
-  telegram-download) do_telegram_download ;;
   *)                 finish false ERR_UNKNOWN_VERB ;;
 esac
