@@ -1568,10 +1568,40 @@ function fetchCloudThenRetry(retryFn) {
 function trackOp(opid, ctx) {
   var box = $("#ops"); box.hidden = false;
   box.innerHTML = "";
+  var head = el("div", "row align-center");
+  head.style.justifyContent = "space-between";
+  head.style.gap = "8px";
   var label = el("div", null, I18N.t("op_running"));
+  label.style.flex = "1";
+  label.style.minWidth = "0";
+  var cancelBtn = el("button", "btn danger small", I18N.t("ui_cancel") || "Cancel");
+  cancelBtn.style.padding = "3px 10px";
+  cancelBtn.style.fontSize = "12px";
+  cancelBtn.style.flexShrink = "0";
+  head.appendChild(label);
+  head.appendChild(cancelBtn);
   var bar = el("div", "bar"); var fill = el("i"); bar.appendChild(fill);
   var sub = el("div", "op-sub"); sub.hidden = true;
-  box.appendChild(label); box.appendChild(bar); box.appendChild(sub);
+  box.appendChild(head); box.appendChild(bar); box.appendChild(sub);
+
+  cancelBtn.onclick = function () {
+    modalConfirm(I18N.t("confirm_cancel_op") || "Cancel the operation in progress?", I18N.t("ui_cancel") || "Cancel").then(function (yes) {
+      if (!yes) return;
+      cancelBtn.disabled = true;
+      cancelBtn.textContent = I18N.t("ui_cancelling") || "Cancelling...";
+      helper("cancel", opid, true).then(function () {
+        clearInterval(timer);
+        label.textContent = I18N.t("msg_op_cancelled") || "Operation cancelled.";
+        cancelBtn.remove();
+        fill.style.background = "var(--err)";
+        setTimeout(function () { box.hidden = true; }, 2500);
+      }).catch(function () {
+        cancelBtn.disabled = false;
+        cancelBtn.textContent = I18N.t("ui_cancel") || "Cancel";
+      });
+    });
+  };
+
   var missing = 0, stuck = 0;
   var timer = setInterval(function () {
     helper("progress", opid, true).then(function (p) {
@@ -1585,6 +1615,7 @@ function trackOp(opid, ctx) {
       updateProgSub(sub, p);
       if (p.done) {
         clearInterval(timer);
+        if (cancelBtn) cancelBtn.remove();
         if (!p.ok && ctx && ctx.entry && p.code === "ERR_IMPORT_ENCRYPTED") {
           box.hidden = true;
           startImport(ctx.from, ctx.entry, true);

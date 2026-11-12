@@ -519,6 +519,10 @@ window.__I18N_EN = {
   "tg_disconnect": "Disconnect",
   "tg_confirm_logout": "Disconnect Telegram Cloud Storage?",
   "tg_err_phone_required": "Phone number is required.",
-  "tg_err_code_required": "Verification code is required."
+  "tg_err_code_required": "Verification code is required.",
+  "confirm_cancel_op": "Cancel the operation in progress?",
+  "msg_op_cancelled": "Operation cancelled.",
+  "msg_err_cancelled": "Operation cancelled.",
+  "ui_cancelling": "Cancelling..."
 };
 

@@ -568,9 +568,16 @@ case "$verb" in
 
   cancel)
     opid="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
-    pid="$(cat "$LOGS/$opid.pid" 2>/dev/null)"
-    if [ -n "$pid" ]; then kill -TERM -"$pid" 2>/dev/null || kill "$pid" 2>/dev/null; fi
+    pid="$(cat "$LOGS/$opid.pid" 2>/dev/null || true)"
+    if [ -n "$pid" ]; then
+      kill -TERM -"$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null || true
+      sleep 0.1
+      kill -9 -"$pid" 2>/dev/null || kill -9 "$pid" 2>/dev/null || true
+    fi
     rm -f "$LOGS/$opid.pid" 2>/dev/null || true
+    f="$LOGS/progress-$opid.json"
+    printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":false,"code":"ERR_CANCELLED"}\n' "$opid" > "$f"
+    printf '{"ts":"%s","op":"cancel","opid":"%s","detail":"cancelled by user"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$opid" >> "$LOGS/audit.jsonl" 2>/dev/null || true
     ok "\"cancelled\":\"$(jstr "$opid")\"" ;;
 
   list-ops)
