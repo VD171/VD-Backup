@@ -381,6 +381,8 @@ Full با `rclone`/Drive، همگام‌سازی Mirror، پشتیبان/باز�
 برای درون‌مایه‌ها [ARCHITECTURE.md](ARCHITECTURE.md) و
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) را ببینید.
 
+<!-- doc-footer -->
+
 ---
 
-*این مستندات با Claude (Anthropic) تولید شده و توسط VD171 نگه‌داری می‌شود. تصحیح‌ها و بهبودها خوشامد است, [CONTRIBUTING.md](CONTRIBUTING.md) را ببینید.*
+> _این مستندات با Claude (Anthropic) تولید شده و توسط VD171 نگهداری می‌شود. اصلاحات و بهبودها خوش‌آمد است؛ به [CONTRIBUTING.md](CONTRIBUTING.md) مراجعه کنید._

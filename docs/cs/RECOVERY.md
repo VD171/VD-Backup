@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   původního vlastníka/kontext. Je to zdroj pravdy.
 - Nic zde není vázáno na konkrétní zařízení: tatáž heslová fráze/keyfile funguje na jakémkoli
   počítači.
+
+<!-- doc-footer -->
+
+---
+
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._

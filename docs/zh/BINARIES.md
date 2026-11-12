@@ -71,4 +71,8 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 如果任何随附的文件与其记录的来源不匹配，请将其视为安全问题并报告（见 [SECURITY.md](SECURITY.md)）。
 这正是此清单存在的目的所要暴露的那类差异。
 
-*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进, 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*
+<!-- doc-footer -->
+
+---
+
+> _本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎修正和改进；请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。_

@@ -40,4 +40,8 @@ Açık bir açıklama ve mümkünse yeniden üretme adımlarını ekleyin. Elimi
   upstream'e kadar izlenebilir ve manifest cihazda birlikte gelir, böylece paketlenmiş yük denetlenebilir
   ve yeniden üretilebilir. Bkz. [BINARIES.md](BINARIES.md).
 
-*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

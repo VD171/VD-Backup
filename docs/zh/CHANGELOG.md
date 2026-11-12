@@ -187,4 +187,8 @@ AI 友好与 i18n：
 - README 和所有项目文档都已翻译成 21 种标准语言（`docs/<lang>/`），并将文档镜像到 wiki。
 - 丰富的应用列表和 Neo 解密通过以 root 身份驱动的 dex 辅助程序运行（经由 ServiceManager 的 `IPackageManager`），因此在 ActivityThread 挂起的环境下也能工作。
 
-*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进, 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*
+<!-- doc-footer -->
+
+---
+
+> _本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎修正和改进；请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。_

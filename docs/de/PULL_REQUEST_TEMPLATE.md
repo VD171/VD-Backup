@@ -14,3 +14,9 @@ Beschreibe, was dieser PR ändert und warum.
 ## Anmerkungen
 
 Alles, was Reviewer wissen sollten.
+
+<!-- doc-footer -->
+
+---
+
+> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen; siehe [CONTRIBUTING.md](CONTRIBUTING.md)._

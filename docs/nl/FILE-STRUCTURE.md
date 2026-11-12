@@ -69,6 +69,8 @@ docs/                               # all public documentation
 └── screenshots/<code>/             # generated WebUI screenshots, per language
 ```
 
+<!-- doc-footer -->
+
 ---
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._

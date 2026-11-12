@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   原始归属者/上下文。它是事实来源。
 - 这里没有任何东西与特定设备绑定：同样的口令/密钥文件在任何
   机器上都有效。
+
+<!-- doc-footer -->
+
+---
+
+> _本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎修正和改进；请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。_

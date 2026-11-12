@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   chủ sở hữu/context gốc. Nó là nguồn chân lý.
 - Không có gì ở đây bị gắn với một thiết bị cụ thể: cùng cụm mật khẩu/keyfile hoạt động trên bất kỳ
   máy nào.
+
+<!-- doc-footer -->
+
+---
+
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._

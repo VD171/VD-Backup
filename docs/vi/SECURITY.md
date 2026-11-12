@@ -41,4 +41,8 @@ sớm nhất có thể và ghi công bạn nếu bạn muốn.
   với một SHA-256 được ghi lại, và bản kê khai được đóng gói trên thiết bị, nên tải trọng đi kèm có thể
   được kiểm toán và tái tạo. Xem [BINARIES.md](BINARIES.md).
 
-*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._

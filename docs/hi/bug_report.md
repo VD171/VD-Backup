@@ -24,3 +24,9 @@ labels: bug
 **Logs**
 यदि संभव हो, तो `/data/adb/vdbackup/logs/` से प्रासंगिक lines संलग्न करें।
 passwords या credentials शामिल न करें।
+
+<!-- doc-footer -->
+
+---
+
+> _यह दस्तावेज़ Claude (Anthropic) से तैयार किया गया है और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और संशोधन का स्वागत है; देखें [CONTRIBUTING.md](CONTRIBUTING.md)।_

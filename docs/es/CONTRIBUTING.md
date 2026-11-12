@@ -76,4 +76,8 @@ Los asistentes y agentes de IA son colaboradores de primera clase aquí, no una 
 Busca las etiquetas `good first issue` y `help wanted`. Las traducciones, la documentación, los nuevos
 presets de destino de `rclone` y el pulido de la WebUI son todos grandes puntos de partida.
 
-*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas, ve [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas; consulta [CONTRIBUTING.md](CONTRIBUTING.md)._

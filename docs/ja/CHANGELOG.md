@@ -257,4 +257,8 @@ AI フレンドリーと i18n:
 - 充実したアプリ一覧と Neo の復号は、root として駆動される dex ヘルパー
   (`IPackageManager` via ServiceManager) を通じて実行されるため、ActivityThread がハングする場所でも動作します。
 
-*このドキュメントは Claude (Anthropic) で生成され、VD171 が保守しています。訂正や改善を歓迎します, [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。*
+<!-- doc-footer -->
+
+---
+
+> _このドキュメントは Claude (Anthropic) で生成され、VD171 によって保守されています。修正や改善を歓迎します。[CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。_

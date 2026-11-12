@@ -40,4 +40,8 @@ a připíšeme vám zásluhy, pokud si to budete přát.
   se zaznamenaným SHA-256 a manifest je dodáván v zařízení, takže přibalený obsah lze auditovat a
   reprodukovat. Viz [BINARIES.md](BINARIES.md).
 
-*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._

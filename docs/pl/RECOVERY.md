@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   oryginalnego właściciela/kontekst. To źródło prawdy.
 - Nic tutaj nie jest powiązane z konkretnym urządzeniem: to samo hasło/plik klucza działa na dowolnej
   maszynie.
+
+<!-- doc-footer -->
+
+---
+
+> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane; zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._

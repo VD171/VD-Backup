@@ -260,4 +260,8 @@ Thân thiện với AI và i18n:
 - Việc liệt kê ứng dụng phong phú và giải mã Neo chạy qua một trợ giúp dex được điều khiển với quyền root
   (`IPackageManager` qua ServiceManager), nên chúng hoạt động ở những nơi mà ActivityThread bị treo.
 
-*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._

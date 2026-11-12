@@ -40,4 +40,8 @@ snart vi kan och ger dig erkännande om du vill.
   registrerad SHA-256, och manifestet levereras på enheten, så att den medföljande nyttolasten kan
   granskas och reproduceras. Se [BINARIES.md](BINARIES.md).
 
-*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna, se [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._

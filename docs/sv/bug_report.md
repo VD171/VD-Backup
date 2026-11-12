@@ -24,3 +24,9 @@ Vad du förväntade dig skulle hända.
 **Loggar**
 Om möjligt, bifoga de relevanta raderna från `/data/adb/vdbackup/logs/`.
 Inkludera INTE lösenord eller inloggningsuppgifter.
+
+<!-- doc-footer -->
+
+---
+
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._

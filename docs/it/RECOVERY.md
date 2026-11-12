@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   proprietario/contesto originale. È la fonte di verità.
 - Nulla qui è legato a un dispositivo specifico: la stessa passphrase/keyfile funziona su qualsiasi
   macchina.
+
+<!-- doc-footer -->
+
+---
+
+> _Questa documentazione è stata generata con Claude (Anthropic) ed è gestita da VD171. Correzioni e miglioramenti sono benvenuti; vedi [CONTRIBUTING.md](CONTRIBUTING.md)._

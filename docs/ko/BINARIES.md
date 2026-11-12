@@ -80,4 +80,8 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 ([SECURITY.md](SECURITY.md) 참조). 이것이 바로 이 매니페스트가 드러내기 위해 존재하는 종류의
 불일치입니다.
 
-*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다, [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*
+<!-- doc-footer -->
+
+---
+
+> _이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 유지 관리합니다. 수정 및 개선을 환영합니다. [CONTRIBUTING.md](CONTRIBUTING.md)를 참조하세요._

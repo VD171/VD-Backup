@@ -37,4 +37,8 @@ VDBackup 以 root 身份运行，并处理你的数据，以及（可选的）�
 - 每个预编译的二进制文件和库都可追溯到一个固定的公共上游，并带有记录的 SHA-256，且清单随设备一同提供，
   因此捆绑的有效负载可以被审计和复现。参见 [BINARIES.md](BINARIES.md)。
 
-*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进, 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*
+<!-- doc-footer -->
+
+---
+
+> _本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎修正和改进；请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。_

@@ -82,4 +82,8 @@ Om någon levererad fil inte matchar sin registrerade källa, behandla det som e
 rapportera det (se [SECURITY.md](SECURITY.md)). Det är precis den sorts avvikelse som detta
 manifest finns till för att göra synlig.
 
-*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna, se [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._

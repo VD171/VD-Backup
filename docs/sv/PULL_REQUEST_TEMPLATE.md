@@ -14,3 +14,9 @@ Beskriv vad denna PR ändrar och varför.
 ## Noteringar
 
 Vad som helst granskare bör veta.
+
+<!-- doc-footer -->
+
+---
+
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._

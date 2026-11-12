@@ -375,6 +375,8 @@ nunca este verbo.
 Ve [ARCHITECTURE.md](ARCHITECTURE.md) y
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) para los detalles internos.
 
+<!-- doc-footer -->
+
 ---
 
-*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas, ve [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas; consulta [CONTRIBUTING.md](CONTRIBUTING.md)._

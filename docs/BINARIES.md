@@ -82,4 +82,8 @@ If any shipped file does not match its recorded source, treat it as a security i
 report it (see [SECURITY.md](../SECURITY.md)). This is exactly the kind of discrepancy this
 manifest exists to make visible.
 
-*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome, see [CONTRIBUTING.md](../CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md)._

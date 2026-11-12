@@ -370,6 +370,8 @@ poll करने के लिए कोई `opid` नहीं होता।
 आंतरिक विवरण के लिए [ARCHITECTURE.md](ARCHITECTURE.md) और
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) देखें।
 
+<!-- doc-footer -->
+
 ---
 
-*यह दस्तावेज़ीकरण Claude (Anthropic) के साथ तैयार किया गया था और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और बेहतरी का स्वागत है, [CONTRIBUTING.md](CONTRIBUTING.md) देखें।*
+> _यह दस्तावेज़ Claude (Anthropic) से तैयार किया गया है और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और संशोधन का स्वागत है; देखें [CONTRIBUTING.md](CONTRIBUTING.md)।_

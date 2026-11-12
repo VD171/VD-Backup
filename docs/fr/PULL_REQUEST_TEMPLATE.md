@@ -14,3 +14,9 @@ Décrivez ce que cette PR modifie et pourquoi.
 ## Notes
 
 Tout ce que les relecteurs devraient savoir.
+
+<!-- doc-footer -->
+
+---
+
+> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues ; voir [CONTRIBUTING.md](CONTRIBUTING.md)._

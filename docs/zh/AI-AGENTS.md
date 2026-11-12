@@ -330,6 +330,8 @@ config 字段 `network_policy` 控制云端传输可使用哪种连接：`any`�
 内部实现请参见 [ARCHITECTURE.md](ARCHITECTURE.md) 和
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md)。
 
+<!-- doc-footer -->
+
 ---
 
-*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进, 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*
+> _本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎修正和改进；请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。_

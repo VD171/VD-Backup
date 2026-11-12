@@ -76,4 +76,8 @@ Android-DataBackup** است, اجتماع قابلیت‌های آن‌ها زی
 به دنبال برچسب‌های `good first issue` و `help wanted` بگردید. ترجمه‌ها، مستندات، پیش‌تنظیم‌های
 مقصد جدید `rclone` و صیقل‌دادن WebUI همگی نقاط شروع عالی هستند.
 
-*این مستندات با Claude (Anthropic) تولید شده و توسط VD171 نگه‌داری می‌شود. تصحیح‌ها و بهبودها خوشامد است, [CONTRIBUTING.md](CONTRIBUTING.md) را ببینید.*
+<!-- doc-footer -->
+
+---
+
+> _این مستندات با Claude (Anthropic) تولید شده و توسط VD171 نگهداری می‌شود. اصلاحات و بهبودها خوش‌آمد است؛ به [CONTRIBUTING.md](CONTRIBUTING.md) مراجعه کنید._

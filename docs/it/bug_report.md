@@ -24,3 +24,9 @@ Cosa ti aspettavi che accadesse.
 **Log**
 Se possibile, allega le righe rilevanti da `/data/adb/vdbackup/logs/`.
 NON includere password o credenziali.
+
+<!-- doc-footer -->
+
+---
+
+> _Questa documentazione è stata generata con Claude (Anthropic) ed è gestita da VD171. Correzioni e miglioramenti sono benvenuti; vedi [CONTRIBUTING.md](CONTRIBUTING.md)._

@@ -361,6 +361,8 @@ VDBackup เอง (ผนึกด้วย SHA-256 พร้อมชุด RE
 ดู [ARCHITECTURE.md](ARCHITECTURE.md) และ
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) สำหรับรายละเอียดภายใน
 
+<!-- doc-footer -->
+
 ---
 
-*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง, ดู [CONTRIBUTING.md](CONTRIBUTING.md)*
+> _เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและการปรับปรุง ดู [CONTRIBUTING.md](CONTRIBUTING.md)_

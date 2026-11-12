@@ -78,4 +78,8 @@ Se un file incluso non corrisponde alla sua sorgente registrata, trattalo come u
 sicurezza e segnalalo (vedi [SECURITY.md](SECURITY.md)). Questo è esattamente il tipo di
 discrepanza che questo manifest esiste per rendere visibile.
 
-*Questa documentazione è stata generata con Claude (Anthropic) ed è mantenuta da VD171. Correzioni e miglioramenti sono benvenuti, vedi [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Questa documentazione è stata generata con Claude (Anthropic) ed è gestita da VD171. Correzioni e miglioramenti sono benvenuti; vedi [CONTRIBUTING.md](CONTRIBUTING.md)._

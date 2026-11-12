@@ -40,4 +40,8 @@ VDBackup ทำงานในฐานะ root และจัดการข�
   ที่บันทึกไว้ และ manifest ถูกแนบมาบนอุปกรณ์ ดังนั้น payload ที่รวมมาจึงสามารถตรวจสอบและทำซ้ำได้
   ดู [BINARIES.md](BINARIES.md)
 
-*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง, ดู [CONTRIBUTING.md](CONTRIBUTING.md)*
+<!-- doc-footer -->
+
+---
+
+> _เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและการปรับปรุง ดู [CONTRIBUTING.md](CONTRIBUTING.md)_

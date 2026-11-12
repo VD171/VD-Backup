@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   ursprungliga ägaren/kontexten. Det är sanningskällan.
 - Inget här är bundet till en specifik enhet: samma lösenfras/nyckelfil fungerar på vilken
   maskin som helst.
+
+<!-- doc-footer -->
+
+---
+
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._

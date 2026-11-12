@@ -371,6 +371,8 @@ root manažer (KernelSU / APatch / Magisk) přes `updateJson` modulu, nikdy toto
 Viz [ARCHITECTURE.md](ARCHITECTURE.md) a
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) pro vnitřnosti.
 
+<!-- doc-footer -->
+
 ---
 
-*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._

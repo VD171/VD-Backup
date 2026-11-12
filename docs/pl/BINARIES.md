@@ -82,4 +82,8 @@ Jeśli jakikolwiek dostarczony plik nie zgadza się ze swoim zapisanym źródłe
 bezpieczeństwa i zgłoś go (zobacz [SECURITY.md](SECURITY.md)). To jest dokładnie ten rodzaj rozbieżności, który ten
 manifest istnieje, aby uczynić widocznym.
 
-*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane; zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._

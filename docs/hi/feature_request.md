@@ -15,3 +15,9 @@ labels: enhancement
 
 **अतिरिक्त संदर्भ**
 Destinations, backup modes, apps, या ROMs जिनसे यह संबंधित है।
+
+<!-- doc-footer -->
+
+---
+
+> _यह दस्तावेज़ Claude (Anthropic) से तैयार किया गया है और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और संशोधन का स्वागत है; देखें [CONTRIBUTING.md](CONTRIBUTING.md)।_

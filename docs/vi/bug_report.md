@@ -24,3 +24,9 @@ Một mô tả rõ ràng về lỗi.
 **Log**
 Nếu có thể, đính kèm các dòng liên quan từ `/data/adb/vdbackup/logs/`.
 KHÔNG đưa vào mật khẩu hay thông tin đăng nhập.
+
+<!-- doc-footer -->
+
+---
+
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._

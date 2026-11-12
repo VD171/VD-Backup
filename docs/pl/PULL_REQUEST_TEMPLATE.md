@@ -14,3 +14,9 @@ Opisz, co ten PR zmienia i dlaczego.
 ## Uwagi
 
 Cokolwiek, co recenzenci powinni wiedzieć.
+
+<!-- doc-footer -->
+
+---
+
+> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane; zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._

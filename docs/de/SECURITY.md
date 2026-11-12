@@ -41,4 +41,8 @@ schnell wir können und nennen dich, wenn du möchtest.
   einem festgehaltenen SHA-256 zurückverfolgbar, und das Manifest wird auf dem Gerät mitgeliefert,
   sodass die gebündelte Nutzlast geprüft und reproduziert werden kann. Siehe [BINARIES.md](BINARIES.md).
 
-*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen; siehe [CONTRIBUTING.md](CONTRIBUTING.md)._

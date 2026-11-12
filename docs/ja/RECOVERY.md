@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   所有者/コンテキストを記述します。これが真実の源です。
 - ここにあるものはどれも特定のデバイスに結び付けられていません。同じ
   パスフレーズ/キーファイルがどのマシンでも機能します。
+
+<!-- doc-footer -->
+
+---
+
+> _このドキュメントは Claude (Anthropic) で生成され、VD171 によって保守されています。修正や改善を歓迎します。[CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。_

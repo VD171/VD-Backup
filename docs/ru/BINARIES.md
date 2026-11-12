@@ -82,4 +82,8 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 безопасности и сообщите о ней (см. [SECURITY.md](SECURITY.md)). Это именно тот тип расхождения, который этот
 манифест и существует, чтобы делать видимым.
 
-*Эта документация была сгенерирована с помощью Claude (Anthropic) и сопровождается VD171. Исправления и улучшения приветствуются, см. [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Эта документация создана с помощью Claude (Anthropic) и поддерживается VD171. Исправления и улучшения приветствуются; см. [CONTRIBUTING.md](CONTRIBUTING.md)._

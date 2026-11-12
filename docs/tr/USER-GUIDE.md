@@ -623,6 +623,8 @@ kapısı yoktur; yedeği koruyan şey paroladır. Onu güvende tutun.
 
 VDBackup'ı diğer modüller gibi KernelSU / APatch / Magisk yöneticinizden kaldırın. Kaldırma **kurulumunuzu korur** ve yalnızca geçici durumu siler, böylece sonradan yeniden kurmak yapılandırmanızı, hedeflerinizi ve zamanlamalarınızı geri alır. Yedeklerinizi `/sdcard/VDBackup` (standart biçimler, modül olmadan bir PC'de açılabilir), yapılandırmanızı `/data/adb/vdbackup` ve kayıtlı kimlik bilgilerinizi, rclone.conf ve age anahtarını kimlik bilgisiyle şifreli `/data/misc_ce/0/vdbackup` (ilk kilit açmaya kadar kilitli) içinde tutar. Bunlardan herhangi birini de kaldırmak için, kaldırmadan sonra o dizini elle silin.
 
+<!-- doc-footer -->
+
 ---
 
-*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

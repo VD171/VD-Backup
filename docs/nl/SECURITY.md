@@ -40,4 +40,8 @@ snel als we kunnen en vermelden je als je dat wilt.
   upstream met een vastgelegde SHA-256, en het manifest wordt op het apparaat meegeleverd, zodat de
   gebundelde payload gecontroleerd en gereproduceerd kan worden. Zie [BINARIES.md](BINARIES.md).
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._

@@ -17,4 +17,8 @@ commit'leri, konuları ve katkıları kaldırabilir ve tekrar suç işleyenleri 
 
 Bu, Contributor Covenant'ın ruhunun özetlenmiş, projeye uygun bir uyarlamasıdır.
 
-*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

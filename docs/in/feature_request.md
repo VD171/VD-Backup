@@ -15,3 +15,9 @@ Apa pun yang Anda pertimbangkan.
 
 **Konteks tambahan**
 Destinasi, mode backup, aplikasi, atau ROM yang berkaitan dengan ini.
+
+<!-- doc-footer -->
+
+---
+
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

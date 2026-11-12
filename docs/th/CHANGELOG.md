@@ -253,4 +253,8 @@ WebUI:
 - รายการแอปที่สมบูรณ์และการถอดรหัส Neo ทำงานผ่าน dex helper ที่ขับเคลื่อนในฐานะ root
   (`IPackageManager` via ServiceManager) จึงทำงานได้ในที่ที่ ActivityThread ค้าง
 
-*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง, ดู [CONTRIBUTING.md](CONTRIBUTING.md)*
+<!-- doc-footer -->
+
+---
+
+> _เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและการปรับปรุง ดู [CONTRIBUTING.md](CONTRIBUTING.md)_

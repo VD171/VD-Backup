@@ -77,4 +77,8 @@ Pokud některý dodaný soubor neodpovídá svému zaznamenanému zdroji, považ
 problém a nahlaste jej (viz [SECURITY.md](SECURITY.md)). To je přesně ten druh nesrovnalosti, který tento
 manifest existuje proto, aby jej učinil viditelným.
 
-*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._

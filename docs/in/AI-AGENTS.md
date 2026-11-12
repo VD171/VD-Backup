@@ -376,6 +376,8 @@ verba ini.
 Lihat [ARCHITECTURE.md](ARCHITECTURE.md) dan
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) untuk internalnya.
 
+<!-- doc-footer -->
+
 ---
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

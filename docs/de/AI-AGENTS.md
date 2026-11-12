@@ -384,6 +384,8 @@ von diesem Verb.
 Siehe [ARCHITECTURE.md](ARCHITECTURE.md) und
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) für die Interna.
 
+<!-- doc-footer -->
+
 ---
 
-*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen; siehe [CONTRIBUTING.md](CONTRIBUTING.md)._

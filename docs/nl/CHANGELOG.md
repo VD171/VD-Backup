@@ -273,4 +273,8 @@ AI-vriendelijk en i18n:
 - De uitgebreide app-lijst en de Neo-ontsleuteling lopen via een als root aangestuurde dex-helper
   (`IPackageManager` via ServiceManager), zodat ze werken waar ActivityThread vastloopt.
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._

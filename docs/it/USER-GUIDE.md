@@ -588,6 +588,8 @@ per progettazione ; la passphrase è ciò che protegge il backup. Tienila al sic
 
 Disinstalla VDBackup come qualsiasi altro modulo dal tuo gestore KernelSU / APatch / Magisk. La disinstallazione **conserva la tua configurazione** e rimuove solo lo stato transitorio, quindi reinstallando poi riprende la tua configurazione, le destinazioni e le pianificazioni. Mantiene i tuoi backup in `/sdcard/VDBackup` (formati standard, apribili su un PC senza il modulo), la tua configurazione in `/data/adb/vdbackup`, e le tue credenziali salvate, il rclone.conf e la chiave age in `/data/misc_ce/0/vdbackup` cifrato per credenziale (bloccato fino al primo sblocco). Per rimuovere anche uno di questi, elimina quella cartella manualmente dopo la disinstallazione.
 
+<!-- doc-footer -->
+
 ---
 
-*Questa documentazione è stata generata con Claude (Anthropic) ed è mantenuta da VD171. Correzioni e miglioramenti sono benvenuti, vedi [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Questa documentazione è stata generata con Claude (Anthropic) ed è gestita da VD171. Correzioni e miglioramenti sono benvenuti; vedi [CONTRIBUTING.md](CONTRIBUTING.md)._

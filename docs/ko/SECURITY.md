@@ -40,4 +40,8 @@ VDBackup은 root로 실행되며 사용자의 데이터와 (선택적으로) 자
   매니페스트가 기기에 함께 제공되므로 번들된 페이로드를 감사하고 재현할 수 있습니다.
   [BINARIES.md](BINARIES.md)를 참조하세요.
 
-*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다, [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*
+<!-- doc-footer -->
+
+---
+
+> _이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 유지 관리합니다. 수정 및 개선을 환영합니다. [CONTRIBUTING.md](CONTRIBUTING.md)를 참조하세요._

@@ -83,4 +83,8 @@ Als een meegeleverd bestand niet overeenkomt met de vastgelegde bron, behandel h
 beveiligingsprobleem en meld het (zie [SECURITY.md](SECURITY.md)). Dit is precies het soort
 discrepantie dat dit manifest bestaat om zichtbaar te maken.
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._

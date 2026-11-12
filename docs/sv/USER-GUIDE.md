@@ -610,6 +610,8 @@ bakdörr avsiktligt; lösenfrasen är det som skyddar säkerhetskopian. Håll de
 
 Avinstallera VDBackup som vilken annan modul som helst från din KernelSU- / APatch- / Magisk-hanterare. Avinstallationen **bevarar din uppsättning** och tar bara bort tillfälligt tillstånd, så en senare ominstallation återupptar din konfiguration, dina destinationer och scheman. Den behåller dina säkerhetskopior under `/sdcard/VDBackup` (standardformat, öppningsbara på en PC utan modulen), din konfiguration under `/data/adb/vdbackup`, och dina sparade inloggningsuppgifter, rclone.conf och age-nyckeln under autentiseringskrypterad `/data/misc_ce/0/vdbackup` (låst till den första upplåsningen). För att ta bort något av dessa också, radera den katalogen manuellt efter avinstallationen.
 
+<!-- doc-footer -->
+
 ---
 
-*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna, se [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._

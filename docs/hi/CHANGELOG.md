@@ -255,4 +255,8 @@ AI-अनुकूल और i18n:
 - समृद्ध ऐप सूची और Neo डिक्रिप्शन एक dex helper के माध्यम से चलते हैं जो root के रूप में संचालित होता है
   (`IPackageManager` via ServiceManager), ताकि वे वहाँ काम करें जहाँ ActivityThread अटक जाता है।
 
-*यह दस्तावेज़ीकरण Claude (Anthropic) के साथ तैयार किया गया था और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और बेहतरी का स्वागत है, [CONTRIBUTING.md](CONTRIBUTING.md) देखें।*
+<!-- doc-footer -->
+
+---
+
+> _यह दस्तावेज़ Claude (Anthropic) से तैयार किया गया है और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और संशोधन का स्वागत है; देखें [CONTRIBUTING.md](CONTRIBUTING.md)।_

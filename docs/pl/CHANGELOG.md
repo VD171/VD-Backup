@@ -273,4 +273,8 @@ Przyjazny dla AI i i18n:
 - Bogaty wykaz aplikacji i odszyfrowywanie Neo działają przez pomocnika dex sterowanego jako root
   (`IPackageManager` przez ServiceManager), więc działają tam, gdzie ActivityThread się zawiesza.
 
-*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane; zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._

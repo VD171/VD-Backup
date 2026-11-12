@@ -41,4 +41,8 @@ prima possibile e ti daremo credito se lo desideri.
   SHA-256 registrato, e il manifest è incluso sul dispositivo, così che il payload incluso possa
   essere verificato e riprodotto. Vedi [BINARIES.md](BINARIES.md).
 
-*Questa documentazione è stata generata con Claude (Anthropic) ed è mantenuta da VD171. Correzioni e miglioramenti sono benvenuti, vedi [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Questa documentazione è stata generata con Claude (Anthropic) ed è gestita da VD171. Correzioni e miglioramenti sono benvenuti; vedi [CONTRIBUTING.md](CONTRIBUTING.md)._

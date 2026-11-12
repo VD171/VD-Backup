@@ -78,4 +78,8 @@ Si algún archivo incluido no coincide con su fuente registrada, trátalo como u
 seguridad e infórmalo (consulta [SECURITY.md](SECURITY.md)). Esta es exactamente la clase de
 discrepancia que este manifiesto existe para hacer visible.
 
-*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas, ve [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas; consulta [CONTRIBUTING.md](CONTRIBUTING.md)._

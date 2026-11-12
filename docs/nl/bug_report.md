@@ -24,3 +24,9 @@ Wat je verwachtte dat er zou gebeuren.
 **Logs**
 Voeg indien mogelijk de relevante regels uit `/data/adb/vdbackup/logs/` toe.
 Neem GEEN wachtwoorden of inloggegevens op.
+
+<!-- doc-footer -->
+
+---
+
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._

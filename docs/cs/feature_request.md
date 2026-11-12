@@ -15,3 +15,9 @@ Cokoli, co jste zvážili.
 
 **Další kontext**
 Destinace, režimy zálohování, aplikace nebo ROM, kterých se to týká.
+
+<!-- doc-footer -->
+
+---
+
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._

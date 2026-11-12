@@ -86,4 +86,8 @@ PC)이 여전히 복원할 수 있습니다. 이전 백업을 손상시키는 �
 대해서는 관리자들이 상세한 설계 노트를 유지하고 있습니다; 이 파일은 기여자를 위한
 개요입니다.
 
-*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다, [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*
+<!-- doc-footer -->
+
+---
+
+> _이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 유지 관리합니다. 수정 및 개선을 환영합니다. [CONTRIBUTING.md](CONTRIBUTING.md)를 참조하세요._

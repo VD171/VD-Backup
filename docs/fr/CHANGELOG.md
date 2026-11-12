@@ -272,4 +272,8 @@ AI-friendly et i18n :
 - Le listage riche des apps et le déchiffrement Neo passent par un helper dex piloté en root
   (`IPackageManager` via ServiceManager), de sorte qu'ils fonctionnent là où ActivityThread se bloque.
 
-*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues ; voir [CONTRIBUTING.md](CONTRIBUTING.md)._

@@ -69,6 +69,8 @@ docs/                               # all public documentation
 └── screenshots/<code>/             # generated WebUI screenshots, per language
 ```
 
+<!-- doc-footer -->
+
 ---
 
-*أُنشئت هذه الوثائق بمساعدة Claude (Anthropic) ويتولى صيانتها VD171. التصحيحات والتحسينات موضع ترحيب, انظر [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _تم إنشاء هذا التوثيق باستخدام Claude (Anthropic) ويتولى صيانته VD171. التصحيحات والتحسينات مرحّب بها؛ راجع [CONTRIBUTING.md](CONTRIBUTING.md)._

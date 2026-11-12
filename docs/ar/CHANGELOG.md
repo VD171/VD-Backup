@@ -197,4 +197,8 @@ WebUI:
 - تُرجم ملف README وجميع وثائق المشروع إلى 21 لغة قياسية (`docs/<lang>/`)، مع عكس الوثائق إلى الويكي.
 - يعمل سرد التطبيقات الغني وفك تشفير Neo عبر مساعد dex يُقاد بصلاحيات الجذر (‏`IPackageManager` عبر ServiceManager)، فيعملان حيث يتعلق ActivityThread.
 
-*أُنشئت هذه الوثائق بمساعدة Claude (Anthropic) ويتولى صيانتها VD171. التصحيحات والتحسينات مرحب بها, انظر [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _تم إنشاء هذا التوثيق باستخدام Claude (Anthropic) ويتولى صيانته VD171. التصحيحات والتحسينات مرحّب بها؛ راجع [CONTRIBUTING.md](CONTRIBUTING.md)._

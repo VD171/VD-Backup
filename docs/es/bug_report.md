@@ -24,3 +24,9 @@ Qué esperabas que pasara.
 **Logs**
 Si es posible, adjunta las líneas relevantes de `/data/adb/vdbackup/logs/`.
 NO incluyas contraseñas ni credenciales.
+
+<!-- doc-footer -->
+
+---
+
+> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas; consulta [CONTRIBUTING.md](CONTRIBUTING.md)._

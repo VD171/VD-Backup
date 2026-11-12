@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   pemilik/konteks asli. Ia adalah sumber kebenaran.
 - Tidak ada di sini yang terikat ke perangkat spesifik: frasa-sandi/keyfile yang sama bekerja di mesin
   mana pun.
+
+<!-- doc-footer -->
+
+---
+
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

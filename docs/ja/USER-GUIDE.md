@@ -548,6 +548,8 @@ backup を守るのは passphrase です。安全に保管してください。
 
 VDBackup は他のモジュールと同様に KernelSU / APatch / Magisk マネージャーからアンインストールします。アンインストールは**設定を保持**し、一時的な状態のみを削除するため、後で再インストールすると設定・保存先・スケジュールを引き継ぎます。バックアップは `/sdcard/VDBackup`（標準形式、モジュールなしで PC で開けます）に、設定は `/data/adb/vdbackup` に、保存された認証情報・rclone.conf・age の鍵は資格情報暗号化の `/data/misc_ce/0/vdbackup`（最初のロック解除まで施錠）に残します。これらのいずれかも削除するには、アンインストール後にそのディレクトリを手動で削除してください。
 
+<!-- doc-footer -->
+
 ---
 
-*このドキュメントは Claude (Anthropic) で生成され、VD171 が保守しています。訂正や改善を歓迎します, [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。*
+> _このドキュメントは Claude (Anthropic) で生成され、VD171 によって保守されています。修正や改善を歓迎します。[CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。_

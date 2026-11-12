@@ -24,3 +24,9 @@ labels: bug
 **Logs**
 หากเป็นไปได้ แนบบรรทัดที่เกี่ยวข้องจาก `/data/adb/vdbackup/logs/`
 อย่าใส่รหัสผ่านหรือ credential
+
+<!-- doc-footer -->
+
+---
+
+> _เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและการปรับปรุง ดู [CONTRIBUTING.md](CONTRIBUTING.md)_

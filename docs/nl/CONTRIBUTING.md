@@ -76,4 +76,8 @@ AI-assistenten en -agenten zijn hier eersteklas bijdragers, geen bijzaak.
 Zoek naar de labels `good first issue` en `help wanted`. Vertalingen, docs, nieuwe
 `rclone`-bestemmingspresets en WebUI-afwerking zijn allemaal geweldige startpunten.
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._

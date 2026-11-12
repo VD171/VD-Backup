@@ -86,4 +86,8 @@ VDBackup は root WebUI モジュールです。3 つの層で構成されてい
 destinations、importers)については、メンテナが詳細な設計ノートを保持しています。このファイルは
 コントリビューター向けの概要です。
 
-*このドキュメントは Claude (Anthropic) で生成され、VD171 が保守しています。訂正や改善を歓迎します, [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。*
+<!-- doc-footer -->
+
+---
+
+> _このドキュメントは Claude (Anthropic) で生成され、VD171 によって保守されています。修正や改善を歓迎します。[CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。_

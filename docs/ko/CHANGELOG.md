@@ -197,4 +197,8 @@ AI 친화성과 i18n:
 - README와 모든 프로젝트 문서가 21개 표준 언어(`docs/<lang>/`)로 번역되었으며, 문서는 위키에도 미러링됩니다.
 - 풍부한 앱 목록 표시와 Neo 복호화는 root로 구동되는 dex 헬퍼(ServiceManager를 통한 `IPackageManager`)를 거치므로, ActivityThread가 멈추는 환경에서도 동작합니다.
 
-*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다, [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*
+<!-- doc-footer -->
+
+---
+
+> _이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 유지 관리합니다. 수정 및 개선을 환영합니다. [CONTRIBUTING.md](CONTRIBUTING.md)를 참조하세요._

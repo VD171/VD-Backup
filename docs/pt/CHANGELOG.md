@@ -267,4 +267,8 @@ AI-friendly e i18n:
 - A listagem rica de apps e a descriptografia do Neo rodam através de um helper dex dirigido como root
   (`IPackageManager` via ServiceManager), de modo que funcionam onde o ActivityThread trava.
 
-*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas; veja [CONTRIBUTING.md](CONTRIBUTING.md)._

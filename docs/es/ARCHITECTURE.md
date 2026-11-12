@@ -86,4 +86,8 @@ Para el diseño técnico completo (formato de archive, esquema de metadatos, pip
 destinos, importadores) los mantenedores guardan notas de diseño detalladas; este archivo es la
 visión general orientada a colaboradores.
 
-*Esta documentación fue generada con Claude (Anthropic) y es mantenida por VD171. Correcciones y mejoras son bienvenidas, ve [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas; consulta [CONTRIBUTING.md](CONTRIBUTING.md)._

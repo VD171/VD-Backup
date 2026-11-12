@@ -18,4 +18,8 @@ issue และการมีส่วนร่วมที่ละเมิ�
 นี่คือการปรับใช้แบบย่อและเหมาะกับโครงการ ตามเจตนารมณ์ของ Contributor
 Covenant
 
-*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง, ดู [CONTRIBUTING.md](CONTRIBUTING.md)*
+<!-- doc-footer -->
+
+---
+
+> _เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและการปรับปรุง ดู [CONTRIBUTING.md](CONTRIBUTING.md)_

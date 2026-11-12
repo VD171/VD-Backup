@@ -81,4 +81,8 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 و گزارشش دهید (نگاه کنید به [SECURITY.md](SECURITY.md)). این دقیقاً همان نوع ناسازگاری
 است که این مانیفست برای آشکار کردنش وجود دارد.
 
-*این مستندات با Claude (Anthropic) تولید شده و توسط VD171 نگه‌داری می‌شود. تصحیح‌ها و بهبودها خوشامد است, [CONTRIBUTING.md](CONTRIBUTING.md) را ببینید.*
+<!-- doc-footer -->
+
+---
+
+> _این مستندات با Claude (Anthropic) تولید شده و توسط VD171 نگهداری می‌شود. اصلاحات و بهبودها خوش‌آمد است؛ به [CONTRIBUTING.md](CONTRIBUTING.md) مراجعه کنید._

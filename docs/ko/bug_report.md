@@ -24,3 +24,9 @@ labels: bug
 **로그**
 가능하면 `/data/adb/vdbackup/logs/`에서 관련 줄을 첨부하세요.
 암호나 자격 증명은 포함하지 마세요.
+
+<!-- doc-footer -->
+
+---
+
+> _이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 유지 관리합니다. 수정 및 개선을 환영합니다. [CONTRIBUTING.md](CONTRIBUTING.md)를 참조하세요._

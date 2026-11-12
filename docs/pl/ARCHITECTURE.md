@@ -86,4 +86,8 @@ Pełny projekt techniczny (format archiwum, schemat metadanych, potoki, kryptogr
 cele, importery) opiekunowie prowadzą w szczegółowych notatkach projektowych; ten plik to przegląd
 skierowany do współtwórców.
 
-*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane; zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._

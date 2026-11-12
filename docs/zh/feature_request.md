@@ -15,3 +15,9 @@ labels: enhancement
 
 **额外背景**
 与此相关的目标、备份模式、应用或 ROM。
+
+<!-- doc-footer -->
+
+---
+
+> _本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎修正和改进；请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。_

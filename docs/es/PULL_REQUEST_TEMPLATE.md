@@ -14,3 +14,9 @@ Describe qué cambia este PR y por qué.
 ## Notas
 
 Cualquier cosa que los revisores deban saber.
+
+<!-- doc-footer -->
+
+---
+
+> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas; consulta [CONTRIBUTING.md](CONTRIBUTING.md)._

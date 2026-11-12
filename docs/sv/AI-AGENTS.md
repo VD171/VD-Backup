@@ -373,6 +373,8 @@ detta verb.
 Se [ARCHITECTURE.md](ARCHITECTURE.md) och
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) för interna detaljer.
 
+<!-- doc-footer -->
+
 ---
 
-*Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar är välkomna, se [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._

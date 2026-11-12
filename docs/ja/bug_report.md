@@ -24,3 +24,9 @@ labels: bug
 **ログ**
 可能であれば、`/data/adb/vdbackup/logs/` から関連する行を添付してください。
 パスワードや認証情報は含めないでください。
+
+<!-- doc-footer -->
+
+---
+
+> _このドキュメントは Claude (Anthropic) で生成され、VD171 によって保守されています。修正や改善を歓迎します。[CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。_

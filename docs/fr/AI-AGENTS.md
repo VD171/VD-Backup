@@ -383,6 +383,8 @@ elle-même est effectuée par votre gestionnaire root (KernelSU / APatch / Magis
 Voir [ARCHITECTURE.md](ARCHITECTURE.md) et
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) pour les détails internes.
 
+<!-- doc-footer -->
+
 ---
 
-*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues ; voir [CONTRIBUTING.md](CONTRIBUTING.md)._

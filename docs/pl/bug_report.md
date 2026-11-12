@@ -24,3 +24,9 @@ Czego się spodziewałeś.
 **Logi**
 Jeśli to możliwe, dołącz odpowiednie linie z `/data/adb/vdbackup/logs/`.
 NIE dołączaj haseł ani poświadczeń.
+
+<!-- doc-footer -->
+
+---
+
+> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane; zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._

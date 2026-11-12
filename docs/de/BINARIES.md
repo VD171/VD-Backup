@@ -81,4 +81,8 @@ Wenn eine mitgelieferte Datei nicht zu ihrer erfassten Quelle passt, behandeln S
 Sicherheitsproblem und melden Sie es (siehe [SECURITY.md](SECURITY.md)). Genau diese Art von
 Abweichung soll dieses Manifest sichtbar machen.
 
-*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen; siehe [CONTRIBUTING.md](CONTRIBUTING.md)._

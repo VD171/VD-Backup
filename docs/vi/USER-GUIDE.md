@@ -611,6 +611,8 @@ khôi phục theo thiết kế; cụm mật khẩu là thứ bảo vệ bản sa
 
 Gỡ VDBackup như bất kỳ mô-đun nào khác từ trình quản lý KernelSU / APatch / Magisk của bạn. Việc gỡ **giữ nguyên thiết lập của bạn** và chỉ xóa trạng thái tạm thời, nên cài lại về sau sẽ tiếp nhận cấu hình, đích đến và lịch trình của bạn. Nó giữ các bản sao lưu của bạn tại `/sdcard/VDBackup` (định dạng chuẩn, mở được trên PC mà không cần mô-đun), cấu hình của bạn tại `/data/adb/vdbackup`, và thông tin xác thực đã lưu, rclone.conf cùng khóa age tại `/data/misc_ce/0/vdbackup` được mã hóa bằng thông tin xác thực (khóa cho đến lần mở khóa đầu tiên). Để xóa bất kỳ mục nào trong số này, hãy tự xóa thư mục đó sau khi gỡ.
 
+<!-- doc-footer -->
+
 ---
 
-*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._

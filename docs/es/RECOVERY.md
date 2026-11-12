@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   propietario/contexto original. Es la fuente de verdad.
 - Nada aquí está atado a un dispositivo específico: la misma frase de cifrado/keyfile funciona en cualquier
   máquina.
+
+<!-- doc-footer -->
+
+---
+
+> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas; consulta [CONTRIBUTING.md](CONTRIBUTING.md)._

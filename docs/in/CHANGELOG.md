@@ -264,4 +264,8 @@ Ramah-AI dan i18n:
 - Daftar aplikasi yang kaya dan dekripsi Neo berjalan melalui helper dex yang dijalankan sebagai root
   (`IPackageManager` via ServiceManager), sehingga berfungsi di tempat ActivityThread menggantung.
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

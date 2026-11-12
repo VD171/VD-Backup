@@ -14,3 +14,9 @@ Popište, co tento PR mění a proč.
 ## Poznámky
 
 Cokoli, co by recenzenti měli vědět.
+
+<!-- doc-footer -->
+
+---
+
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._

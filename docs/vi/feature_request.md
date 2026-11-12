@@ -15,3 +15,9 @@ Bất cứ điều gì bạn đã cân nhắc.
 
 **Bối cảnh thêm**
 Các đích đến, chế độ backup, ứng dụng, hoặc ROM mà điều này liên quan tới.
+
+<!-- doc-footer -->
+
+---
+
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._

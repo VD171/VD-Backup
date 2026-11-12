@@ -375,6 +375,8 @@ không bao giờ bởi động từ này.
 Xem [ARCHITECTURE.md](ARCHITECTURE.md) và
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) để biết các chi tiết nội bộ.
 
+<!-- doc-footer -->
+
 ---
 
-*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._

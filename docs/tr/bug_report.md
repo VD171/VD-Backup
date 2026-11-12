@@ -24,3 +24,9 @@ Olmasını beklediğiniz şey.
 **Günlükler**
 Mümkünse, `/data/adb/vdbackup/logs/` dizinindeki ilgili satırları ekleyin.
 Parolaları veya kimlik bilgilerini DAHİL ETMEYİN.
+
+<!-- doc-footer -->
+
+---
+
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

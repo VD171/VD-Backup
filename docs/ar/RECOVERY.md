@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   المالك/السياق الأصلي. إنه مصدر الحقيقة.
 - لا شيء هنا مرتبط بجهاز محدد: عبارة المرور/ملف المفتاح ذاتها تعمل على أي
   آلة.
+
+<!-- doc-footer -->
+
+---
+
+> _تم إنشاء هذا التوثيق باستخدام Claude (Anthropic) ويتولى صيانته VD171. التصحيحات والتحسينات مرحّب بها؛ راجع [CONTRIBUTING.md](CONTRIBUTING.md)._

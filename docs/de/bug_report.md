@@ -24,3 +24,9 @@ Was du erwartet hast, dass passiert.
 **Logs**
 Wenn möglich, füge die relevanten Zeilen aus `/data/adb/vdbackup/logs/` an.
 Füge KEINE Passwörter oder Zugangsdaten bei.
+
+<!-- doc-footer -->
+
+---
+
+> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen; siehe [CONTRIBUTING.md](CONTRIBUTING.md)._

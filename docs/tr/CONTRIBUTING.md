@@ -76,4 +76,8 @@ Yapay zeka asistanları ve ajanları burada sonradan akla gelen değil, birinci 
 `good first issue` ve `help wanted` etiketlerini arayın. Çeviriler, belgeler, yeni
 `rclone` hedef hazır ayarları ve WebUI cilası harika başlangıç noktalarıdır.
 
-*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

@@ -75,4 +75,8 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 إذا كان أي ملف مشحون لا يطابق مصدره المُسجّل، فعامله كمشكلة أمنية وأبلغ عنها (انظر
 [SECURITY.md](SECURITY.md)). هذا بالضبط نوع التباين الذي وُجد هذا البيان ليجعله مرئياً.
 
-*أُنشئت هذه الوثائق بمساعدة Claude (Anthropic) ويتولى صيانتها VD171. التصحيحات والتحسينات مرحب بها, انظر [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _تم إنشاء هذا التوثيق باستخدام Claude (Anthropic) ويتولى صيانته VD171. التصحيحات والتحسينات مرحّب بها؛ راجع [CONTRIBUTING.md](CONTRIBUTING.md)._

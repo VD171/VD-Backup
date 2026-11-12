@@ -82,4 +82,8 @@ Se algum arquivo distribuído não corresponder à sua origem registrada, trate 
 segurança e reporte (veja [SECURITY.md](SECURITY.md)). Este é exatamente o tipo de divergência que este
 manifesto existe para tornar visível.
 
-*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas; veja [CONTRIBUTING.md](CONTRIBUTING.md)._

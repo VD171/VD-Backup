@@ -373,6 +373,8 @@ kit 付きで)、backups ディレクトリ内の `.paths/` 配下に書き込�
 内部については [ARCHITECTURE.md](ARCHITECTURE.md) と
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) を参照してください。
 
+<!-- doc-footer -->
+
 ---
 
-*このドキュメントは Claude (Anthropic) で生成され、VD171 が保守しています。訂正や改善を歓迎します, [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。*
+> _このドキュメントは Claude (Anthropic) で生成され、VD171 によって保守されています。修正や改善を歓迎します。[CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。_

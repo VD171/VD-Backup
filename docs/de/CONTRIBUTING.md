@@ -76,4 +76,8 @@ KI-Assistenten und -Agenten sind hier erstklassige Mitwirkende, kein nachträgli
 Halte Ausschau nach den Labels `good first issue` und `help wanted`. Übersetzungen, Docs, neue
 `rclone`-Ziel-Presets und WebUI-Feinschliff sind alle großartige Ausgangspunkte.
 
-*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen; siehe [CONTRIBUTING.md](CONTRIBUTING.md)._

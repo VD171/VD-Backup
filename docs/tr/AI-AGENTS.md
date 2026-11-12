@@ -377,6 +377,8 @@ fiil yapmaz.
 Dahili yapı için [ARCHITECTURE.md](ARCHITECTURE.md) ve
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) dosyalarına bakın.
 
+<!-- doc-footer -->
+
 ---
 
-*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

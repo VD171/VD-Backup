@@ -376,6 +376,8 @@ HTTP-запрос со стороны root, это выполняется вне
 См. [ARCHITECTURE.md](ARCHITECTURE.md) и
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) для внутренних деталей.
 
+<!-- doc-footer -->
+
 ---
 
-*Эта документация была сгенерирована с помощью Claude (Anthropic) и сопровождается VD171. Исправления и улучшения приветствуются, см. [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Эта документация создана с помощью Claude (Anthropic) и поддерживается VD171. Исправления и улучшения приветствуются; см. [CONTRIBUTING.md](CONTRIBUTING.md)._

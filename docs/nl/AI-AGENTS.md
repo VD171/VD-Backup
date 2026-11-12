@@ -381,6 +381,8 @@ nooit door dit werkwoord.
 Zie [ARCHITECTURE.md](ARCHITECTURE.md) en
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) voor de interne werking.
 
+<!-- doc-footer -->
+
 ---
 
-*Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._

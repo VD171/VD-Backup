@@ -86,4 +86,8 @@ prompt ขออนุญาต และไม่มีแอปคู่หู
 destinations, importers) ผู้ดูแลเก็บบันทึกการออกแบบโดยละเอียดไว้ ไฟล์นี้เป็น
 ภาพรวมที่มุ่งให้ผู้ร่วมพัฒนา
 
-*เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและปรับปรุง, ดู [CONTRIBUTING.md](CONTRIBUTING.md)*
+<!-- doc-footer -->
+
+---
+
+> _เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและการปรับปรุง ดู [CONTRIBUTING.md](CONTRIBUTING.md)_

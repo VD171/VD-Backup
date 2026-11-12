@@ -362,6 +362,8 @@ Mirror، نسخ/استعادة لقطة `restic` البعيدة، استعادة
 انظر [ARCHITECTURE.md](ARCHITECTURE.md) و
 [FILE-STRUCTURE.md](FILE-STRUCTURE.md) للاطلاع على التفاصيل الداخلية.
 
+<!-- doc-footer -->
+
 ---
 
-*أُنشئت هذه الوثائق بمساعدة Claude (Anthropic) ويتولى صيانتها VD171. التصحيحات والتحسينات مرحب بها, انظر [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _تم إنشاء هذا التوثيق باستخدام Claude (Anthropic) ويتولى صيانته VD171. التصحيحات والتحسينات مرحّب بها؛ راجع [CONTRIBUTING.md](CONTRIBUTING.md)._

@@ -76,4 +76,8 @@ Asisten dan agen AI adalah kontributor kelas satu di sini, bukan sekadar pelengk
 Cari label `good first issue` dan `help wanted`. Terjemahan, dokumentasi, preset destinasi
 `rclone` baru dan pemolesan WebUI semuanya adalah titik awal yang bagus.
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

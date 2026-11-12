@@ -81,4 +81,8 @@ Nếu bất kỳ tệp được đi kèm nào không khớp với nguồn đã g
 và báo cáo nó (xem [SECURITY.md](SECURITY.md)). Đây chính là loại sai lệch mà bản kê này tồn tại để
 làm cho nó hiển thị rõ.
 
-*Tài liệu này được tạo với Claude (Anthropic) và được VD171 duy trì. Hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._

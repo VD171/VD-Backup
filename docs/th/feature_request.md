@@ -15,3 +15,9 @@ labels: enhancement
 
 **บริบทเพิ่มเติม**
 destinations, โหมด backup, แอป หรือ ROM ที่เกี่ยวข้องกับเรื่องนี้
+
+<!-- doc-footer -->
+
+---
+
+> _เอกสารนี้สร้างขึ้นด้วย Claude (Anthropic) และดูแลโดย VD171 ยินดีรับการแก้ไขและการปรับปรุง ดู [CONTRIBUTING.md](CONTRIBUTING.md)_

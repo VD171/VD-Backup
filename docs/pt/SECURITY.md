@@ -41,4 +41,8 @@ que pudermos e daremos crédito a você se desejar.
   SHA-256 registrado, e o manifesto é embarcado no dispositivo, de modo que o payload empacotado pode
   ser auditado e reproduzido. Veja [BINARIES.md](BINARIES.md).
 
-*Esta documentação foi gerada com Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas; veja [CONTRIBUTING.md](CONTRIBUTING.md)._

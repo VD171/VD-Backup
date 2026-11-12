@@ -40,4 +40,8 @@ VDBackup はルートとして動作し、あなたのデータ、そして（�
   たどることができ、マニフェストは端末上に同梱されるため、同梱されたペイロードは監査および再現が可能です。
   [BINARIES.md](BINARIES.md) を参照してください。
 
-*このドキュメントは Claude (Anthropic) で生成され、VD171 が保守しています。訂正や改善を歓迎します, [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。*
+<!-- doc-footer -->
+
+---
+
+> _このドキュメントは Claude (Anthropic) で生成され、VD171 によって保守されています。修正や改善を歓迎します。[CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。_

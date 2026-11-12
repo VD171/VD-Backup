@@ -259,4 +259,8 @@ Vstřícné k AI a i18n:
 - Bohatý výpis aplikací a dešifrování Neo probíhají přes pomocný nástroj dex řízený jako root
   (`IPackageManager` přes ServiceManager), takže fungují i tam, kde ActivityThread zamrzá.
 
-*Tato dokumentace byla vygenerována pomocí Claude (Anthropic) a je spravována VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._

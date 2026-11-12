@@ -76,4 +76,8 @@ Les assistants et agents IA sont des contributeurs de premier plan ici, pas une 
 Cherchez les labels `good first issue` et `help wanted`. Les traductions, la documentation, les nouveaux
 presets de destination `rclone` et les finitions de la WebUI sont tous d'excellents points de départ.
 
-*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues ; voir [CONTRIBUTING.md](CONTRIBUTING.md)._

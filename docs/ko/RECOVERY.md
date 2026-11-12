@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   설명합니다. 그것이 진실의 원천입니다.
 - 여기 있는 어떤 것도 특정 장치에 묶여 있지 않습니다: 동일한 passphrase/keyfile이
   어떤 기계에서든 작동합니다.
+
+<!-- doc-footer -->
+
+---
+
+> _이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 유지 관리합니다. 수정 및 개선을 환영합니다. [CONTRIBUTING.md](CONTRIBUTING.md)를 참조하세요._

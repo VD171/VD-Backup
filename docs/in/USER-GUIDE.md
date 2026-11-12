@@ -579,6 +579,8 @@ pemulihan berdasarkan desain; passphrase itulah yang melindungi backup. Jaga aga
 
 Copot VDBackup seperti modul lain dari pengelola KernelSU / APatch / Magisk Anda. Pencopotan **mempertahankan penyiapan Anda** dan hanya menghapus status sementara, jadi memasang ulang nanti mengambil kembali konfigurasi, tujuan, dan jadwal Anda. Ia menyimpan cadangan Anda di `/sdcard/VDBackup` (format standar, dapat dibuka di PC tanpa modul), konfigurasi Anda di `/data/adb/vdbackup`, dan kredensial tersimpan Anda, rclone.conf, serta kunci age di `/data/misc_ce/0/vdbackup` yang terenkripsi-kredensial (terkunci hingga pembukaan kunci pertama). Untuk menghapus salah satunya juga, hapus direktori itu secara manual setelah mencopot.
 
+<!-- doc-footer -->
+
 ---
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

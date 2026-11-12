@@ -86,4 +86,8 @@ Tam teknik tasarım için (arşiv biçimi, üst veri şeması, pipeline'lar, kri
 hedefler, içe aktarıcılar) bakımcılar ayrıntılı tasarım notları tutar; bu dosya,
 katkıda bulunanlara yönelik genel bakıştır.
 
-*Bu belge Claude (Anthropic) ile oluşturuldu ve VD171 tarafından sürdürülüyor. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

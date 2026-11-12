@@ -40,4 +40,8 @@ secepat mungkin dan memberi Anda kredit jika Anda menginginkannya.
   SHA-256 yang tercatat, dan manifes disertakan di perangkat, sehingga muatan yang dibundel dapat
   diaudit dan direproduksi. Lihat [BINARIES.md](BINARIES.md).
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

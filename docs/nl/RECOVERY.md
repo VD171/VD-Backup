@@ -68,3 +68,9 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
   oorspronkelijke eigenaar/context. Het is de bron van de waarheid.
 - Niets hier is gebonden aan een specifiek apparaat: dezelfde wachtwoordzin/keyfile werkt op elke
   machine.
+
+<!-- doc-footer -->
+
+---
+
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._

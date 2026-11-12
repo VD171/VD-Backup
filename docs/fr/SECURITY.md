@@ -41,4 +41,8 @@ que possible et vous créditerons si vous le souhaitez.
   avec un SHA-256 enregistré, et le manifeste est embarqué sur l'appareil, de sorte que la charge
   fournie peut être auditée et reproduite. Voir [BINARIES.md](BINARIES.md).
 
-*Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues ; voir [CONTRIBUTING.md](CONTRIBUTING.md)._

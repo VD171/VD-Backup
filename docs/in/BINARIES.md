@@ -81,4 +81,8 @@ Jika ada berkas yang dikirim tidak cocok dengan sumber tercatatnya, perlakukan s
 masalah keamanan dan laporkan (lihat [SECURITY.md](SECURITY.md)). Ini persis jenis
 ketidaksesuaian yang karenanya manifes ini ada untuk membuatnya terlihat.
 
-*Dokumentasi ini dihasilkan dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

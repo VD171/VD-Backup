@@ -87,4 +87,8 @@ Für das vollständige technische Design (Archivformat, Metadatenschema, Pipelin
 Ziele, Importeure) führen die Maintainer detaillierte Designnotizen; diese Datei ist der
 an Mitwirkende gerichtete Überblick.
 
-*Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen; siehe [CONTRIBUTING.md](CONTRIBUTING.md)._

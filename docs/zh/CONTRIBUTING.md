@@ -76,4 +76,8 @@ AI 助手和智能体在这里是一等的贡献者，而非事后补充。
 寻找 `good first issue` 和 `help wanted` 标签。翻译、文档、新的
 `rclone` 目标预设和 WebUI 润色都是很好的起点。
 
-*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进, 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*
+<!-- doc-footer -->
+
+---
+
+> _本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎修正和改进；请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。_

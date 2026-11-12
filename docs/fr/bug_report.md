@@ -24,3 +24,9 @@ Ce que vous vous attendiez à voir se produire.
 **Logs**
 Si possible, joignez les lignes pertinentes de `/data/adb/vdbackup/logs/`.
 N'INCLUEZ PAS de mots de passe ni d'identifiants.
+
+<!-- doc-footer -->
+
+---
+
+> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues ; voir [CONTRIBUTING.md](CONTRIBUTING.md)._

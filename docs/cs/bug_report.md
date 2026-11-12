@@ -24,3 +24,9 @@ Co jste očekávali, že se stane.
 **Logy**
 Pokud je to možné, přiložte relevantní řádky z `/data/adb/vdbackup/logs/`.
 NEuvádějte hesla ani přihlašovací údaje.
+
+<!-- doc-footer -->
+
+---
+
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._

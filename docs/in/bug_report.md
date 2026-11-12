@@ -24,3 +24,9 @@ Apa yang Anda harapkan terjadi.
 **Log**
 Jika memungkinkan, lampirkan baris yang relevan dari `/data/adb/vdbackup/logs/`.
 JANGAN sertakan kata sandi atau kredensial.
+
+<!-- doc-footer -->
+
+---
+
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

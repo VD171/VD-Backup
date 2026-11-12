@@ -485,6 +485,8 @@ SSAID 保持选用，变更性操作保持需确认且被审计）。
 
 像卸载其他模块一样，从你的 KernelSU / APatch / Magisk 管理器卸载 VDBackup。卸载会**保留你的设置**，只移除临时状态，因此以后重装会接续你的配置、目标位置和计划。它会保留你的备份于 `/sdcard/VDBackup`（标准格式，无需模块即可在 PC 上打开）、你的配置于 `/data/adb/vdbackup`，以及你已保存的凭据、rclone.conf 和 age 密钥于凭据加密的 `/data/misc_ce/0/vdbackup`（首次解锁前保持锁定）。若也要移除其中任一项，请在卸载后手动删除相应目录。
 
+<!-- doc-footer -->
+
 ---
 
-*本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎提出修正与改进, 参见 [CONTRIBUTING.md](CONTRIBUTING.md)。*
+> _本文档由 Claude (Anthropic) 生成，并由 VD171 维护。欢迎修正和改进；请参阅 [CONTRIBUTING.md](CONTRIBUTING.md)。_

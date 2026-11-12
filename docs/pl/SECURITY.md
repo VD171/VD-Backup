@@ -41,4 +41,8 @@ szybko, jak zdołamy, i wymienimy Cię w podziękowaniach, jeśli sobie tego ży
   źródła nadrzędnego z zapisanym SHA-256, a manifest jest dostarczany na urządzeniu, więc dołączony
   ładunek można poddać audytowi i odtworzyć. Zobacz [BINARIES.md](BINARIES.md).
 
-*Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md).*
+<!-- doc-footer -->
+
+---
+
+> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane; zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._

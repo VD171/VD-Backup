@@ -554,6 +554,8 @@ VDBackup은 사람뿐 아니라 AI 어시스턴트와 에이전트에게도 친�
 
 VDBackup을 다른 모듈처럼 KernelSU / APatch / Magisk 관리자에서 제거하세요. 제거는 **설정을 보존**하고 임시 상태만 지우므로, 나중에 다시 설치하면 구성, 대상, 예약을 이어받습니다. 백업은 `/sdcard/VDBackup`(표준 형식, 모듈 없이 PC에서 열 수 있음)에, 구성은 `/data/adb/vdbackup`에, 저장된 자격 증명·rclone.conf·age 키는 자격 증명 암호화된 `/data/misc_ce/0/vdbackup`(첫 잠금 해제 전까지 잠김)에 보관합니다. 이 중 하나도 제거하려면 제거 후 해당 디렉터리를 수동으로 삭제하세요.
 
+<!-- doc-footer -->
+
 ---
 
-*이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 관리합니다. 수정과 개선을 환영합니다, [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.*
+> _이 문서는 Claude (Anthropic)로 생성되었으며 VD171이 유지 관리합니다. 수정 및 개선을 환영합니다. [CONTRIBUTING.md](CONTRIBUTING.md)를 참조하세요._
