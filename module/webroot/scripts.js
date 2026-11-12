@@ -270,6 +270,7 @@ function renderApps(filter) {
   var ul = $("#applist"); ul.innerHTML = "";
   _iconQ = [];   // drop icon requests for the previous (now-removed) rows
   if (iconObserver) iconObserver.disconnect();   // drop the now-detached rows before re-observing
+  var frag = document.createDocumentFragment();
   visibleApps(filter).forEach(function (a) {
     var li = el("li", "row");
     var ic = el("div", "app-ic", (a.label || a.package).charAt(0).toUpperCase());
@@ -293,9 +294,10 @@ function renderApps(filter) {
       li.classList.add("tappable");
       li.onclick = function () { openAppBackups(a.package, a.label || a.package); };
     }
-    ul.appendChild(li);
+    frag.appendChild(li);
     if (iconObserver) iconObserver.observe(ic); else loadIcon(ic);
   });
+  ul.appendChild(frag);
   // "Back up tag" is offered only when a tag is active, we are not in select mode, and the
   // tag actually matches apps in the current (user/system) view - so it never dead-ends.
   var tb = $("#app-backuptag");
@@ -318,14 +320,59 @@ function setSelectMode(on) {
   updateSelCount();
   renderApps($("#search").value);
 }
-function loadApps() {
-  $("#applist").innerHTML = "<li class='muted'>" + I18N.t("apps_loading") + "</li>";
-  helper("list-apps", { user: activeUser }).then(function (r) {
-    APPS = (r && r.apps) ? r.apps : [];
-    fillTagFilter();
-    renderApps($("#search").value);
-    buildBlockPicker();   // keep the Settings "Excluded apps" picker in sync with APPS
-    buildAppItemsPicker(); // and the "Per-app items and tags" picker
+
+var APPS_CACHE_PREFIX = "vdb_apps_cache_v2_";
+function appsSig(list) {
+  if (!list || !list.length) return "";
+  return list.length + ":" + list.map(function (a) { return a.package + "@" + (a.versionCode || 0); }).join(",");
+}
+
+function loadApps(forceRefresh) {
+  var user = (activeUser != null) ? (activeUser | 0) : 0;
+  var key = APPS_CACHE_PREFIX + user;
+  var hadCache = false;
+
+  if (!forceRefresh && (!APPS || !APPS.length)) {
+    try {
+      var raw = localStorage.getItem(key);
+      if (raw) {
+        var cached = JSON.parse(raw);
+        if (Array.isArray(cached) && cached.length) {
+          APPS = cached;
+          hadCache = true;
+          fillTagFilter();
+          renderApps($("#search") ? $("#search").value : "");
+          setTimeout(function () {
+            buildBlockPicker();
+            buildAppItemsPicker();
+          }, 100);
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (!hadCache && (!APPS || !APPS.length)) {
+    $("#applist").innerHTML = "<li class='muted'>" + I18N.t("apps_loading") + "</li>";
+  }
+
+  return helper("list-apps", { user: user }).then(function (r) {
+    if ((activeUser | 0) !== user) return;
+    if (r && Array.isArray(r.apps)) {
+      var fresh = r.apps;
+      var changed = !hadCache || appsSig(fresh) !== appsSig(APPS);
+      APPS = fresh;
+      try {
+        localStorage.setItem(key, JSON.stringify(fresh));
+      } catch (e) {}
+      if (changed || forceRefresh || !hadCache) {
+        fillTagFilter();
+        renderApps($("#search") ? $("#search").value : "");
+        setTimeout(function () {
+          buildBlockPicker();
+          buildAppItemsPicker();
+        }, 80);
+      }
+    }
   });
 }
 
@@ -707,6 +754,7 @@ function loadDests() {
   helper("dests-list").then(function (r) { DESTS = (r && r.dests) ? r.dests : []; renderDests(DESTS); });
   loadRemotes();
   syncDestFields();
+  checkTelegramStatus();
 }
 function loadRemotes() {
   helper("remote-list").then(function (r) {
@@ -949,10 +997,16 @@ function syncDestFields() {
   set("#d-remote", type === "rclone");
   set("#d-repo", type === "restic");
   set("#d-pass", type === "restic");
-  set("#d-path", type !== "restic");
+  set("#d-path", type !== "restic" && type !== "telegram" && type !== "gdrive");
   set("#d-browse", type === "local");   // folder browser only makes sense for a local path
   set("#remote-box", type === "rclone");
   var hint = $("#d-rclone-hint"); if (hint) hint.hidden = (type !== "rclone");
+  if (type === "telegram") {
+    checkTelegramStatus().then(function (st) {
+      var isAuth = st && (st.authorized || st.is_auth);
+      if (!isAuth) openTelegramModal();
+    });
+  }
 }
 // jump to the Add-cloud-remote section and briefly highlight it, so choosing the
 // rclone destination type makes clear that a remote is required and where to add it.
@@ -1020,6 +1074,12 @@ function addDest() {
     repo: $("#d-repo").value.trim(), password: $("#d-pass").value
   };
   if (!d.id) return;
+  if (type === "telegram") {
+    checkTelegramStatus().then(function (st) {
+      var isAuth = st && (st.authorized || st.is_auth);
+      if (!isAuth) openTelegramModal();
+    });
+  }
   helper("dest-add", d).then(function (r) {
     $("#d-id").value = ""; $("#d-pass").value = ""; loadDests();
     if (type === "gdrive") setupGdrive(d.id);
@@ -1031,6 +1091,17 @@ function addDest() {
 function testDest(id) {
   var d = destById(id);
   if (d && d.type === "gdrive") { setupGdrive(id); return; }
+  if (d && d.type === "telegram") {
+    checkTelegramStatus().then(function (st) {
+      var isAuth = st && (st.authorized || st.is_auth);
+      if (isAuth) {
+        modalAlert(id + ": " + I18N.t("dest_ok"));
+      } else {
+        openTelegramModal();
+      }
+    });
+    return;
+  }
   helper("dest-test", { id: id }).then(function (r) {
     modalAlert(id + ": " + ((r && r.reachable) ? I18N.t("dest_ok") : errMsg(r)));
   });
@@ -1039,6 +1110,435 @@ function delDest(id) {
   modalConfirm(I18N.t("confirm_delete", { name: id })).then(function (ok) {
     if (!ok) return;
     helper("dest-del", { id: id }).then(loadDests);
+  });
+}
+
+// --- Telegram Cloud Storage (Native MTProto) -----------------------------
+var TG_STATE = null;
+var _tgLoadedBackups = [];
+var _tgPendingPhone = "";
+
+function checkTelegramStatus() {
+  return helper("telegram-status").then(function (r) {
+    TG_STATE = (r && r.ok) ? r : null;
+    updateTelegramUI();
+    return TG_STATE;
+  }).catch(function () {
+    TG_STATE = null;
+    updateTelegramUI();
+  });
+}
+
+function updateTelegramUI() {
+  var isAuth = TG_STATE && (TG_STATE.authorized || TG_STATE.is_auth);
+  var tgCard = $("#tg-card");
+  if (tgCard) tgCard.hidden = !isAuth;
+  var linkBtn = $("#tg-link-btn");
+  var browseBtn = $("#tg-browse-btn");
+  var manageBtn = $("#tg-manage-btn");
+  var sub = $("#tg-card-sub");
+  var badge = $("#tg-card-badge");
+  var statusTxt = $("#tg-card-status-text");
+
+  if (isAuth) {
+    if (linkBtn) linkBtn.hidden = true;
+    if (browseBtn) browseBtn.hidden = false;
+    if (manageBtn) manageBtn.hidden = false;
+    if (badge) badge.className = "badge ok";
+    if (statusTxt) statusTxt.textContent = I18N.t("tg_status_ready") || "Ready";
+    var user = (TG_STATE.user && (TG_STATE.user.first_name || TG_STATE.user.username)) || "";
+    var chTitle = (TG_STATE.channel && TG_STATE.channel.title) || (TG_STATE.dest && TG_STATE.dest.channel_title) || "VD_Backup";
+    if (sub) sub.textContent = I18N.t("tg_status_connected", { user: user, channel: chTitle });
+  } else {
+    if (linkBtn) linkBtn.hidden = false;
+    if (browseBtn) browseBtn.hidden = true;
+    if (manageBtn) manageBtn.hidden = true;
+    if (badge) badge.className = "badge info";
+    if (statusTxt) statusTxt.textContent = I18N.t("tg_status_unlinked") || "Unlinked";
+    if (sub) sub.textContent = I18N.t("tg_vault_sub") || I18N.t("tg_storage_sub");
+  }
+}
+
+function showTgStep(step) {
+  var steps = ["phone", "code", "notice", "active"];
+  steps.forEach(function (s) {
+    var el = $("#tg-step-" + s);
+    if (el) el.hidden = (s !== step);
+  });
+  var errs = ["phone", "code", "create"];
+  errs.forEach(function (e) {
+    var errEl = $("#tg-" + e + "-err");
+    if (errEl) { errEl.textContent = ""; errEl.hidden = true; }
+  });
+
+  // Dynamic Stepper State Update
+  var stepper = $("#tg-stepper");
+  if (stepper) stepper.hidden = (step === "active");
+
+  var node1 = $("#tg-node-1"), node2 = $("#tg-node-2"), node3 = $("#tg-node-3");
+  var line1 = $("#tg-line-1"), line2 = $("#tg-line-2");
+  if (node1 && node2 && node3) {
+    node1.className = "tg-step-node" + (step === "phone" ? " active" : " completed");
+    node2.className = "tg-step-node" + (step === "code" ? " active" : (step === "notice" || step === "active" ? " completed" : ""));
+    node3.className = "tg-step-node" + (step === "notice" ? " active" : (step === "active" ? " completed" : ""));
+    if (line1) line1.className = "tg-step-line" + (step !== "phone" ? " active" : "");
+    if (line2) line2.className = "tg-step-line" + (step === "notice" || step === "active" ? " active" : "");
+  }
+}
+
+function setupTelegramInteractiveInputs() {
+  var codeInp = $("#tg-code-input");
+  if (codeInp && !codeInp._bound) {
+    codeInp._bound = true;
+    codeInp.addEventListener("input", function () {
+      this.value = this.value.replace(/[^0-9]/g, "");
+      if (this.value.length === 5 && $("#tg-pw-box").hidden) {
+        var verifyBtn = $("#tg-code-verify");
+        if (verifyBtn) verifyBtn.focus();
+      }
+    });
+    codeInp.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") submitTelegramCode();
+    });
+  }
+
+  var pwInp = $("#tg-pw-input");
+  if (pwInp && !pwInp._bound) {
+    pwInp._bound = true;
+    pwInp.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") submitTelegramCode();
+    });
+  }
+
+  var phoneInp = $("#tg-phone-input");
+  if (phoneInp && !phoneInp._bound) {
+    phoneInp._bound = true;
+    phoneInp.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") submitTelegramPhone();
+    });
+  }
+
+  var searchInp = $("#tg-bk-search");
+  if (searchInp && !searchInp._bound) {
+    searchInp._bound = true;
+    searchInp.addEventListener("input", function () {
+      renderTelegramBackups(this.value);
+    });
+  }
+}
+
+function openTelegramModal() {
+  var m = $("#tg-modal"); if (!m) return;
+  m.hidden = false;
+  setupTelegramInteractiveInputs();
+
+  checkTelegramStatus().then(function (st) {
+    var isAuth = st && (st.authorized || st.is_auth);
+    if (isAuth) {
+      showTgStep("active");
+      var u = (st.user && (st.user.first_name || st.user.username || st.user.phone)) || "User";
+      var fullName = (st.user && [st.user.first_name, st.user.last_name].filter(Boolean).join(" ")) || u;
+      var phoneTxt = (st.user && st.user.phone ? ("+" + st.user.phone.replace("+", "")) : "") +
+                     (st.user && st.user.username ? (" (@" + st.user.username + ")") : "");
+      var ch = (st.channel && st.channel.title) || (st.dest && st.dest.channel_title) || "VD_Backup";
+      var chId = (st.channel && st.channel.id) || (st.dest && st.dest.channel_id) ? String((st.channel && st.channel.id) || st.dest.channel_id) : "";
+
+      if ($("#tg-active-user")) $("#tg-active-user").textContent = fullName;
+      if ($("#tg-active-phone")) $("#tg-active-phone").textContent = phoneTxt || "MTProto Session";
+      if ($("#tg-active-channel")) $("#tg-active-channel").textContent = ch;
+      if ($("#tg-active-chid")) $("#tg-active-chid").textContent = chId || "-";
+
+      var initial = (u.replace(/[^a-zA-Z0-9]/g, "")[0] || "T").toUpperCase();
+      if ($("#tg-avatar-initial")) $("#tg-avatar-initial").textContent = initial;
+
+      var copyBtn = $("#tg-copy-ch-btn");
+      if (copyBtn && chId) {
+        copyBtn.onclick = function () {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(chId).then(function () {
+              var txt = $("#tg-copy-ch-txt");
+              if (txt) txt.textContent = I18N.t("tg_copied") || "Copied!";
+              copyBtn.style.borderColor = "var(--ok)";
+              copyBtn.style.color = "var(--ok)";
+              setTimeout(function () {
+                if (txt) txt.textContent = I18N.t("tg_copy") || "Copy";
+                copyBtn.style.borderColor = "";
+                copyBtn.style.color = "";
+              }, 1800);
+            });
+          }
+        };
+      }
+    } else {
+      showTgStep("phone");
+      var inp = $("#tg-phone-input");
+      if (inp) { inp.value = ""; inp.focus(); }
+    }
+  });
+}
+
+function submitTelegramPhone() {
+  var raw = ($("#tg-phone-input").value || "").trim();
+  var errEl = $("#tg-phone-err");
+  if (!raw) {
+    errEl.textContent = I18N.t("tg_err_phone_required");
+    errEl.hidden = false;
+    return;
+  }
+  var digits = raw.replace(/^00/, "").replace(/\D/g, "");
+  if (!digits) {
+    errEl.textContent = I18N.t("tg_err_phone_required");
+    errEl.hidden = false;
+    return;
+  }
+  var phone = "+" + digits;
+  errEl.hidden = true;
+  var btn = $("#tg-phone-next");
+  btn.disabled = true;
+  var origContent = btn.innerHTML;
+  btn.innerHTML = "<span class='spinner'></span> <span>" + I18N.t("ui_loading") + "</span>";
+
+  helper("telegram-send-code", { phone: phone }).then(function (r) {
+    btn.disabled = false;
+    btn.innerHTML = origContent;
+    if (r && r.ok) {
+      _tgPendingPhone = phone;
+      showTgStep("code");
+      var codeInp = $("#tg-code-input");
+      if (codeInp) { codeInp.value = ""; codeInp.focus(); }
+      $("#tg-pw-box").hidden = true;
+      $("#tg-pw-input").value = "";
+    } else {
+      errEl.textContent = errMsg(r);
+      errEl.hidden = false;
+    }
+  }).catch(function (e) {
+    btn.disabled = false;
+    btn.innerHTML = origContent;
+    errEl.textContent = String(e);
+    errEl.hidden = false;
+  });
+}
+
+function submitTelegramCode() {
+  var rawCode = ($("#tg-code-input").value || "").trim();
+  var code = rawCode.replace(/\D/g, "");
+  var pw = ($("#tg-pw-input").value || "").trim();
+  var errEl = $("#tg-code-err");
+
+  if (!code) {
+    errEl.textContent = I18N.t("tg_err_code_required");
+    errEl.hidden = false;
+    return;
+  }
+  errEl.hidden = true;
+  var btn = $("#tg-code-verify");
+  btn.disabled = true;
+  var origText = btn.textContent;
+  btn.innerHTML = "<span class='spinner'></span> <span>" + I18N.t("ui_loading") + "</span>";
+
+  helper("telegram-sign-in", { phone: _tgPendingPhone, code: code, password: pw }).then(function (r) {
+    btn.disabled = false;
+    btn.textContent = origText;
+
+    if (r && (r.need_password || r.code === "2FA_REQUIRED")) {
+      $("#tg-pw-box").hidden = false;
+      errEl.textContent = r.message || I18N.t("tg_need_password");
+      errEl.hidden = false;
+      var pwi = $("#tg-pw-input");
+      if (pwi) pwi.focus();
+      return;
+    }
+
+    if (r && r.ok) {
+      checkTelegramStatus().then(function (st) {
+        var hasChannel = st && ((st.channel && st.channel.id) || (st.dest && st.dest.channel_id));
+        if (hasChannel) {
+          showTgStep("active");
+          loadDests();
+        } else {
+          showTgStep("notice");
+        }
+      });
+    } else {
+      errEl.textContent = errMsg(r);
+      errEl.hidden = false;
+    }
+  }).catch(function (e) {
+    btn.disabled = false;
+    btn.textContent = origText;
+    errEl.textContent = String(e);
+    errEl.hidden = false;
+  });
+}
+
+function createTelegramChannel() {
+  var btn = $("#tg-create-channel-btn");
+  var errEl = $("#tg-create-err");
+  btn.disabled = true;
+  var origText = btn.textContent;
+  btn.innerHTML = "<span class='spinner'></span> <span>" + I18N.t("ui_loading") + "</span>";
+  errEl.hidden = true;
+
+  helper("telegram-init-storage", {}).then(function (r) {
+    btn.disabled = false;
+    btn.textContent = origText;
+    if (r && r.ok) {
+      checkTelegramStatus().then(function () {
+        showTgStep("active");
+        loadDests();
+      });
+    } else {
+      errEl.textContent = errMsg(r);
+      errEl.hidden = false;
+    }
+  }).catch(function (e) {
+    btn.disabled = false;
+    btn.textContent = origText;
+    errEl.textContent = String(e);
+    errEl.hidden = false;
+  });
+}
+
+function logoutTelegram() {
+  modalConfirm(I18N.t("tg_confirm_logout")).then(function (ok) {
+    if (!ok) return;
+    helper("telegram-logout").then(function () {
+      TG_STATE = null;
+      updateTelegramUI();
+      checkTelegramStatus();
+      loadDests();
+      $("#tg-modal").hidden = true;
+    });
+  });
+}
+
+function openTelegramBackupsModal() {
+  checkTelegramStatus().then(function (st) {
+    var isAuth = st && (st.authorized || st.is_auth);
+    if (!isAuth) {
+      openTelegramModal();
+      return;
+    }
+    $("#tg-backups-modal").hidden = false;
+    setupTelegramInteractiveInputs();
+    var s = $("#tg-bk-search");
+    if (s) s.value = "";
+    loadTelegramBackups();
+  });
+}
+
+function loadTelegramBackups() {
+  var ul = $("#tg-bk-list");
+  var empty = $("#tg-bk-empty");
+  var refIc = $("#tg-bk-refresh-ic");
+  if (refIc) refIc.style.animation = "spin .7s linear infinite";
+
+  ul.innerHTML = "<li class='log-loading'><span class='spinner'></span><span>" + I18N.t("apps_loading") + "</span></li>";
+  empty.hidden = true;
+
+  helper("telegram-list-remote").then(function (r) {
+    if (refIc) refIc.style.animation = "";
+    _tgLoadedBackups = (r && r.backups) ? r.backups : [];
+    renderTelegramBackups("");
+  }).catch(function (e) {
+    if (refIc) refIc.style.animation = "";
+    ul.innerHTML = "<li class='muted' style='color:var(--err); padding:16px 0; text-align:center;'>" + String(e) + "</li>";
+  });
+}
+
+function renderTelegramBackups(query) {
+  var ul = $("#tg-bk-list");
+  var empty = $("#tg-bk-empty");
+  var badge = $("#tg-bk-count-badge");
+  ul.innerHTML = "";
+
+  var q = (query || "").trim().toLowerCase();
+  var filtered = _tgLoadedBackups.filter(function (b) {
+    if (!q) return true;
+    var name = (b.name || (b.meta && b.meta.app) || "").toLowerCase();
+    var msgId = String(b.message_id || "");
+    return name.indexOf(q) !== -1 || msgId.indexOf(q) !== -1;
+  });
+
+  if (badge) {
+    badge.textContent = filtered.length + " " + (filtered.length === 1 ? "app" : "apps");
+  }
+
+  if (!filtered.length) {
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+
+  filtered.forEach(function (b) {
+    var li = el("li", "tg-backup-item");
+
+    var appName = b.name || (b.meta && b.meta.app) || ("Backup #" + b.message_id);
+    var avatarInitial = (appName.replace(/[^a-zA-Z0-9]/g, "")[0] || "A").toUpperCase();
+    var avatar = el("div", "tg-app-avatar", avatarInitial);
+
+    var info = el("div", "tg-backup-info");
+    var titleRow = el("div", "tg-backup-title");
+    titleRow.appendChild(document.createTextNode(appName));
+
+    var pkgRow = el("div", "tg-backup-pkg", "Message #" + b.message_id);
+
+    var metaRow = el("div", "tg-backup-meta");
+    var sizePill = el("span", "tg-pill-size", fmtSize(b.size || 0));
+    metaRow.appendChild(sizePill);
+    if (b.date) {
+      var dateSpan = el("span", "tg-pill-date", "• " + shortDate(new Date(b.date * 1000).toISOString()));
+      metaRow.appendChild(dateSpan);
+    }
+
+    info.appendChild(titleRow);
+    info.appendChild(pkgRow);
+    info.appendChild(metaRow);
+
+    var actions = el("div", "tg-backup-actions");
+    var dlBtn = el("button", "btn small", I18N.t("tg_download_single_btn") || I18N.t("download"));
+    dlBtn.onclick = function () {
+      downloadTelegramBackup(String(b.message_id), false);
+    };
+
+    var resBtn = el("button", "btn go small", I18N.t("tg_restore_single_btn") || I18N.t("restore"));
+    resBtn.onclick = function () {
+      downloadTelegramBackup(String(b.message_id), true);
+    };
+
+    actions.appendChild(dlBtn);
+    actions.appendChild(resBtn);
+
+    li.appendChild(avatar);
+    li.appendChild(info);
+    li.appendChild(actions);
+    ul.appendChild(li);
+  });
+}
+
+function downloadTelegramBackup(ref, autoRestore) {
+  var promptMsg = autoRestore ? I18N.t("tg_confirm_restore_cloud", { ref: ref }) : I18N.t("tg_confirm_download_cloud", { ref: ref });
+  modalConfirm(promptMsg).then(function (ok) {
+    if (!ok) return;
+    $("#tg-backups-modal").hidden = true;
+    var args = {
+      dest: "telegram",
+      ref: ref,
+      user: activeUser,
+      auto_restore: !!autoRestore
+    };
+    helper("telegram-download", args).then(function (r) {
+      if (r && r.opid) {
+        trackOp(r.opid, {
+          retry: function () {
+            helper("telegram-download", args).then(function (rr) { if (rr && rr.opid) trackOp(rr.opid); });
+          }
+        });
+      } else {
+        modalAlert(errMsg(r));
+      }
+    });
   });
 }
 
@@ -2369,6 +2869,24 @@ function boot() {
   setupSegments();
   setupSwipe();
   setupBackNav();
+
+  // Telegram Cloud Storage event listeners
+  if ($("#tg-link-btn")) $("#tg-link-btn").onclick = openTelegramModal;
+  if ($("#tg-manage-btn")) $("#tg-manage-btn").onclick = openTelegramModal;
+  if ($("#tg-browse-btn")) $("#tg-browse-btn").onclick = openTelegramBackupsModal;
+  if ($("#tg-modal-close-x")) $("#tg-modal-close-x").onclick = function () { $("#tg-modal").hidden = true; };
+  if ($("#tg-phone-cancel")) $("#tg-phone-cancel").onclick = function () { $("#tg-modal").hidden = true; };
+  if ($("#tg-notice-cancel")) $("#tg-notice-cancel").onclick = function () { $("#tg-modal").hidden = true; };
+  if ($("#tg-active-close")) $("#tg-active-close").onclick = function () { $("#tg-modal").hidden = true; };
+  if ($("#tg-phone-next")) $("#tg-phone-next").onclick = submitTelegramPhone;
+  if ($("#tg-code-back")) $("#tg-code-back").onclick = function () { showTgStep("phone"); };
+  if ($("#tg-code-verify")) $("#tg-code-verify").onclick = submitTelegramCode;
+  if ($("#tg-create-channel-btn")) $("#tg-create-channel-btn").onclick = createTelegramChannel;
+  if ($("#tg-logout-btn")) $("#tg-logout-btn").onclick = logoutTelegram;
+  if ($("#tg-view-backups-btn")) $("#tg-view-backups-btn").onclick = function () { $("#tg-modal").hidden = true; openTelegramBackupsModal(); };
+  if ($("#tg-bk-close")) $("#tg-bk-close").onclick = function () { $("#tg-backups-modal").hidden = true; };
+  if ($("#tg-bk-refresh")) $("#tg-bk-refresh").onclick = loadTelegramBackups;
+  if ($("#bk-tg-cloud")) $("#bk-tg-cloud").onclick = openTelegramBackupsModal;
 
   helper("config-get").then(function (c) { CFG = c || {}; activeUser = (CFG.user != null) ? (CFG.user | 0) : 0; return I18N.init(CFG.language || "auto"); })
     .then(function () { I18N.apply(); loadDests(); loadSettings(); loadUsers(); loadOverview(); reattachOps(); recoverPendingAuth(); autoCheckUpdates(); });

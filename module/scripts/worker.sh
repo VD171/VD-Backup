@@ -82,6 +82,11 @@ export PATH="$BIN:$CLOUD:$PATH"
 # $CLOUD/lib holds the libs of any on-demand-fetched binaries (the lite edition).
 export LD_LIBRARY_PATH="$BIN/lib:$CLOUD/lib:${LD_LIBRARY_PATH:-}"
 
+HELPER_DEX="$MODDIR/etc/vdbackup_helper.dex"
+[ -f "$HELPER_DEX" ] || HELPER_DEX="$MODDIR/vdbhelper.dex"
+COMPANION_APK="$MODDIR/etc/companion.apk"
+[ -f "$COMPANION_APK" ] || COMPANION_APK="$MODDIR/companion.apk"
+
 # the state dirs must exist for every op: a missing staging dir would make the
 # dumpsys redirect (and metadata: versionName/Code, perms) silently fail.
 mkdir -p "$STATE/staging" "$STATE/logs" 2>/dev/null
@@ -526,11 +531,14 @@ resolve_dest() {
   DESTID="$(jget "$ARGS" '.dest')"; { [ -z "$DESTID" ] || [ "$DESTID" = null ]; } && DESTID=local
   DJSON="$STATE/dests/$DESTID.json"
   DTYPE=local; DREMOTE=""; DPATH=""; DREPO=""
+  DCHAT=""
   if [ -f "$DJSON" ]; then
     DTYPE="$("$JQ" -r '.type // "local"' "$DJSON")"
     DREMOTE="$("$JQ" -r '.remote // empty' "$DJSON")"
     DPATH="$("$JQ" -r '.path // empty'   "$DJSON")"
     DREPO="$("$JQ" -r '.repo // empty'   "$DJSON")"
+    DCHAT="$("$JQ" -r '.channel_id // .tg_chat // empty' "$DJSON")"
+    [ -z "$DCHAT" ] && [ -f "$STATE/dests/telegram.json" ] && DCHAT="$("$JQ" -r '.channel_id // empty' "$STATE/dests/telegram.json" 2>/dev/null)"
   fi
 }
 
@@ -643,7 +651,7 @@ rclone_check_seal() {   # <localdir> <remote:path>; 0 = verified or skipped, 1 =
 
 # Full mode: ship the just-built local backup dir to a remote destination
 transfer_full() {
-  case "$DTYPE" in rclone|gdrive) net_guard || return 1 ;; esac
+  case "$DTYPE" in rclone|gdrive|telegram) net_guard || return 1 ;; esac
   case "$DTYPE" in
     rclone) [ -n "$DREMOTE" ] || { audit "rclone dest without remote $PKG"; finish false ERR_NO_DEST; return 1; }
             _tneed="$(du -s -B1 "$DEST" 2>/dev/null | cut -f1)"; _tneed="${_tneed:-0}"
@@ -673,6 +681,10 @@ transfer_full() {
               exec_ns rm -f "$_sf"
             done
             exec_ns rm -rf "$_stg" ;;
+    telegram)
+            [ -n "$DCHAT" ] || { audit "telegram dest without channel $PKG"; finish false ERR_TG_CHAT; return 1; }
+            "$MODDIR/scripts/telegram.sh" upload "$DCHAT" "$DEST" "$OPID" \
+              || { audit "telegram transfer failed $PKG"; finish false ERR_TRANSFER; return 1; } ;;
     local)  if [ -n "$DPATH" ] && [ "$DPATH" != "$BACKUPS" ]; then
               safe_local_dest "$DPATH" || { audit "refused unsafe local dest $DPATH $PKG"; finish false ERR_DEST_UNSAFE; return 1; }
               _lsz="$(du -s -B1 "$DEST" 2>/dev/null | cut -f1)"; _lfree="$(fs_free "$DPATH")"
@@ -2078,21 +2090,46 @@ config_import() {
   finish true ERR_NONE
 }
 
+do_telegram_download() {
+  DESTID="$(jget "$ARGS" '.dest')"; { [ -z "$DESTID" ] || [ "$DESTID" = null ]; } && DESTID=telegram
+  resolve_dest
+  REF="$(jget "$ARGS" '.ref')"
+  case "$REF" in ''|*..*|*/*/*) : ;; esac
+  PKG="$(jget "$ARGS" '.package')"
+  U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
+  [ -n "$REF" ] || { finish false ERR_BAD_REF; return; }
+  TARGET="$(backups_dir "$U")/$REF"
+  prog 5 downloading "telegram"
+  audit "telegram-download start $REF -> $TARGET"
+  "$MODDIR/scripts/telegram.sh" download "$DCHAT" "$REF" "$TARGET" "$OPID" \
+    || { audit "telegram-download failed $REF"; finish false ERR_TG_DOWNLOAD; return; }
+  media_own -R "$TARGET" 2>/dev/null
+  audit "telegram-download done $REF"
+  if [ "$(jget "$ARGS" '.auto_restore // false')" = true ]; then
+    # update ARGS ref to local target and run restore
+    ARGS="$(printf '%s' "$ARGS" | "$JQ" -c --arg target "$TARGET" '.ref = $target')"
+    restore
+  else
+    finish true ERR_NONE
+  fi
+}
+
 # mark the operation live immediately, before any (possibly slow) validation, so the
 # UI never sits on a stale "starting" while the first guard/dumpsys runs.
-case "$VERB" in backup|backup-batch|restore|restore-batch|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore|config-export|config-import) prog 2 preparing "" ;; esac
+case "$VERB" in backup|backup-batch|restore|restore-batch|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore|config-export|config-import|telegram-download) prog 2 preparing "" ;; esac
 case "$VERB" in
-  backup)          backup ;;
-  backup-batch)    backup_batch ;;
-  restore)         restore ;;
-  restore-batch)   restore_batch ;;
-  config-export)   config_export ;;
-  config-import)   config_import ;;
-  import)          do_import ;;
-  special-backup)  do_special_backup ;;
-  special-restore) do_special_restore ;;
-  cloud-fetch)     do_cloud_fetch ;;
-  path-backup)     do_path_backup ;;
-  path-restore)    do_path_restore ;;
-  *)               finish false ERR_UNKNOWN_VERB ;;
+  backup)            backup ;;
+  backup-batch)      backup_batch ;;
+  restore)           restore ;;
+  restore-batch)     restore_batch ;;
+  config-export)     config_export ;;
+  config-import)     config_import ;;
+  import)            do_import ;;
+  special-backup)    do_special_backup ;;
+  special-restore)   do_special_restore ;;
+  cloud-fetch)       do_cloud_fetch ;;
+  path-backup)       do_path_backup ;;
+  path-restore)      do_path_restore ;;
+  telegram-download) do_telegram_download ;;
+  *)                 finish false ERR_UNKNOWN_VERB ;;
 esac

@@ -171,6 +171,29 @@ fetch_abx() {
   fi
 }
 
-for abi in $ABIS; do build_abi "$abi"; fetch_abx "$abi"; write_provenance "$abi"; done
+build_telegram() {
+  local abi="$1" out="$OUT_BASE/$abi" goarch goarm=""
+  case "$abi" in
+    arm64-v8a) goarch=arm64 ;;
+    armeabi-v7a) goarch=arm; goarm=7 ;;
+    x86) goarch=386 ;;
+    x86_64) goarch=amd64 ;;
+  esac
+  if command -v go >/dev/null 2>&1; then
+    echo "  telegram-vdb: building for $abi ($goarch)..."
+    (
+      cd "$ROOT/tools/telegram-vdb"
+      GOOS=linux GOARCH="$goarch" GOARM="$goarm" CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath -o "$out/telegram-vdb"
+    )
+    chmod 0755 "$out/telegram-vdb"
+    printf '{"type": "source-go", "project": "tools/telegram-vdb", "package": "telegram-vdb", "version": "1.0.0"}\n' >> "$WORK/$abi/src.jsonl"
+  elif [ -f "$out/telegram-vdb" ]; then
+    echo "  telegram-vdb: using existing binary"
+  else
+    echo "  telegram-vdb: skipped (go not found)"
+  fi
+}
+
+for abi in $ABIS; do build_abi "$abi"; fetch_abx "$abi"; build_telegram "$abi"; write_provenance "$abi"; done
 echo "done. binaries + libs under $OUT_BASE/<abi>/ (engine sets LD_LIBRARY_PATH=bin/<abi>/lib)"
 echo "each bin/<abi>/ carries PROVENANCE.json (source + sha256 of every shipped file)"
