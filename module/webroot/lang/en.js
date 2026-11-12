@@ -523,6 +523,7 @@ window.__I18N_EN = {
   "confirm_cancel_op": "Cancel the operation in progress?",
   "msg_op_cancelled": "Operation cancelled.",
   "msg_err_cancelled": "Operation cancelled.",
-  "ui_cancelling": "Cancelling..."
+  "ui_cancelling": "Cancelling...",
+  "ui_dest_telegram_hint": "Telegram storage requires connecting your account:"
 };
 

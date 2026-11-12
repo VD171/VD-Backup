@@ -426,13 +426,22 @@ func cmdSignIn(phone, code, password string) {
 }
 
 func cmdCheckAuth() {
+	sessPath := getSessionPath()
+	if fi, err := os.Stat(sessPath); err != nil || fi.Size() == 0 {
+		printJSON(map[string]any{
+			"ok":      true,
+			"is_auth": false,
+		})
+		return
+	}
+
 	client, err := createClient()
 	if err != nil {
 		printError("ERR_CLIENT", err.Error())
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	err = client.Run(ctx, func(ctx context.Context) error {

@@ -743,7 +743,8 @@ function renderDests(list) {
   (list || []).forEach(function (d) {
     var li = el("li", "row"), grow = el("div", "grow");
     grow.appendChild(el("div", "name", d.id + "  (" + d.type + ")"));
-    grow.appendChild(el("div", "pkg", d.remote || d.repo || d.path || ""));
+    var sub = d.remote || d.repo || d.path || d.channel_title || d.title || (d.type === "telegram" ? (I18N.t("tg_status_ready") || "Connected") : "");
+    grow.appendChild(el("div", "pkg", sub));
     var t = el("button", "btn", I18N.t("test")); t.onclick = function () { testDest(d.id); };
     var x = el("button", "btn", I18N.t("delete")); x.onclick = function () { delDest(d.id); };
     li.appendChild(grow); li.appendChild(t); li.appendChild(x); ul.appendChild(li);
@@ -751,10 +752,9 @@ function renderDests(list) {
   fillDestSelect();
 }
 function loadDests() {
-  helper("dests-list").then(function (r) { DESTS = (r && r.dests) ? r.dests : []; renderDests(DESTS); });
+  helper("dests-list").then(function (r) { DESTS = (r && r.dests) ? r.dests : []; renderDests(DESTS); syncDestFields(); });
   loadRemotes();
   syncDestFields();
-  checkTelegramStatus();
 }
 function loadRemotes() {
   helper("remote-list").then(function (r) {
@@ -1005,7 +1005,8 @@ function syncDestFields() {
   if (tgHint) {
     if (type !== "telegram") tgHint.hidden = true;
     else {
-      var isAuth = TG_STATE && (TG_STATE.authorized || TG_STATE.is_auth);
+      var hasTg = DESTS.some(function (d) { return d.type === "telegram"; });
+      var isAuth = hasTg || (TG_STATE && (TG_STATE.authorized || TG_STATE.is_auth));
       tgHint.hidden = !!isAuth;
     }
   }
@@ -1093,19 +1094,14 @@ function addDest() {
 function testDest(id) {
   var d = destById(id);
   if (d && d.type === "gdrive") { setupGdrive(id); return; }
-  if (d && d.type === "telegram") {
-    checkTelegramStatus().then(function (st) {
-      var isAuth = st && (st.authorized || st.is_auth);
-      if (isAuth) {
-        modalAlert(id + ": " + I18N.t("dest_ok"));
-      } else {
-        openTelegramModal();
-      }
-    });
-    return;
-  }
   helper("dest-test", { id: id }).then(function (r) {
-    modalAlert(id + ": " + ((r && r.reachable) ? I18N.t("dest_ok") : errMsg(r)));
+    if (r && r.reachable) {
+      modalAlert(id + ": " + I18N.t("dest_ok"));
+    } else if (d && d.type === "telegram" && r && r.code === "ERR_DEST_AUTH") {
+      openTelegramModal();
+    } else {
+      modalAlert(id + ": " + errMsg(r));
+    }
   });
 }
 function delDest(id) {
@@ -1568,37 +1564,31 @@ function fetchCloudThenRetry(retryFn) {
 function trackOp(opid, ctx) {
   var box = $("#ops"); box.hidden = false;
   box.innerHTML = "";
-  var head = el("div", "row align-center");
-  head.style.justifyContent = "space-between";
-  head.style.gap = "8px";
-  var label = el("div", null, I18N.t("op_running"));
-  label.style.flex = "1";
-  label.style.minWidth = "0";
-  var cancelBtn = el("button", "btn danger small", I18N.t("ui_cancel") || "Cancel");
-  cancelBtn.style.padding = "3px 10px";
-  cancelBtn.style.fontSize = "12px";
-  cancelBtn.style.flexShrink = "0";
+  var head = el("div", "op-head");
+  var label = el("div", "op-name", I18N.t("op_running"));
+  var cancelBtn = el("button", "op-cancel-btn", I18N.t("ui_cancel") || "Cancel");
   head.appendChild(label);
   head.appendChild(cancelBtn);
   var bar = el("div", "bar"); var fill = el("i"); bar.appendChild(fill);
   var sub = el("div", "op-sub"); sub.hidden = true;
   box.appendChild(head); box.appendChild(bar); box.appendChild(sub);
 
+  var cancelling = false;
   cancelBtn.onclick = function () {
-    modalConfirm(I18N.t("confirm_cancel_op") || "Cancel the operation in progress?", I18N.t("ui_cancel") || "Cancel").then(function (yes) {
-      if (!yes) return;
-      cancelBtn.disabled = true;
-      cancelBtn.textContent = I18N.t("ui_cancelling") || "Cancelling...";
-      helper("cancel", opid, true).then(function () {
-        clearInterval(timer);
-        label.textContent = I18N.t("msg_op_cancelled") || "Operation cancelled.";
-        cancelBtn.remove();
-        fill.style.background = "var(--err)";
-        setTimeout(function () { box.hidden = true; }, 2500);
-      }).catch(function () {
-        cancelBtn.disabled = false;
-        cancelBtn.textContent = I18N.t("ui_cancel") || "Cancel";
-      });
+    if (cancelling) return;
+    cancelling = true;
+    cancelBtn.disabled = true;
+    cancelBtn.textContent = I18N.t("ui_cancelling") || "Cancelling...";
+    helper("cancel", opid, true).then(function () {
+      clearInterval(timer);
+      label.textContent = I18N.t("msg_op_cancelled") || "Operation cancelled.";
+      cancelBtn.remove();
+      fill.style.background = "var(--err)";
+      setTimeout(function () { box.hidden = true; }, 1500);
+    }).catch(function () {
+      cancelling = false;
+      cancelBtn.disabled = false;
+      cancelBtn.textContent = I18N.t("ui_cancel") || "Cancel";
     });
   };
 
@@ -1667,7 +1657,7 @@ function trackOp(opid, ctx) {
           label.textContent = p.ok ? I18N.t("op_done") : errMsg(p);
         }
         if (ctx && ctx.onDone) ctx.onDone(p);
-        setTimeout(function () { box.hidden = true; }, 4000);
+        setTimeout(function () { box.hidden = true; }, 1500);
         return;
       }
       // a live op leaves "starting" within a second; if it is still stuck there

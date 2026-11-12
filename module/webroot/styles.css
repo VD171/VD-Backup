@@ -280,6 +280,27 @@ button { cursor: pointer; font-family: inherit; }
 .ops[hidden] { display: none; }
 .op-name { font-weight: 650; font-size: 15px; }
 .op-phase { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.op-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.op-head > div:first-child { flex: 1; min-width: 0; }
+.op-cancel-btn {
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  color: var(--muted);
+  border-radius: var(--r-sm);
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  flex: none;
+  min-height: 0;
+  line-height: 1.3;
+  transition: all .15s;
+}
+.op-cancel-btn:hover, .op-cancel-btn:active {
+  color: var(--restore);
+  border-color: var(--restore);
+  background: color-mix(in srgb, var(--restore) 10%, transparent);
+}
 .bar { height: 9px; background: var(--line); border-radius: 6px; overflow: hidden; margin-top: 10px; }
 .bar > i { display: block; height: 100%; width: 0; border-radius: 6px;
   background: linear-gradient(90deg, var(--backup), var(--accent)); transition: width .3s ease; }
@@ -662,6 +683,8 @@ input[type="checkbox"].switch:focus-visible { outline: 2px solid var(--accent); 
    to the Add-cloud-remote section below, with an affordance that scrolls to it. */
 #d-rclone-hint[hidden] { display: none; }
 #d-rclone-hint .btn { align-self: flex-start; }
+#d-telegram-hint[hidden] { display: none; }
+#d-telegram-hint .btn { align-self: flex-start; }
 #remote-box.flash-target { animation: remoteflash 1.6s var(--ease) both; border-radius: var(--r); }
 @keyframes remoteflash {
   0%, 100% { background: transparent; box-shadow: none; }
