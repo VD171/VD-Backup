@@ -1,7 +1,7 @@
 id=vdbackup
 name=VDBackup
-version=v1.06
-versionCode=10600
+version=v1.07
+versionCode=10700
 author=VD171
 description=Full app and data backup & restore.
 updateJson=https://raw.githubusercontent.com/VD171/VD-Backup/main/module/update.json

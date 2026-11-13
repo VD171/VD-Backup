@@ -1,9 +1,9 @@
 {
-  "version": "v1.06",
-  "versionCode": 10600,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.06/VD-Backup-v1.06-universal-full.zip",
+  "version": "v1.07",
+  "versionCode": 10700,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.07/VD-Backup-v1.07-universal-full.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "Restore fixes (issue #8): restoring an app over a fresh install now relabels its data for that install. Internal files get the new install's SELinux categories (fixes a crash where the app was denied its own data), and external files (Android/data, Android/obb, Android/media) are re-owned to the new app uid (fixes a startup hang). Full, snapshot and mirror restores.",
-  "size": 241906932,
-  "sha256": "45fd244ef7bc13c4b07c1bc89aafe48bf3a7ba08de2f81ddf80b0f62ea327802"
+  "notes": "Reliability: unattended and scheduled backups no longer stop when you leave the app - the backup now runs fully outside the app's process group.\n\nRestore: app permissions restore correctly on custom ROMs - per-UID permission modes and a restored app's network-access policy are reapplied (Android 16 and 17). You can opt in, per app, to also back up its network policy.\n\nSettings: exporting settings, or any encrypted backup, now reports a clear message when encryption cannot run on this device, instead of a generic error.\n\nInterface: dragging the interface-scale slider no longer switches tabs.\n\nLanguages: Ukrainian added - 22 languages.",
+  "size": 241925955,
+  "sha256": "15d460c334e55859f06a89194dc620ed8f3ecd3a8a3c8fe737d348eaf0ae1d77"
 }
