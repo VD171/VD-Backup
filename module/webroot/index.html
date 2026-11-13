@@ -164,6 +164,7 @@
         <input id="d-id" type="text" data-i18n-ph="ph_dest_id" placeholder="id (e.g. mynas)">
         <select id="d-type">
           <option value="local">local</option>
+          <option value="telegram" data-i18n="ui_dest_telegram">Telegram (unlimited storage)</option>
           <option value="rclone">rclone (SFTP/SMB/WebDAV/Drive/S3/...)</option>
           <option value="restic">restic (snapshot repo)</option>
           <option value="gdrive" data-i18n="ui_dest_gdrive">Google Drive (companion)</option>
@@ -172,6 +173,10 @@
         <div id="d-rclone-hint" class="notice" hidden>
           <div class="notice-msg" data-i18n="ui_dest_rclone_hint">rclone needs a remote. Pick one below, or add a new one:</div>
           <button id="d-add-remote" class="btn small" type="button" data-i18n="ui_dest_add_remote_btn">Add a remote</button>
+        </div>
+        <div id="d-telegram-hint" class="notice" hidden>
+          <div class="notice-msg" data-i18n="ui_dest_telegram_hint">Telegram storage requires connecting your account:</div>
+          <button id="d-tg-connect-btn" class="btn small" type="button" data-i18n="tg_btn_connect">Connect Telegram</button>
         </div>
         <input id="d-path" type="text" data-i18n-ph="ph_dest_path" placeholder="path / sub-folder">
         <button id="d-browse" class="btn" data-i18n="ui_browse">Browse</button>
@@ -830,6 +835,158 @@
         <button class="btn" id="pb-cancel" data-i18n="ui_import_cancel">Cancel</button>
         <button class="btn go" id="pb-ok" data-i18n="ui_pathbk_do">Back up</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Telegram Authentication & Storage Setup Modal -->
+  <div id="tg-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="row align-center mb-sm" style="gap:12px;">
+        <div class="tg-icon-badge" style="width:38px; height:38px; border-radius:10px;">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+          </svg>
+        </div>
+        <div class="grow" style="min-width:0;">
+          <div class="modal-title" id="tg-modal-title" data-i18n="tg_vault_title">Telegram Cloud Vault</div>
+          <div class="muted" style="font-size:12px;" id="tg-modal-subtitle" data-i18n="tg_storage_sub">Private cloud backups in your Telegram account</div>
+        </div>
+        <button id="tg-modal-close-x" class="icon-btn" style="width:32px; height:32px; border-radius:8px; font-size:16px;" type="button" aria-label="Close">✕</button>
+      </div>
+
+      <!-- Multi-step Stepper Indicator (shown in login flow) -->
+      <div id="tg-stepper" class="tg-stepper">
+        <div class="tg-step-node active" id="tg-node-1">
+          <div class="tg-step-num">1</div>
+          <span data-i18n="tg_step1_label">Phone</span>
+        </div>
+        <div class="tg-step-line" id="tg-line-1"></div>
+        <div class="tg-step-node" id="tg-node-2">
+          <div class="tg-step-num">2</div>
+          <span data-i18n="tg_step2_label">Verify</span>
+        </div>
+        <div class="tg-step-line" id="tg-line-2"></div>
+        <div class="tg-step-node" id="tg-node-3">
+          <div class="tg-step-num">3</div>
+          <span data-i18n="tg_step3_label">Vault</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Phone input -->
+      <div id="tg-step-phone">
+        <div class="modal-msg mb-sm" data-i18n="tg_step1_desc">Enter your phone number in international format (+ country code) to receive a secure login code in Telegram.</div>
+        <div class="field" style="margin:10px 0;">
+          <label for="tg-phone-input" style="font-size:13px; font-weight:600; color:var(--muted);" data-i18n="tg_phone_label">Phone Number</label>
+          <input id="tg-phone-input" type="tel" autocomplete="tel" placeholder="+1 234 567 8900" style="font-size:17px; font-weight:600; letter-spacing:0.04em;">
+        </div>
+        <div class="tg-security-pill">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-i18n="tg_security_notice">Direct MTProto TLS connection. Your credentials remain strictly on this device.</span>
+        </div>
+        <div id="tg-phone-err" class="modal-err" hidden></div>
+        <div class="modal-actions">
+          <button class="btn" id="tg-phone-cancel" type="button" data-i18n="ui_cancel">Cancel</button>
+          <button class="btn go" id="tg-phone-next" type="button">
+            <span data-i18n="tg_send_code">Next</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: OTP Code input -->
+      <div id="tg-step-code" hidden>
+        <div class="modal-msg mb-sm" data-i18n="tg_step2_desc">Enter the 5-digit verification code sent to your official Telegram app.</div>
+        <div class="field" style="margin:12px 0; text-align:center;">
+          <input id="tg-code-input" class="tg-otp-input" type="text" autocomplete="one-time-code" maxlength="6" placeholder="• • • • •">
+        </div>
+        <div id="tg-pw-box" hidden style="margin-top:10px;">
+          <div class="field">
+            <label for="tg-pw-input" style="font-size:13px; font-weight:600; color:var(--muted);"><span data-i18n="tg_pw_label">2FA Cloud Password</span> <span class="muted" style="font-weight:normal;" data-i18n="tg_pw_optional">(Only if 2-Step Verification is active)</span></label>
+            <input id="tg-pw-input" type="password" placeholder="••••••••">
+          </div>
+        </div>
+        <div id="tg-code-err" class="modal-err" hidden></div>
+        <div class="modal-actions">
+          <button class="btn" id="tg-code-back" type="button" data-i18n="ui_back">Back</button>
+          <button class="btn go" id="tg-code-verify" type="button" data-i18n="tg_verify_login">Verify & Log In</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Storage Channel Notice & Creation -->
+      <div id="tg-step-notice" hidden>
+        <div class="tg-notice-card">
+          <div class="tg-notice-hero">
+            <div class="tg-notice-ic">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div class="tg-notice-title" data-i18n="tg_provision_title">Dedicated Cloud Vault</div>
+              <div class="muted" style="font-size:12px;">Automatic Private Channel Setup</div>
+            </div>
+          </div>
+          <div class="tg-notice-points">
+            <div class="tg-point-item">
+              <span class="tg-point-bullet">✓</span>
+              <span data-i18n="tg_provision_p1"><b>100% Private:</b> Only your Telegram account has access to this channel.</span>
+            </div>
+            <div class="tg-point-item">
+              <span class="tg-point-bullet">✓</span>
+              <span data-i18n="tg_provision_p2"><b>Safe & Granular:</b> Each app backup is packaged with SHA-256 integrity checksums.</span>
+            </div>
+            <div class="tg-point-item" style="color:var(--warn);">
+              <span class="tg-point-bullet" style="color:var(--warn);">⚠️</span>
+              <span data-i18n="tg_provision_warn"><b>Keep Intact:</b> Do not delete or leave this channel in Telegram, or your backups will be lost.</span>
+            </div>
+          </div>
+        </div>
+        <div id="tg-create-err" class="modal-err" hidden></div>
+        <div class="modal-actions">
+          <button class="btn" id="tg-notice-cancel" type="button" data-i18n="ui_cancel">Cancel</button>
+          <button class="btn go" id="tg-create-channel-btn" type="button" data-i18n="tg_init_vault_btn">Initialize Cloud Vault</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Storage Active / Manage -->
+      <div id="tg-step-active" hidden>
+        <div class="tg-profile-card">
+          <div class="tg-avatar" id="tg-avatar-initial">N</div>
+          <div class="tg-profile-info">
+            <div class="tg-profile-name" id="tg-active-user">User</div>
+            <div class="tg-profile-sub" id="tg-active-phone">+1 ...</div>
+          </div>
+          <span class="badge ok"><span class="dot"></span><span data-i18n="tg_status_ready">Ready</span></span>
+        </div>
+
+        <div class="tg-vault-grid">
+          <div class="tg-vault-row">
+            <span class="tg-vault-label" data-i18n="tg_channel_label">Storage Channel</span>
+            <span class="tg-vault-val">
+              <span id="tg-active-channel" style="color:#229ED9;">VD_Backup</span>
+              <button type="button" class="tg-copy-btn" id="tg-copy-ch-btn" title="Copy Channel ID">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span id="tg-copy-ch-txt" data-i18n="tg_copy">Copy</span>
+              </button>
+            </span>
+          </div>
+          <div class="tg-vault-row">
+            <span class="tg-vault-label" data-i18n="tg_protocol">Protocol</span>
+            <span class="tg-vault-val">Official MTProto 2.0 (TLS)</span>
+          </div>
+          <div class="tg-vault-row">
+            <span class="tg-vault-label">Target ID</span>
+            <span class="tg-vault-val" id="tg-active-chid" style="font-family:monospace; font-size:12px;">-100...</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn danger" id="tg-logout-btn" type="button" style="flex:1;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span data-i18n="tg_disconnect">Disconnect</span>
+          </button>
+          <button class="btn" id="tg-active-close" type="button" style="flex:1;" data-i18n="ui_close">Close</button>
+        </div>
+      </div>
+
     </div>
   </div>
 

@@ -74,6 +74,11 @@ BIN="$MODDIR/bin/$BINABI"
 export PATH="$BIN:$PATH"
 export LD_LIBRARY_PATH="$BIN/lib:${LD_LIBRARY_PATH:-}"
 
+HELPER_DEX="$MODDIR/etc/vdbackup_helper.dex"
+[ -f "$HELPER_DEX" ] || HELPER_DEX="$MODDIR/vdbhelper.dex"
+COMPANION_APK="$MODDIR/etc/companion.apk"
+[ -f "$COMPANION_APK" ] || COMPANION_APK="$MODDIR/companion.apk"
+
 # pm/dumpsys are app_process based: run them with a CLEAN env, or the bundled Termux
 # libs on LD_LIBRARY_PATH shadow ART's and binder marshalling fails on some ROMs
 # ("Failure calling service package: Failed transaction"). These wrappers shadow the
@@ -554,20 +559,44 @@ case "$verb" in
   progress)
     opid="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
     f="$LOGS/progress-$opid.json"
+    pid="$(cat "$LOGS/$opid.pid" 2>/dev/null || true)"
+    if [ -n "$pid" ] && ! kill -0 "$pid" 2>/dev/null; then
+      rm -f "$LOGS/$opid.pid"
+      if [ -s "$f" ]; then
+        JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+        "$JQ" -c '. + {done: true, error: "terminated"}' "$f" 2>/dev/null || cat "$f"
+      else
+        ok "\"opid\":\"$(jstr "$opid")\",\"percent\":100,\"phase\":\"finished\",\"done\":true"
+      fi
+      exit 0
+    fi
     if [ -s "$f" ]; then cat "$f"; else ok "\"opid\":\"$(jstr "$opid")\",\"percent\":0,\"phase\":\"starting\""; fi ;;
 
   cancel)
     opid="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
-    pid="$(cat "$LOGS/$opid.pid" 2>/dev/null)"
-    if [ -n "$pid" ]; then kill -TERM -"$pid" 2>/dev/null || kill "$pid" 2>/dev/null; fi
+    pid="$(cat "$LOGS/$opid.pid" 2>/dev/null || true)"
+    if [ -n "$pid" ]; then
+      kill -TERM -"$pid" 2>/dev/null || kill -TERM "$pid" 2>/dev/null || true
+      sleep 0.1
+      kill -9 -"$pid" 2>/dev/null || kill -9 "$pid" 2>/dev/null || true
+    fi
+    rm -f "$LOGS/$opid.pid" 2>/dev/null || true
+    f="$LOGS/progress-$opid.json"
+    printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":false,"code":"ERR_CANCELLED"}\n' "$opid" > "$f"
+    printf '{"ts":"%s","op":"cancel","opid":"%s","detail":"cancelled by user"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$opid" >> "$LOGS/audit.jsonl" 2>/dev/null || true
     ok "\"cancelled\":\"$(jstr "$opid")\"" ;;
 
   list-ops)
     # active operations, so the UI can reattach after being reopened
     printf '{"ok":true,"ops":['
     first=1
-    for p in "$LOGS"/*.pid; do
+    for p in "$LOGS"/op-*.pid; do
       [ -e "$p" ] || continue
+      pid="$(cat "$p" 2>/dev/null || true)"
+      if [ -z "$pid" ] || ! kill -0 "$pid" 2>/dev/null; then
+        rm -f "$p"
+        continue
+      fi
       id="$(basename "$p" .pid)"
       [ "$first" = 1 ] || printf ','; first=0
       printf '{"opid":"%s","progress":%s}' "$(jstr "$id")" "$(cat "$LOGS/progress-$id.json" 2>/dev/null || echo '{}')"
@@ -879,8 +908,51 @@ case "$verb" in
         i=0; while [ ! -f "$res.done" ] && [ "$i" -lt 30 ]; do sleep 1; i=$((i+1)); done
         if [ -f "$res.done" ] && "$JQ" -e '.ok==true' "$res" >/dev/null 2>&1; then rm -f "$res" "$res.done"; ok '"reachable":true'
         else c="$("$JQ" -r '.code // "ERR_DRIVE_TIMEOUT"' "$res" 2>/dev/null)"; rm -f "$res" "$res.done"; err "${c:-ERR_DRIVE}" "Drive not reachable - authorize consent"; fi ;;
+      telegram)
+        st="$("$MODDIR/scripts/telegram.sh" check-auth 2>/dev/null)"
+        if printf '%s' "$st" | "$JQ" -e '.ok == true and .is_auth == true' >/dev/null 2>&1; then
+          ok '"reachable":true'
+        else
+          err ERR_DEST_AUTH "Telegram not connected. Please link your Telegram account."
+        fi ;;
       *) err ERR_DEST_TYPE "unknown type" ;;
     esac ;;
+
+  telegram-status)
+    "$MODDIR/scripts/telegram.sh" check-auth ;;
+
+  telegram-send-code)
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    phone="$(printf '%s' "$j" | "$JQ" -r '.phone // empty' 2>/dev/null)"
+    [ -n "$phone" ] || { err ERR_TG_PHONE "Phone number is required"; exit 0; }
+    "$MODDIR/scripts/telegram.sh" send-code --phone "$phone" ;;
+
+  telegram-sign-in)
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    phone="$(printf '%s' "$j" | "$JQ" -r '.phone // empty' 2>/dev/null)"
+    code="$(printf '%s' "$j" | "$JQ" -r '.code // empty' 2>/dev/null)"
+    pw="$(printf '%s' "$j" | "$JQ" -r '.password // empty' 2>/dev/null)"
+    [ -n "$phone" ] && [ -n "$code" ] || { err ERR_TG_CODE "Phone and verification code are required"; exit 0; }
+    if [ -n "$pw" ] && [ "$pw" != null ]; then
+      "$MODDIR/scripts/telegram.sh" sign-in --phone "$phone" --code "$code" --password "$pw"
+    else
+      "$MODDIR/scripts/telegram.sh" sign-in --phone "$phone" --code "$code"
+    fi ;;
+
+  telegram-init-storage)
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    title="$(printf '%s' "$j" | "$JQ" -r '.title // empty' 2>/dev/null)"
+    if [ -n "$title" ] && [ "$title" != null ]; then
+      "$MODDIR/scripts/telegram.sh" init-storage --title "$title"
+    else
+      "$MODDIR/scripts/telegram.sh" init-storage
+    fi ;;
+
+  telegram-logout)
+    "$MODDIR/scripts/telegram.sh" logout ;;
 
   schedule-set)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"

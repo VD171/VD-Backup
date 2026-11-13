@@ -142,6 +142,7 @@ set_perm_recursive "$MODPATH" 0 0 0755 0644
 set_perm_recursive "$MODPATH/bin" 0 0 0755 0755
 set_perm "$MODPATH/scripts/helper.sh" 0 0 0755
 set_perm "$MODPATH/scripts/worker.sh" 0 0 0755
+set_perm "$MODPATH/scripts/telegram.sh" 0 0 0755
 set_perm "$MODPATH/service.sh" 0 0 0755
 [ -f "$MODPATH/uninstall.sh" ] && set_perm "$MODPATH/uninstall.sh" 0 0 0755
 
