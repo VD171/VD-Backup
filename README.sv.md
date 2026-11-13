@@ -1,6 +1,6 @@
 <!--
-  VD BACKUP - full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+  VD BACKUP: full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # VD Backup
@@ -150,6 +150,7 @@ Systerprojekt av samma författare:
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: en felsökare för enhetsmetoder: läser varje objekt genom varje metod som kan läsa det och jämför dem sida vid sida.
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: dina Google-tjänster (RCS, Wallet, Play Integrity-attesteringar), lästa på din enhet utan internet.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: en enhetsspoofer som förvandlar ett färskt fingerprint till en sammanhängande, konsekvent profil.
+- **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: en fristående rootad SSH-daemon (Dropbear).
 
 ## Kontakter
 

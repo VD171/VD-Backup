@@ -1,6 +1,6 @@
 <!--
-  VD BACKUP - full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+  VD BACKUP: full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # VD Backup
@@ -150,6 +150,7 @@ Sibling projects by the same author:
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: a device method debugger that reads each item through every method that can read it and compares them side by side.
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: your Google services (RCS, Wallet, Play Integrity attestations), read on your device with no internet.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: a device spoofer that turns a fresh fingerprint into a coherent, consistent profile.
+- **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: a standalone rooted SSH daemon (Dropbear).
 
 ## Contacts
 

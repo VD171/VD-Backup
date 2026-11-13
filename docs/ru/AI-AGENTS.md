@@ -164,8 +164,8 @@ snapshot/mirror, `"password"` для зашифрованной копии, `"ss
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (по умолчанию) | "restore"
-  "package": "com.example.app",   // одно приложение   - ИЛИ -
-  "packages": ["com.a","com.b"],  // набор приложений   - ИЛИ -
+  "package": "com.example.app",   // одно приложение   (ИЛИ)
+  "packages": ["com.a","com.b"],  // набор приложений   (ИЛИ)
   "all": true,                    // все приложения, кроме списка исключённых приложений
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

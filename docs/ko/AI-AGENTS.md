@@ -162,8 +162,8 @@ config에서, 설치 시점에 installer를 Play Store로 설정)와 `"deep_spoo
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (기본값) | "restore"
-  "package": "com.example.app",   // 단일 앱   - 또는 -
-  "packages": ["com.a","com.b"],  // 앱 집합   - 또는 -
+  "package": "com.example.app",   // 단일 앱   (또는)
+  "packages": ["com.a","com.b"],  // 앱 집합   (또는)
   "all": true,                    // 모든 앱, 제외 앱 목록 제외
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

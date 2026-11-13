@@ -1,6 +1,6 @@
 <!--
-  VD BACKUP - full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+  VD BACKUP: full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # VD Backup
@@ -136,6 +136,7 @@ Neo-Backup وAndroid-DataBackup الموجودة كي تنتقل إليها.
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: مُنقِّح طرق الجهاز: يقرأ كل عنصر عبر كل طريقة قادرة على قراءته ويقارنها جنبًا إلى جنب.
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: خدمات Google لديك (RCS، Wallet، شهادات Play Integrity)، تُقرأ على جهازك دون إنترنت.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: مُزيِّف جهاز يحوّل بصمة جديدة إلى ملف تعريف متماسك ومتسق.
+- **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: خادم SSH مستقل يعمل بصلاحيات الجذر (Dropbear).
 
 ## جهات الاتصال
 

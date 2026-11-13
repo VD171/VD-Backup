@@ -165,8 +165,8 @@ Ein geplanter Auftrag wählt **ein** Ziel und eine **Aktion**:
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (Standard) | "restore"
-  "package": "com.example.app",   // eine App   - ODER -
-  "packages": ["com.a","com.b"],  // ein Satz von Apps   - ODER -
+  "package": "com.example.app",   // eine App   (ODER)
+  "packages": ["com.a","com.b"],  // ein Satz von Apps   (ODER)
   "all": true,                    // alle Apps, abzüglich der Liste ausgeschlossener Apps
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

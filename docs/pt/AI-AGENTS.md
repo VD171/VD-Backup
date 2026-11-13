@@ -165,8 +165,8 @@ Um job de agendamento escolhe **um** alvo e uma **ação**:
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (padrão) | "restore"
-  "package": "com.example.app",   // um app   - OU -
-  "packages": ["com.a","com.b"],  // um conjunto de apps   - OU -
+  "package": "com.example.app",   // um app   (OU)
+  "packages": ["com.a","com.b"],  // um conjunto de apps   (OU)
   "all": true,                    // todos os apps, menos a lista de apps excluídos
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

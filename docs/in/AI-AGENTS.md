@@ -164,8 +164,8 @@ Sebuah pekerjaan terjadwal memilih **satu** target dan sebuah **action**:
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (default) | "restore"
-  "package": "com.example.app",   // satu aplikasi   - ATAU -
-  "packages": ["com.a","com.b"],  // sekumpulan aplikasi   - ATAU -
+  "package": "com.example.app",   // satu aplikasi   (ATAU)
+  "packages": ["com.a","com.b"],  // sekumpulan aplikasi   (ATAU)
   "all": true,                    // semua aplikasi, dikurangi daftar aplikasi-yang-dikecualikan
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

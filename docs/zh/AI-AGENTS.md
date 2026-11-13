@@ -155,8 +155,8 @@ SSH-to-root 配置）来执行该命令。模块附带捆绑的二进制文件�
 {
   "id": "nightly-games",
   "action": "backup",             // "backup"（默认） | "restore"
-  "package": "com.example.app",   // 单个应用   - 或 -
-  "packages": ["com.a","com.b"],  // 一组应用   - 或 -
+  "package": "com.example.app",   // 单个应用   (或)
+  "packages": ["com.a","com.b"],  // 一组应用   (或)
   "all": true,                    // 所有应用，减去排除应用列表
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

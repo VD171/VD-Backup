@@ -1,6 +1,6 @@
 <!--
-  VD BACKUP - full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+  VD BACKUP: full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # VD Backup
@@ -142,6 +142,7 @@ JSON으로 말하고 (`helper.sh`의 모든 verb는 하나의 JSON 객체를 반
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: 기기 메서드 디버거. 각 항목을 그것을 읽을 수 있는 모든 메서드로 읽어 나란히 비교합니다.
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: 여러분의 Google 서비스 (RCS, Wallet, Play Integrity 증명)를 인터넷 없이 기기에서 읽습니다.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: 새 핑거프린트를 일관되고 정합성 있는 프로필로 바꾸는 기기 스푸퍼.
+- **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: 독립 실행형 루트 SSH 데몬 (Dropbear).
 
 ## 연락처
 

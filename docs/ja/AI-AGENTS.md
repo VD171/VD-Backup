@@ -166,8 +166,8 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (デフォルト) | "restore"
-  "package": "com.example.app",   // 単一のアプリ   - または -
-  "packages": ["com.a","com.b"],  // アプリの集合   - または -
+  "package": "com.example.app",   // 単一のアプリ   (または)
+  "packages": ["com.a","com.b"],  // アプリの集合   (または)
   "all": true,                    // すべてのアプリ、除外アプリのリストを除く
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

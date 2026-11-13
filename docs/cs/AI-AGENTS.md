@@ -163,8 +163,8 @@ Naplánovaná úloha volí **jeden** cíl a jednu **akci**:
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (výchozí) | "restore"
-  "package": "com.example.app",   // jedna aplikace   - NEBO -
-  "packages": ["com.a","com.b"],  // sada aplikací   - NEBO -
+  "package": "com.example.app",   // jedna aplikace   (NEBO)
+  "packages": ["com.a","com.b"],  // sada aplikací   (NEBO)
   "all": true,                    // všechny aplikace, bez seznamu vyloučených aplikací
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

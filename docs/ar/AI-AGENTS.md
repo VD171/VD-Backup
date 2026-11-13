@@ -163,8 +163,8 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (الافتراضي) | "restore"
-  "package": "com.example.app",   // تطبيق واحد   - أو -
-  "packages": ["com.a","com.b"],  // مجموعة تطبيقات   - أو -
+  "package": "com.example.app",   // تطبيق واحد   (أو)
+  "packages": ["com.a","com.b"],  // مجموعة تطبيقات   (أو)
   "all": true,                    // كل التطبيقات، ما عدا قائمة التطبيقات المستبعَدة
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

@@ -1,6 +1,6 @@
 # ======================================================================
 #  VD BACKUP  ::  root backup & restore, no grant prompt
-#  Full app/data backup & restore as root - KernelSU/APatch/Magisk WebUI.
+#  Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
 #
 #  Copyright (C) 2026  VD171
 #  SPDX-License-Identifier: AGPL-3.0-or-later

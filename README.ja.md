@@ -1,6 +1,6 @@
 <!--
-  VD BACKUP - full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+  VD BACKUP: full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # VD Backup
@@ -139,6 +139,7 @@ VDBackup は、人だけでなく AI アシスタントやエージェントに�
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: デバイスのメソッドを調べるデバッガー。各項目を、それを読み取れるあらゆるメソッドで読み取り、結果を並べて比較します。
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: あなたの Google サービス (RCS、Wallet、Play Integrity の構成証明) を、インターネットなしでデバイス上で読み取ります。
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: 新しいフィンガープリントを、首尾一貫した整合性のあるプロファイルに変えるデバイススプーファー。
+- **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: 単体で動く root 権限の SSH デーモン (Dropbear)。
 
 ## 連絡先
 

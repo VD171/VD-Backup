@@ -165,8 +165,8 @@ A schedule job picks **one** target and an **action**:
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (default) | "restore"
-  "package": "com.example.app",   // one app   - OR -
-  "packages": ["com.a","com.b"],  // a set of apps   - OR -
+  "package": "com.example.app",   // one app   (OR)
+  "packages": ["com.a","com.b"],  // a set of apps   (OR)
   "all": true,                    // all apps, minus the excluded-apps list
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

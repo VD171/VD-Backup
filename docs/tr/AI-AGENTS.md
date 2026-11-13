@@ -165,8 +165,8 @@ Bir zamanlama işi **bir** hedef ve bir **eylem** seçer:
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (varsayılan) | "restore"
-  "package": "com.example.app",   // tek bir uygulama   - VEYA -
-  "packages": ["com.a","com.b"],  // bir uygulama kümesi   - VEYA -
+  "package": "com.example.app",   // tek bir uygulama   (VEYA)
+  "packages": ["com.a","com.b"],  // bir uygulama kümesi   (VEYA)
   "all": true,                    // tüm uygulamalar, hariç tutulan uygulamalar listesi çıkarılarak
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

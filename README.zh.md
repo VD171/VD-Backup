@@ -1,6 +1,6 @@
 <!--
-  VD BACKUP - full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+  VD BACKUP: full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # VD Backup
@@ -123,6 +123,7 @@ VDBackup 的构建目标是不仅欢迎人，也欢迎 AI 助手和代理。引�
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: 一个设备方法调试器: 通过每一种能读取某项的方法去读取它，并将结果并排比较。
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: 在你的设备上无需联网即可读取你的 Google 服务 (RCS、Wallet、Play Integrity 证明)。
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: 一个设备伪装器，把全新的指纹变成连贯一致的配置。
+- **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: 一个独立的 root SSH 守护进程 (Dropbear)。
 
 ## Contacts
 

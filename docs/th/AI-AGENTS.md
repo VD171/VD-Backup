@@ -162,8 +162,8 @@ Neo backup ที่เข้ารหัสไว้ จะรับ `"password
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (ค่าเริ่มต้น) | "restore"
-  "package": "com.example.app",   // แอปเดียว   - หรือ -
-  "packages": ["com.a","com.b"],  // ชุดของแอป   - หรือ -
+  "package": "com.example.app",   // แอปเดียว   (หรือ)
+  "packages": ["com.a","com.b"],  // ชุดของแอป   (หรือ)
   "all": true,                    // แอปทั้งหมด ลบด้วยรายการแอปที่ยกเว้น
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

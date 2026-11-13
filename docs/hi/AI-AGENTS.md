@@ -164,8 +164,8 @@ restore-test):
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (default) | "restore"
-  "package": "com.example.app",   // एक ऐप   - या -
-  "packages": ["com.a","com.b"],  // ऐप्स का एक समूह   - या -
+  "package": "com.example.app",   // एक ऐप   (या)
+  "packages": ["com.a","com.b"],  // ऐप्स का एक समूह   (या)
   "all": true,                    // सभी ऐप्स, बहिष्कृत-ऐप्स सूची को छोड़कर
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

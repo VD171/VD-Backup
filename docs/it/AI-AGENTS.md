@@ -164,8 +164,8 @@ Un lavoro pianificato sceglie **un** bersaglio e un'**action** :
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (predefinita) | "restore"
-  "package": "com.example.app",   // una app   - OPPURE -
-  "packages": ["com.a","com.b"],  // un insieme di app   - OPPURE -
+  "package": "com.example.app",   // una app   (OPPURE)
+  "packages": ["com.a","com.b"],  // un insieme di app   (OPPURE)
   "all": true,                    // tutte le app, meno la lista delle app escluse
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

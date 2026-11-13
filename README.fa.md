@@ -1,6 +1,6 @@
 <!--
-  VD BACKUP - full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+  VD BACKUP: full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # VD Backup
@@ -138,6 +138,7 @@ VDBackup طوری ساخته شده که نه‌فقط برای مردم، بل�
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: یک اشکال‌زدای روش‌های دستگاه: هر مورد را از طریق هر روشی که می‌تواند آن را بخواند می‌خواند و آن‌ها را کنار هم مقایسه می‌کند.
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: سرویس‌های Google شما (RCS، Wallet، گواهی‌های Play Integrity)، روی دستگاهتان و بدون اینترنت خوانده می‌شوند.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: یک جاعلِ دستگاه که یک اثرانگشت تازه را به یک پروفایلِ منسجم و یکدست تبدیل می‌کند.
+- **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: یک سرویس SSH مستقل با دسترسی روت (Dropbear).
 
 ## تماس
 

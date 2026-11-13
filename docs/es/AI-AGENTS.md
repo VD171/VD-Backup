@@ -164,8 +164,8 @@ Un trabajo agendado elige **un** objetivo y una **acción**:
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (por defecto) | "restore"
-  "package": "com.example.app",   // una app   - O -
-  "packages": ["com.a","com.b"],  // un conjunto de apps   - O -
+  "package": "com.example.app",   // una app   (O)
+  "packages": ["com.a","com.b"],  // un conjunto de apps   (O)
   "all": true,                    // todas las apps, menos la lista de apps excluidas
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

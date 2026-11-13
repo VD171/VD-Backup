@@ -166,8 +166,8 @@ Une tâche planifiée choisit **une** cible et une **action** :
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (par défaut) | "restore"
-  "package": "com.example.app",   // une seule app   - OU -
-  "packages": ["com.a","com.b"],  // un ensemble d'apps   - OU -
+  "package": "com.example.app",   // une seule app   (OU)
+  "packages": ["com.a","com.b"],  // un ensemble d'apps   (OU)
   "all": true,                    // toutes les apps, moins la liste des apps exclues
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

@@ -1,6 +1,6 @@
 <!--
-  VD BACKUP - full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+  VD BACKUP: full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # VD Backup
@@ -136,6 +136,7 @@ VDBackup को केवल लोगों के लिए ही नही�
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: एक डिवाइस मेथड डिबगर: हर आइटम को उस हर मेथड से पढ़ता है जो उसे पढ़ सकता है और उनकी साथ-साथ तुलना करता है।
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: आपकी Google सेवाएँ (RCS, Wallet, Play Integrity प्रमाणन), बिना इंटरनेट के आपके डिवाइस पर पढ़ी जाती हैं।
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: एक डिवाइस स्पूफ़र जो एक ताज़ा फ़िंगरप्रिंट को एक सुसंगत, संगत प्रोफ़ाइल में बदल देता है।
+- **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: एक स्वतंत्र रूटेड SSH डीमन (Dropbear)।
 
 ## संपर्क
 

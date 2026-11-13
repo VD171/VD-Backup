@@ -170,8 +170,8 @@ Neo رمزگذاری‌شده، مقدار `"password"` را می‌گیرد.
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (پیش‌فرض) | "restore"
-  "package": "com.example.app",   // یک برنامه   - یا -
-  "packages": ["com.a","com.b"],  // یک مجموعه برنامه   - یا -
+  "package": "com.example.app",   // یک برنامه   (یا)
+  "packages": ["com.a","com.b"],  // یک مجموعه برنامه   (یا)
   "all": true,                    // همهٔ برنامه‌ها، منهای فهرست برنامه‌های مستثنا
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

@@ -165,8 +165,8 @@ Een geplande taak kiest **één** doel en een **actie**:
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (standaard) | "restore"
-  "package": "com.example.app",   // één app   - OF -
-  "packages": ["com.a","com.b"],  // een set apps   - OF -
+  "package": "com.example.app",   // één app   (OF)
+  "packages": ["com.a","com.b"],  // een set apps   (OF)
   "all": true,                    // alle apps, minus de uitgesloten-apps-lijst
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

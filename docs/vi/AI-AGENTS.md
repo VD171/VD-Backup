@@ -164,8 +164,8 @@ Một công việc theo lịch chọn **một** mục tiêu và một **hành đ
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (mặc định) | "restore"
-  "package": "com.example.app",   // một ứng dụng   - HOẶC -
-  "packages": ["com.a","com.b"],  // một tập hợp ứng dụng   - HOẶC -
+  "package": "com.example.app",   // một ứng dụng   (HOẶC)
+  "packages": ["com.a","com.b"],  // một tập hợp ứng dụng   (HOẶC)
   "all": true,                    // tất cả ứng dụng, trừ danh sách ứng dụng loại trừ
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

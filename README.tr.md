@@ -1,6 +1,6 @@
 <!--
-  VD BACKUP - full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+  VD BACKUP: full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # VD Backup
@@ -139,6 +139,7 @@ Aynı yazarın kardeş projeleri:
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: bir cihaz yöntem hata ayıklayıcısı: her öğeyi, onu okuyabilen her yöntemle okur ve bunları yan yana karşılaştırır.
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: Google hizmetleriniz (RCS, Wallet, Play Integrity doğrulamaları), internet olmadan cihazınızda okunur.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: taze bir parmak izini tutarlı, uyumlu bir profile dönüştüren bir cihaz sahteleyici.
+- **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: bağımsız, root yetkili bir SSH artalan süreci (Dropbear).
 
 ## İletişim
 

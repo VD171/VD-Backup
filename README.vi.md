@@ -1,6 +1,6 @@
 <!--
-  VD BACKUP - full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+  VD BACKUP: full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # VD Backup
@@ -137,6 +137,7 @@ Các dự án anh em của cùng tác giả:
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: một trình gỡ lỗi phương thức của thiết bị: đọc từng mục qua mọi phương thức có thể đọc nó và so sánh chúng cạnh nhau.
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: các dịch vụ Google của bạn (RCS, Wallet, các chứng thực Play Integrity), đọc ngay trên thiết bị của bạn mà không cần internet.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: một trình giả lập thiết bị biến một fingerprint mới thành một hồ sơ mạch lạc, nhất quán.
+- **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: một SSH daemon độc lập chạy với quyền root (Dropbear).
 
 ## Contacts
 

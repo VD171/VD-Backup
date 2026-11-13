@@ -163,8 +163,8 @@ Zadanie harmonogramu wybiera **jeden** cel i **akcję**:
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (domyślnie) | "restore"
-  "package": "com.example.app",   // jedna aplikacja   - LUB -
-  "packages": ["com.a","com.b"],  // zestaw aplikacji   - LUB -
+  "package": "com.example.app",   // jedna aplikacja   (LUB)
+  "packages": ["com.a","com.b"],  // zestaw aplikacji   (LUB)
   "all": true,                    // wszystkie aplikacje, minus lista wykluczonych aplikacji
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM

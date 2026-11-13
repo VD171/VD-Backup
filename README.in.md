@@ -1,6 +1,6 @@
 <!--
-  VD BACKUP - full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171 - SPDX-License-Identifier: AGPL-3.0-or-later
+  VD BACKUP: full app & data backup and restore as root, from a WebUI.
+  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # VD Backup
@@ -137,6 +137,7 @@ Proyek saudara dari penulis yang sama:
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: sebuah debugger metode perangkat: membaca setiap item melalui setiap metode yang dapat membacanya dan membandingkannya berdampingan.
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: layanan Google Anda (RCS, Wallet, atestasi Play Integrity), dibaca di perangkat Anda tanpa internet.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: sebuah pemalsu perangkat yang mengubah fingerprint baru menjadi profil yang koheren dan konsisten.
+- **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: sebuah daemon SSH mandiri dengan akses root (Dropbear).
 
 ## Kontak
 

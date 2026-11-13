@@ -163,8 +163,8 @@ Ett schemajobb väljer **ett** mål och en **åtgärd**:
 {
   "id": "nightly-games",
   "action": "backup",             // "backup" (standard) | "restore"
-  "package": "com.example.app",   // en app   - ELLER -
-  "packages": ["com.a","com.b"],  // en uppsättning appar   - ELLER -
+  "package": "com.example.app",   // en app   (ELLER)
+  "packages": ["com.a","com.b"],  // en uppsättning appar   (ELLER)
   "all": true,                    // alla appar, minus listan över uteslutna appar
   "cron": "daily",                // hourly | daily | weekly
   "at": "02:30",                  // HH:MM
