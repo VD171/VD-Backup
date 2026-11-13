@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · हिन्दी · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · हिन्दी · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Changelog
 
 VDBackup में सभी उल्लेखनीय परिवर्तन यहाँ प्रलेखित हैं। केवल अंग्रेज़ी में।
+
+## v1.07
+
+विश्वसनीयता:
+
+- चल रहा बैकअप अब खुद को ऐप के प्रोसेस समूह से बाहर ले जाता है, इसलिए जब आप ऐप को बैकग्राउंड में भेजते हैं या बंद करते हैं तो Android का app freezer और phantom-process killer उसे रोक या समाप्त नहीं कर सकते। बिना निगरानी वाले और निर्धारित बैकअप विश्वसनीय ढंग से पूरे होते हैं, जो v1.05 के अलग किए गए प्रोसेस वाले काम पर आधारित है।
+
+पुनर्स्थापना:
+
+- किसी ऐप की अनुमतियों की पुनर्स्थापना अब कस्टम ROM पर काम करती है। रद्द की गई रनटाइम अनुमतियाँ केवल पैकेज के अनुसार नहीं, बल्कि UID के अनुसार फिर से लागू होती हैं, इसलिए LineageOS-शैली की प्रति-UID अनुमति मोड सही ढंग से वापस आती हैं। किसी पुनर्स्थापित ऐप की सहेजी गई नेटवर्क-एक्सेस नीति (उसकी मोबाइल-डेटा और Wi-Fi अनुमति) भी फिर से लागू होती है, Android 16 और 17 पर दिखने वाले नेस्टेड और फ़्लैट दोनों netpolicy.xml लेआउट में।
+
+सेटिंग्स:
+
+- अब आप प्रत्येक ऐप के लिए यह चुन सकते हैं कि उसकी नेटवर्क-एक्सेस नीति का भी बैकअप और पुनर्स्थापना हो।
+- सेटिंग्स का निर्यात, और कोई भी एन्क्रिप्टेड बैकअप, अब सामान्य स्थानांतरण त्रुटि के बजाय एक स्पष्ट, विशिष्ट संदेश के साथ विफल होता है जब इस डिवाइस पर एन्क्रिप्शन नहीं चल सकता। ऐप लोड होते समय एन्क्रिप्शन की उपलब्धता की सूचना भी देता है।
+
+इंटरफ़ेस:
+
+- सेटिंग्स में इंटरफ़ेस-स्केल स्लाइडर खींचने पर अब दूसरे टैब पर स्विच नहीं होता।
+
+भाषाएँ:
+
+- यूक्रेनी जोड़ी गई, जिससे इंटरफ़ेस और दस्तावेज़ 22 भाषाओं तक पहुँच गए।
 
 ## v1.06
 

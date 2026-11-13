@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · Svenska · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · Svenska · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Ändringslogg
 
 Alla noterbara ändringar i VDBackup dokumenteras här. Endast engelska.
+
+## v1.07
+
+Tillförlitlighet:
+
+- En pågående säkerhetskopia flyttar sig nu ut ur appens processgrupp, så att Androids app freezer och phantom-process killer inte kan pausa eller avsluta den när du lägger appen i bakgrunden eller stänger den. Obevakade och schemalagda säkerhetskopior slutförs tillförlitligt och bygger vidare på arbetet med frånkopplad process från v1.05.
+
+Återställning:
+
+- Att återställa en apps behörigheter fungerar nu på anpassade ROM:ar. Återkallade körningsbehörigheter tillämpas nu om per UID, inte bara per paket, så att behörighetslägen per UID i LineageOS-stil kommer tillbaka korrekt. En återställd apps sparade policy för nätverksåtkomst (dess tillstånd för mobildata och Wi-Fi) tillämpas också om, i både den nästlade och den platta netpolicy.xml-layouten som förekommer på Android 16 och 17.
+
+Inställningar:
+
+- Du kan nu per app välja att även säkerhetskopiera och återställa dess policy för nätverksåtkomst.
+- Export av inställningar, och varje krypterad säkerhetskopia, misslyckas nu med ett tydligt, specifikt meddelande när kryptering inte kan köras på den här enheten, i stället för ett allmänt överföringsfel. Appen rapporterar också om kryptering är tillgänglig när den läses in.
+
+Gränssnitt:
+
+- Att dra reglaget för gränssnittsskala i Inställningar växlar inte längre till en annan flik.
+
+Språk:
+
+- Lade till ukrainska, vilket tar gränssnittet och dokumentationen till 22 språk.
 
 ## v1.06
 

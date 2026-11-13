@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · Deutsch · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · Deutsch · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Changelog
 
 Alle nennenswerten Änderungen an VDBackup werden hier dokumentiert. Nur auf Englisch.
+
+## v1.07
+
+Zuverlässigkeit:
+
+- Ein laufendes Backup verlässt jetzt die Prozessgruppe der App, sodass Androids App-Freezer und Phantom-Process-Killer es nicht mehr anhalten oder beenden können, wenn Sie die App in den Hintergrund schicken oder schließen. Unbeaufsichtigte und geplante Backups schließen zuverlässig ab und bauen auf der abgekoppelten Prozessarbeit aus v1.05 auf.
+
+Wiederherstellung:
+
+- Das Wiederherstellen der Berechtigungen einer App funktioniert jetzt auf Custom-ROMs. Widerrufene Laufzeitberechtigungen werden per UID wiederhergestellt, nicht nur per Paket, sodass UID-bezogene Berechtigungsmodi im LineageOS-Stil korrekt zurückkommen. Die gespeicherte Netzwerkzugriffsrichtlinie einer wiederhergestellten App (ihre Erlaubnis für mobile Daten und WLAN) wird ebenfalls wieder angewendet, sowohl im verschachtelten als auch im flachen netpolicy.xml-Layout, wie sie auf Android 16 und 17 vorkommen.
+
+Einstellungen:
+
+- Sie können jetzt pro App festlegen, dass auch ihre Netzwerkzugriffsrichtlinie gesichert und wiederhergestellt wird.
+- Das Exportieren der Einstellungen und jedes verschlüsselte Backup schlagen jetzt mit einer klaren, konkreten Meldung fehl, wenn die Verschlüsselung auf diesem Gerät nicht ausgeführt werden kann, statt mit einem allgemeinen Übertragungsfehler. Die App meldet beim Laden außerdem die Verfügbarkeit der Verschlüsselung.
+
+Oberfläche:
+
+- Das Ziehen des Schiebereglers für die Oberflächenskalierung in den Einstellungen wechselt nicht mehr zu einem anderen Reiter.
+
+Sprachen:
+
+- Ukrainisch hinzugefügt, womit Oberfläche und Dokumentation jetzt 22 Sprachen umfassen.
 
 ## v1.06
 

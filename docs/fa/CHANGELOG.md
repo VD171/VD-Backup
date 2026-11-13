@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · فارسی · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · فارسی · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # تغییرنگار
 
 همه تغییرات مهم VDBackup اینجا مستند شده‌اند. فقط به انگلیسی.
+
+## v1.07
+
+قابلیت اطمینان:
+
+- یک پشتیبان‌گیری در حال اجرا اکنون خود را از گروه فرایند برنامه بیرون می‌برد، پس app freezer و phantom-process killer اندروید نمی‌توانند هنگام فرستادن برنامه به پس‌زمینه یا بستن آن، آن را متوقف یا پایان دهند. پشتیبان‌های بدون نظارت و زمان‌بندی‌شده به‌طور قابل‌اعتماد تمام می‌شوند و بر کار فرایند جدا از v1.05 بنا می‌شوند.
+
+بازیابی:
+
+- بازیابی مجوزهای یک برنامه اکنون روی ROMهای سفارشی کار می‌کند. مجوزهای زمان اجرای لغوشده بر اساس UID دوباره اعمال می‌شوند، نه فقط بر اساس بسته، پس حالت‌های مجوز بر پایهٔ UID به سبک LineageOS درست بازمی‌گردند. سیاست دسترسی به شبکهٔ ذخیره‌شدهٔ یک برنامهٔ بازیابی‌شده (اجازهٔ دادهٔ همراه و Wi-Fi آن) نیز دوباره اعمال می‌شود، در هر دو چیدمان تو‌درتو و تخت netpolicy.xml که روی Android 16 و 17 دیده می‌شوند.
+
+تنظیمات:
+
+- اکنون می‌توانید برای هر برنامه انتخاب کنید که سیاست دسترسی به شبکهٔ آن نیز پشتیبان‌گیری و بازیابی شود.
+- برون‌بری تنظیمات، و هر پشتیبان رمزگذاری‌شده، اکنون وقتی رمزگذاری نتواند روی این دستگاه اجرا شود، به‌جای یک خطای انتقال عمومی، با پیامی روشن و مشخص شکست می‌خورد. برنامه همچنین هنگام بارگذاری، در دسترس بودن رمزگذاری را گزارش می‌دهد.
+
+رابط کاربری:
+
+- کشیدن لغزندهٔ مقیاس رابط در تنظیمات دیگر به برگهٔ دیگری نمی‌رود.
+
+زبان‌ها:
+
+- اوکراینی افزوده شد و رابط و مستندات را به 22 زبان رساند.
 
 ## v1.06
 

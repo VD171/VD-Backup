@@ -1,10 +1,33 @@
-> **Languages:** English · [العربية](docs/ar/CHANGELOG.md) · [Čeština](docs/cs/CHANGELOG.md) · [Deutsch](docs/de/CHANGELOG.md) · [Español](docs/es/CHANGELOG.md) · [فارسی](docs/fa/CHANGELOG.md) · [Français](docs/fr/CHANGELOG.md) · [हिन्दी](docs/hi/CHANGELOG.md) · [Bahasa Indonesia](docs/in/CHANGELOG.md) · [Italiano](docs/it/CHANGELOG.md) · [日本語](docs/ja/CHANGELOG.md) · [한국어](docs/ko/CHANGELOG.md) · [Nederlands](docs/nl/CHANGELOG.md) · [Polski](docs/pl/CHANGELOG.md) · [Português](docs/pt/CHANGELOG.md) · [Русский](docs/ru/CHANGELOG.md) · [Svenska](docs/sv/CHANGELOG.md) · [ไทย](docs/th/CHANGELOG.md) · [Türkçe](docs/tr/CHANGELOG.md) · [Tiếng Việt](docs/vi/CHANGELOG.md) · [中文](docs/zh/CHANGELOG.md)
+> **Languages:** English · [العربية](docs/ar/CHANGELOG.md) · [Čeština](docs/cs/CHANGELOG.md) · [Deutsch](docs/de/CHANGELOG.md) · [Español](docs/es/CHANGELOG.md) · [فارسی](docs/fa/CHANGELOG.md) · [Français](docs/fr/CHANGELOG.md) · [हिन्दी](docs/hi/CHANGELOG.md) · [Bahasa Indonesia](docs/in/CHANGELOG.md) · [Italiano](docs/it/CHANGELOG.md) · [日本語](docs/ja/CHANGELOG.md) · [한국어](docs/ko/CHANGELOG.md) · [Nederlands](docs/nl/CHANGELOG.md) · [Polski](docs/pl/CHANGELOG.md) · [Português](docs/pt/CHANGELOG.md) · [Русский](docs/ru/CHANGELOG.md) · [Svenska](docs/sv/CHANGELOG.md) · [ไทย](docs/th/CHANGELOG.md) · [Türkçe](docs/tr/CHANGELOG.md) · [Українська](docs/uk/CHANGELOG.md) · [Tiếng Việt](docs/vi/CHANGELOG.md) · [中文](docs/zh/CHANGELOG.md)
 
 ---
 
 # Changelog
 
 All notable changes to VDBackup are documented here. English only.
+
+## v1.07
+
+Reliability:
+
+- A running backup now moves itself out of the app's process group, so Android's app freezer and phantom-process killer cannot pause or kill it when you background or close the app. Unattended and scheduled backups finish reliably, building on the detached-process work from v1.05.
+
+Restore:
+
+- Restoring an app's permissions now works on custom ROMs. Revoked runtime permissions are reapplied by UID, not only by package, so LineageOS-style per-UID permission modes come back correctly. A restored app's saved network-access policy (its mobile-data and Wi-Fi allowance) is reapplied too, across both the nested and flat netpolicy.xml layouts seen on Android 16 and 17.
+
+Settings:
+
+- You can now opt in, per app, to also back up and restore its network-access policy.
+- Exporting settings, and any encrypted backup, now fails with a clear, specific message when encryption cannot run on this device, instead of a generic transfer error. The app also reports encryption availability when it loads.
+
+Interface:
+
+- Dragging the interface-scale slider in Settings no longer switches to another tab.
+
+Languages:
+
+- Added Ukrainian, bringing the interface and documentation to 22 languages.
 
 ## v1.06
 

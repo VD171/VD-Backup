@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · Español · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · Español · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Changelog
 
 Todos los cambios relevantes de VDBackup están documentados aquí. Solo en inglés.
+
+## v1.07
+
+Fiabilidad:
+
+- Una copia en curso ahora sale del grupo de procesos de la aplicación, así que el app freezer y el phantom-process killer de Android no pueden pausarla ni cerrarla cuando mandas la aplicación a segundo plano o la cierras. Las copias desatendidas y programadas terminan de forma fiable, ampliando el trabajo de proceso independiente de v1.05.
+
+Restauración:
+
+- Restaurar los permisos de una aplicación ahora funciona en ROM personalizadas. Los permisos de runtime revocados se vuelven a aplicar por UID, no solo por paquete, así que los modos de permiso por UID al estilo de LineageOS vuelven correctamente. La política de acceso a la red guardada de una aplicación restaurada (su permiso de datos móviles y Wi-Fi) también se vuelve a aplicar, tanto en el diseño anidado como en el plano de netpolicy.xml que se ven en Android 16 y 17.
+
+Configuración:
+
+- Ahora puedes optar, por aplicación, por respaldar y restaurar también su política de acceso a la red.
+- Exportar la configuración, y cualquier copia cifrada, ahora falla con un mensaje claro y específico cuando el cifrado no puede ejecutarse en este dispositivo, en lugar de un error de transferencia genérico. La aplicación también informa de la disponibilidad del cifrado al cargarse.
+
+Interfaz:
+
+- Arrastrar el control deslizante de escala de interfaz en Configuración ya no cambia a otra pestaña.
+
+Idiomas:
+
+- Se añadió el ucraniano, llevando la interfaz y la documentación a 22 idiomas.
 
 ## v1.06
 

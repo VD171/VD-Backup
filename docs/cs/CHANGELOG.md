@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · Čeština · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · Čeština · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Changelog
 
 Všechny podstatné změny ve VDBackup jsou zdokumentovány zde. Pouze anglicky.
+
+## v1.07
+
+Spolehlivost:
+
+- Probíhající záloha se nyní přesune mimo skupinu procesů aplikace, takže ji app freezer a phantom-process killer Androidu nemohou pozastavit ani ukončit, když aplikaci přepnete na pozadí nebo ji zavřete. Bezobslužné a naplánované zálohy spolehlivě doběhnou a navazují na práci s odděleným procesem z v1.05.
+
+Obnovení:
+
+- Obnovení oprávnění aplikace nyní funguje na custom ROM. Odebraná runtime oprávnění se znovu aplikují podle UID, nejen podle balíčku, takže režimy oprávnění podle UID ve stylu LineageOS se správně vrátí. Uložená zásada síťového přístupu obnovené aplikace (její povolení mobilních dat a Wi-Fi) se také znovu aplikuje, a to v obou rozvrženích netpolicy.xml, vnořeném i plochém, jaká se vyskytují na Androidu 16 a 17.
+
+Nastavení:
+
+- Nyní můžete u jednotlivých aplikací zapnout, aby se zálohovala a obnovovala i jejich zásada síťového přístupu.
+- Export nastavení a jakákoli šifrovaná záloha nyní selžou s jasnou, konkrétní zprávou, když na tomto zařízení nelze spustit šifrování, místo obecné chyby přenosu. Aplikace také po načtení hlásí dostupnost šifrování.
+
+Rozhraní:
+
+- Tažení posuvníku měřítka rozhraní v Nastavení už nepřepne na jinou kartu.
+
+Jazyky:
+
+- Přidána ukrajinština, čímž rozhraní a dokumentace dosahují 22 jazyků.
 
 ## v1.06
 

@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · Русский · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · Русский · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Журнал изменений
 
 Все значимые изменения в VDBackup документируются здесь. Только на английском.
+
+## v1.07
+
+Надёжность:
+
+- Выполняющаяся резервная копия теперь выводит себя из группы процессов приложения, так что app freezer и phantom-process killer в Android не могут приостановить или завершить её, когда вы сворачиваете или закрываете приложение. Автоматические и запланированные копии завершаются надёжно, продолжая работу над отсоединённым процессом из v1.05.
+
+Восстановление:
+
+- Восстановление разрешений приложения теперь работает на кастомных прошивках. Отозванные разрешения времени выполнения применяются заново по UID, а не только по пакету, поэтому режимы разрешений по UID в стиле LineageOS возвращаются правильно. Сохранённая политика сетевого доступа восстановленного приложения (его разрешение на мобильные данные и Wi-Fi) также применяется заново, в обоих форматах netpolicy.xml, вложенном и плоском, встречающихся на Android 16 и 17.
+
+Настройки:
+
+- Теперь можно для каждого приложения включить резервное копирование и восстановление и его политики сетевого доступа.
+- Экспорт настроек и любая зашифрованная копия теперь завершаются понятным, конкретным сообщением, когда шифрование не может работать на этом устройстве, вместо общей ошибки передачи. Приложение также сообщает о доступности шифрования при загрузке.
+
+Интерфейс:
+
+- Перетаскивание ползунка масштаба интерфейса в настройках больше не переключает на другую вкладку.
+
+Языки:
+
+- Добавлен украинский, доведя интерфейс и документацию до 22 языков.
 
 ## v1.06
 

@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · 中文
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · 中文
 
 ---
 
 # 更新日志
 
 VDBackup 的所有重要变更都记录于此。仅提供英文。
+
+## v1.07
+
+可靠性:
+
+- 正在运行的备份现在会把自身移出应用的进程组，因此当你将应用切到后台或关闭它时，Android 的 app freezer 和 phantom-process killer 无法暂停或终止它。无人值守和计划备份能可靠完成，这是在 v1.05 的分离进程工作基础上的延续。
+
+恢复:
+
+- 恢复应用的权限现在在定制 ROM 上也能工作。被撤销的运行时权限现在按 UID 而不仅仅按软件包重新应用，因此 LineageOS 式的按 UID 权限模式能正确恢复。恢复的应用已保存的网络访问策略（其移动数据和 Wi-Fi 允许设置）也会被重新应用，涵盖 Android 16 和 17 上出现的嵌套和扁平两种 netpolicy.xml 布局。
+
+设置:
+
+- 现在你可以按应用选择同时备份和恢复其网络访问策略。
+- 导出设置以及任何加密备份，现在在本设备无法运行加密时会以清晰、具体的消息失败，而不是一个笼统的传输错误。应用在加载时也会报告加密的可用性。
+
+界面:
+
+- 在设置中拖动界面缩放滑块不再切换到另一个标签页。
+
+语言:
+
+- 新增乌克兰语，使界面和文档达到 22 种语言。
 
 ## v1.06
 

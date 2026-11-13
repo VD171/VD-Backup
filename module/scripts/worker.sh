@@ -138,6 +138,45 @@ ssaid_restore() {
   audit "ssaid restored $_p old=${_old:-none} new=$_val backup=$_bkf (applies after reboot)"
 }
 
+# Per-app network policy (opt-in). Some ROMs (LineageOS and derivatives) store a per-app
+# "deny network" toggle as a <uid-policy uid=.. policy=..> entry in /data/system/netpolicy.xml
+# (ABX), keyed by uid - not an AppOp, so it is not carried by the permission/appops path
+# (issue #9). On restore the app gets a fresh uid, so the captured policy is written for the
+# NEW uid: decode the ABX, update-or-insert the uid-policy, verify a round-trip, back up the
+# live file byte-exact, then overwrite. Applies after reboot (the service caches it).
+netpolicy_restore() {   # <pkg> <user> <policy-int>
+  _p="$1"; _u="$2"; _pol="$3"
+  case "$_pol" in ''|*[!0-9]*|0) return 0 ;; esac   # nothing to restore for no/zero policy
+  _f=/data/system/netpolicy.xml; [ -f "$_f" ] || { audit "netpolicy no file $_p"; return 0; }
+  _nuid="$(stat -c %u "/data/user/$_u/$_p" 2>/dev/null)"; case "$_nuid" in ''|*[!0-9]*) audit "netpolicy no uid $_p"; return 0 ;; esac
+  _abx=no; is_abx "$_f" && _abx=yes
+  if [ "$_abx" = yes ]; then { [ -x /system/bin/abx2xml ] || [ -x "$BIN/abx2xml" ]; } || { audit "netpolicy no abx tool $_p"; return 0; }; fi
+  _x="$STATE/staging/np.$OPID.xml"; _o="$STATE/staging/np.$OPID.out"; _c="$STATE/staging/np.$OPID.chk"
+  if [ "$_abx" = yes ]; then abx_to_xml "$_f" "$_x" || { audit "netpolicy decode failed $_p"; return 0; }
+  else cp "$_f" "$_x"; fi
+  [ -s "$_x" ] || { rm -f "$_x"; audit "netpolicy empty decode $_p"; return 0; }
+  if grep -q "<uid-policy uid=\"$_nuid\"" "$_x"; then
+    sed -i -E "s@(<uid-policy uid=\"$_nuid\" policy=)\"[0-9]+\"@\1\"$_pol\"@" "$_x"   # update in place
+  elif grep -q '</policy-list>' "$_x"; then
+    sed -i "s@</policy-list>@<uid-policy uid=\"$_nuid\" policy=\"$_pol\" />\n</policy-list>@" "$_x"   # nested style: before the close tag
+  elif grep -q '<policy-list' "$_x"; then
+    # flat style (some ROMs, e.g. A17/Infinity-X): <policy-list .../> is self-closed and the
+    # <uid-policy> entries are siblings after it; add a new sibling right after that tag.
+    sed -i "s@\(<policy-list[^>]*>\)@\1\n<uid-policy uid=\"$_nuid\" policy=\"$_pol\" />@" "$_x"
+  else rm -f "$_x"; audit "netpolicy no policy-list $_p"; return 0; fi
+  if [ "$_abx" = yes ]; then xml_to_abx "$_x" "$_o" || { rm -f "$_x" "$_o"; audit "netpolicy encode failed $_p"; return 0; }
+  else cp "$_x" "$_o"; fi
+  if [ "$_abx" = yes ]; then abx_to_xml "$_o" "$_c" 2>/dev/null; else cp "$_o" "$_c"; fi
+  if ! grep -q "<uid-policy uid=\"$_nuid\" policy=\"$_pol\"" "$_c" 2>/dev/null; then
+    rm -f "$_x" "$_o" "$_c"; audit "netpolicy verify failed live untouched $_p"; return 0; fi
+  _bk="$STATE/netpolicy_backups"; mkdir -p "$_bk"; chmod 700 "$_bk" 2>/dev/null
+  _ts="$(date -u +%Y%m%dT%H%M%SZ)"; _bkf="$_bk/netpolicy_${_ts}.bak"
+  cp "$_f" "$_bkf" 2>/dev/null || { rm -f "$_x" "$_o" "$_c"; audit "netpolicy backup failed, live untouched $_p"; return 0; }
+  cat "$_o" > "$_f"
+  rm -f "$_x" "$_o" "$_c"
+  audit "netpolicy restored $_p uid=$_nuid policy=$_pol backup=$_bkf (applies after reboot)"
+}
+
 # enter the init mount namespace (correct view under Magisk)
 # NOTE the `--`: toybox nsenter permutes options and would otherwise swallow the
 # target command's flags (e.g. tar --acls, tar -t, pm --user) as its own. `--`
@@ -416,6 +455,92 @@ remap_restored() {   # <type> <target>
   esac
 }
 
+# Capture the framework state a reinstall resets (runtime permissions, AppOps, Doze
+# exemption, notification-listener + accessibility grants, disabled flag, installer) as
+# a JSON object shaped like the manifest's .permissions + .package. The Full backup
+# embeds the same fields inline in its manifest; Snapshot and Mirror write this to a
+# meta.json so restore has permission/appops parity regardless of mode (issue #9). Keep
+# the shape in sync with the manifest block and with fwstate_apply.
+fwstate_capture() {   # echoes JSON on stdout; uses $PKG $U
+  _df="$STATE/staging/fwdump.$OPID"; fw dumpsys package "$PKG" > "$_df" 2>/dev/null
+  _fperms="$(sed -n "/User $U:/,/^ *User [0-9]/p" "$_df" | sed -n '/runtime permissions:/,/^$/p' | grep 'granted=' | while IFS= read -r ln; do
+      nm="${ln%%:*}"; nm="$(printf '%s' "$nm" | tr -d ' \t')"
+      case "$ln" in *granted=true*) g=true ;; *) g=false ;; esac
+      [ -n "$nm" ] && printf '%s\t%s\n' "$nm" "$g"
+    done)"
+  _fpj="$(printf '%s\n' "$_fperms" | "$JQ" -R -s 'split("\n")|map(select(length>0)|split("\t")|{name:.[0],granted:(.[1]=="true")})')"; [ -n "$_fpj" ] || _fpj='[]'
+  _faoj="$(fw cmd appops get --user "$U" "$PKG" 2>/dev/null | "$JQ" -R -s '
+      split("\n")|map(select(test(": "))
+        |{op:(.|sub("^ +";"")|split(":")[0]), mode:(.|split(": ")[1]|split(";")[0])}
+        |select(.op|test("^[A-Z][A-Z0-9_]*$")))')"; [ -n "$_faoj" ] || _faoj='[]'
+  # uid-mode AppOps (LineageOS and similar store a revoked permission as a UID-scoped
+  # "ignore" here, which the package-scoped get above misreports; capture it cleanly and
+  # restore it at uid scope so those revocations survive a restore (issue #9).
+  _fauid="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null)"; _fauoj='[]'
+  case "$_fauid" in ''|*[!0-9]*) : ;; *)
+    _fauoj="$(fw cmd appops get --uid "$_fauid" 2>/dev/null | "$JQ" -R -s '
+      split("\n")|map(select(test("^[A-Z][A-Z0-9_]+: "))
+        |{op:(.|split(": ")[0]), mode:(.|split(": ")[1]|split(";")[0]|sub(" .*";""))}
+        |select(.mode|test("^(ignore|deny|foreground)$")))')"; [ -n "$_fauoj" ] || _fauoj='[]' ;;
+  esac
+  _fpe="$(printf '%s' "$PKG" | sed 's/\./\\./g')"
+  _fdoze=false; fw dumpsys deviceidle whitelist 2>/dev/null | grep -qE "(^|,)$_fpe(,|\$)" && _fdoze=true
+  _fnl="$(fw /system/bin/settings --user "$U" get secure enabled_notification_listeners 2>/dev/null | tr ':' '\n' | grep "^$PKG/" | "$JQ" -R -s 'split("\n")|map(select(length>0))')"; [ -n "$_fnl" ] || _fnl='[]'
+  _facc="$(fw /system/bin/settings --user "$U" get secure enabled_accessibility_services 2>/dev/null | tr ':' '\n' | grep "^$PKG/" | "$JQ" -R -s 'split("\n")|map(select(length>0))')"; [ -n "$_facc" ] || _facc='[]'
+  _fen="$(sed -n "/^ *User $U:/s/.*enabled=\([0-9]*\).*/\1/p" "$_df" | head -1)"; case "$_fen" in ''|*[!0-9]*) _fen=0 ;; esac
+  _fins="$(sed -n 's/.*installerPackageName=\([^ ]*\).*/\1/p' "$_df" | head -1)"; case "$_fins" in null|"") _fins="" ;; esac
+  rm -f "$_df"
+  "$JQ" -n --argjson perms "$_fpj" --argjson appops "$_faoj" --argjson appops_uid "$_fauoj" --argjson doze "$_fdoze" \
+    --argjson nl "$_fnl" --argjson acc "$_facc" --argjson enabled "$_fen" --arg installer "$_fins" \
+    '{permissions:{runtime:$perms, appops:$appops, appops_uid:$appops_uid, doze_whitelisted:$doze, notification_listeners:$nl, accessibility_services:$acc}, package:{enabled:$enabled, installer:$installer}}'
+}
+
+# Apply the framework state a reinstall resets, from a manifest or a snapshot/mirror
+# meta.json (same shape): runtime permissions, AppOps, Doze exemption, notification-
+# listener + accessibility grants, and the disabled flag. Shared by all three restore
+# engines so permission/appops fidelity does not depend on the backup mode (issue #9).
+fwstate_apply() {   # <json-file>; uses $PKG $U
+  _mf="$1"; [ -f "$_mf" ] || return 0
+  "$JQ" -c '.permissions.runtime[]?' "$_mf" 2>/dev/null | while IFS= read -r row; do
+    name="$(printf '%s' "$row" | "$JQ" -r '.name')"; g="$(printf '%s' "$row" | "$JQ" -r '.granted')"
+    [ -n "$name" ] && [ "$name" != null ] || continue
+    if [ "$g" = "true" ]; then fw pm grant  --user "$U" "$PKG" "$name" 2>/dev/null
+    else                        fw pm revoke --user "$U" "$PKG" "$name" 2>/dev/null; fi
+  done
+  fw cmd appops reset --user "$U" "$PKG" 2>/dev/null
+  "$JQ" -c '.permissions.appops[]?' "$_mf" 2>/dev/null | while IFS= read -r row; do
+    op="$(printf '%s' "$row" | "$JQ" -r '.op')"; mode="$(printf '%s' "$row" | "$JQ" -r '.mode')"
+    [ -n "$op" ] && [ "$op" != null ] && [ -n "$mode" ] || continue
+    fw cmd appops set --user "$U" "$PKG" "$op" "$mode" 2>/dev/null
+  done
+  # uid-mode AppOps restored at the freshly installed uid (differs per device/reinstall);
+  # this is where LineageOS-style permission revocations live, so they survive (issue #9).
+  _nuid="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null)"
+  case "$_nuid" in ''|*[!0-9]*) : ;; *)
+    "$JQ" -c '.permissions.appops_uid[]?' "$_mf" 2>/dev/null | while IFS= read -r row; do
+      op="$(printf '%s' "$row" | "$JQ" -r '.op')"; mode="$(printf '%s' "$row" | "$JQ" -r '.mode')"
+      [ -n "$op" ] && [ "$op" != null ] && [ -n "$mode" ] || continue
+      fw cmd appops set --uid "$_nuid" "$op" "$mode" 2>/dev/null
+    done ;;
+  esac
+  [ "$("$JQ" -r '.permissions.doze_whitelisted // false' "$_mf" 2>/dev/null)" = true ] && \
+    fw dumpsys deviceidle whitelist "+$PKG" >/dev/null 2>&1
+  _fw_secure_append() {   # <secure-key> <component>
+    _cur="$(fw /system/bin/settings --user "$U" get secure "$1" 2>/dev/null)"
+    case "$_cur" in null|"") _cur="" ;; esac
+    case ":$_cur:" in *":$2:"*) return 0 ;; esac
+    fw /system/bin/settings --user "$U" put secure "$1" "${_cur:+$_cur:}$2" 2>/dev/null
+  }
+  "$JQ" -r '.permissions.notification_listeners[]?' "$_mf" 2>/dev/null | while IFS= read -r _c; do
+    [ -n "$_c" ] && _fw_secure_append enabled_notification_listeners "$_c"; done
+  "$JQ" -r '.permissions.accessibility_services[]?' "$_mf" 2>/dev/null | while IFS= read -r _c; do
+    [ -n "$_c" ] && _fw_secure_append enabled_accessibility_services "$_c"; done
+  [ -n "$("$JQ" -r '.permissions.accessibility_services[0]? // empty' "$_mf" 2>/dev/null)" ] && \
+    fw /system/bin/settings --user "$U" put secure accessibility_enabled 1 2>/dev/null
+  _fren="$("$JQ" -r '.package.enabled // 0' "$_mf" 2>/dev/null)"
+  case "$_fren" in 2|3) fw pm disable-user --user "$U" "$PKG" 2>/dev/null ;; esac
+}
+
 # Encryption: age with a scrypt passphrase ($PW), so a backup decrypts on any PC
 # with just the passphrase (`age -d`) - no device keyfile needed. age reads the
 # passphrase from a controlling terminal, which a detached root process lacks, so it
@@ -431,6 +556,15 @@ dec_age() { # <infile> ; writes the decrypted plaintext of an age scrypt file to
   _dp="$STATE/staging/dec.$OPID.$$"
   printf '%s\n' "$PW" | "$SCRIPT" -qec "$AGE -d -o \"$_dp\" \"$1\"" /dev/null >/dev/null 2>&1
   cat "$_dp" 2>/dev/null; rm -f "$_dp"
+}
+# Passphrase encryption needs the bundled `age` AND a pty provider (`script`): age reads
+# the passphrase from a controlling terminal, so enc_age/dec_age run it under `script`. An
+# install whose bundled binaries are incomplete (e.g. a stale/partial module missing
+# `script`) would otherwise fail every encrypt/decrypt with a generic ERR_TRANSFER; this
+# smoke-tests both so callers report ERR_CRYPTO_UNAVAIL up front, with an actionable message.
+crypto_available() {
+  { [ -x "$AGE" ] || command -v age >/dev/null 2>&1; } || return 1
+  "$SCRIPT" -qec true /dev/null >/dev/null 2>&1   # script present AND a pty can be allocated
 }
 
 # compression (write): none | zstd[:N] | gzip | lz4. gzip is the universal
@@ -691,6 +825,11 @@ do_snapshot() {
   freeze "$PKG"
   PATHS="$(item_paths)"
   for a in $(fw pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do PATHS="$PATHS $a"; done
+  # framework state (perms/appops/grants/enabled) so Snapshot restore matches Full's
+  # permission fidelity (issue #9). Stable path, backed up with the data; restore reads
+  # it back from the restored tree.
+  SNAPMETA="$STATE/snapmeta/$PKG.json"; mkdir -p "$STATE/snapmeta"; fwstate_capture > "$SNAPMETA" 2>/dev/null
+  PATHS="$PATHS $SNAPMETA"
   prog 20 snapshot-init "$PKG"
   export RESTIC_PASSWORD_FILE="$SECRETS/creds/$DESTID.pass"
   # initialize the repo on first use
@@ -738,6 +877,14 @@ do_mirror() {
   prog 65 mirror external; echo " $ITEMS " | grep -q ' external ' && sync_one external "/data/media/$U/Android/data/$PKG" 65
   prog 78 mirror obb;      echo " $ITEMS " | grep -q ' obb '      && sync_one obb      "/data/media/$U/Android/obb/$PKG" 78
   prog 88 mirror media;    echo " $ITEMS " | grep -q ' media '    && sync_one media    "/data/media/$U/Android/media/$PKG" 88
+  # framework state (perms/appops/grants/enabled) so Mirror restore matches Full's
+  # permission fidelity (issue #9); a small meta.json beside the mirrored trees.
+  _mmeta="$STATE/staging/mmeta.$OPID.json"; fwstate_capture > "$_mmeta" 2>/dev/null
+  case "$DTYPE" in
+    local)  mkdir -p "$(remote_pfx)/$PKG" && cp "$_mmeta" "$(remote_pfx)/$PKG/meta.json" 2>/dev/null ;;
+    rclone) exec_ns "$RCLONE" --config "$SECRETS/rclone.conf" copyto "$_mmeta" "$DREMOTE:$(remote_pfx)/$PKG/meta.json" >/dev/null 2>&1 ;;
+  esac
+  rm -f "$_mmeta"
   prog 98 verify "$PKG"; audit "mirror $PKG -> ${DREMOTE:-$DPATH}"; notify backup_done "$PKG"; finish true ERR_NONE
 }
 
@@ -760,6 +907,9 @@ backup() {
   # refuse instead so the user never thinks data is encrypted when it is not.
   if { [ "$ENCDATA" = true ] || [ "$ENCAPK" = true ]; } && [ -z "$PW" ]; then
     finish false ERR_CRYPTO_PASS; return; fi
+  # refuse clearly if encryption was asked for but this install cannot run it
+  if { [ "$ENCDATA" = true ] || [ "$ENCAPK" = true ]; } && ! crypto_available; then
+    finish false ERR_CRYPTO_UNAVAIL; return; fi
   ITEMS="$(jget "$ARGS" '.items | join(" ")')"; { [ -z "$ITEMS" ] || [ "$ITEMS" = "null" ]; } && ITEMS="apk data data_de obb external media"
   # Per-app item-set override (action-mark): a marked app backs up its chosen set of
   # items in bulk, auto and scheduled runs, so those paths honor the app's intent without
@@ -979,6 +1129,15 @@ backup() {
         |{op:(.|sub("^ +";"")|split(":")[0]), mode:(.|split(": ")[1]|split(";")[0])}
         |select(.op|test("^[A-Z][A-Z0-9_]*$")))')"
   [ -n "$APPOPS_JSON" ] || APPOPS_JSON='[]'
+  # uid-mode AppOps (where LineageOS-style permission revocations live); captured cleanly
+  # per uid and restored at uid scope (issue #9). See fwstate_capture for the shared shape.
+  AUID="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null)"; APPOPS_UID_JSON='[]'
+  case "$AUID" in ''|*[!0-9]*) : ;; *)
+    APPOPS_UID_JSON="$(fw cmd appops get --uid "$AUID" 2>/dev/null | "$JQ" -R -s '
+      split("\n")|map(select(test("^[A-Z][A-Z0-9_]+: "))
+        |{op:(.|split(": ")[0]), mode:(.|split(": ")[1]|split(";")[0]|sub(" .*";""))}
+        |select(.mode|test("^(ignore|deny|foreground)$")))')"; [ -n "$APPOPS_UID_JSON" ] || APPOPS_UID_JSON='[]' ;;
+  esac
   # Extra grants that reset on reinstall (captured as state, restored like appops so an
   # automation/accessibility app works again right after restore - Swift Backup does this):
   #   - Doze battery-exemption (deviceidle whitelist)
@@ -995,6 +1154,19 @@ backup() {
     if is_abx "$SSF"; then SSTMP="$STATE/staging/ssaid-cap.$OPID.xml"; abx_to_xml "$SSF" "$SSTMP"; SSX="$(cat "$SSTMP" 2>/dev/null)"; rm -f "$SSTMP"
     else SSX="$(cat "$SSF" 2>/dev/null)"; fi
     SSAID="$(printf '%s' "$SSX" | tr '>' '\n' | grep "package=\"$PKG\"" | grep -o 'value="[0-9a-fA-F]*"' | head -1 | sed 's/value="//;s/"//')"
+  fi
+  # per-app network policy: OPT-IN only (.netpolicy arg). ROM-specific (LineageOS et al.)
+  # <uid-policy> in /data/system/netpolicy.xml; its restore rewrites a system file, so it
+  # is captured only when asked. Store the policy integer for the app's current uid.
+  NETPOL=""
+  if [ "$(jget "$ARGS" '.netpolicy')" = true ] && [ -f /data/system/netpolicy.xml ]; then
+    _npx="$STATE/staging/npcap.$OPID.xml"
+    if is_abx /data/system/netpolicy.xml; then abx_to_xml /data/system/netpolicy.xml "$_npx" 2>/dev/null; else cp /data/system/netpolicy.xml "$_npx"; fi
+    _npau="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null)"
+    case "$_npau" in ''|*[!0-9]*) : ;; *)
+      NETPOL="$(grep -o "<uid-policy uid=\"$_npau\" policy=\"[0-9]*\"" "$_npx" 2>/dev/null | grep -o 'policy="[0-9]*"' | grep -o '[0-9]*' | head -1)" ;;
+    esac
+    rm -f "$_npx"
   fi
 
   # manifest
@@ -1016,7 +1188,7 @@ backup() {
     --arg fp "$FP" --argjson sdk "${SDK:-0}" --arg abi "$abi" --arg sel "${SEL:-unknown}" \
     --argjson user "$U" --arg pkg "$PKG" --arg label "$LABEL" --arg icon "$ICON_B64" --arg vn "${VN:-}" --argjson vc "${VC:-0}" \
     --argjson issys "$ISSYS" --argjson apks "$APKS" --slurpfile items "$IFILE" \
-    --argjson perms "$PERMS_JSON" --argjson appops "$APPOPS_JSON" --arg ssaid "$SSAID" \
+    --argjson perms "$PERMS_JSON" --argjson appops "$APPOPS_JSON" --argjson appops_uid "$APPOPS_UID_JSON" --arg ssaid "$SSAID" --arg netpolicy "$NETPOL" \
     --argjson doze "$DOZE" --argjson nl "$NLJSON" --argjson acc "$ACCJSON" \
     --arg installer "$INSTALLER" --argjson enabled "$ENABLED" \
     --argjson cache "$([ "$(cfg .include_cache)" = true ] && echo true || echo false)" \
@@ -1026,7 +1198,7 @@ backup() {
       package:{name:$pkg, label:$label, icon:$icon, versionName:$vn, versionCode:$vc, isSystem:$issys,
                installer:$installer, enabled:$enabled, apk:{files:$apks}},
       preserve:{selinux:true, uid_gid:true, xattr:true, caps:true, modes:true},
-      permissions:{runtime:$perms, appops:$appops, ssaid:$ssaid,
+      permissions:{runtime:$perms, appops:$appops, appops_uid:$appops_uid, ssaid:$ssaid, netpolicy:$netpolicy,
                    doze_whitelisted:$doze, notification_listeners:$nl, accessibility_services:$acc},
       summary:{items:($items|length),
                orig_bytes:(([$items[].orig_bytes//0]|add)//0),
@@ -1090,7 +1262,8 @@ do_restore_snapshot() {
   exec_ns "$RESTIC" -r "$DREPO" restore "$SNAP" --target "$ST" \
     --include "/data/user/$U/$PKG" --include "/data/user_de/$U/$PKG" \
     --include "/data/media/$U/Android/data/$PKG" --include "/data/media/$U/Android/obb/$PKG" \
-    --include "/data/media/$U/Android/media/$PKG" --include "/data/app" >/dev/null 2>&1
+    --include "/data/media/$U/Android/media/$PKG" --include "/data/app" \
+    --include "$STATE/snapmeta/$PKG.json" >/dev/null 2>&1
   # install APKs found in the restored tree
   prog 55 installing "$PKG"
   verifier_off
@@ -1119,6 +1292,7 @@ do_restore_snapshot() {
     esac
     remap_restored "$_rt" "$dst"
   done
+  prog 90 framework "$PKG"; fwstate_apply "$ST$STATE/snapmeta/$PKG.json"
   rm -rf "$ST"
   prog 97 framework "$PKG"; audit "restore-snapshot done $PKG"; notify restore_done "$PKG"
   finish true ERR_NONE
@@ -1161,6 +1335,7 @@ do_restore_mirror() {
   restore_one external "/data/media/$U/Android/data/$PKG"
   restore_one obb      "/data/media/$U/Android/obb/$PKG"
   restore_one media    "/data/media/$U/Android/media/$PKG"
+  prog 90 framework "$PKG"; [ -f "$SRC/meta.json" ] && fwstate_apply "$SRC/meta.json"
   [ "$DTYPE" = local ] || rm -rf "$SRC"
   prog 97 framework "$PKG"; audit "restore-mirror done $PKG"; notify restore_done "$PKG"
   finish true ERR_NONE
@@ -1177,6 +1352,7 @@ restore() {
   PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
   # an encrypted backup needs the passphrase; tell the UI to prompt for it
   if ls "$REF"/*.age >/dev/null 2>&1 && [ -z "$PW" ]; then finish false ERR_CRYPTO_PASS; return; fi
+  if ls "$REF"/*.age >/dev/null 2>&1 && ! crypto_available; then finish false ERR_CRYPTO_UNAVAIL; return; fi
   # selective restore: .items limits what is restored (empty/absent = everything)
   RITEMS="$(jget "$ARGS" '.items | join(" ")')"; [ "$RITEMS" = null ] && RITEMS=""
   want_item() { [ -z "$RITEMS" ] && return 0; case " $RITEMS " in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
@@ -1359,42 +1535,12 @@ restore() {
     i=$((i+1))
   done
 
-  # restore runtime permissions / appops / ssaid (shell; dex helper for richer cases)
-  prog 90 framework "$PKG"
-  "$JQ" -c '.permissions.runtime[]?' "$M" 2>/dev/null | while IFS= read -r row; do
-    name="$(printf '%s' "$row" | "$JQ" -r '.name')"; g="$(printf '%s' "$row" | "$JQ" -r '.granted')"
-    [ -n "$name" ] && [ "$name" != null ] || continue
-    if [ "$g" = "true" ]; then fw pm grant  --user "$U" "$PKG" "$name" 2>/dev/null
-    else                        fw pm revoke --user "$U" "$PKG" "$name" 2>/dev/null; fi
-  done
-  fw cmd appops reset --user "$U" "$PKG" 2>/dev/null
-  "$JQ" -c '.permissions.appops[]?' "$M" 2>/dev/null | while IFS= read -r row; do
-    op="$(printf '%s' "$row" | "$JQ" -r '.op')"; mode="$(printf '%s' "$row" | "$JQ" -r '.mode')"
-    [ -n "$op" ] && [ "$op" != null ] && [ -n "$mode" ] || continue
-    fw cmd appops set --user "$U" "$PKG" "$op" "$mode" 2>/dev/null
-  done
-  # extra grants captured at backup: Doze battery-exemption + notification-listener +
-  # accessibility components, re-applied so automation/accessibility apps work at once.
-  [ "$("$JQ" -r '.permissions.doze_whitelisted // false' "$M" 2>/dev/null)" = true ] && \
-    fw dumpsys deviceidle whitelist "+$PKG" >/dev/null 2>&1
-  _secure_append() {   # <secure-key> <component>: append the component if not already listed
-    _cur="$(fw /system/bin/settings --user "$U" get secure "$1" 2>/dev/null)"
-    case "$_cur" in null|"") _cur="" ;; esac
-    case ":$_cur:" in *":$2:"*) return 0 ;; esac
-    fw /system/bin/settings --user "$U" put secure "$1" "${_cur:+$_cur:}$2" 2>/dev/null
-  }
-  "$JQ" -r '.permissions.notification_listeners[]?' "$M" 2>/dev/null | while IFS= read -r _c; do
-    [ -n "$_c" ] && _secure_append enabled_notification_listeners "$_c"; done
-  "$JQ" -r '.permissions.accessibility_services[]?' "$M" 2>/dev/null | while IFS= read -r _c; do
-    [ -n "$_c" ] && _secure_append enabled_accessibility_services "$_c"; done
-  [ -n "$("$JQ" -r '.permissions.accessibility_services[0]? // empty' "$M" 2>/dev/null)" ] && \
-    fw /system/bin/settings --user "$U" put secure accessibility_enabled 1 2>/dev/null
+  # restore runtime permissions / appops / Doze / listener+accessibility grants / enabled
+  # flag - shared helper so Full, Snapshot and Mirror restore identically (issue #9).
   # install-source attribution is applied at install time via install-create -i (see
   # installer_flag); pm set-installer is rejected for uid 0, so nothing to do here.
-  # enabled-state fidelity: an app disabled when it was backed up is disabled again.
-  # enabled codes: 2=disabled, 3=disabled-by-user (re-disable); others stay enabled.
-  REN="$("$JQ" -r '.package.enabled // 0' "$M" 2>/dev/null)"
-  case "$REN" in 2|3) fw pm disable-user --user "$U" "$PKG" 2>/dev/null ;; esac
+  prog 90 framework "$PKG"
+  fwstate_apply "$M"
   # deep install-source spoof (OPT-IN per-op): also forge initiatingPackageName +
   # packageSource in packages.xml so the app looks fully Play-installed. Reboot required.
   if want_item apk && [ "$(jget "$ARGS" '.deep_spoof')" = true ]; then
@@ -1410,6 +1556,14 @@ restore() {
     case "$SS" in ''|null|*[!0-9a-fA-F]*) : ;; *) ssaid_restore "$PKG" "$U" "$SS" ;; esac
   elif [ -n "$SS" ] && [ "$SS" != null ]; then
     audit "ssaid present in backup but not opted in $PKG"
+  fi
+  # per-app network policy: OPT-IN only (.netpolicy). Rewrites /data/system/netpolicy.xml
+  # for the new uid; applies after reboot. Same validate-then-overwrite discipline as ssaid.
+  NP="$("$JQ" -r '.permissions.netpolicy // empty' "$M" 2>/dev/null)"
+  if [ "$(jget "$ARGS" '.netpolicy')" = true ]; then
+    case "$NP" in ''|null|0|*[!0-9]*) : ;; *) netpolicy_restore "$PKG" "$U" "$NP" ;; esac
+  elif [ -n "$NP" ] && [ "$NP" != null ] && [ "$NP" != 0 ]; then
+    audit "netpolicy present in backup but not opted in $PKG"
   fi
   prog 97 framework "$PKG"
   audit "restore done $PKG"; notify restore_done "$PKG"
@@ -1779,6 +1933,8 @@ do_special_restore() {
   PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
   if "$JQ" -e '[.items[]?|select(.encryption=="age-scrypt")]|length>0' "$M" >/dev/null 2>&1 && [ -z "$PW" ]; then
     finish false ERR_CRYPTO_PASS; return; fi
+  if "$JQ" -e '[.items[]?|select(.encryption=="age-scrypt")]|length>0' "$M" >/dev/null 2>&1 && ! crypto_available; then
+    finish false ERR_CRYPTO_UNAVAIL; return; fi
   WANTC="$(jget "$ARGS" '.categories | join(" ")')"; [ "$WANTC" = null ] && WANTC=""
   want_cat() { [ -z "$WANTC" ] && return 0; case " $WANTC " in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
   SYSSET="$(jget "$ARGS" '.system_settings')"
@@ -1881,6 +2037,7 @@ do_path_backup() {
   PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
   ENCDATA="$(jget "$ARGS" '.encrypt_data')"; [ "$ENCDATA" = null ] && ENCDATA="$(cfg .encrypt_data)"
   if [ "$ENCDATA" = true ] && [ -z "$PW" ]; then finish false ERR_CRYPTO_PASS; return; fi
+  if [ "$ENCDATA" = true ] && ! crypto_available; then finish false ERR_CRYPTO_UNAVAIL; return; fi
   use_data_age() { [ "$ENCDATA" = true ] && [ -n "$PW" ]; }
   resolve_dest
   transport_guard full || return
@@ -1953,6 +2110,7 @@ do_path_restore() {
   case "$SRCP" in *..*) finish false ERR_BAD_PATH; return ;; esac
   { [ -n "$arc" ] && [ "$arc" != null ]; } || { finish false ERR_NO_BACKUP; return; }
   if [ "$enc" = age ] && [ -z "$PW" ]; then finish false ERR_CRYPTO_PASS; return; fi
+  if [ "$enc" = age ] && ! crypto_available; then finish false ERR_CRYPTO_UNAVAIL; return; fi
   prog 5 preparing "path"; audit "path-restore start $REF -> $SRCP"; notify restore_start "path"
   # anti-traversal: reject a tampered archive BEFORE the destructive wipe
   _renc=none; [ "$enc" = age ] && _renc=age
@@ -2036,6 +2194,7 @@ restore_batch() {
 config_export() {
   PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
   [ -n "$PW" ] || { finish false ERR_CRYPTO_PASS; return; }   # carries credentials
+  crypto_available || { finish false ERR_CRYPTO_UNAVAIL; return; }  # the export is always encrypted
   secrets_init || { finish false ERR_LOCKED; return; }        # creds/keys live on CE storage
   prog 20 exporting ""
   _xdir="/data/media/0/VDBackup/.export"; exec_ns mkdir -p "$_xdir"
@@ -2057,6 +2216,7 @@ config_import() {
   IREF="$(jget "$ARGS" '.ref')"
   { [ -n "$IREF" ] && [ -f "$IREF" ]; } || { finish false ERR_NO_REF; return; }
   [ -n "$PW" ] || { finish false ERR_CRYPTO_PASS; return; }
+  crypto_available || { finish false ERR_CRYPTO_UNAVAIL; return; }  # decrypt needs the same pty helper
   secrets_init || { finish false ERR_LOCKED; return; }        # creds/keys land on CE storage
   prog 30 importing ""
   _itmp="$STATE/staging/import.$OPID"; rm -rf "$_itmp"; mkdir -p "$_itmp"
@@ -2077,6 +2237,15 @@ config_import() {
   audit "config imported from $IREF"
   finish true ERR_NONE
 }
+
+# Detached-engine survival (issue #5): move this worker - and so every child it forks -
+# out of the manager app's cgroup into the root cgroup, where root daemons run. Android's
+# cached-app freezer (cgroup.freeze on /apps/uid_<app>) and the phantom-process killer act
+# per app cgroup, so a worker left there is paused or killed when the WebUI/manager app is
+# backgrounded or closed - the backup then stalls until it is reopened and never finishes
+# unattended. Done here, before any heavy child is forked. Best-effort: a kernel that
+# refuses the move leaves the worker where it was, no worse than before.
+echo $$ > /sys/fs/cgroup/cgroup.procs 2>/dev/null || true
 
 # mark the operation live immediately, before any (possibly slow) validation, so the
 # UI never sits on a stale "starting" while the first guard/dumpsys runs.

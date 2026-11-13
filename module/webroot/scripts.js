@@ -387,7 +387,7 @@ function startBatchRestore() {
     if (res == null) return;
     setBkSelectMode(false);
     // ONE detached op restores the whole list server-side (survives the WebUI closing).
-    var args = { refs: refs, ssaid: res.ssaid, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
+    var args = { refs: refs, ssaid: res.ssaid, netpolicy: res.netpolicy, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
     var run = function () { helper("restore-batch", args).then(function (r) { if (r && r.opid) trackOp(r.opid, { batch: true, retry: run }); }); };
     run();
   });
@@ -512,9 +512,9 @@ function startRestore(ref, pkg, items) {
     msg: I18N.t("confirm_restore", { name: pkg })
   }).then(function (res) {
     if (res == null) return;
-    var args = { ref: ref, ssaid: res.ssaid, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
+    var args = { ref: ref, ssaid: res.ssaid, netpolicy: res.netpolicy, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
     if (res.items) args.items = res.items;
-    var ctx = { restoreRef: ref, restorePkg: pkg, ssaid: res.ssaid, items: res.items, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
+    var ctx = { restoreRef: ref, restorePkg: pkg, ssaid: res.ssaid, netpolicy: res.netpolicy, items: res.items, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
     ctx.retry = function () { helper("restore", args).then(function (r) { if (r && r.opid) trackOp(r.opid, ctx); }); };
     ctx.retry();
   });
@@ -579,9 +579,11 @@ function runImport(from, entry, password, ssaid) {
 function openOpModal(o) {
   return new Promise(function (resolve) {
     var modal = $("#pw-modal"), input = $("#pw-input"), errBox = $("#pw-err"), ssaid = $("#pw-ssaid");
+    var appnet = $("#pw-app-netpolicy");
     var okBtn = $("#pw-ok"), ackRow = $("#pw-overwrite-row"), ack = $("#pw-overwrite");
     var ssaidRow = $("#pw-ssaid-row"); ssaidRow.hidden = (o.allowSsaid === false);   // hide for flows where SSAID is irrelevant (e.g. settings backup)
-    input.value = ""; ssaid.checked = false; input.hidden = !o.needPassword;
+    var appnetRow = $("#pw-app-netpolicy-row"); appnetRow.hidden = (o.allowSsaid === false);   // same gating: system-file opt-ins are irrelevant for settings backup
+    input.value = ""; ssaid.checked = false; appnet.checked = false; input.hidden = !o.needPassword;
     errBox.textContent = (o.needPassword && o.retry) ? I18N.t("msg_import_password_wrong") : "";
     $("#pw-title").textContent = I18N.t(o.titleKey || "ui_import_password");
     $("#pw-msg").textContent = o.msg || "";
@@ -616,14 +618,14 @@ function openOpModal(o) {
     if (o.needPassword) setTimeout(function () { input.focus(); }, 0);
     function cleanup() {
       input.value = ""; errBox.textContent = ""; modal.hidden = true; input.hidden = false;
-      okBtn.disabled = false; ackRow.hidden = true; ack.onchange = null; itemsBox.hidden = true; itemsBox.innerHTML = ""; ssaidRow.hidden = false;
+      okBtn.disabled = false; ackRow.hidden = true; ack.onchange = null; itemsBox.hidden = true; itemsBox.innerHTML = ""; ssaidRow.hidden = false; appnetRow.hidden = false;
       testRow.hidden = true; test.onchange = null; spoofRow.hidden = true;
       deepRow.hidden = true; deep.disabled = false; spoof.onchange = null;
       okBtn.onclick = null; $("#pw-cancel").onclick = null; input.onkeydown = null;
     }
     function submit() {
       if (okBtn.disabled) return;
-      var r = { password: o.needPassword ? input.value : null, ssaid: ssaid.checked };
+      var r = { password: o.needPassword ? input.value : null, ssaid: ssaid.checked, netpolicy: appnet.checked };
       if (o.allowTest) r.test = test.checked;
       if (o.allowSpoof) { r.spoof_installer = spoof.checked; r.deep_spoof = deep.checked; }
       if (o.items && o.items.length) {
@@ -1137,7 +1139,7 @@ function backupArgs(pkg, res, manual) {
   var args = {
     package: pkg, user: activeUser,
     mode: CFG.default_mode || "full", dest: res.dest || CFG.default_dest || "local",
-    items: res.items, ssaid: !!CFG.ssaid, verify: res.verify, dry_run: res.dry_run
+    items: res.items, ssaid: !!CFG.ssaid, netpolicy: !!CFG.app_netpolicy, verify: res.verify, dry_run: res.dry_run
   };
   if (manual) args.manual = true;   // single interactive backup: keep the user's exact ticks (skip per-app override)
   if (res.password) args.password = res.password;
@@ -1265,7 +1267,7 @@ function trackOp(opid, ctx) {
           openOpModal({ needPassword: true, titleKey: "restore", confirmKey: "restore",
                         msg: I18N.t("msg_restore_passphrase", { name: ctx.restorePkg }) }).then(function (res) {
             if (res == null) return;
-            helper("restore", { ref: ctx.restoreRef, ssaid: ctx.ssaid, items: ctx.items, test: ctx.test, spoof_installer: ctx.spoof_installer, deep_spoof: ctx.deep_spoof, password: res.password }).then(function (r) {
+            helper("restore", { ref: ctx.restoreRef, ssaid: ctx.ssaid, netpolicy: ctx.netpolicy, items: ctx.items, test: ctx.test, spoof_installer: ctx.spoof_installer, deep_spoof: ctx.deep_spoof, password: res.password }).then(function (r) {
               if (r && r.opid) trackOp(r.opid, ctx);
             });
           });
@@ -1545,9 +1547,9 @@ function setupSwipe() {
   function order() { return Array.prototype.map.call(document.querySelectorAll(".tab"), function (t) { return t.dataset.tab; }); }
   document.addEventListener("touchstart", function (e) {
     if (e.touches.length !== 1) { x0 = null; return; }
-    // a horizontally scrollable strip (the tab bar, the accent swatches) handles its own
-    // sideways drag; starting a gesture there must not also flip tabs.
-    if (e.target.closest && e.target.closest(".tabs, .swatches, [data-noswipe]")) { x0 = null; return; }
+    // a sideways-dragging control (the tab bar, the accent swatches, a range slider
+    // like the interface scale) owns its own horizontal drag; it must not also flip tabs.
+    if (e.target.closest && e.target.closest(".tabs, .swatches, input[type=range], [data-noswipe]")) { x0 = null; return; }
     x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now(); moved = false;
   }, { passive: true });
   document.addEventListener("touchmove", function () { moved = true; }, { passive: true });
@@ -1576,7 +1578,7 @@ var LANG_ENDONYM = {
   ar: "العربية", cs: "Čeština", de: "Deutsch", en: "English", es: "Español",
   fa: "فارسی", fr: "Français", hi: "हिन्दी", in: "Bahasa Indonesia", it: "Italiano",
   ja: "日本語", ko: "한국어", nl: "Nederlands", pl: "Polski", pt: "Português",
-  ru: "Русский", sv: "Svenska", th: "ไทย", tr: "Türkçe", vi: "Tiếng Việt", zh: "中文"
+  ru: "Русский", sv: "Svenska", th: "ไทย", tr: "Türkçe", uk: "Українська", vi: "Tiếng Việt", zh: "中文"
 };
 function currentUiLang() {
   var c = CFG.language;
@@ -1621,6 +1623,7 @@ function loadSettings() {
   if ($("#set-enc-data")) $("#set-enc-data").checked = !!CFG.encrypt_data;
   if ($("#set-enc-apk"))  $("#set-enc-apk").checked = !!CFG.encrypt_apk;
   if ($("#set-ssaid"))    $("#set-ssaid").checked = !!CFG.ssaid;
+  if ($("#set-app-netpolicy")) $("#set-app-netpolicy").checked = !!CFG.app_netpolicy;
   if ($("#set-mode"))     $("#set-mode").value = CFG.default_mode || "full";
   if ($("#set-netpolicy")) $("#set-netpolicy").value = CFG.network_policy || "any";
   if ($("#set-auto"))     $("#set-auto").checked = !!CFG.auto_backup;
@@ -1644,6 +1647,7 @@ function saveSettings() {
   CFG.encrypt_data = $("#set-enc-data").checked;
   CFG.encrypt_apk = $("#set-enc-apk").checked;
   CFG.ssaid = $("#set-ssaid").checked;
+  CFG.app_netpolicy = $("#set-app-netpolicy").checked;
   CFG.default_mode = $("#set-mode").value;
   CFG.default_dest = $("#set-dest").value;
   if ($("#set-netpolicy")) CFG.network_policy = $("#set-netpolicy").value;

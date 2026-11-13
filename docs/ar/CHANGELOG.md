@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · العربية · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · العربية · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # سجل التغييرات
 
 جميع التغييرات المهمة في VDBackup موثقة هنا. بالإنجليزية فقط.
+
+## v1.07
+
+الموثوقية:
+
+- النسخة الاحتياطية الجارية تنتقل الآن خارج مجموعة عمليات التطبيق، فلا يستطيع app freezer وphantom-process killer في Android إيقافها مؤقتًا أو إنهاءها عندما تنقل التطبيق إلى الخلفية أو تغلقه. تكتمل النسخ الاحتياطية غير المراقَبة والمجدولة بشكل موثوق، بناءً على عمل العملية المنفصلة من v1.05.
+
+الاستعادة:
+
+- استعادة أذونات تطبيق تعمل الآن على نسخ ROM المخصصة. تُعاد الأذونات أثناء التشغيل الملغاة حسب UID، لا حسب الحزمة فقط، فتعود أوضاع الأذونات حسب UID بنمط LineageOS بشكل صحيح. كما تُعاد سياسة الوصول إلى الشبكة المحفوظة لتطبيق مُستعاد (سماحها ببيانات الجوال وWi-Fi)، عبر كلا تخطيطَي netpolicy.xml المتداخل والمسطّح الظاهرين على Android 16 و17.
+
+الإعدادات:
+
+- يمكنك الآن اختيار، لكل تطبيق، النسخ الاحتياطي لسياسة الوصول إلى الشبكة الخاصة به واستعادتها أيضًا.
+- تصدير الإعدادات، وأي نسخة احتياطية مشفَّرة، يفشل الآن برسالة واضحة ومحددة عندما يتعذّر تشغيل التشفير على هذا الجهاز، بدلًا من خطأ نقل عام. كما يُبلِّغ التطبيق عن توفر التشفير عند تحميله.
+
+الواجهة:
+
+- سحب شريط تمرير مقياس الواجهة في الإعدادات لم يعد ينتقل إلى تبويب آخر.
+
+اللغات:
+
+- أُضيفت الأوكرانية، لتصل الواجهة والتوثيق إلى 22 لغة.
 
 ## v1.06
 

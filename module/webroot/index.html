@@ -381,6 +381,15 @@
         <div class="notice-msg" data-i18n="msg_ssaid_warning">This backs up and, on restore, rewrites the device ID (SSAID / ANDROID_ID). It is optional and off by default. A restored value only takes effect after a reboot, and the previous value is always saved first so it can be rolled back.</div>
       </div>
 
+      <div class="notice warn">
+        <label class="notice-toggle">
+          <input type="checkbox" class="switch" id="set-app-netpolicy">
+          <span data-i18n="ui_app_netpolicy_label">Include per-app network policy</span>
+          <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
+        </label>
+        <div class="notice-msg" data-i18n="msg_app_netpolicy_warning">This backs up and, on restore, re-applies each app's per-app network policy (such as a ROM's deny-network toggle), stored in the system network-policy file. It is optional and off by default. A restored policy only takes effect after a reboot, and the previous file is always saved first so it can be rolled back.</div>
+      </div>
+
       <button id="set-save" class="btn go block" data-i18n="save">Save</button>
       <div id="set-status" class="muted"></div>
 
@@ -567,6 +576,14 @@
           <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
         </label>
         <div class="notice-msg" data-i18n="msg_ssaid_warning">This backs up and, on restore, rewrites the device ID (SSAID / ANDROID_ID). It is optional and off by default. A restored value only takes effect after a reboot, and the previous value is always saved first so it can be rolled back.</div>
+      </div>
+      <div class="notice warn" id="pw-app-netpolicy-row">
+        <label class="notice-toggle">
+          <input type="checkbox" class="switch" id="pw-app-netpolicy">
+          <span data-i18n="ui_app_netpolicy_label">Include per-app network policy</span>
+          <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
+        </label>
+        <div class="notice-msg" data-i18n="msg_app_netpolicy_warning">This backs up and, on restore, re-applies each app's per-app network policy (such as a ROM's deny-network toggle), stored in the system network-policy file. It is optional and off by default. A restored policy only takes effect after a reboot, and the previous file is always saved first so it can be rolled back.</div>
       </div>
       <div class="checks" id="pw-test-row" hidden>
         <label><input type="checkbox" class="switch" id="pw-test"><span data-i18n="ui_restore_test">Test only (extract, do not touch the live app)</span></label>

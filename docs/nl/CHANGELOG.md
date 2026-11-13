@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · Nederlands · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · Nederlands · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Changelog
 
 Alle noemenswaardige wijzigingen aan VDBackup worden hier gedocumenteerd. Alleen in het Engels.
+
+## v1.07
+
+Betrouwbaarheid:
+
+- Een lopende back-up haalt zichzelf nu uit de procesgroep van de app, zodat de app freezer en phantom-process killer van Android hem niet kunnen pauzeren of beëindigen wanneer je de app naar de achtergrond stuurt of sluit. Onbeheerde en geplande back-ups voltooien betrouwbaar en bouwen voort op het losgekoppelde-proceswerk uit v1.05.
+
+Herstel:
+
+- Het herstellen van de machtigingen van een app werkt nu op custom ROM's. Ingetrokken runtime-machtigingen worden opnieuw toegepast per UID, niet alleen per pakket, zodat per-UID-machtigingsmodi in LineageOS-stijl correct terugkomen. Het opgeslagen netwerktoegangsbeleid van een hersteld app (de toestemming voor mobiele data en Wi-Fi) wordt ook opnieuw toegepast, in zowel de geneste als de platte netpolicy.xml-indeling die op Android 16 en 17 voorkomen.
+
+Instellingen:
+
+- Je kunt nu per app kiezen om ook het netwerktoegangsbeleid ervan te back-uppen en te herstellen.
+- Het exporteren van instellingen, en elke versleutelde back-up, mislukt nu met een duidelijke, specifieke melding wanneer versleuteling op dit apparaat niet kan draaien, in plaats van een algemene overdrachtsfout. De app meldt ook de beschikbaarheid van versleuteling bij het laden.
+
+Interface:
+
+- De schuifregelaar voor de interfaceschaal in Instellingen slepen schakelt niet meer over naar een ander tabblad.
+
+Talen:
+
+- Oekraïens toegevoegd, waarmee de interface en documentatie op 22 talen komen.
 
 ## v1.06
 

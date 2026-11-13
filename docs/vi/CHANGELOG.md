@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · Tiếng Việt · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · Tiếng Việt · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Nhật ký thay đổi
 
 Mọi thay đổi đáng chú ý của VDBackup được ghi lại ở đây. Chỉ bằng tiếng Anh.
+
+## v1.07
+
+Độ tin cậy:
+
+- Một bản sao lưu đang chạy giờ tự di chuyển ra khỏi nhóm tiến trình của ứng dụng, nên app freezer và phantom-process killer của Android không thể tạm dừng hay kết thúc nó khi bạn đưa ứng dụng xuống nền hoặc đóng ứng dụng. Các bản sao lưu không giám sát và theo lịch hoàn tất một cách đáng tin cậy, kế thừa phần tiến trình tách rời từ v1.05.
+
+Khôi phục:
+
+- Khôi phục quyền của một ứng dụng giờ hoạt động trên các ROM tùy chỉnh. Các quyền thời gian chạy bị thu hồi được áp dụng lại theo UID, không chỉ theo gói, nên các chế độ quyền theo UID kiểu LineageOS quay lại đúng. Chính sách truy cập mạng đã lưu của một ứng dụng được khôi phục (quyền dùng dữ liệu di động và Wi-Fi của nó) cũng được áp dụng lại, trên cả hai bố cục netpolicy.xml lồng nhau và phẳng thấy trên Android 16 và 17.
+
+Cài đặt:
+
+- Giờ bạn có thể chọn theo từng ứng dụng để cũng sao lưu và khôi phục chính sách truy cập mạng của nó.
+- Việc xuất cài đặt, và mọi bản sao lưu được mã hóa, giờ sẽ thất bại với một thông báo rõ ràng, cụ thể khi không thể chạy mã hóa trên thiết bị này, thay vì một lỗi truyền chung chung. Ứng dụng cũng báo cáo khả năng dùng mã hóa khi nó tải.
+
+Giao diện:
+
+- Kéo thanh trượt tỷ lệ giao diện trong Cài đặt không còn chuyển sang thẻ khác nữa.
+
+Ngôn ngữ:
+
+- Đã thêm tiếng Ukraina, đưa giao diện và tài liệu lên 22 ngôn ngữ.
 
 ## v1.06
 

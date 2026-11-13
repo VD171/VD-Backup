@@ -295,7 +295,13 @@ verb="$1"; ARGS_B64="$2"
 case "$verb" in
 
   ping)
-    ok "\"version\":\"$(sed -n 's/^version=//p' "$MODDIR/module.prop")\",\"abi\":\"$abi\"" ;;
+    # crypto_ok: passphrase encryption needs the bundled `age` AND a pty helper (`script`).
+    # A stale/partial install missing `script` cannot encrypt or decrypt; surface that at
+    # load so the UI can warn before the user tries, instead of a late generic failure.
+    _cok=false
+    { [ -x "$BIN/age" ] || command -v age >/dev/null 2>&1; } \
+      && { [ -x "$BIN/script" ] || command -v script >/dev/null 2>&1; } && _cok=true
+    ok "\"version\":\"$(sed -n 's/^version=//p' "$MODDIR/module.prop")\",\"abi\":\"$abi\",\"crypto_ok\":$_cok" ;;
 
   log-prune)
     log_prune; ok '"pruned":true' ;;

@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · Polski · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · Polski · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Changelog
 
 Wszystkie istotne zmiany w VDBackup są udokumentowane tutaj. Tylko po angielsku.
+
+## v1.07
+
+Niezawodność:
+
+- Trwająca kopia zapasowa przenosi się teraz poza grupę procesów aplikacji, więc app freezer i phantom-process killer Androida nie mogą jej wstrzymać ani zakończyć, gdy przeniesiesz aplikację w tło lub ją zamkniesz. Kopie bez nadzoru i zaplanowane kończą się niezawodnie, rozwijając pracę nad odłączonym procesem z v1.05.
+
+Przywracanie:
+
+- Przywracanie uprawnień aplikacji działa teraz na niestandardowych ROM-ach. Cofnięte uprawnienia runtime są ponownie stosowane według UID, a nie tylko według pakietu, więc tryby uprawnień na UID w stylu LineageOS wracają poprawnie. Zapisana polityka dostępu do sieci przywróconej aplikacji (jej zezwolenie na dane mobilne i Wi-Fi) również jest stosowana ponownie, w obu układach netpolicy.xml, zagnieżdżonym i płaskim, spotykanych na Androidzie 16 i 17.
+
+Ustawienia:
+
+- Możesz teraz dla każdej aplikacji włączyć również tworzenie kopii i przywracanie jej polityki dostępu do sieci.
+- Eksport ustawień oraz każda zaszyfrowana kopia kończą się teraz czytelnym, konkretnym komunikatem, gdy na tym urządzeniu nie można uruchomić szyfrowania, zamiast ogólnego błędu transferu. Aplikacja zgłasza też dostępność szyfrowania przy wczytaniu.
+
+Interfejs:
+
+- Przeciąganie suwaka skali interfejsu w Ustawieniach nie przełącza już na inną kartę.
+
+Języki:
+
+- Dodano ukraiński, co podnosi liczbę języków interfejsu i dokumentacji do 22.
 
 ## v1.06
 

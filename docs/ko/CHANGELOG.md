@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · 한국어 · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · 한국어 · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # 변경 이력
 
 VDBackup의 모든 주요 변경 사항은 여기에 기록됩니다. 영어로만 작성됩니다.
+
+## v1.07
+
+안정성:
+
+- 실행 중인 백업이 이제 앱의 프로세스 그룹에서 스스로 벗어나므로, 앱을 백그라운드로 보내거나 닫아도 Android의 app freezer와 phantom-process killer가 백업을 일시 중지하거나 종료할 수 없습니다. 무인 백업과 예약 백업이 안정적으로 완료되며, v1.05의 분리된 프로세스 작업을 이어갑니다.
+
+복원:
+
+- 앱 권한 복원이 이제 커스텀 ROM에서 작동합니다. 취소된 런타임 권한이 패키지뿐 아니라 UID 단위로 다시 적용되어, LineageOS 방식의 UID별 권한 모드가 올바르게 돌아옵니다. 복원된 앱의 저장된 네트워크 접근 정책(모바일 데이터와 Wi-Fi 허용)도 다시 적용되며, Android 16과 17에서 보이는 중첩형과 평면형 netpolicy.xml 레이아웃 모두에 대응합니다.
+
+설정:
+
+- 이제 앱별로 해당 앱의 네트워크 접근 정책도 백업하고 복원하도록 선택할 수 있습니다.
+- 설정 내보내기와 모든 암호화 백업은 이제 이 기기에서 암호화를 실행할 수 없을 때 일반적인 전송 오류 대신 명확하고 구체적인 메시지와 함께 실패합니다. 앱은 로드될 때 암호화 사용 가능 여부도 보고합니다.
+
+인터페이스:
+
+- 설정에서 인터페이스 스케일 슬라이더를 드래그해도 더 이상 다른 탭으로 전환되지 않습니다.
+
+언어:
+
+- 우크라이나어를 추가하여 인터페이스와 문서가 22개 언어가 되었습니다.
 
 ## v1.06
 

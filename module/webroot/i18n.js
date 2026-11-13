@@ -23,7 +23,7 @@
  */
 window.I18N = (function () {
   var AVAILABLE = ["en","ar","cs","de","es","fa","fr","hi","in","it","ja",
-                   "ko","nl","pl","pt","ru","sv","th","tr","vi","zh"];
+                   "ko","nl","pl","pt","ru","sv","th","tr","uk","vi","zh"];
   var EN = window.__I18N_EN || {};
   var strings = Object.assign({}, EN);
 

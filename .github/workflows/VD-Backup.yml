@@ -216,6 +216,9 @@ jobs:
           # not in the tree. Restore the placeholder before the blanket artifact commit so
           # "git commit -am" cannot sweep the real id onto the public branch.
           git checkout -- companion/app/src/main/res/values/oauth.xml 2>/dev/null || true
+          # Stage NEW screenshot dirs too (git commit -am only catches tracked files): a newly
+          # added language, e.g. uk, has an untracked docs/screenshots/<lang>/ that -am would miss.
+          git add docs/screenshots 2>/dev/null || true
           git commit -am "Release ${{ steps.v.outputs.name }} (assets, screenshots, update.json)" || true
           git push || true
 

@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · Türkçe · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · Türkçe · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Değişiklik Günlüğü
 
 VDBackup'taki tüm kayda değer değişiklikler burada belgelenir. Yalnızca İngilizce.
+
+## v1.07
+
+Güvenilirlik:
+
+- Çalışan bir yedek artık kendini uygulamanın işlem grubunun dışına taşıyor; böylece uygulamayı arka plana aldığınızda veya kapattığınızda Android'in app freezer'ı ve phantom-process killer'ı onu duraklatamıyor ya da sonlandıramıyor. Gözetimsiz ve zamanlanmış yedekler güvenilir biçimde tamamlanır; bu, v1.05'teki ayrık işlem çalışmasının üzerine kuruludur.
+
+Geri yükleme:
+
+- Bir uygulamanın izinlerini geri yüklemek artık özel ROM'larda çalışıyor. İptal edilmiş çalışma zamanı izinleri yalnızca pakete göre değil, UID'ye göre yeniden uygulanır; böylece LineageOS tarzı UID başına izin modları doğru şekilde geri gelir. Geri yüklenen bir uygulamanın kaydedilmiş ağ erişim ilkesi (mobil veri ve Wi-Fi izni) de yeniden uygulanır; hem Android 16 hem de 17'de görülen iç içe ve düz netpolicy.xml düzenlerinde.
+
+Ayarlar:
+
+- Artık uygulama bazında, uygulamanın ağ erişim ilkesini de yedeklemeyi ve geri yüklemeyi seçebilirsiniz.
+- Ayarları dışa aktarma ve herhangi bir şifreli yedek, bu cihazda şifreleme çalıştırılamadığında artık genel bir aktarım hatası yerine açık ve belirli bir mesajla başarısız oluyor. Uygulama ayrıca yüklenirken şifrelemenin kullanılabilirliğini bildirir.
+
+Arayüz:
+
+- Ayarlar'da arayüz ölçeği kaydırıcısını sürüklemek artık başka bir sekmeye geçmiyor.
+
+Diller:
+
+- Ukraynaca eklendi; böylece arayüz ve belgeler 22 dile ulaştı.
 
 ## v1.06
 

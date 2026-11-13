@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · 日本語 · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · 日本語 · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Changelog
 
 VDBackup のすべての重要な変更はここに記録されます。英語のみ。
+
+## v1.07
+
+信頼性:
+
+- 実行中のバックアップはアプリのプロセスグループから自身を切り離すようになり、アプリをバックグラウンドにしたり閉じたりしても、Android の app freezer や phantom-process killer が一時停止させたり終了させたりできなくなりました。無人バックアップやスケジュールバックアップが確実に完了し、v1.05 の切り離しプロセスの取り組みを引き継ぎます。
+
+復元:
+
+- アプリの権限の復元がカスタム ROM でも動作するようになりました。取り消されたランタイム権限はパッケージ単位だけでなく UID 単位で再適用されるため、LineageOS 系の UID ごとの権限モードが正しく戻ります。復元したアプリの保存済みネットワークアクセスポリシー（モバイルデータと Wi-Fi の許可）も再適用され、Android 16 と 17 で見られる入れ子型とフラット型の両方の netpolicy.xml レイアウトに対応します。
+
+設定:
+
+- アプリごとに、そのネットワークアクセスポリシーもバックアップ・復元するよう選べるようになりました。
+- 設定のエクスポート、および暗号化バックアップは、この端末で暗号化を実行できない場合、汎用の転送エラーではなく、明確で具体的なメッセージで失敗するようになりました。アプリは読み込み時に暗号化の利用可否も報告します。
+
+インターフェース:
+
+- 設定でインターフェーススケールのスライダーをドラッグしても、別のタブに切り替わらなくなりました。
+
+言語:
+
+- ウクライナ語を追加し、インターフェースとドキュメントが 22 言語になりました。
 
 ## v1.06
 

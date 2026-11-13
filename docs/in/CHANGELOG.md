@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · Bahasa Indonesia · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · Bahasa Indonesia · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · [ไทย](../th/CHANGELOG.md) · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Changelog
 
 Semua perubahan penting pada VDBackup didokumentasikan di sini. Hanya dalam bahasa Inggris.
+
+## v1.07
+
+Keandalan:
+
+- Pencadangan yang sedang berjalan kini memindahkan dirinya keluar dari grup proses aplikasi, sehingga app freezer dan phantom-process killer milik Android tidak dapat menjeda atau menghentikannya saat Anda memindahkan aplikasi ke latar belakang atau menutupnya. Pencadangan tanpa pengawasan dan terjadwal selesai dengan andal, melanjutkan kerja proses terpisah dari v1.05.
+
+Pemulihan:
+
+- Memulihkan izin sebuah aplikasi kini berfungsi pada ROM kustom. Izin runtime yang dicabut diterapkan ulang menurut UID, bukan hanya menurut paket, sehingga mode izin per-UID bergaya LineageOS kembali dengan benar. Kebijakan akses jaringan tersimpan dari aplikasi yang dipulihkan (izin data seluler dan Wi-Fi-nya) juga diterapkan ulang, pada kedua tata letak netpolicy.xml, bersarang maupun datar, yang terlihat di Android 16 dan 17.
+
+Pengaturan:
+
+- Kini Anda dapat memilih, per aplikasi, untuk turut mencadangkan dan memulihkan kebijakan akses jaringannya.
+- Mengekspor pengaturan, dan setiap cadangan terenkripsi, kini gagal dengan pesan yang jelas dan spesifik saat enkripsi tidak dapat dijalankan di perangkat ini, alih-alih galat transfer umum. Aplikasi juga melaporkan ketersediaan enkripsi saat dimuat.
+
+Antarmuka:
+
+- Menyeret penggeser skala antarmuka di Pengaturan tidak lagi beralih ke tab lain.
+
+Bahasa:
+
+- Menambahkan bahasa Ukraina, membawa antarmuka dan dokumentasi ke 22 bahasa.
 
 ## v1.06
 

@@ -1,10 +1,33 @@
-> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · ไทย · [Türkçe](../tr/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
+> **Languages:** [English](../../CHANGELOG.md) · [العربية](../ar/CHANGELOG.md) · [Čeština](../cs/CHANGELOG.md) · [Deutsch](../de/CHANGELOG.md) · [Español](../es/CHANGELOG.md) · [فارسی](../fa/CHANGELOG.md) · [Français](../fr/CHANGELOG.md) · [हिन्दी](../hi/CHANGELOG.md) · [Bahasa Indonesia](../in/CHANGELOG.md) · [Italiano](../it/CHANGELOG.md) · [日本語](../ja/CHANGELOG.md) · [한국어](../ko/CHANGELOG.md) · [Nederlands](../nl/CHANGELOG.md) · [Polski](../pl/CHANGELOG.md) · [Português](../pt/CHANGELOG.md) · [Русский](../ru/CHANGELOG.md) · [Svenska](../sv/CHANGELOG.md) · ไทย · [Türkçe](../tr/CHANGELOG.md) · [Українська](../uk/CHANGELOG.md) · [Tiếng Việt](../vi/CHANGELOG.md) · [中文](../zh/CHANGELOG.md)
 
 ---
 
 # Changelog
 
 การเปลี่ยนแปลงสำคัญทั้งหมดของ VDBackup ถูกบันทึกไว้ที่นี่ เป็นภาษาอังกฤษเท่านั้น
+
+## v1.07
+
+ความน่าเชื่อถือ:
+
+- การสำรองข้อมูลที่กำลังทำงานตอนนี้จะย้ายตัวเองออกจากกลุ่มกระบวนการของแอป ดังนั้น app freezer และ phantom-process killer ของ Android จึงไม่สามารถหยุดชั่วคราวหรือปิดมันได้เมื่อคุณย้ายแอปไปทำงานเบื้องหลังหรือปิดแอป การสำรองข้อมูลแบบไม่มีคนดูแลและตามกำหนดเวลาจะเสร็จสมบูรณ์อย่างน่าเชื่อถือ ต่อยอดจากงานกระบวนการที่แยกออกมาใน v1.05
+
+การกู้คืน:
+
+- การกู้คืนสิทธิ์ของแอปตอนนี้ทำงานได้บน ROM ที่ปรับแต่งเอง สิทธิ์รันไทม์ที่ถูกเพิกถอนจะถูกใช้ใหม่ตาม UID ไม่ใช่แค่ตามแพ็กเกจ ดังนั้นโหมดสิทธิ์ต่อ UID แบบ LineageOS จึงกลับคืนมาอย่างถูกต้อง นโยบายการเข้าถึงเครือข่ายที่บันทึกไว้ของแอปที่กู้คืน (การอนุญาตข้อมูลมือถือและ Wi-Fi) ก็ถูกใช้ใหม่ด้วย ทั้งในเลย์เอาต์ netpolicy.xml แบบซ้อนและแบบแบนที่พบบน Android 16 และ 17
+
+การตั้งค่า:
+
+- ตอนนี้คุณสามารถเลือกเป็นรายแอปให้สำรองและกู้คืนนโยบายการเข้าถึงเครือข่ายของแอปนั้นด้วยได้
+- การส่งออกการตั้งค่า และข้อมูลสำรองที่เข้ารหัสใด ๆ ตอนนี้จะล้มเหลวพร้อมข้อความที่ชัดเจนและเฉพาะเจาะจงเมื่อไม่สามารถเรียกใช้การเข้ารหัสบนอุปกรณ์นี้ได้ แทนที่จะเป็นข้อผิดพลาดการถ่ายโอนทั่วไป แอปยังรายงานความพร้อมใช้งานของการเข้ารหัสเมื่อโหลดด้วย
+
+อินเทอร์เฟซ:
+
+- การลากแถบเลื่อนสเกลอินเทอร์เฟซในการตั้งค่าจะไม่สลับไปยังแท็บอื่นอีกต่อไป
+
+ภาษา:
+
+- เพิ่มภาษายูเครน ทำให้อินเทอร์เฟซและเอกสารมีทั้งหมด 22 ภาษา
 
 ## v1.06
 

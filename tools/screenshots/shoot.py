@@ -24,7 +24,7 @@
 #  WebUI screenshot harness. Renders the real module/webroot WebUI in a
 #  headless Chrome under a mocked `ksu.exec` bridge that answers every
 #  helper.sh verb with fictional, privacy-safe fixtures (NEVER real device
-#  data), then captures the six documented screens in each of the 21
+#  data), then captures the six documented screens in each of the 22
 #  languages (dark theme, 412x915 @ 3x). Output: docs/screenshots/<lang>/.
 #
 #  Why this lives in the repo:
@@ -37,7 +37,7 @@
 #     UI starts calling a new one.
 #
 #  Usage:
-#     python3 tools/screenshots/shoot.py            # all 21 languages
+#     python3 tools/screenshots/shoot.py            # all 22 languages
 #     python3 tools/screenshots/shoot.py pt en ar   # only the given codes
 #  Requires: python3-playwright + a system Google Chrome/Chromium.
 # ======================================================================
@@ -56,7 +56,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 WEBROOT = os.path.join(ROOT, "module", "webroot")
 OUTDIR = os.path.join(ROOT, "docs", "screenshots")
 LANGS = ["ar", "cs", "de", "en", "es", "fa", "fr", "hi", "in", "it", "ja",
-         "ko", "nl", "pl", "pt", "ru", "sv", "th", "tr", "vi", "zh"]
+         "ko", "nl", "pl", "pt", "ru", "sv", "th", "tr", "uk", "vi", "zh"]
 # (tab to switch to, scroll target, output basename)
 SCREENS = [
     ("apps", "top", "home"),
