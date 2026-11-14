@@ -14,9 +14,9 @@
   Source         : https://github.com/VD171/VD-Backup
   GitHub         : @VD171 https://github.com/VD171
   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
-  XDA-Thread     : https://xdaforums.com/t/VD-Backup.4807267/
+  XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
-  Telegram       : @Priv8_VD https://t.me/Priv8_VD
+  Channel        : @Priv8_VD https://t.me/Priv8_VD
   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
   E-mail         : vd.priv8@pm.me
  ======================================================================
@@ -59,7 +59,7 @@ step with the UI:
 - the mock data is declared once in `build_fixtures()` in `shoot.py`; when the UI starts
   calling a new `helper.sh` verb, add it there.
 
-`tools/` is outside `module/`, so it is never copied into the flashed module zip - it
+`tools/` is outside `module/`, so it is never copied into the flashed module zip; it
 ships only to the dev remote, never to end users.
 
 ## Rules (match the project)
@@ -67,7 +67,7 @@ ships only to the dev remote, never to end users.
 - **Mock only, never a real device.** The fixtures are invented (sample FOSS apps,
   invented counts). Real screenshots would leak the owner's installed apps and backups.
 - **Faithful.** Fixtures use the engine's real verb names and op names (e.g. the activity
-  log uses `scheduler-run`, `delete-backup`, `prune` - the strings the engine actually
+  log uses `scheduler-run`, `delete-backup`, `prune`: the strings the engine actually
   writes), so a screenshot never shows a state the app cannot produce.
 - **All 21 languages, per language**, including `dir=rtl` for `ar` and `fa`.
 
@@ -82,4 +82,4 @@ ships only to the dev remote, never to end users.
 | `settings-dark` | Settings | theme, interface scale, language, accent, backup defaults |
 | `activitylog-dark` | Activity log | the audit log screen |
 
-*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome - see [CONTRIBUTING.md](../../CONTRIBUTING.md).*
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome; see [CONTRIBUTING.md](../../CONTRIBUTING.md).*
