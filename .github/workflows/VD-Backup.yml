@@ -205,6 +205,23 @@ jobs:
           mv "$tmp" module/update.json
           cat module/update.json
 
+      # MMRL feed: mmrl-util (the VD-Modules repo) requires the ONLINE_JSON zip to be under
+      # 50MB, which the ~230MB universal-full is not. Emit a parallel update-mmrl.json pointing
+      # at the universal-LITE zip (~48MB) so the module is distributable via MMRL, while the
+      # in-app update.json stays on the full zip. Same version/notes/changelog as update.json.
+      - name: Fill update-mmrl.json (lite feed for MMRL)
+        env:
+          VER: ${{ steps.v.outputs.name }}
+        run: |
+          set -e
+          zip="VD-Backup-${VER}-universal-lite.zip"
+          sz=$(stat -c%s "$zip")
+          sh=$(sha256sum "$zip" | cut -d' ' -f1)
+          url="https://github.com/VD171/VD-Backup/releases/download/${VER}/${zip}"
+          jq --arg url "$url" --argjson size "$sz" --arg sha "$sh" \
+             '.zipUrl=$url | .size=$size | .sha256=$sha' module/update.json > module/update-mmrl.json
+          cat module/update-mmrl.json
+
       # Always commit the release artifacts (regenerated screenshots, filled update.json and
       # any version bump), so no manual follow-up is ever pending after a release, including
       # the no-bump path. VD171 authorship to match the repo's clean-commit convention.
@@ -218,7 +235,7 @@ jobs:
           git checkout -- companion/app/src/main/res/values/oauth.xml 2>/dev/null || true
           # Stage NEW screenshot dirs too (git commit -am only catches tracked files): a newly
           # added language, e.g. uk, has an untracked docs/screenshots/<lang>/ that -am would miss.
-          git add docs/screenshots 2>/dev/null || true
+          git add docs/screenshots module/update-mmrl.json 2>/dev/null || true
           git commit -am "Release ${{ steps.v.outputs.name }} (assets, screenshots, update.json)" || true
           git push || true
 

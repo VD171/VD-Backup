@@ -1,0 +1,9 @@
+{
+  "version": "v1.07",
+  "versionCode": 10700,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.07/VD-Backup-v1.07-universal-lite.zip",
+  "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
+  "notes": "Reliability: unattended and scheduled backups no longer stop when you leave the app - the backup now runs fully outside the app's process group.\n\nRestore: app permissions restore correctly on custom ROMs - per-UID permission modes and a restored app's network-access policy are reapplied (Android 16 and 17). You can opt in, per app, to also back up its network policy.\n\nSettings: exporting settings, or any encrypted backup, now reports a clear message when encryption cannot run on this device, instead of a generic error.\n\nInterface: dragging the interface-scale slider no longer switches tabs.\n\nLanguages: Ukrainian added - 22 languages.",
+  "size": 49628589,
+  "sha256": "4979f4db88a84e9f7176bfea87a98ad00c94fa1044af120162693f04196f4d34"
+}
