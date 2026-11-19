@@ -265,9 +265,10 @@ else TARC="-p"; fi
 if echo "$TARHELP" | grep -q -- '--no-absolute-names'; then NAN="--no-absolute-names"; else NAN=""; fi
 TARX="$TARC $NAN"
 
-VERB="$1"; OPID="$2"; ARGS_B64="$3"
+VERB="$1"; OPID="$2"
 PROG="$LOGS/progress-$OPID.json"
-ARGS="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+# args arrive in the 0600 file detach() wrote (never on argv); read once, then remove it.
+ARGS="$(base64 -d < "$STATE/staging/args.$OPID" 2>/dev/null)"; rm -f "$STATE/staging/args.$OPID"
 
 # Survive Android's low-memory killer. A bulk backup backgrounds the root manager and the
 # user opens other apps (camera, etc.); without this the LMK kills this detached worker
@@ -286,7 +287,7 @@ _release_wakelock() { echo "vdbackup_$OPID" > /sys/power/wake_unlock 2>/dev/null
 # release into cleanup, and routing the signals into the same trap, fixes it for good.
 # also reap this op's staging transients (dump/xe/ic/batch/restore/...): a kill anywhere,
 # even during preparing (before the per-op DEST trap in do_backup arms), leaves no scratch.
-cleanup() { _release_wakelock; verifier_restore; rm -f "$LOGS/$OPID.pid"; [ -n "$OPID" ] && rm -rf "$STATE/staging/"*"$OPID"* 2>/dev/null; }
+cleanup() { _release_wakelock; verifier_restore; rm -f "$LOGS/$OPID.pid"; [ -n "$OPID" ] && rm -rf "$STATE/staging/"*".$OPID" "$STATE/staging/"*".$OPID."* 2>/dev/null; }
 trap cleanup EXIT
 trap 'exit 143' TERM
 trap 'exit 130' INT
@@ -342,7 +343,12 @@ notify() {
   [ -f "$MODDIR/etc/vdbackup_helper.dex" ] && LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" \
       /system/bin ru.vd171.vdbackup.Helper notify "VDBackup" "$_nm" >/dev/null 2>&1; }
 
-jget() { printf '%s' "$1" | "$JQ" -r "$2" 2>/dev/null; }
+# here-doc, not printf: under mksh printf is external and would put the JSON (passphrases
+# included) on its argv.
+jget() { "$JQ" -r "$2" 2>/dev/null <<EOF
+$1
+EOF
+}
 cfg() { "$JQ" -r "$1 // empty" "$STATE/config.json" 2>/dev/null; }
 
 # active network transport: wifi | mobile | other | unknown. Layered detection so
@@ -406,10 +412,11 @@ freeze() {
   # only, but the wall merely moved to ~120 - the AMS call itself is the problem. kill makes
   # ZERO AMS calls, so it scales to any number of apps. Kill every process of the app's uid
   # (the main process AND its :sub-processes, which a `pidof` comm match alone would miss).
-  _fu="$(stat -c %u "/data/data/$1" 2>/dev/null)"
-  case "$_fu" in
-    ''|*[!0-9]*|0) kill -9 $(pidof "$1" 2>/dev/null) 2>/dev/null || true; return 0 ;;
-  esac
+  # Only for an app uid: a system app can share uid 1000 with system_server, and killing
+  # that uid soft-reboots the phone, so those fall back to the pidof match.
+  _fu="$(stat -c %u "/data/user/${U:-0}/$1" 2>/dev/null)"
+  case "$_fu" in ''|*[!0-9]*) _fu=0 ;; esac
+  if [ $(( _fu % 100000 )) -lt 10000 ]; then kill -9 $(pidof "$1" 2>/dev/null) 2>/dev/null || true; return 0; fi
   for _fd in /proc/[0-9]*; do
     [ "$(stat -c %u "$_fd" 2>/dev/null)" = "$_fu" ] && kill -9 "${_fd##*/}" 2>/dev/null
   done
@@ -502,6 +509,13 @@ verifier_restore() {
 # wait for the freshly installed app's data dir to exist before chown (it may lag
 # a moment after install-commit; without this the chown is silently skipped).
 wait_datadir() { _w=0; while [ "$_w" -lt 25 ]; do [ -d "$1" ] && return 0; exec_ns sleep 0.2 2>/dev/null; _w=$((_w+1)); done; }
+# install_ok <op>: after an install step that had APKs, the package must be installed for $U,
+# as restore() checks (issue #7); otherwise fail with ERR_INSTALL instead of restoring data
+# into a package that is not there.
+install_ok() {
+  fw pm path --user "$U" "$PKG" >/dev/null 2>&1 && return 0
+  audit "$1: APK install failed for $PKG"; finish false ERR_INSTALL; return 1
+}
 
 # Re-map ownership + SELinux label of a restored tree onto the freshly installed app
 # (issue #8). Uses LIVEU/LIVEG/LIVECTX captured from the fresh install by the caller.
@@ -626,13 +640,28 @@ enc_age() { # <outfile> ; reads plaintext on stdin, writes an age scrypt file
   _ep="$STATE/staging/enc.$OPID.$$"; cat > "$_ep"
   # paths go through the environment, never spliced into the -c string: a path with a
   # double-quote would otherwise break out and run as root inside `script`.
-  printf '%s\n%s\n' "$PW" "$PW" | AGE_BIN="$AGE" AGE_IN="$_ep" AGE_OUT="$1" "$SCRIPT" -qec 'exec "$AGE_BIN" -p -o "$AGE_OUT" "$AGE_IN"' /dev/null >/dev/null 2>&1
+  # the passphrase reaches age's pty on stdin from a here-doc: printf is external under
+  # mksh and would put it on argv.
+  AGE_BIN="$AGE" AGE_IN="$_ep" AGE_OUT="$1" "$SCRIPT" -qec 'exec "$AGE_BIN" -p -o "$AGE_OUT" "$AGE_IN"' /dev/null >/dev/null 2>&1 <<EOF
+$PW
+$PW
+EOF
   _er=$?; rm -f "$_ep"; return $_er
 }
 dec_age() { # <infile> ; writes the decrypted plaintext of an age scrypt file to stdout
   _dp="$STATE/staging/dec.$OPID.$$"
-  printf '%s\n' "$PW" | AGE_BIN="$AGE" AGE_IN="$1" AGE_OUT="$_dp" "$SCRIPT" -qec 'exec "$AGE_BIN" -d -o "$AGE_OUT" "$AGE_IN"' /dev/null >/dev/null 2>&1
+  AGE_BIN="$AGE" AGE_IN="$1" AGE_OUT="$_dp" "$SCRIPT" -qec 'exec "$AGE_BIN" -d -o "$AGE_OUT" "$AGE_IN"' /dev/null >/dev/null 2>&1 <<EOF
+$PW
+EOF
   cat "$_dp" 2>/dev/null; rm -f "$_dp"
+}
+# age_pass_ok <infile>: 0 when $PW opens this age file. age checks the passphrase on the
+# header and writes plaintext as it goes, so a short prefix is enough: one scrypt KDF, no
+# full decrypt. Run before archive_safe so a wrong passphrase reports ERR_CRYPTO_PASS.
+age_pass_ok() {
+  _pp="$STATE/staging/probe.$OPID.$$"; head -c 262144 "$1" > "$_pp" 2>/dev/null
+  _pn="$(dec_age "$_pp" 2>/dev/null | head -c 1 | wc -c)"; rm -f "$_pp"
+  [ "${_pn:-0}" -ge 1 ]
 }
 # Passphrase encryption needs the bundled `age` AND a pty provider (`script`): age reads
 # the passphrase from a controlling terminal, so enc_age/dec_age run it under `script`. An
@@ -657,29 +686,55 @@ comp() { case "$1" in
   zstd:*) "$ZSTD" -q "-${1#zstd:}" ;; *) "$ZSTD" -q -10 ;; esac; }
 comp_ext() { case "$1" in none) echo tar ;; gzip) echo tar.gz ;; lz4) echo tar.lz4 ;; *) echo tar.zst ;; esac; }
 # decompress by filename (lz4 via zstd, so DataBackup imports also work).
+# package names are [A-Za-z0-9._] and never start with a dot, so "." / ".." or a
+# slash can't turn "/data/user/$U/$PKG" or "$BACKUPS/$PKG" into a parent path.
+valid_pkg() { case "$1" in ''|null|.*|*[!A-Za-z0-9._]*) return 1 ;; esac; }
 decomp() { case "$1" in
   *.tar.gz*) "$GZIP" -dc "$1" ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c "$1" ;;
   *.tar.zst*) "$ZSTD" -dqc "$1" ;; *.tar*) cat "$1" ;; *) "$ZSTD" -dqc "$1" ;; esac; }
+# same, for a stream on stdin (decrypted age output); $1 only picks the codec.
+decomp_in() { case "$1" in
+  *.tar.gz*) "$GZIP" -dc ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c ;;
+  *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; }
 
 # Anti-path-traversal guard. Restore extracts tar archives AS ROOT, so a tampered
 # backup/import/special archive must never escape its target dir. scan_members reads
 # a tar listing on stdin and returns non-zero if any member is an absolute path or
-# holds a ".." component; archive_safe lists an archive (decrypting/decompressing by
-# encryption flag + filename) and returns 0 only when every member is contained.
+# holds a ".." component; list_safe lists a tar stream on stdin and also fails when tar
+# fails or lists nothing (wrong passphrase, unreadable or empty archive); archive_safe
+# lists an archive (decrypting/decompressing by encryption flag + filename) and returns
+# 0 only when it is readable and every member is contained.
 # Callers run this BEFORE the destructive wipe + extraction and abort on failure.
-scan_members() {
+# Optional <base> args: an archive extracted into a shared parent (/data/user/<u>,
+# Android/data, /data/misc/profiles) must also keep every member inside one of them
+# (<base>, <base>/..., optionally ./-prefixed), so it can only touch its own app's dir.
+scan_members() {   # [<base>...]
   while IFS= read -r _m; do
     case "$_m" in /*|..|../*|*/../*|*/..) return 1 ;; esac
+    [ $# -eq 0 ] && continue
+    _ok=1
+    for _b in "$@"; do
+      case "${_m#./}" in "$_b"|"$_b"/*) _ok=0; break ;; esac
+    done
+    [ "$_ok" -eq 0 ] || return 1
   done
   return 0
 }
-archive_safe() {   # <archive> <enc:none|age|age-scrypt>; 0 = safe, 1 = unsafe
-  { case "$2" in
-      age|age-scrypt) dec_age "$1" | { case "$1" in
-          *.tar.gz*) "$GZIP" -dc ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c ;;
-          *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; } ;;
-      *) decomp "$1" ;;
-    esac; } | exec_ns "$TAR" -t 2>/dev/null | scan_members
+list_safe() {   # [<base>...]; tar stream on stdin
+  _ls="$(exec_ns "$TAR" -t 2>/dev/null)" || return 1
+  [ -n "$_ls" ] || return 1
+  # here-doc, not printf: under mksh printf is external, so a large listing hit ARG_MAX,
+  # printf failed and scan_members read nothing and passed the archive unchecked
+  scan_members "$@" <<LSEOF
+$_ls
+LSEOF
+}
+archive_safe() {   # <archive> <enc:none|age|age-scrypt> [<base>...]; 0 = safe, 1 = unsafe
+  _asf="$1"; _ase="$2"; shift 2
+  { case "$_ase" in
+      age|age-scrypt) dec_age "$_asf" | decomp_in "$_asf" ;;
+      *) decomp "$_asf" ;;
+    esac; } | list_safe "$@"
 }
 
 # media_own [-R] <path>: create <path> and give it the ownership + SELinux context
@@ -929,7 +984,8 @@ transfer_full() {
               [ "$_lfree" -gt 0 ] && [ "${_lsz:-0}" -gt 0 ] && [ "$_lfree" -lt $(( _lsz + 10485760 )) ] \
                 && { audit "no space at dest $DPATH $PKG"; finish false ERR_NO_SPACE; return 1; }
               mkdir -p "$(remote_pfx)/$PKG" && cp -a "$DEST" "$(remote_pfx)/$PKG/" \
-                || { audit "local transfer failed $PKG"; finish false ERR_TRANSFER; return 1; }; fi ;;
+                || { audit "local transfer failed $PKG"; finish false ERR_TRANSFER; return 1; }
+              media_own -R "$(remote_pfx)/$PKG/$(basename "$DEST")"; fi ;;   # staging copy is root-only
   esac
 }
 
@@ -1010,7 +1066,7 @@ do_mirror() {
 # ----------------------------------------------------------------------
 backup() {
   PKG="$(jget "$ARGS" '.package')"
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   is_root_manager "$PKG" && { audit "refused root manager backup: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
   BACKUPS="$(backups_dir "$U")"
@@ -1136,7 +1192,8 @@ backup() {
   # root-only staging dir and cleaned on exit (stealth); otherwise it builds in BACKUPS, where it
   # lives and is listed.
   if remote_only; then
-    DEST="$(staging_root)/$PKG/${TS}_${VC}"
+    _sroot="$(staging_root)"; mkdir -p "$_sroot" && chmod 700 "$_sroot"   # root-only: plaintext data waits here for upload
+    DEST="$_sroot/$PKG/${TS}_${VC}"
   else
     DEST="$BACKUPS/$PKG/${TS}_${VC}"; media_own "$BACKUPS"; media_own "$BACKUPS/$PKG"
   fi
@@ -1365,7 +1422,7 @@ backup() {
       items:$items}' > "$DEST/manifest.json"
   rm -f "$IFILE"
   sha256sum "$DEST/manifest.json" | cut -d' ' -f1 > "$DEST/manifest.json.sha256"
-  media_own -R "$DEST"   # make the finished backup visible under /sdcard/VDBackup
+  remote_only || media_own -R "$DEST"   # make the finished backup visible under /sdcard/VDBackup (staging stays root-only)
 
   rm -f "$DUMPF"
 
@@ -1412,7 +1469,7 @@ backup() {
 do_restore_snapshot() {
   DESTID="$(jget "$ARGS" '.dest')"; SNAP="$(jget "$ARGS" '.snapshot')"
   PKG="$(jget "$ARGS" '.package')"; U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac   # same guard as backup()/restore(): a package with a slash feeds rm -rf "/data/user/$U/$PKG"
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }   # same guard as backup()/restore(): a package with a slash feeds rm -rf "/data/user/$U/$PKG"
   is_root_manager "$PKG" && { audit "refused root manager restore: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   { [ -z "$SNAP" ] || [ "$SNAP" = null ]; } && SNAP=latest
   resolve_dest
@@ -1435,12 +1492,15 @@ do_restore_snapshot() {
   # install APKs found in the restored tree
   prog 55 installing "$PKG"
   verifier_off
-  SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
-  if [ -n "$SESSION" ]; then
-    find "$ST/data/app" -name '*.apk' 2>/dev/null | while IFS= read -r apk; do
-      fw pm install-write "$SESSION" "$(basename "$apk" .apk)" "$apk" >/dev/null 2>&1
-    done
-    fw pm install-commit "$SESSION" >/dev/null 2>&1
+  if [ -n "$(find "$ST/data/app" -name '*.apk' 2>/dev/null | head -n 1)" ]; then
+    SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
+    if [ -n "$SESSION" ]; then
+      find "$ST/data/app" -name '*.apk' 2>/dev/null | while IFS= read -r apk; do
+        fw pm install-write "$SESSION" "$(basename "$apk" .apk)" "$apk" >/dev/null 2>&1
+      done
+      fw pm install-commit "$SESSION" >/dev/null 2>&1
+    fi
+    install_ok restore-snapshot || { rm -rf "$ST"; return; }
   fi
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
@@ -1470,7 +1530,7 @@ do_restore_snapshot() {
 # Restore from a Mirror: pm install the mirrored APKs, rsync the data dirs back, remap.
 do_restore_mirror() {
   DESTID="$(jget "$ARGS" '.dest')"; PKG="$(jget "$ARGS" '.package')"; U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac   # same guard as backup()/restore(): a package with a slash feeds rm -rf / rsync --delete on "/data/user/$U/$PKG"
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }   # same guard as backup()/restore(): a package with a slash feeds rm -rf / rsync --delete on "/data/user/$U/$PKG"
   is_root_manager "$PKG" && { audit "refused root manager restore: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   resolve_dest
   transport_guard mirror || return
@@ -1486,13 +1546,16 @@ do_restore_mirror() {
   freeze "$PKG"
   prog 35 installing "$PKG"
   verifier_off
-  SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
-  if [ -n "$SESSION" ] && [ -d "$SRC/apk" ]; then
-    TMP="$STATE/staging/mapk-r.$OPID"; rm -rf "$TMP"; mkdir -p "$TMP"
-    for af in "$SRC"/apk/*.zst; do [ -e "$af" ] || continue
-      bn="$(basename "$af" .zst)"; "$ZSTD" -dqc "$af" > "$TMP/$bn"
-      fw pm install-write "$SESSION" "${bn%.apk}" "$TMP/$bn" >/dev/null 2>&1; done
-    fw pm install-commit "$SESSION" >/dev/null 2>&1; rm -rf "$TMP"
+  if ls "$SRC"/apk/*.zst >/dev/null 2>&1; then
+    SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
+    if [ -n "$SESSION" ]; then
+      TMP="$STATE/staging/mapk-r.$OPID"; rm -rf "$TMP"; mkdir -p "$TMP"
+      for af in "$SRC"/apk/*.zst; do [ -e "$af" ] || continue
+        bn="$(basename "$af" .zst)"; "$ZSTD" -dqc "$af" > "$TMP/$bn"
+        fw pm install-write "$SESSION" "${bn%.apk}" "$TMP/$bn" >/dev/null 2>&1; done
+      fw pm install-commit "$SESSION" >/dev/null 2>&1; rm -rf "$TMP"
+    fi
+    install_ok restore-mirror || { [ "$DTYPE" = local ] || rm -rf "$SRC"; return; }
   fi
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
@@ -1541,7 +1604,7 @@ restore() {
   PKG="$("$JQ" -r '.package.name' "$M")"; U="$("$JQ" -r '.user_id // 0' "$M")"
   is_root_manager "$PKG" && { audit "refused root manager restore: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   case "$U" in ""|*[!0-9]*) U=0 ;; esac
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
 
   # restore-test: extract every archive into a temp dir under the state dir and report
   # whether each extracts cleanly and its sha256 matches the manifest. Touches no live
@@ -1554,6 +1617,7 @@ restore() {
     while [ "$i" -lt "${n:-0}" ]; do
       arc="$("$JQ" -r ".items[$i].archive // empty" "$M")"
       want="$("$JQ" -r ".items[$i].sha256 // empty" "$M")"
+      ttyp="$("$JQ" -r ".items[$i].type // empty" "$M")"
       i=$((i+1))
       [ -n "$arc" ] || continue
       TTOTAL=$((TTOTAL+1)); af="$REF/$arc"
@@ -1564,7 +1628,10 @@ restore() {
       fi
       sub="$TDIR/item$i"; mkdir -p "$sub"
       _tenc=none; echo "$arc" | grep -q '\.age$' && _tenc=age
-      archive_safe "$af" "$_tenc" || { TFAIL=$((TFAIL+1)); TERR="$TERR unsafe:$arc"; continue; }
+      if [ "$_tenc" = age ] && [ -n "$PW" ] && ! age_pass_ok "$af"; then TFAIL=$((TFAIL+1)); TERR="$TERR pass:$arc"; continue; fi
+      if [ "$ttyp" = profiles ]; then archive_safe "$af" "$_tenc" "ref/$PKG" "cur/$U/$PKG"
+      else archive_safe "$af" "$_tenc" "$PKG"; fi \
+        || { TFAIL=$((TFAIL+1)); TERR="$TERR unsafe:$arc"; continue; }
       if echo "$arc" | grep -q '\.age$'; then
         if [ -z "$PW" ]; then TFAIL=$((TFAIL+1)); TERR="$TERR nopass:$arc"; continue; fi
         dec_age "$af" | { case "$arc" in
@@ -1675,7 +1742,11 @@ restore() {
     # anti-traversal: reject a tampered archive BEFORE the destructive wipe, so a
     # crafted member can never escape into the filesystem and no live data is lost.
     _renc=none; echo "$arc" | grep -q '\.age$' && _renc=age
-    archive_safe "$af" "$_renc" || { audit "restore unsafe archive $arc"; finish false ERR_UNSAFE_ARCHIVE; return; }
+    if [ "$_renc" = age ] && ! age_pass_ok "$af"; then
+      audit "restore wrong passphrase $arc"; finish false ERR_CRYPTO_PASS; return; fi
+    if [ "$typ" = profiles ]; then archive_safe "$af" "$_renc" "ref/$PKG" "cur/$U/$PKG"
+    else archive_safe "$af" "$_renc" "$PKG"; fi \
+      || { audit "restore unsafe archive $arc"; finish false ERR_UNSAFE_ARCHIVE; return; }
     # faithful restore: reproduce the backed-up state exactly (wipe then extract),
     # so files created after the backup do not linger. Extraction is checked; a
     # failure after the wipe is reported (never a silent success).
@@ -1759,7 +1830,7 @@ do_import() {
 do_import_databackup() {
   PKG="$(basename "$(dirname "$REF")")"
   [ -d "$REF" ] || { finish false ERR_NO_BACKUP; return; }
-  case "$PKG" in ''|.|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   prog 5 fetching "$PKG"; audit "import-db start $PKG"; notify restore_start "$PKG"
   freeze "$PKG"
   prog 30 installing "$PKG"
@@ -1768,13 +1839,14 @@ do_import_databackup() {
     TMP="$STATE/staging/dbimp.$OPID"; rm -rf "$TMP"; mkdir -p "$TMP"
     "$ZSTD" -dqc "$REF/apk.tar.zst" | exec_ns "$TAR" $NAN -x -C "$TMP" 2>/dev/null
     verifier_off
-    SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
+    SESSION=""; ls "$TMP"/*.apk >/dev/null 2>&1 && SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
     if [ -n "$SESSION" ]; then
       for apk in "$TMP"/*.apk; do [ -e "$apk" ] || continue
         fw pm install-write "$SESSION" "$(basename "$apk" .apk)" "$apk" >/dev/null 2>&1; done
       fw pm install-commit "$SESSION" >/dev/null 2>&1
     fi
     rm -rf "$TMP"
+    install_ok import-db || return
   fi
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
@@ -1782,7 +1854,7 @@ do_import_databackup() {
   prog 60 extracting "$PKG"
   db_item() { # <archive> <parent> <target> <type>
     f="$REF/$1"; [ -f "$f" ] || return 0
-    archive_safe "$f" none || { audit "import-db unsafe archive $1 $PKG"; finish false ERR_UNSAFE_ARCHIVE; return 1; }
+    archive_safe "$f" none "$PKG" || { audit "import-db unsafe archive $1 $PKG"; finish false ERR_UNSAFE_ARCHIVE; return 1; }
     exec_ns rm -rf "$3" 2>/dev/null                   # faithful: wipe then extract (migration)
     mkdir -p "$2"; decomp "$f" | exec_ns "$TAR" $TARX -x -C "$2" 2>/dev/null
     [ $? -eq 0 ] || { audit "import-db extract failed $1 $PKG"; finish false ERR_RESTORE; return 1; }
@@ -1817,7 +1889,7 @@ do_import_databackup() {
 do_import_neo() {
   PROP="$REF.properties"; [ -f "$PROP" ] || { finish false ERR_NO_MANIFEST; return; }
   PKG="$("$JQ" -r '.packageName' "$PROP")"
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   # The real encryption signal is the per-file .enc suffix, NOT metadata cipherType/iv:
   # recent Neo writes cipherType/iv even when a given backup's archives are left plain.
   ENC=no; ls "$REF"/*.enc >/dev/null 2>&1 && ENC=yes
@@ -1852,14 +1924,17 @@ do_import_neo() {
         src="$apk"
         case "$apk" in
           *.enc) [ "$ENC" = yes ] || continue
-                 src="$APKTMP/$(basename "${apk%.enc}")"; neo_decrypt_to "$apk" "$src" || { rm -f "$src"; continue; } ;;
+                 src="$APKTMP/$(basename "${apk%.enc}")"
+                 neo_decrypt_to "$apk" "$src" || { fw pm install-abandon "$SESSION" >/dev/null 2>&1; rm -rf "$APKTMP"
+                   audit "import-neo decrypt failed $(basename "$apk") $PKG"; finish false ERR_IMPORT_ENCRYPTED; return; } ;;
         esac
         fw pm install-write "$SESSION" "$(basename "${src%.apk}")" "$src" >/dev/null 2>&1
       done
       fw pm install-commit "$SESSION" >/dev/null 2>&1
     fi
+    rm -rf "$APKTMP"
+    install_ok import-neo || return
   fi
-  rm -rf "$APKTMP"
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
   LIVECTX="$(exec_ns ls -Zd "/data/user/$U/$PKG" 2>/dev/null | cut -d' ' -f1)"
@@ -1868,13 +1943,14 @@ do_import_neo() {
     for ext in "tar.$COMP" tar.zst tar.gz tar; do
       f="$REF/$1.$ext"; src="$f"
       if [ -f "$f.enc" ]; then                       # encrypted archive: decrypt via dex
-        src="$STATE/staging/neo.$OPID.$1"; neo_decrypt_to "$f.enc" "$src" || { rm -f "$src"; continue; }
+        src="$STATE/staging/neo.$OPID.$1"
+        neo_decrypt_to "$f.enc" "$src" || { rm -f "$src"; audit "import-neo decrypt failed $1 $PKG"; finish false ERR_IMPORT_ENCRYPTED; return 1; }
       elif [ -f "$f" ]; then :                        # plain archive
       else continue; fi
       # anti-traversal: reject a tampered archive BEFORE the wipe (decrypted temp has
       # no suffix, so decompress by $ext, not by filename).
       if ! { case "$ext" in *.zst) "$ZSTD" -dqc "$src" ;; *.gz) "$GZIP" -dc "$src" ;; *) cat "$src" ;; esac; } \
-           | exec_ns "$TAR" -t 2>/dev/null | scan_members; then
+           | list_safe; then
         [ "$src" != "$f" ] && rm -f "$src"
         audit "import-neo unsafe archive $1 $PKG"; finish false ERR_UNSAFE_ARCHIVE; return 1; fi
       exec_ns rm -rf "$2" 2>/dev/null                 # faithful: wipe then extract (migration)
@@ -1909,7 +1985,7 @@ do_import_neo() {
 # via $TARC). Restore is same-device/same-ROM faithful. A portable content:// export
 # sidecar is produced separately by the dex helper. Restore is reboot-required and
 # gated behind heavy UI friction (it overwrites live system state).
-special_paths() {   # <category>; echoes each existing owned path, one per line
+special_candidates() {   # <category>; echoes every path the category owns, one per line
   case "$1" in
     messages)  set -- "/data/user/${U:-0}/com.android.providers.telephony" "/data/user_de/${U:-0}/com.android.providers.telephony" ;;
     rcs)       set -- "/data/user/${U:-0}/com.google.android.apps.messaging" "/data/user_de/${U:-0}/com.google.android.apps.messaging" ;;   # RCS lives in Google Messages' own data (bugle_db), not the telephony provider
@@ -1920,7 +1996,10 @@ special_paths() {   # <category>; echoes each existing owned path, one per line
     wallpaper) set -- "/data/system/users/${U:-0}/wallpaper" "/data/system/users/${U:-0}/wallpaper_lock" "/data/system/users/${U:-0}/wallpaper_info.xml" ;;
     *) return 1 ;;
   esac
-  for _p in "$@"; do [ -e "$_p" ] && printf '%s\n' "$_p"; done
+  printf '%s\n' "$@"
+}
+special_paths() {   # <category>; echoes each existing owned path, one per line
+  special_candidates "$1" | while IFS= read -r _p; do [ -e "$_p" ] && printf '%s\n' "$_p"; done
 }
 
 # Portable export sidecar for special backups: read the provider SQLite dbs with the
@@ -2052,6 +2131,7 @@ do_special_backup() {
   # gated by an explicit .system_settings flag exactly like ssaid; default OFF.
   SYSSET="$(jget "$ARGS" '.system_settings')"
   use_special_age() { [ -n "$PW" ]; }
+  if use_special_age && ! crypto_available; then finish false ERR_CRYPTO_UNAVAIL; return; fi
   prog 2 preparing "special"; audit "special-backup start $CATS"; notify backup_start "special"
   BK="$(backups_dir "$U")/.special"; TS="$(date -u +%Y%m%dT%H%M%SZ)"; DEST="$BK/$TS"
   media_own "$(backups_dir "$U")"; media_own "$BK"; mkdir -p "$DEST"
@@ -2079,20 +2159,37 @@ do_special_backup() {
           parent="$(dirname "$src")"; base="$(basename "$src")"
           ctx="$(ls -Zd "$src" 2>/dev/null | cut -d' ' -f1)"
           ext="$(comp_ext "$COMP")"; arc="$cat.$idx.$ext"; use_special_age && arc="$arc.age"
+          # same completeness checks as archive_dir: a fatal tar exit (>1) via the .trc sentinel,
+          # then the written archive must read back as a complete tar. A failure marks the whole
+          # backup failed (.sfail; this loop is a subshell) instead of silently dropping the path.
+          rm -f "$DEST/.trc"; _sok=true
           if use_special_age; then
-            exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" | enc_age "$DEST/$arc" \
-              || { audit "special archive failed $cat:$src"; continue; }
+            { exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null || { _tc=$?; [ "$_tc" -gt 1 ] && echo "$_tc" > "$DEST/.trc"; }; } | comp "$COMP" | enc_age "$DEST/$arc" \
+              && dec_age "$DEST/$arc" 2>/dev/null | { case "$COMP" in gzip) "$GZIP" -dc ;; lz4) "$ZSTD" -dq --format=lz4 -c ;; none) cat ;; *) "$ZSTD" -dqc ;; esac; } | exec_ns "$TAR" -t >/dev/null 2>&1 || _sok=false
           else
-            exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" > "$DEST/$arc" \
-              || { audit "special archive failed $cat:$src"; continue; }
+            { exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null || { _tc=$?; [ "$_tc" -gt 1 ] && echo "$_tc" > "$DEST/.trc"; }; } | comp "$COMP" > "$DEST/$arc" \
+              && decomp "$DEST/$arc" | exec_ns "$TAR" -t >/dev/null 2>&1 || _sok=false
+          fi
+          if [ "$_sok" != true ] || [ -f "$DEST/.trc" ]; then
+            audit "special archive failed $cat:$src"; rm -f "$DEST/$arc" "$DEST/.trc"; : > "$DEST/.sfail"; continue
           fi
           sha="$(sha256sum "$DEST/$arc" 2>/dev/null | cut -d' ' -f1)"
           emit_special "$cat" "$arc" "$src" "$ctx" "$sha"
         done
         [ "$PORTABLE" != false ] && special_export "$cat" "$DEST" ;;
     esac
+    # a selected category that produced nothing (no provider path on this device, or every
+    # archive failed) is a failed backup, not an empty success.
+    if [ "$cat" != system_settings ] || [ "$SYSSET" = true ]; then
+      "$JQ" -e --arg c "$cat" 'select(.category == $c)' "$IFILE" >/dev/null 2>&1 \
+        || { audit "special-backup: nothing backed up for $cat"; : > "$DEST/.sfail"; }
+    fi
     done_c=$((done_c+1)); prog $(( 10 + done_c * 80 / nc )) archiving "$cat"
   done
+  if [ -f "$DEST/.sfail" ]; then
+    case "$DEST" in "$BK"/?*) rm -rf "$DEST" ;; esac
+    finish false ERR_BACKUP; return
+  fi
   prog 92 manifest "special"
   FP="$(getprop ro.build.fingerprint)"; SDK="$(getprop ro.build.version.sdk)"; SEL="$(getenforce 2>/dev/null | tr 'A-Z' 'a-z')"
   "$JQ" -n --arg producer "VDBackup $(sed -n 's/^version=//p' "$MODDIR/module.prop")" \
@@ -2153,14 +2250,23 @@ do_special_restore() {
     { [ -z "$arc" ] || [ -z "$src" ]; } && continue
     want_cat "$cat" || continue
     case "$src" in *..*) audit "special-restore skip traversal $src"; continue ;; /data/*) : ;; *) audit "special-restore skip unsafe path $src"; continue ;; esac
+    # the manifest sits on /sdcard: only restore into a path this category owns
+    special_candidates "$cat" | grep -qxF "$src" || { audit "special-restore skip foreign path $cat:$src"; continue; }
     parent="$(dirname "$src")"; base="$(basename "$src")"
     prog $(( 10 + i * 80 / (n>0?n:1) )) extracting "$cat"
-    # anti-traversal: reject a tampered archive BEFORE the destructive wipe
+    # integrity + anti-traversal BEFORE the destructive wipe (same order as restore())
+    want="$("$JQ" -r ".items[$((i-1))].sha256 // empty" "$M")"
+    if [ -n "$want" ]; then
+      got="$(sha256sum "$REF/$arc" 2>/dev/null | cut -d' ' -f1)"
+      [ "$want" = "$got" ] || { audit "special-restore sha mismatch $cat:$arc"; finish false ERR_VERIFY; return; }
+    fi
     _senc=none; [ "$enc" = age-scrypt ] && _senc=age
+    if [ "$_senc" = age ] && ! age_pass_ok "$REF/$arc"; then
+      audit "special-restore wrong passphrase $cat:$arc"; finish false ERR_CRYPTO_PASS; return; fi
     archive_safe "$REF/$arc" "$_senc" || { audit "special-restore unsafe archive $cat:$arc"; finish false ERR_UNSAFE_ARCHIVE; return; }
     exec_ns rm -rf "$src" 2>/dev/null
     mkdir -p "$parent"
-    if [ "$enc" = age-scrypt ]; then dec_age "$REF/$arc" | decomp "$arc" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
+    if [ "$enc" = age-scrypt ]; then dec_age "$REF/$arc" | decomp_in "$arc" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
     else decomp "$REF/$arc" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null; fi
     [ $? -eq 0 ] || { audit "special-restore extract failed $cat:$arc"; finish false ERR_RESTORE; return; }
     exec_ns restorecon -R "$src" 2>/dev/null
@@ -2280,6 +2386,18 @@ do_path_backup() {
 
 # Restore a standalone path backup: verify, anti-traversal guard, wipe the original
 # path and extract the archive back into place, restoring ownership/context.
+# The restore target comes from a manifest on /sdcard and is wiped before extraction:
+# refuse a whole user/storage root (or /data/x itself) and the root manager's /data/adb.
+path_restore_ok() {   # <abs path>; 0 = may be replaced
+  _p="${1%/}"
+  case "$_p" in
+    /data/adb|/data/adb/*) return 1 ;;
+    /data/user/*/*|/data/user_de/*/*|/data/media/*/*|/storage/emulated/*/*|/sdcard/?*) return 0 ;;
+    /data/user/*|/data/user_de/*|/data/media/*|/storage/emulated/*) return 1 ;;
+    /data/*/*) return 0 ;;
+  esac
+  return 1
+}
 do_path_restore() {
   REF="$(jget "$ARGS" '.ref')"
   case "$REF" in /data/media/*/VDBackup/.paths/*) : ;; *) finish false ERR_BAD_REF; return ;; esac
@@ -2298,12 +2416,15 @@ do_path_restore() {
   uid="$("$JQ" -r '.owner_uid // 0' "$M")"; gid="$("$JQ" -r '.owner_gid // 0' "$M")"
   case "$SRCP" in /storage/emulated/*|/data/media/*|/sdcard/*|/data/*) : ;; *) finish false ERR_BAD_PATH; return ;; esac
   case "$SRCP" in *..*) finish false ERR_BAD_PATH; return ;; esac
+  path_restore_ok "$SRCP" || { audit "path-restore refused $SRCP"; finish false ERR_BAD_PATH; return; }
   { [ -n "$arc" ] && [ "$arc" != null ]; } || { finish false ERR_NO_BACKUP; return; }
   if [ "$enc" = age ] && [ -z "$PW" ]; then finish false ERR_CRYPTO_PASS; return; fi
   if [ "$enc" = age ] && ! crypto_available; then finish false ERR_CRYPTO_UNAVAIL; return; fi
   prog 5 preparing "path"; audit "path-restore start $REF -> $SRCP"; notify restore_start "path"
   # anti-traversal: reject a tampered archive BEFORE the destructive wipe
   _renc=none; [ "$enc" = age ] && _renc=age
+  if [ "$_renc" = age ] && ! age_pass_ok "$REF/$arc"; then
+    audit "path-restore wrong passphrase"; finish false ERR_CRYPTO_PASS; return; fi
   archive_safe "$REF/$arc" "$_renc" || { audit "path-restore unsafe archive $arc"; finish false ERR_UNSAFE_ARCHIVE; return; }
   # integrity before the destructive restore
   want="$("$JQ" -r '.sha256 // empty' "$M")"
@@ -2435,8 +2556,8 @@ do_adb_restore() {
   if [ "$enc" = age ] && ! crypto_available; then finish false ERR_CRYPTO_UNAVAIL; return; fi
   prog 5 preparing "adb"; audit "adb-restore start $REF"; notify restore_start "adb"
   # a wrong passphrase otherwise surfaces late as ERR_RESTORE (empty decrypt -> empty extract); probe
-  # once here so the user gets a clear ERR_CRYPTO_PASS. One scrypt KDF, cheap next to a real restore.
-  if [ "$enc" = age ] && [ "$(dec_age "$REF/$arc" 2>/dev/null | head -c 1 | wc -c)" -lt 1 ]; then
+  # once here so the user gets a clear ERR_CRYPTO_PASS.
+  if [ "$enc" = age ] && ! age_pass_ok "$REF/$arc"; then
     audit "adb-restore: wrong passphrase"; finish false ERR_CRYPTO_PASS; return; fi
   _renc=none; [ "$enc" = age ] && _renc=age
   archive_safe "$REF/$arc" "$_renc" || { audit "adb-restore unsafe archive"; finish false ERR_UNSAFE_ARCHIVE; return; }   # anti-traversal BEFORE writing
@@ -2699,7 +2820,7 @@ do_telegram_pull() {   # download a backup from Telegram into local storage; it 
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
   case "$NAME" in *__*.vdb.tar) : ;; *) finish false ERR_INVALID_REF; return ;; esac
   _rest="${NAME%.vdb.tar}"; PKG="${_rest%%__*}"; _tsvc="${_rest#*__}"
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   case "$_tsvc" in ''|*/*|*..*|*' '*) finish false ERR_INVALID_REF; return ;; esac   # feeds a backups path
   net_guard || return
   [ -x "$TGBIN" ] || { finish false ERR_TG_BIN; return; }
@@ -2722,7 +2843,7 @@ do_rclone_pull() {   # download an rclone remote-only backup into local storage;
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
   case "$_rref" in ''|/*|*..*) finish false ERR_INVALID_REF; return ;; esac
   PKG="${_rref%%/*}"; _tsvc="${_rref#*/}"
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   case "$_tsvc" in ''|*/*|*' '*) finish false ERR_INVALID_REF; return ;; esac
   resolve_dest
   { [ "$DTYPE" = rclone ] && [ -n "$DREMOTE" ]; } || { finish false ERR_INVALID_REF; return; }
@@ -2743,7 +2864,7 @@ do_gdrive_pull() {   # download a gdrive remote-only backup (its Drive folder) i
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
   case "$_rref" in ''|/*|*..*) finish false ERR_INVALID_REF; return ;; esac
   PKG="${_rref%%/*}"; _tsvc="${_rref#*/}"
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   case "$_tsvc" in ''|*/*|*' '*) finish false ERR_INVALID_REF; return ;; esac
   case "$_gfolder" in ''|*[!A-Za-z0-9_-]*) finish false ERR_INVALID_REF; return ;; esac   # Drive file-id charset
   resolve_dest
