@@ -509,6 +509,13 @@ verifier_restore() {
 # wait for the freshly installed app's data dir to exist before chown (it may lag
 # a moment after install-commit; without this the chown is silently skipped).
 wait_datadir() { _w=0; while [ "$_w" -lt 25 ]; do [ -d "$1" ] && return 0; exec_ns sleep 0.2 2>/dev/null; _w=$((_w+1)); done; }
+# install_ok <op>: after an install step that had APKs, the package must be installed for $U,
+# as restore() checks (issue #7); otherwise fail with ERR_INSTALL instead of restoring data
+# into a package that is not there.
+install_ok() {
+  fw pm path --user "$U" "$PKG" >/dev/null 2>&1 && return 0
+  audit "$1: APK install failed for $PKG"; finish false ERR_INSTALL; return 1
+}
 
 # Re-map ownership + SELinux label of a restored tree onto the freshly installed app
 # (issue #8). Uses LIVEU/LIVEG/LIVECTX captured from the fresh install by the caller.
@@ -1485,12 +1492,15 @@ do_restore_snapshot() {
   # install APKs found in the restored tree
   prog 55 installing "$PKG"
   verifier_off
-  SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
-  if [ -n "$SESSION" ]; then
-    find "$ST/data/app" -name '*.apk' 2>/dev/null | while IFS= read -r apk; do
-      fw pm install-write "$SESSION" "$(basename "$apk" .apk)" "$apk" >/dev/null 2>&1
-    done
-    fw pm install-commit "$SESSION" >/dev/null 2>&1
+  if [ -n "$(find "$ST/data/app" -name '*.apk' 2>/dev/null | head -n 1)" ]; then
+    SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
+    if [ -n "$SESSION" ]; then
+      find "$ST/data/app" -name '*.apk' 2>/dev/null | while IFS= read -r apk; do
+        fw pm install-write "$SESSION" "$(basename "$apk" .apk)" "$apk" >/dev/null 2>&1
+      done
+      fw pm install-commit "$SESSION" >/dev/null 2>&1
+    fi
+    install_ok restore-snapshot || { rm -rf "$ST"; return; }
   fi
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
@@ -1536,13 +1546,16 @@ do_restore_mirror() {
   freeze "$PKG"
   prog 35 installing "$PKG"
   verifier_off
-  SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
-  if [ -n "$SESSION" ] && [ -d "$SRC/apk" ]; then
-    TMP="$STATE/staging/mapk-r.$OPID"; rm -rf "$TMP"; mkdir -p "$TMP"
-    for af in "$SRC"/apk/*.zst; do [ -e "$af" ] || continue
-      bn="$(basename "$af" .zst)"; "$ZSTD" -dqc "$af" > "$TMP/$bn"
-      fw pm install-write "$SESSION" "${bn%.apk}" "$TMP/$bn" >/dev/null 2>&1; done
-    fw pm install-commit "$SESSION" >/dev/null 2>&1; rm -rf "$TMP"
+  if ls "$SRC"/apk/*.zst >/dev/null 2>&1; then
+    SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
+    if [ -n "$SESSION" ]; then
+      TMP="$STATE/staging/mapk-r.$OPID"; rm -rf "$TMP"; mkdir -p "$TMP"
+      for af in "$SRC"/apk/*.zst; do [ -e "$af" ] || continue
+        bn="$(basename "$af" .zst)"; "$ZSTD" -dqc "$af" > "$TMP/$bn"
+        fw pm install-write "$SESSION" "${bn%.apk}" "$TMP/$bn" >/dev/null 2>&1; done
+      fw pm install-commit "$SESSION" >/dev/null 2>&1; rm -rf "$TMP"
+    fi
+    install_ok restore-mirror || { [ "$DTYPE" = local ] || rm -rf "$SRC"; return; }
   fi
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
@@ -1826,13 +1839,14 @@ do_import_databackup() {
     TMP="$STATE/staging/dbimp.$OPID"; rm -rf "$TMP"; mkdir -p "$TMP"
     "$ZSTD" -dqc "$REF/apk.tar.zst" | exec_ns "$TAR" $NAN -x -C "$TMP" 2>/dev/null
     verifier_off
-    SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
+    SESSION=""; ls "$TMP"/*.apk >/dev/null 2>&1 && SESSION="$(fw pm install-create $(pm_install_flags) $(installer_flag "") --user "$U" 2>/dev/null | sed -n 's/.*\[\([0-9]*\)\].*/\1/p')"
     if [ -n "$SESSION" ]; then
       for apk in "$TMP"/*.apk; do [ -e "$apk" ] || continue
         fw pm install-write "$SESSION" "$(basename "$apk" .apk)" "$apk" >/dev/null 2>&1; done
       fw pm install-commit "$SESSION" >/dev/null 2>&1
     fi
     rm -rf "$TMP"
+    install_ok import-db || return
   fi
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
@@ -1910,14 +1924,17 @@ do_import_neo() {
         src="$apk"
         case "$apk" in
           *.enc) [ "$ENC" = yes ] || continue
-                 src="$APKTMP/$(basename "${apk%.enc}")"; neo_decrypt_to "$apk" "$src" || { rm -f "$src"; continue; } ;;
+                 src="$APKTMP/$(basename "${apk%.enc}")"
+                 neo_decrypt_to "$apk" "$src" || { fw pm install-abandon "$SESSION" >/dev/null 2>&1; rm -rf "$APKTMP"
+                   audit "import-neo decrypt failed $(basename "$apk") $PKG"; finish false ERR_IMPORT_ENCRYPTED; return; } ;;
         esac
         fw pm install-write "$SESSION" "$(basename "${src%.apk}")" "$src" >/dev/null 2>&1
       done
       fw pm install-commit "$SESSION" >/dev/null 2>&1
     fi
+    rm -rf "$APKTMP"
+    install_ok import-neo || return
   fi
-  rm -rf "$APKTMP"
   wait_datadir "/data/user/$U/$PKG"
   LIVEU="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null || echo 0)"; LIVEG="$(stat -c %g "/data/user/$U/$PKG" 2>/dev/null || echo 0)"
   LIVECTX="$(exec_ns ls -Zd "/data/user/$U/$PKG" 2>/dev/null | cut -d' ' -f1)"
@@ -1926,7 +1943,8 @@ do_import_neo() {
     for ext in "tar.$COMP" tar.zst tar.gz tar; do
       f="$REF/$1.$ext"; src="$f"
       if [ -f "$f.enc" ]; then                       # encrypted archive: decrypt via dex
-        src="$STATE/staging/neo.$OPID.$1"; neo_decrypt_to "$f.enc" "$src" || { rm -f "$src"; continue; }
+        src="$STATE/staging/neo.$OPID.$1"
+        neo_decrypt_to "$f.enc" "$src" || { rm -f "$src"; audit "import-neo decrypt failed $1 $PKG"; finish false ERR_IMPORT_ENCRYPTED; return 1; }
       elif [ -f "$f" ]; then :                        # plain archive
       else continue; fi
       # anti-traversal: reject a tampered archive BEFORE the wipe (decrypted temp has
