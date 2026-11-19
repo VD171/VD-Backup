@@ -265,9 +265,10 @@ else TARC="-p"; fi
 if echo "$TARHELP" | grep -q -- '--no-absolute-names'; then NAN="--no-absolute-names"; else NAN=""; fi
 TARX="$TARC $NAN"
 
-VERB="$1"; OPID="$2"; ARGS_B64="$3"
+VERB="$1"; OPID="$2"
 PROG="$LOGS/progress-$OPID.json"
-ARGS="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+# args arrive in the 0600 file detach() wrote (never on argv); read once, then remove it.
+ARGS="$(base64 -d < "$STATE/staging/args.$OPID" 2>/dev/null)"; rm -f "$STATE/staging/args.$OPID"
 
 # Survive Android's low-memory killer. A bulk backup backgrounds the root manager and the
 # user opens other apps (camera, etc.); without this the LMK kills this detached worker
@@ -342,7 +343,12 @@ notify() {
   [ -f "$MODDIR/etc/vdbackup_helper.dex" ] && LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" \
       /system/bin ru.vd171.vdbackup.Helper notify "VDBackup" "$_nm" >/dev/null 2>&1; }
 
-jget() { printf '%s' "$1" | "$JQ" -r "$2" 2>/dev/null; }
+# here-doc, not printf: under mksh printf is external and would put the JSON (passphrases
+# included) on its argv.
+jget() { "$JQ" -r "$2" 2>/dev/null <<EOF
+$1
+EOF
+}
 cfg() { "$JQ" -r "$1 // empty" "$STATE/config.json" 2>/dev/null; }
 
 # active network transport: wifi | mobile | other | unknown. Layered detection so
@@ -627,12 +633,19 @@ enc_age() { # <outfile> ; reads plaintext on stdin, writes an age scrypt file
   _ep="$STATE/staging/enc.$OPID.$$"; cat > "$_ep"
   # paths go through the environment, never spliced into the -c string: a path with a
   # double-quote would otherwise break out and run as root inside `script`.
-  printf '%s\n%s\n' "$PW" "$PW" | AGE_BIN="$AGE" AGE_IN="$_ep" AGE_OUT="$1" "$SCRIPT" -qec 'exec "$AGE_BIN" -p -o "$AGE_OUT" "$AGE_IN"' /dev/null >/dev/null 2>&1
+  # the passphrase reaches age's pty on stdin from a here-doc: printf is external under
+  # mksh and would put it on argv.
+  AGE_BIN="$AGE" AGE_IN="$_ep" AGE_OUT="$1" "$SCRIPT" -qec 'exec "$AGE_BIN" -p -o "$AGE_OUT" "$AGE_IN"' /dev/null >/dev/null 2>&1 <<EOF
+$PW
+$PW
+EOF
   _er=$?; rm -f "$_ep"; return $_er
 }
 dec_age() { # <infile> ; writes the decrypted plaintext of an age scrypt file to stdout
   _dp="$STATE/staging/dec.$OPID.$$"
-  printf '%s\n' "$PW" | AGE_BIN="$AGE" AGE_IN="$1" AGE_OUT="$_dp" "$SCRIPT" -qec 'exec "$AGE_BIN" -d -o "$AGE_OUT" "$AGE_IN"' /dev/null >/dev/null 2>&1
+  AGE_BIN="$AGE" AGE_IN="$1" AGE_OUT="$_dp" "$SCRIPT" -qec 'exec "$AGE_BIN" -d -o "$AGE_OUT" "$AGE_IN"' /dev/null >/dev/null 2>&1 <<EOF
+$PW
+EOF
   cat "$_dp" 2>/dev/null; rm -f "$_dp"
 }
 # Passphrase encryption needs the bundled `age` AND a pty provider (`script`): age reads

@@ -133,7 +133,15 @@ detach() {               # detach <opid> <worker-verb> <b64args>
   # seed a concrete progress state so the UI shows "starting" instantly instead of
   # an empty file (the worker overwrites it with the first real phase right away).
   printf '{"opid":"%s","percent":0,"phase":"starting","item":"","done":false}\n' "$opid" > "$LOGS/progress-$opid.json"
-  setsid nohup "$MODDIR/scripts/worker.sh" "$wverb" "$opid" "$wargs" \
+  # the args (passphrases included) reach the worker in a root-only 0600 file, never on its
+  # argv, which other uids can read through /proc for the whole operation. A here-doc feeds
+  # cat on stdin (mksh has no printf builtin, so printf would put them on argv as well).
+  mkdir -p "$STATE/staging" 2>/dev/null
+  ( umask 077; cat > "$STATE/staging/args.$opid" <<EOF
+$wargs
+EOF
+  ) || return 1
+  setsid nohup "$MODDIR/scripts/worker.sh" "$wverb" "$opid" \
       >"$LOGS/$opid.out" 2>&1 </dev/null &
   echo "$!" > "$LOGS/$opid.pid"
 }
