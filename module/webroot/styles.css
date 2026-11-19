@@ -80,6 +80,13 @@ html[data-theme="light"] {
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* Controls behave like app controls: a long press on a tab, button or tappable row no longer
+   starts a text selection or the link/callout menu, and taps skip the double-tap-zoom wait.
+   Text in rows, notices and dialogs stays selectable. */
+.tabs, .tab, .btn, .icon-btn, .segment, .row.tappable .name, .row.tappable .pkg, summary.section-head {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+button, .tab, .row.tappable, summary, input[type="checkbox"] { touch-action: manipulation; }
 html, body { margin: 0; }
 body {
   background: var(--bg); color: var(--text);
