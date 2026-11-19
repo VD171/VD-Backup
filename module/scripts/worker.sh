@@ -286,7 +286,7 @@ _release_wakelock() { echo "vdbackup_$OPID" > /sys/power/wake_unlock 2>/dev/null
 # release into cleanup, and routing the signals into the same trap, fixes it for good.
 # also reap this op's staging transients (dump/xe/ic/batch/restore/...): a kill anywhere,
 # even during preparing (before the per-op DEST trap in do_backup arms), leaves no scratch.
-cleanup() { _release_wakelock; verifier_restore; rm -f "$LOGS/$OPID.pid"; [ -n "$OPID" ] && rm -rf "$STATE/staging/"*"$OPID"* 2>/dev/null; }
+cleanup() { _release_wakelock; verifier_restore; rm -f "$LOGS/$OPID.pid"; [ -n "$OPID" ] && rm -rf "$STATE/staging/"*".$OPID" "$STATE/staging/"*".$OPID."* 2>/dev/null; }
 trap cleanup EXIT
 trap 'exit 143' TERM
 trap 'exit 130' INT
@@ -660,12 +660,18 @@ comp_ext() { case "$1" in none) echo tar ;; gzip) echo tar.gz ;; lz4) echo tar.l
 decomp() { case "$1" in
   *.tar.gz*) "$GZIP" -dc "$1" ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c "$1" ;;
   *.tar.zst*) "$ZSTD" -dqc "$1" ;; *.tar*) cat "$1" ;; *) "$ZSTD" -dqc "$1" ;; esac; }
+# same, for a stream on stdin (decrypted age output); $1 only picks the codec.
+decomp_in() { case "$1" in
+  *.tar.gz*) "$GZIP" -dc ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c ;;
+  *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; }
 
 # Anti-path-traversal guard. Restore extracts tar archives AS ROOT, so a tampered
 # backup/import/special archive must never escape its target dir. scan_members reads
 # a tar listing on stdin and returns non-zero if any member is an absolute path or
-# holds a ".." component; archive_safe lists an archive (decrypting/decompressing by
-# encryption flag + filename) and returns 0 only when every member is contained.
+# holds a ".." component; list_safe lists a tar stream on stdin and also fails when tar
+# fails or lists nothing (wrong passphrase, unreadable or empty archive); archive_safe
+# lists an archive (decrypting/decompressing by encryption flag + filename) and returns
+# 0 only when it is readable and every member is contained.
 # Callers run this BEFORE the destructive wipe + extraction and abort on failure.
 scan_members() {
   while IFS= read -r _m; do
@@ -673,13 +679,15 @@ scan_members() {
   done
   return 0
 }
+list_safe() {
+  _ls="$(exec_ns "$TAR" -t 2>/dev/null)" || return 1
+  [ -n "$_ls" ] && printf '%s\n' "$_ls" | scan_members
+}
 archive_safe() {   # <archive> <enc:none|age|age-scrypt>; 0 = safe, 1 = unsafe
   { case "$2" in
-      age|age-scrypt) dec_age "$1" | { case "$1" in
-          *.tar.gz*) "$GZIP" -dc ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c ;;
-          *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; } ;;
+      age|age-scrypt) dec_age "$1" | decomp_in "$1" ;;
       *) decomp "$1" ;;
-    esac; } | exec_ns "$TAR" -t 2>/dev/null | scan_members
+    esac; } | list_safe
 }
 
 # media_own [-R] <path>: create <path> and give it the ownership + SELinux context
@@ -1874,7 +1882,7 @@ do_import_neo() {
       # anti-traversal: reject a tampered archive BEFORE the wipe (decrypted temp has
       # no suffix, so decompress by $ext, not by filename).
       if ! { case "$ext" in *.zst) "$ZSTD" -dqc "$src" ;; *.gz) "$GZIP" -dc "$src" ;; *) cat "$src" ;; esac; } \
-           | exec_ns "$TAR" -t 2>/dev/null | scan_members; then
+           | list_safe; then
         [ "$src" != "$f" ] && rm -f "$src"
         audit "import-neo unsafe archive $1 $PKG"; finish false ERR_UNSAFE_ARCHIVE; return 1; fi
       exec_ns rm -rf "$2" 2>/dev/null                 # faithful: wipe then extract (migration)
@@ -2160,7 +2168,7 @@ do_special_restore() {
     archive_safe "$REF/$arc" "$_senc" || { audit "special-restore unsafe archive $cat:$arc"; finish false ERR_UNSAFE_ARCHIVE; return; }
     exec_ns rm -rf "$src" 2>/dev/null
     mkdir -p "$parent"
-    if [ "$enc" = age-scrypt ]; then dec_age "$REF/$arc" | decomp "$arc" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
+    if [ "$enc" = age-scrypt ]; then dec_age "$REF/$arc" | decomp_in "$arc" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
     else decomp "$REF/$arc" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null; fi
     [ $? -eq 0 ] || { audit "special-restore extract failed $cat:$arc"; finish false ERR_RESTORE; return; }
     exec_ns restorecon -R "$src" 2>/dev/null
