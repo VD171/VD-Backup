@@ -832,6 +832,14 @@ item_paths() {
 # every backend namespaces its data under <path>/vdbackup so our files never
 # collide with the user's other files at the chosen destination path.
 remote_pfx() { printf '%s' "${DPATH:+$DPATH/}vdbackup"; }
+# A local Mirror needs an absolute, allowed root: the default local destination has no path,
+# which would make remote_pfx relative to the worker's cwd. Default it to a hidden dir in the
+# user's backups dir, then apply the same storage allowlist as a full backup's local copy.
+mirror_local_dest() {
+  [ "$DTYPE" = local ] || return 0
+  [ -n "$DPATH" ] || DPATH="$(backups_dir "$U")/.mirror"
+  safe_local_dest "$DPATH" || { audit "refused unsafe local dest $DPATH $PKG"; finish false ERR_DEST_UNSAFE; return 1; }
+}
 
 # Live rclone transfer: run rclone with periodic one-line stats and feed progx so the
 # WebUI shows percent / speed / ETA. A sentinel file carries rclone's real exit code
@@ -967,8 +975,10 @@ do_snapshot() {
 do_mirror() {
   [ -n "$DREMOTE" ] || [ "$DTYPE" = local ] || { finish false ERR_NO_DEST; return; }
   [ "$DTYPE" = local ] || net_guard || return
+  mirror_local_dest || return
   prog 5 freezing "$PKG"; notify backup_start "$PKG"
   freeze "$PKG"
+  _bfail=0
   # APK: always compressed, never raw (even in a mirror)
   if echo " $ITEMS " | grep -q ' apk '; then
     prog 18 mirror apk
@@ -978,10 +988,9 @@ do_mirror() {
     case "$DTYPE" in
       local)  mkdir -p "$(remote_pfx)/$PKG/apk" && exec_ns "$RSYNC" -a --delete "$apkdir/" "$(remote_pfx)/$PKG/apk/" >/dev/null 2>&1 ;;
       rclone) rclone_live "mirror apk" 18 sync "$apkdir" "$DREMOTE:$(remote_pfx)/$PKG/apk" ;;
-    esac
+    esac || { _bfail=1; audit "mirror sync failed $PKG (apk)"; }
     rm -rf "$apkdir"
   fi
-  _bfail=0
   sync_one() { # <label> <src> <basepct>
     [ -e "$2" ] || return 0
     case "$DTYPE" in
@@ -1475,6 +1484,7 @@ do_restore_mirror() {
   resolve_dest
   transport_guard mirror || return
   [ "$DTYPE" = local ] || net_guard || return
+  mirror_local_dest || return
   prog 5 fetching "$PKG"; audit "restore-mirror start $PKG"; notify restore_start "$PKG"
   if [ "$DTYPE" = local ]; then SRC="$(remote_pfx)/$PKG"
   else SRC="$STATE/staging/mrestore.$OPID"; rm -rf "$SRC"; mkdir -p "$SRC"
