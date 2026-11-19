@@ -681,7 +681,12 @@ scan_members() {
 }
 list_safe() {
   _ls="$(exec_ns "$TAR" -t 2>/dev/null)" || return 1
-  [ -n "$_ls" ] && printf '%s\n' "$_ls" | scan_members
+  [ -n "$_ls" ] || return 1
+  # here-doc, not printf: under mksh printf is external, so a large listing hit ARG_MAX,
+  # printf failed and scan_members read nothing and passed the archive unchecked
+  scan_members <<LSEOF
+$_ls
+LSEOF
 }
 archive_safe() {   # <archive> <enc:none|age|age-scrypt>; 0 = safe, 1 = unsafe
   { case "$2" in
