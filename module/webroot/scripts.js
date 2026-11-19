@@ -1876,7 +1876,7 @@ function loadSettings() {
   if ($("#set-gpass")) {
     $("#set-gpass").value = "";
     helper("pass-status", {}).then(function (r) { var e = $("#set-gpass-state"); if (e) e.textContent = I18N.t((r && r.global) ? "settings_gpass_set" : "settings_gpass_unset"); }).catch(function () {});
-    if ($("#set-gpass-clear")) $("#set-gpass-clear").onclick = function () { helper("pass-set-global", { password: "" }).then(function () { var e = $("#set-gpass-state"); if (e) e.textContent = I18N.t("settings_gpass_unset"); $("#set-gpass").value = ""; }); };
+    if ($("#set-gpass-clear")) $("#set-gpass-clear").onclick = function () { helper("pass-set-global", { password: "" }).then(function (r) { if (!r || !r.ok) { modalAlert(errMsg(r)); return; } var e = $("#set-gpass-state"); if (e) e.textContent = I18N.t("settings_gpass_unset"); $("#set-gpass").value = ""; }); };
   }
   if ($("#set-enc-data")) $("#set-enc-data").checked = !!CFG.encrypt_data;
   if ($("#set-enc-apk"))  $("#set-enc-apk").checked = !!CFG.encrypt_apk;
@@ -1913,7 +1913,7 @@ function saveSettings() {
   CFG.default_mode = $("#set-mode").value;
   CFG.default_dest = $("#set-dest").value;
   if ($("#set-staging")) CFG.staging_dir = $("#set-staging").value.trim();
-  if ($("#set-gpass") && $("#set-gpass").value) { helper("pass-set-global", { password: $("#set-gpass").value }).then(function () { var e = $("#set-gpass-state"); if (e) e.textContent = I18N.t("settings_gpass_set"); }); $("#set-gpass").value = ""; }
+  if ($("#set-gpass") && $("#set-gpass").value) { helper("pass-set-global", { password: $("#set-gpass").value }).then(function (r) { if (!r || !r.ok) { modalAlert(errMsg(r)); return; } var e = $("#set-gpass-state"); if (e) e.textContent = I18N.t("settings_gpass_set"); }); $("#set-gpass").value = ""; }
   if ($("#set-netpolicy")) CFG.network_policy = $("#set-netpolicy").value;
   if ($("#set-auto")) CFG.auto_backup = $("#set-auto").checked;
   if ($("#set-auto-keep")) CFG.auto_backup_keep = parseInt($("#set-auto-keep").value, 10) || 5;
@@ -2101,7 +2101,7 @@ function openAppItemsModal(pkg, label) {
   if ($("#ai-pass")) {
     $("#ai-pass").value = "";
     helper("pass-status", { package: pkg }).then(function (r) { var e = $("#ai-pass-state"); if (e) e.textContent = I18N.t((r && r.app) ? "settings_gpass_set" : "settings_gpass_unset"); }).catch(function () {});
-    if ($("#ai-pass-clear")) $("#ai-pass-clear").onclick = function () { helper("pass-set-app", { package: pkg, password: "" }).then(function () { var e = $("#ai-pass-state"); if (e) e.textContent = I18N.t("settings_gpass_unset"); $("#ai-pass").value = ""; }); };
+    if ($("#ai-pass-clear")) $("#ai-pass-clear").onclick = function () { helper("pass-set-app", { package: pkg, password: "" }).then(function (r) { if (!r || !r.ok) { modalAlert(errMsg(r)); return; } var e = $("#ai-pass-state"); if (e) e.textContent = I18N.t("settings_gpass_unset"); $("#ai-pass").value = ""; }); };
   }
   $("#appitems-modal").hidden = false;
 }
@@ -2892,7 +2892,7 @@ function boot() {
     if (!_aiPkg) return;
     var items = AI_ITEMS.filter(function (k) { var e = $("#ai-" + k); return e && e.checked; });
     if ($("#ai-note")) setAppNote(_aiPkg, $("#ai-note").value);
-    if ($("#ai-pass") && $("#ai-pass").value) { helper("pass-set-app", { package: _aiPkg, password: $("#ai-pass").value }); $("#ai-pass").value = ""; }
+    if ($("#ai-pass") && $("#ai-pass").value) { helper("pass-set-app", { package: _aiPkg, password: $("#ai-pass").value }).then(function (r) { if (!r || !r.ok) modalAlert(errMsg(r)); }); $("#ai-pass").value = ""; }
     setAppItems(_aiPkg, items); closeAppItemsModal(); buildAppItemsPicker(); renderApps($("#search") ? $("#search").value : "");
   };
   if ($("#appitems-clear")) $("#appitems-clear").onclick = function () {
