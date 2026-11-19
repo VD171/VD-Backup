@@ -48,8 +48,13 @@ mkdir -p "$LOGS"
 # honour the skip flag
 [ -f "$MODDIR/.scheduler.skip" ] && exit 0
 
-# single-instance guard: bail out if a scheduler loop is already alive
-if [ -f "$LOOPPID" ] && kill -0 "$(cat "$LOOPPID" 2>/dev/null)" 2>/dev/null; then exit 0; fi
+# single-instance guard: bail out if a scheduler loop is already alive. The pid file
+# survives reboot and its pid can be reused by another process, so match the loop's
+# own command line (it carries $LOOPPID) instead of trusting kill -0.
+_lp="$(cat "$LOOPPID" 2>/dev/null)"
+case "$_lp" in ''|*[!0-9]*) : ;; *)
+  case "$(tr '\0' ' ' < "/proc/$_lp/cmdline" 2>/dev/null)" in *"$LOOPPID"*) exit 0 ;; esac ;;
+esac
 
 # recurring, detached heartbeat (survives boot, never blocks it): the loop
 # records its own pid for the guard, then runs scheduler-tick every INTERVAL.
