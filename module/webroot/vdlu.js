@@ -135,17 +135,25 @@
       return cfgCache;
     }, function () { cfgCache = { order: [], map: {} }; return cfgCache; });
   }
+  // writes are chained: each one builds the whole file from cfgCache, so a second write
+  // started before the first resolved would drop the first one's keys.
+  var cfgWrite = Promise.resolve();
   function writeConfig(patch) {
-    var base = cfgCache || { order: [], map: {} };
-    var order = base.order.slice(), map = {};
-    base.order.forEach(function (k) { map[k] = base.map[k]; });
-    Object.keys(patch).forEach(function (k) {
-      var v = String(patch[k]).replace(/[\r\n]/g, '');
-      if (order.indexOf(k) < 0) order.push(k); map[k] = v;
-    });
-    var body = order.map(function (k) { return k + '=' + map[k]; }).join('\n') + '\n';
-    var cmd = 'cat > ' + q(C.vdluDir + '/config') + " << 'VDLUEOF'\n" + body + 'VDLUEOF';
-    return ex(cmd).then(function () { cfgCache = { order: order, map: map }; return cfgCache; });
+    var run = function () {
+      var base = cfgCache || { order: [], map: {} };
+      var order = base.order.slice(), map = {};
+      base.order.forEach(function (k) { map[k] = base.map[k]; });
+      Object.keys(patch).forEach(function (k) {
+        var v = String(patch[k]).replace(/[\r\n]/g, '');
+        if (order.indexOf(k) < 0) order.push(k); map[k] = v;
+      });
+      var body = order.map(function (k) { return k + '=' + map[k]; }).join('\n') + '\n';
+      var cmd = 'cat > ' + q(C.vdluDir + '/config') + " << 'VDLUEOF'\n" + body + 'VDLUEOF';
+      return ex(cmd).then(function () { cfgCache = { order: order, map: map }; return cfgCache; });
+    };
+    var p = cfgWrite.then(run, run);
+    cfgWrite = p.catch(function () {});
+    return p;
   }
 
   // ---- persistent pending-reboot banner ----------------------------------------------------------
