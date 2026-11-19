@@ -44,6 +44,7 @@
   "dest_fail": "onbereikbaar",
   "confirm_delete": "${name} verwijderen?",
   "backup": "Back-up maken",
+  "msg_err_dest_has_backups": "Deze bestemming bevat nog back-ups. Verplaats of verwijder ze eerst.",
   "msg_err_crypto_pass": "Deze back-up is versleuteld, voer de wachtwoordzin in.",
   "msg_err_crypto_unavail": "Versleuteling is niet beschikbaar op dit apparaat: een vereist meegeleverd binair bestand ontbreekt. Installeer VDBackup opnieuw of werk het bij en probeer het opnieuw.",
   "msg_restore_passphrase": "${name} is versleuteld. Voer de wachtwoordzin in om te herstellen.",

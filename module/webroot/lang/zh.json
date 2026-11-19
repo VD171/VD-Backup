@@ -44,6 +44,7 @@
   "dest_fail": "无法连接",
   "confirm_delete": "删除 ${name}？",
   "backup": "备份",
+  "msg_err_dest_has_backups": "该目标中仍有备份。请先移动或删除它们。",
   "msg_err_crypto_pass": "此备份已加密, 请输入其口令。",
   "msg_err_crypto_unavail": "此设备上无法使用加密：缺少必需的捆绑二进制文件。请重新安装或更新 VDBackup，然后重试。",
   "msg_restore_passphrase": "${name} 已加密。请输入口令以恢复。",

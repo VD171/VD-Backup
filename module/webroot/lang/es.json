@@ -44,6 +44,7 @@
   "dest_fail": "inaccesible",
   "confirm_delete": "¿Eliminar ${name}?",
   "backup": "Copiar",
+  "msg_err_dest_has_backups": "Este destino aún contiene copias. Muévelas o elimínalas primero.",
   "msg_err_crypto_pass": "Esta copia está cifrada, introduce la contraseña.",
   "msg_err_crypto_unavail": "El cifrado no está disponible en este dispositivo: falta un binario incluido necesario. Reinstala o actualiza VDBackup e inténtalo de nuevo.",
   "msg_restore_passphrase": "${name} está cifrado. Introduce la contraseña para restaurar.",

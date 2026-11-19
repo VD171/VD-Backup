@@ -982,7 +982,7 @@ EOF
     done
     paths=0; for d in "$bk"/.paths/*/; do [ -d "$d" ] && paths=$(( paths + 1 )); done
     jobs=0; for f in "$STATE/jobs"/*.json; do [ -f "$f" ] && jobs=$(( jobs + 1 )); done
-    size=0; if [ -d "$bk" ]; then size="$(du -s -B1 "$bk" 2>/dev/null | cut -f1)"; case "$size" in ''|*[!0-9]*) size=0 ;; esac; fi
+    size=0; if [ -d "$bk" ]; then size="$(du -sk "$bk" 2>/dev/null | cut -f1)"; case "$size" in ''|*[!0-9]*) size=0 ;; esac; size=$((size * 1024)); fi   # toybox du: -k, no -B
     _dfp="$bk"; [ -d "$_dfp" ] || _dfp="/data/media/$u"; [ -d "$_dfp" ] || _dfp=/data
     free=0; total=0
     set -- $(df -kP "$_dfp" 2>/dev/null | tail -1)

@@ -44,6 +44,7 @@
   "dest_fail": "nieosiągalny",
   "confirm_delete": "Usunąć ${name}?",
   "backup": "Utwórz kopię",
+  "msg_err_dest_has_backups": "To miejsce docelowe nadal zawiera kopie. Najpierw je przenieś lub usuń.",
   "msg_err_crypto_pass": "Ta kopia jest zaszyfrowana, podaj hasło.",
   "msg_err_crypto_unavail": "Szyfrowanie jest niedostępne na tym urządzeniu: brakuje wymaganego dołączonego pliku binarnego. Zainstaluj ponownie lub zaktualizuj VDBackup i spróbuj ponownie.",
   "msg_restore_passphrase": "${name} jest zaszyfrowany. Podaj hasło, aby przywrócić.",

@@ -44,6 +44,7 @@
   "dest_fail": "到達不可",
   "confirm_delete": "${name} を削除しますか？",
   "backup": "バックアップ",
+  "msg_err_dest_has_backups": "この保存先にはまだバックアップがあります。先に移動または削除してください。",
   "msg_err_crypto_pass": "このバックアップは暗号化されています, パスフレーズを入力してください。",
   "msg_err_crypto_unavail": "この端末では暗号化を利用できません。必要な同梱バイナリがありません。VDBackup を再インストールまたは更新してから、もう一度お試しください。",
   "msg_restore_passphrase": "${name} は暗号化されています。復元するにはパスフレーズを入力してください。",

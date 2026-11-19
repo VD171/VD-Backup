@@ -44,6 +44,7 @@
   "dest_fail": "không thể kết nối",
   "confirm_delete": "Xóa ${name}?",
   "backup": "Sao lưu",
+  "msg_err_dest_has_backups": "Đích này vẫn còn bản sao lưu. Hãy di chuyển hoặc xóa chúng trước.",
   "msg_err_crypto_pass": "Bản sao lưu này được mã hóa, nhập mật khẩu.",
   "msg_err_crypto_unavail": "Mã hóa không khả dụng trên thiết bị này: thiếu một tệp nhị phân đi kèm bắt buộc. Cài đặt lại hoặc cập nhật VDBackup rồi thử lại.",
   "msg_restore_passphrase": "${name} được mã hóa. Nhập mật khẩu để khôi phục.",

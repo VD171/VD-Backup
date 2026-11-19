@@ -44,6 +44,7 @@
   "dest_fail": "tidak dapat dijangkau",
   "confirm_delete": "Hapus ${name}?",
   "backup": "Cadangkan",
+  "msg_err_dest_has_backups": "Tujuan ini masih berisi cadangan. Pindahkan atau hapus dulu.",
   "msg_err_crypto_pass": "Cadangan ini terenkripsi, masukkan frasa sandinya.",
   "msg_err_crypto_unavail": "Enkripsi tidak tersedia di perangkat ini: berkas biner bawaan yang diperlukan tidak ada. Pasang ulang atau perbarui VDBackup, lalu coba lagi.",
   "msg_restore_passphrase": "${name} terenkripsi. Masukkan frasa sandi untuk memulihkan.",

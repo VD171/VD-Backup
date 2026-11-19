@@ -70,6 +70,7 @@ window.__I18N_EN = {
   "dest_fail": "unreachable",
   "confirm_delete": "Delete ${name}?",
   "backup": "Back up",
+  "msg_err_dest_has_backups": "This destination still holds backups. Move or delete them first.",
   "msg_err_crypto_pass": "This backup is encrypted. Enter its passphrase.",
   "msg_err_crypto_unavail": "Encryption is unavailable on this device: a required bundled binary is missing. Reinstall or update VDBackup, then try again.",
   "msg_restore_passphrase": "${name} is encrypted. Enter the passphrase to restore it.",

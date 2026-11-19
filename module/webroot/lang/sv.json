@@ -44,6 +44,7 @@
   "dest_fail": "onåbar",
   "confirm_delete": "Ta bort ${name}?",
   "backup": "Säkerhetskopiera",
+  "msg_err_dest_has_backups": "Det här målet har fortfarande säkerhetskopior. Flytta eller ta bort dem först.",
   "msg_err_crypto_pass": "Denna säkerhetskopia är krypterad, ange lösenfrasen.",
   "msg_err_crypto_unavail": "Kryptering är inte tillgänglig på den här enheten: en nödvändig medföljande binärfil saknas. Installera om eller uppdatera VDBackup och försök igen.",
   "msg_restore_passphrase": "${name} är krypterad. Ange lösenfrasen för att återställa.",

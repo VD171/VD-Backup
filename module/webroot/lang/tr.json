@@ -44,6 +44,7 @@
   "dest_fail": "erişilemez",
   "confirm_delete": "${name} silinsin mi?",
   "backup": "Yedekle",
+  "msg_err_dest_has_backups": "Bu hedefte hâlâ yedekler var. Önce taşıyın veya silin.",
   "msg_err_crypto_pass": "Bu yedek şifreli, parolasını girin.",
   "msg_err_crypto_unavail": "Bu cihazda şifreleme kullanılamıyor: gerekli bir paketli ikili dosya eksik. VDBackup'ı yeniden yükleyin veya güncelleyin, sonra tekrar deneyin.",
   "msg_restore_passphrase": "${name} şifreli. Geri yüklemek için parolayı girin.",

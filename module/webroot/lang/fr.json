@@ -44,6 +44,7 @@
   "dest_fail": "inaccessible",
   "confirm_delete": "Supprimer ${name} ?",
   "backup": "Sauvegarder",
+  "msg_err_dest_has_backups": "Cette destination contient encore des sauvegardes. Déplacez-les ou supprimez-les d'abord.",
   "msg_err_crypto_pass": "Cette sauvegarde est chiffrée, saisissez la phrase secrète.",
   "msg_err_crypto_unavail": "Le chiffrement est indisponible sur cet appareil : un binaire fourni requis est manquant. Réinstallez ou mettez à jour VDBackup, puis réessayez.",
   "msg_restore_passphrase": "${name} est chiffré. Saisissez la phrase secrète pour le restaurer.",
