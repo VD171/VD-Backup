@@ -1015,7 +1015,7 @@ function cancelAuthorize() {
 function delRemote(name) {
   modalConfirm(I18N.t("confirm_delete", { name: name })).then(function (ok) {
     if (!ok) return;
-    helper("remote-del", { name: name }).then(loadRemotes);
+    helper("remote-del", { name: name }).then(function (r) { if (!r || !r.ok) modalAlert(errMsg(r)); loadRemotes(); });
   });
 }
 // Populate a <select> with every destination (local + configured) and preselect
@@ -1128,7 +1128,7 @@ function testDest(id) {
 function delDest(id) {
   modalConfirm(I18N.t("confirm_delete", { name: id })).then(function (ok) {
     if (!ok) return;
-    helper("dest-del", { id: id }).then(loadDests);
+    helper("dest-del", { id: id }).then(function (r) { if (!r || !r.ok) modalAlert(errMsg(r)); loadDests(); });
   });
 }
 
@@ -1702,7 +1702,7 @@ function saveJob() {
 function delJob(id) {
   modalConfirm(I18N.t("confirm_delete", { name: id })).then(function (ok) {
     if (!ok) return;
-    helper("schedule-delete", { id: id }).then(loadSchedule);
+    helper("schedule-delete", { id: id }).then(function (r) { if (!r || !r.ok) modalAlert(errMsg(r)); loadSchedule(); });
   });
 }
 
