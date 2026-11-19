@@ -272,7 +272,8 @@ function cacheIcon(pkg, vc, b64) {
 // instead of one process per icon. Cache hits are instant.
 var _iconQ = [], _iconTimer = null, ICON_BATCH = 40;
 function loadIcon(ic) {
-  var pkg = ic.dataset.pkg; if (!pkg) return;
+  var pkg = ic.dataset.pkg;
+  if (!pkg) { if (ic.dataset.bref) loadBackupIcon(ic, ic.dataset.bref); return; }
   var vc = ic.dataset.vc || "0", cached = null;
   try { cached = localStorage.getItem(iconKey(pkg, vc)); } catch (e) {}
   if (cached) { setIcon(ic, cached); return; }
@@ -391,8 +392,11 @@ function bkMatch(b, q) {
     || ((b.package || "").toLowerCase().indexOf(q) >= 0)
     || ((b.tags || []).some(function (t) { return (t || "").toLowerCase().indexOf(q) >= 0; }));
 }
+var _bkIcons = [];
 function renderBackups(list) {
   var ul = $("#backuplist"); ul.innerHTML = "";
+  if (iconObserver) _bkIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
+  _bkIcons = [];
   BACKUPS = list || [];
   var q = (bkQuery || "").toLowerCase().trim();
   var shown = q ? BACKUPS.filter(function (b) { return bkMatch(b, q); }) : BACKUPS;
@@ -421,7 +425,9 @@ function renderBackups(list) {
       li.onclick = function () { openBackupInfo(b); };
     }
     ul.appendChild(li);
-    loadBackupIcon(ic, b.ref);   // icon comes from the manifest, not the live app
+    // icon comes from the manifest, not the live app; loaded lazily on scroll, like app icons
+    ic.dataset.bref = b.ref || ""; _bkIcons.push(ic);
+    if (iconObserver) iconObserver.observe(ic); else loadBackupIcon(ic, b.ref);
   });
 }
 function toggleBkSel(b, on) {
@@ -457,15 +463,34 @@ function startBatchRestore() {
 }
 // Backup-list icon: read the icon stored in the manifest, so it shows even when
 // the app is uninstalled. Cached per backup ref; "0" marks a backup with no icon.
+// Batched like app icons (one helper call per ICON_BATCH refs), and a ref already
+// being fetched is not asked for again: re-renders just add their icon to the wait list.
+var _bicQ = [], _bicTimer = null, _bicPending = {};
 function loadBackupIcon(ic, ref) {
   if (!ref) return;
-  var key = "vdb_bic:" + ref, cached = null;
-  try { cached = localStorage.getItem(key); } catch (e) {}
+  var cached = null;
+  try { cached = localStorage.getItem("vdb_bic:" + ref); } catch (e) {}
   if (cached) { if (cached !== "0") setIcon(ic, cached); return; }
-  helper("backup-icon", { ref: ref }).then(function (r) {
-    if (r && r.ok && r.icon) { try { localStorage.setItem(key, r.icon); } catch (e) {} setIcon(ic, r.icon); }
-    else { try { localStorage.setItem(key, "0"); } catch (e) {} }
-  });
+  if (_bicPending[ref]) { _bicPending[ref].push(ic); return; }
+  _bicPending[ref] = [ic]; _bicQ.push(ref);
+  if (_bicQ.length >= ICON_BATCH) flushBackupIcons();
+  else if (!_bicTimer) _bicTimer = setTimeout(flushBackupIcons, 120);
+}
+function flushBackupIcons() {
+  if (_bicTimer) { clearTimeout(_bicTimer); _bicTimer = null; }
+  if (!_bicQ.length) return;
+  var refs = _bicQ.splice(0, ICON_BATCH);
+  var done = function (map) {
+    refs.forEach(function (ref) {
+      var ics = _bicPending[ref] || []; delete _bicPending[ref];
+      // only an answered ref is cached ("" = no icon); a failed call is retried on a later render
+      if (!map || !Object.prototype.hasOwnProperty.call(map, ref)) return;
+      try { localStorage.setItem("vdb_bic:" + ref, map[ref] || "0"); } catch (e) {}
+      if (map[ref]) ics.forEach(function (ic) { setIcon(ic, map[ref]); });
+    });
+  };
+  helper("backup-icons", { refs: refs }).then(function (r) { done(r && r.ok && r.icons); }, function () { done(null); });
+  if (_bicQ.length) _bicTimer = setTimeout(flushBackupIcons, 0);   // drain remaining
 }
 // backup details (tap a backup entry)
 function openBackupInfo(b) {
