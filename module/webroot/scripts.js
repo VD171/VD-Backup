@@ -993,6 +993,9 @@ function pollAuthorize() {
       return;
     }
     if (r.done) {
+      // focus, visibilitychange and the interval can each have a poll in flight:
+      // only the first one that sees done may store the remote
+      if (!_authActive) return;
       _authActive = false;
       stopAuthorizePoll();
       _authorizedToken = r.token || "";
