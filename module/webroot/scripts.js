@@ -2578,7 +2578,7 @@ function adbRender() {
   adbUpdateSel();
 }
 function adbRowEl(n) {
-  var row = el("div", "adb-row"); row.style.paddingLeft = (10 + n.depth * 16) + "px";
+  var row = el("div", "adb-row"); row.style.paddingInlineStart = (10 + n.depth * 16) + "px";
   var branch = n.type === "dir" && n.hasKids;
   var tw = el("span", "adb-twisty" + (branch ? "" : " leaf"), n.expanded ? "▾" : "▸");
   if (branch) tw.onclick = function (e) { e.stopPropagation(); adbToggle(n); };
