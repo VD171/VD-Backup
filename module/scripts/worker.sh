@@ -1925,7 +1925,7 @@ do_import_neo() {
 # via $TARC). Restore is same-device/same-ROM faithful. A portable content:// export
 # sidecar is produced separately by the dex helper. Restore is reboot-required and
 # gated behind heavy UI friction (it overwrites live system state).
-special_paths() {   # <category>; echoes each existing owned path, one per line
+special_candidates() {   # <category>; echoes every path the category owns, one per line
   case "$1" in
     messages)  set -- "/data/user/${U:-0}/com.android.providers.telephony" "/data/user_de/${U:-0}/com.android.providers.telephony" ;;
     rcs)       set -- "/data/user/${U:-0}/com.google.android.apps.messaging" "/data/user_de/${U:-0}/com.google.android.apps.messaging" ;;   # RCS lives in Google Messages' own data (bugle_db), not the telephony provider
@@ -1936,7 +1936,10 @@ special_paths() {   # <category>; echoes each existing owned path, one per line
     wallpaper) set -- "/data/system/users/${U:-0}/wallpaper" "/data/system/users/${U:-0}/wallpaper_lock" "/data/system/users/${U:-0}/wallpaper_info.xml" ;;
     *) return 1 ;;
   esac
-  for _p in "$@"; do [ -e "$_p" ] && printf '%s\n' "$_p"; done
+  printf '%s\n' "$@"
+}
+special_paths() {   # <category>; echoes each existing owned path, one per line
+  special_candidates "$1" | while IFS= read -r _p; do [ -e "$_p" ] && printf '%s\n' "$_p"; done
 }
 
 # Portable export sidecar for special backups: read the provider SQLite dbs with the
@@ -2169,9 +2172,16 @@ do_special_restore() {
     { [ -z "$arc" ] || [ -z "$src" ]; } && continue
     want_cat "$cat" || continue
     case "$src" in *..*) audit "special-restore skip traversal $src"; continue ;; /data/*) : ;; *) audit "special-restore skip unsafe path $src"; continue ;; esac
+    # the manifest sits on /sdcard: only restore into a path this category owns
+    special_candidates "$cat" | grep -qxF "$src" || { audit "special-restore skip foreign path $cat:$src"; continue; }
     parent="$(dirname "$src")"; base="$(basename "$src")"
     prog $(( 10 + i * 80 / (n>0?n:1) )) extracting "$cat"
-    # anti-traversal: reject a tampered archive BEFORE the destructive wipe
+    # integrity + anti-traversal BEFORE the destructive wipe (same order as restore())
+    want="$("$JQ" -r ".items[$((i-1))].sha256 // empty" "$M")"
+    if [ -n "$want" ]; then
+      got="$(sha256sum "$REF/$arc" 2>/dev/null | cut -d' ' -f1)"
+      [ "$want" = "$got" ] || { audit "special-restore sha mismatch $cat:$arc"; finish false ERR_VERIFY; return; }
+    fi
     _senc=none; [ "$enc" = age-scrypt ] && _senc=age
     archive_safe "$REF/$arc" "$_senc" || { audit "special-restore unsafe archive $cat:$arc"; finish false ERR_UNSAFE_ARCHIVE; return; }
     exec_ns rm -rf "$src" 2>/dev/null
