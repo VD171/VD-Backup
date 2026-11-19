@@ -743,3 +743,32 @@ details.grp[open] > summary.section-head::after { transform: rotate(180deg); col
   border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
 
 .app-note { font-size: .82em; opacity: .7; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Restore from Telegram: one collapsible card per app, one line per backup inside it. The lines wrap
+   their actions under the date on narrow screens instead of letting the buttons overlap. */
+#tg-backups .modal-card { overflow: hidden; }
+#tg-backups .tgb-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; gap: 10px; padding-right: 2px; }
+.tgb-card { flex: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.tgb-head { display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; list-style: none; }
+.tgb-head::-webkit-details-marker { display: none; }
+.tgb-head::after { content: "\25BC"; flex: none; width: 26px; height: 26px; display: grid; place-items: center;
+  font-size: 11px; border-radius: var(--r-sm); background: var(--bg-2); border: 1px solid var(--line);
+  color: var(--muted); transition: transform .2s ease, color .15s ease; }
+.tgb-group[open] > .tgb-head::after { transform: rotate(180deg); color: var(--accent); }
+.tgb-head .grow { flex: 1; min-width: 0; }
+.tgb-head .name { font-weight: 650; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tgb-head .pkg { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; word-break: normal; }
+.tgb-head .sub { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.tgb-head .sub .badge { font-size: 11px; padding: 0 7px; }
+.tgb-head .app-ic { width: 40px; height: 40px; border-radius: 10px; flex: none; background: var(--surface-2);
+  display: grid; place-items: center; font-weight: 800; color: var(--silver); font-size: 17px; }
+.tgb-vers { display: flex; flex-direction: column; border-top: 1px solid var(--line); background: var(--surface-2); }
+.tgb-ver { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px; }
+.tgb-ver + .tgb-ver { border-top: 1px solid var(--line); }
+.tgb-info { flex: 1 1 140px; min-width: 0; }
+.tgb-date { font-weight: 600; font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tgb-date .badge { font-size: 11px; padding: 0 7px; }
+.tgb-info .sub { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.tgb-acts { display: flex; gap: 8px; flex: 0 0 auto; margin-left: auto; }
+.tgb-acts .btn.small { min-height: 36px; padding: 0 12px; font-size: 13.5px; }
+[dir="rtl"] .tgb-acts { margin-left: 0; margin-right: auto; }

@@ -1236,42 +1236,117 @@ function openTelegramLogin() {
 
 // list the backups stored in the Telegram channel and let the user PULL one back to local
 // storage (where the normal restore flow then handles it). Not logged in -> run the login first.
+// The archives are self-describing (<pkg>__<ts>_<vc>.vdb.tar), so the list is grouped per app:
+// one collapsed card per package (icon + app label, "Not installed" when it is gone) that
+// opens to one line per backup (date, size, version) with its own Pull / Delete actions.
+function tgParseName(name) {
+  var mt = (name || "").match(/^(.+)__([^_]+)_(-?\d+)\.vdb\.tar$/);
+  if (!mt) return null;
+  var ts = mt[2], d = null, tm = ts.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/);
+  if (tm) d = new Date(Date.UTC(+tm[1], +tm[2] - 1, +tm[3], +tm[4], +tm[5], +tm[6]));
+  return { pkg: mt[1], ts: ts, vc: mt[3], when: d };
+}
+function tgWhen(b, info) {
+  var d = info && info.when;
+  if (!d && b.date != null) { var n = Number(b.date); d = new Date(isNaN(n) ? b.date : (n < 1e12 ? n * 1000 : n)); }
+  return (d && !isNaN(d.getTime())) ? d : null;
+}
 function openTelegramBackups() {
-  var m = $("#tg-backups"), box = $("#tg-backups-list");
+  var m = $("#tg-backups"), box = $("#tg-backups-list"), q = $("#tg-backups-search");
   box.innerHTML = "<li class='muted'>" + I18N.t("apps_loading") + "</li>"; m.hidden = false;
+  if (q) { q.hidden = true; q.value = ""; }
   $("#tg-backups-close").onclick = function () { m.hidden = true; };
   helper("telegram-check").then(function (c) {
     if (!c || !c.ok || !c.is_auth) { m.hidden = true; openTelegramLogin().then(function (ok) { if (ok) openTelegramBackups(); }); return; }
     helper("telegram-list").then(function (r) {
-      box.innerHTML = "";
       var items = ((r && r.ok && r.backups) ? r.backups : []).filter(function (b) { return /\.vdb\.tar$/.test(b.name || ""); });
-      if (!items.length) { box.innerHTML = "<li class='muted'>" + I18N.t("ui_tg_no_backups") + "</li>"; return; }
+      // group by package, newest backup first inside each group
+      var groups = {}, order = [];
       items.forEach(function (b) {
-        var mt = (b.name || "").match(/^(.+)__([^_]+)_(\d+)\.vdb\.tar$/);
-        var li = el("li", "row");
-        li.appendChild(el("div", "grow", (mt ? mt[1] : b.name)));
-        var btn = el("button", "btn small go", I18N.t("ui_tg_pull"));
-        btn.onclick = function () {
-          m.hidden = true;
-          helper("telegram-pull", { message_id: b.message_id, name: b.name }).then(function (op) {
-            if (op && op.opid) trackOp(op.opid, { onDone: function (p) { if (p.ok) { loadBackups(); modalAlert(I18N.t("msg_tg_pulled")); } } });
-            else modalAlert(errMsg(op));
-          }).catch(function () { modalAlert(errMsg()); });
-        };
-        var del = el("button", "btn small danger", I18N.t("delete"));
-        del.onclick = function () {
-          modalConfirm(I18N.t("msg_tg_delete_confirm"), I18N.t("delete")).then(function (yes) {
-            if (!yes) return;
-            helper("telegram-delete", { message_id: b.message_id }).then(function (r) {
-              if (r && r.ok) { modalAlert(I18N.t("msg_tg_deleted")); openTelegramBackups(); }
-              else modalAlert(errMsg(r));
-            }).catch(function () { modalAlert(errMsg()); });
-          });
-        };
-        li.appendChild(del); li.appendChild(btn); box.appendChild(li);
+        var info = tgParseName(b.name), pkg = info ? info.pkg : b.name;
+        if (!groups[pkg]) {
+          // the archive name only carries the package: take the label from the installed app,
+          // else from the upload's caption meta (newer uploads), else from a local backup of it
+          var app = APPS.filter(function (a) { return a.package === pkg; })[0];
+          var local = BACKUPS.filter(function (x) { return x.package === pkg && x.label; })[0];
+          groups[pkg] = { pkg: pkg, app: app, label: (app && app.label) || (local && local.label) || "", list: [] };
+          order.push(pkg);
+        }
+        if (!groups[pkg].app && b.meta && b.meta.label) groups[pkg].label = b.meta.label;
+        groups[pkg].list.push({ b: b, info: info, when: tgWhen(b, info) });
       });
+      order.forEach(function (k) { groups[k].list.sort(function (x, y) { return (y.when ? y.when.getTime() : 0) - (x.when ? x.when.getTime() : 0); }); });
+      function newest(k) { var w = groups[k].list[0].when; return w ? w.getTime() : 0; }
+      order.sort(function (a, b) { return newest(b) - newest(a); });   // most recently backed-up app first
+      function render() {
+        var f = q && !q.hidden ? (q.value || "").toLowerCase().trim() : "";
+        box.innerHTML = "";
+        if (!items.length) { box.innerHTML = "<li class='muted'>" + I18N.t("ui_tg_no_backups") + "</li>"; return; }
+        var shown = order.filter(function (k) { return !f || k.toLowerCase().indexOf(f) >= 0 || groups[k].label.toLowerCase().indexOf(f) >= 0; });
+        if (!shown.length) { box.innerHTML = "<li class='muted'>" + I18N.t("ui_job_no_match") + "</li>"; return; }
+        shown.forEach(function (k) { box.appendChild(tgGroupCard(groups[k], m)); });
+      }
+      if (q) { q.hidden = order.length < 6; q.oninput = render; }
+      render();
     }).catch(function () { box.innerHTML = "<li class='muted'>" + errMsg() + "</li>"; });
   }).catch(function () { box.innerHTML = "<li class='muted'>" + errMsg() + "</li>"; });
+}
+function tgGroupCard(g, m) {
+  // native <details>: every app starts collapsed, tapping its header shows its backups
+  var li = el("li", "tgb-card"), grp = el("details", "tgb-group");
+  var head = el("summary", "tgb-head");
+  var ic = el("div", "app-ic", (g.label || g.pkg).charAt(0).toUpperCase());
+  var meta = el("div", "grow");
+  meta.appendChild(el("div", "name", g.label || g.pkg));
+  if (g.label) meta.appendChild(el("div", "pkg", g.pkg));
+  var bits = [], newest = g.list[0].when, sub = el("div", "sub");
+  if (g.list.length > 1) bits.push(I18N.t("ui_tg_n_backups", { n: g.list.length }));
+  if (newest) bits.push(shortDate(newest.toISOString()));
+  if (!g.app) sub.appendChild(statusBadge("warn", I18N.t("ui_tg_not_installed")));
+  if (bits.length) sub.appendChild(el("span", null, bits.join(" \u00b7 ")));
+  if (sub.childNodes.length) meta.appendChild(sub);
+  head.appendChild(ic); head.appendChild(meta);
+  grp.appendChild(head);
+  if (g.app) { ic.dataset.pkg = g.pkg; ic.dataset.vc = (g.app.versionCode != null) ? String(g.app.versionCode) : "0"; loadIcon(ic); }
+  var vers = el("div", "tgb-vers");
+  g.list.forEach(function (e, i) {
+    var b = e.b, row = el("div", "tgb-ver");
+    var txt = el("div", "tgb-info");
+    var line = el("div", "tgb-date", e.when ? shortDate(e.when.toISOString()) : (e.info ? e.info.ts : b.name));
+    if (i === 0 && g.list.length > 1) { line.appendChild(document.createTextNode(" ")); line.appendChild(el("span", "badge ok", I18N.t("ui_tg_latest"))); }
+    txt.appendChild(line);
+    var bits = [];
+    if (b.size) bits.push(fmtSize(b.size));
+    if (e.info && e.info.vc && e.info.vc !== "0") bits.push("v" + e.info.vc);
+    if (bits.length) txt.appendChild(el("div", "sub", bits.join(" \u00b7 ")));
+    row.appendChild(txt);
+    var acts = el("div", "tgb-acts");
+    var del = el("button", "btn small danger", I18N.t("delete"));
+    del.type = "button";
+    del.onclick = function () {
+      modalConfirm(I18N.t("msg_tg_delete_confirm"), I18N.t("delete")).then(function (yes) {
+        if (!yes) return;
+        helper("telegram-delete", { message_id: b.message_id }).then(function (r) {
+          if (r && r.ok) { modalAlert(I18N.t("msg_tg_deleted")); openTelegramBackups(); }
+          else modalAlert(errMsg(r));
+        }).catch(function () { modalAlert(errMsg()); });
+      });
+    };
+    var btn = el("button", "btn small go", I18N.t("ui_tg_pull"));
+    btn.type = "button";
+    btn.onclick = function () {
+      m.hidden = true;
+      helper("telegram-pull", { message_id: b.message_id, name: b.name }).then(function (op) {
+        if (op && op.opid) trackOp(op.opid, { onDone: function (p) { if (p.ok) { loadBackups(); modalAlert(I18N.t("msg_tg_pulled")); } } });
+        else modalAlert(errMsg(op));
+      }).catch(function () { modalAlert(errMsg()); });
+    };
+    acts.appendChild(del); acts.appendChild(btn);
+    row.appendChild(acts);
+    vers.appendChild(row);
+  });
+  grp.appendChild(vers); li.appendChild(grp);
+  return li;
 }
 
 // list Full backups stored remote-only on the configured rclone destinations and let the user PULL

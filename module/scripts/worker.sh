@@ -744,7 +744,9 @@ drive_ok() { printf '%s' "$1" | "$JQ" -e '.ok==true' >/dev/null 2>&1; }
 # the generic store. The binary reads only $STATE/staging (root-visible) + the network.
 TGBIN="$(bin_or mtproto-store)"
 TG_STATE="$SECRETS/telegram"
-tg_cmd() { MTPROTO_STORE_TAG=VDB MTPROTO_STORE_STATE="$TG_STATE" "$TGBIN" "$@" 2>/dev/null; }
+# TG_LABEL (the app label, set before an upload) rides in the caption metadata as "label", so the
+# Telegram list can show the app name; mtproto-store builds without it just ignore the variable.
+tg_cmd() { MTPROTO_STORE_TAG=VDB MTPROTO_STORE_STATE="$TG_STATE" MTPROTO_STORE_LABEL="${TG_LABEL:-}" "$TGBIN" "$@" 2>/dev/null; }
 tg_ok() { printf '%s' "$1" | "$JQ" -e '.ok==true' >/dev/null 2>&1; }
 # check-auth returns ok:true even with no session, with a boolean .is_auth (and user/channel
 # only once logged in). The real auth gate is .is_auth==true, not .ok. (Verified against the
@@ -920,6 +922,7 @@ transfer_full() {
             _tstg="$STATE/staging/tgup.$OPID"; rm -rf "$_tstg"; mkdir -p "$_tstg"
             exec_ns "$TAR" -C "$DEST" -c -f "$_tstg/${PKG}__${TS}_${VC}.vdb.tar" . \
               || { rm -rf "$_tstg"; audit "telegram pack failed $PKG"; finish false ERR_TRANSFER; return 1; }
+            TG_LABEL=""; [ -n "${LABEL:-}" ] && [ "$LABEL" != "$PKG" ] && TG_LABEL="$LABEL"
             tg_ok "$(tg_cmd upload --dir "$_tstg" --opid "$OPID")" \
               || { rm -rf "$_tstg"; audit "telegram upload failed $PKG"; finish false ERR_TRANSFER; return 1; }
             rm -rf "$_tstg" ;;
