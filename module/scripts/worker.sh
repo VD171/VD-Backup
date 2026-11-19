@@ -2230,6 +2230,9 @@ do_path_backup() {
   if [ "$ENCDATA" = true ] && ! crypto_available; then finish false ERR_CRYPTO_UNAVAIL; return; fi
   use_data_age() { [ "$ENCDATA" = true ] && [ -n "$PW" ]; }
   resolve_dest
+  # Telegram stores one archive per app backup and telegram-pull restores only those, so a
+  # folder backup there could never come back: refuse it up front, before any work.
+  [ "$DTYPE" = telegram ] && { finish false ERR_TG_KIND; return; }
   transport_guard full || return
   prog 2 preparing "path"; audit "path-backup start $SRCP"; notify backup_start "path"
   SAFE="$(printf '%s' "$SRCP" | sed -e 's#^/##' -e 's#[^A-Za-z0-9._-]#_#g')"; [ -n "$SAFE" ] || SAFE=path
@@ -2346,6 +2349,7 @@ do_adb_backup() {
   use_data_age() { [ "$ENCDATA" = true ] && [ -n "$PW" ]; }
   U=0   # /data/adb is system-wide, not per-user
   resolve_dest
+  [ "$DTYPE" = telegram ] && { finish false ERR_TG_KIND; return; }   # app backups only (see do_path_backup)
   transport_guard full || return
   prog 2 preparing "adb"; audit "adb-backup start"; notify backup_start "adb"
   BACKUPS="$(backups_dir "$U")"; BK="$BACKUPS/.adb"; TS="$(date -u +%Y%m%dT%H%M%SZ)"; DEST="$BK/$TS"
