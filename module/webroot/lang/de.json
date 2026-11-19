@@ -44,6 +44,7 @@
   "dest_fail": "nicht erreichbar",
   "confirm_delete": "${name} löschen?",
   "backup": "Sichern",
+  "msg_err_dest_has_backups": "Dieses Ziel enthält noch Backups. Verschiebe oder lösche sie zuerst.",
   "msg_err_crypto_pass": "Dieses Backup ist verschlüsselt, Passphrase eingeben.",
   "msg_err_crypto_unavail": "Die Verschlüsselung ist auf diesem Gerät nicht verfügbar: eine benötigte mitgelieferte Binärdatei fehlt. Installiere VDBackup neu oder aktualisiere es und versuche es erneut.",
   "msg_restore_passphrase": "${name} ist verschlüsselt. Passphrase zum Wiederherstellen eingeben.",

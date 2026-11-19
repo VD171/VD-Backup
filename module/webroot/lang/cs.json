@@ -44,6 +44,7 @@
   "dest_fail": "nedostupný",
   "confirm_delete": "Smazat ${name}?",
   "backup": "Zálohovat",
+  "msg_err_dest_has_backups": "Tento cíl stále obsahuje zálohy. Nejprve je přesuňte nebo smažte.",
   "msg_err_crypto_pass": "Tato záloha je šifrovaná, zadejte heslo.",
   "msg_err_crypto_unavail": "Šifrování není na tomto zařízení dostupné: chybí požadovaný přibalený binární soubor. Přeinstalujte nebo aktualizujte VDBackup a zkuste to znovu.",
   "msg_restore_passphrase": "${name} je šifrovaný. Zadejte heslo pro obnovení.",

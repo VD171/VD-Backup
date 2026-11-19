@@ -44,6 +44,7 @@
   "dest_fail": "inacessível",
   "confirm_delete": "Excluir ${name}?",
   "backup": "Fazer backup",
+  "msg_err_dest_has_backups": "Este destino ainda contém backups. Mova-os ou apague-os primeiro.",
   "msg_err_crypto_pass": "Este backup é cifrado, informe a senha.",
   "msg_err_crypto_unavail": "A criptografia está indisponível neste aparelho: um binário incluído necessário está faltando. Reinstale ou atualize o VDBackup e tente de novo.",
   "msg_restore_passphrase": "${name} é cifrado. Informe a senha para restaurar.",
