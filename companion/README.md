@@ -69,7 +69,7 @@ am start-foreground-service \
 # 2) first-run consent (VISIBLE Activity, the one unavoidable UI step)
 am start \
   -n ru.vd171.vdbackup/.ConsentActivity \
-  -e result /data/adb/vdbackup/drive/consent.json
+  -e result /data/data/ru.vd171.vdbackup/files/consent.json
 #    user signs in; result JSON: ok=true code=ERR_NONE, or ok=false code=ERR_CONSENT_DENIED
 ```
 

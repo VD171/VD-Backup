@@ -204,6 +204,7 @@
   "msg_err_dest_id": "Nama tujuan tidak ada atau tidak valid.",
   "msg_err_dest_none": "Tujuan itu tidak ada lagi.",
   "msg_err_dest_type": "Jenis tujuan itu tidak didukung.",
+  "msg_err_tg_kind": "Tujuan Telegram hanya menyimpan cadangan aplikasi. Pilih tujuan lain untuk cadangan folder dan /data/adb.",
   "msg_err_dest_unreach": "Tujuan tidak dapat dijangkau.",
   "msg_err_drive": "Google Drive tidak dapat dijangkau. Silakan izinkan akses dan coba lagi.",
   "msg_err_drive_consent": "Google Drive belum diizinkan. Silakan izinkan akses dan coba lagi.",

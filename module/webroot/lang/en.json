@@ -205,6 +205,7 @@
   "msg_err_dest_id": "The destination name is missing or invalid.",
   "msg_err_dest_none": "That destination no longer exists.",
   "msg_err_dest_type": "That destination type is not supported.",
+  "msg_err_tg_kind": "Telegram destinations hold app backups only. Pick another destination for folder and /data/adb backups.",
   "msg_err_dest_unreach": "The destination could not be reached.",
   "msg_err_drive": "Google Drive could not be reached. Please authorize access and try again.",
   "msg_err_drive_consent": "Google Drive is not authorized yet. Please authorize access and try again.",

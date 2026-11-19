@@ -31,6 +31,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
+import java.io.File
 
 class ConsentActivity : Activity() {
 
@@ -71,11 +72,19 @@ class ConsentActivity : Activity() {
     }
 
     private fun finishWith(ok: Boolean, code: String, msg: String? = null) {
-        intent.getStringExtra(EXTRA_RESULT)?.let { path ->
-            CommandResult.write(path, ok, "consent", code, null, msg ?: if (ok) "consent granted" else "consent denied")
+        resultFile()?.let { f ->
+            CommandResult.write(f.path, ok, "consent", code, null, msg ?: if (ok) "consent granted" else "consent denied")
         }
         setResult(if (ok) RESULT_OK else RESULT_CANCELED)
         finish()
+    }
+
+    // The Activity is exported (root starts it with `am start`), so the result path
+    // comes from any caller: accept only a consent.* file directly in our files dir.
+    private fun resultFile(): File? {
+        val path = intent.getStringExtra(EXTRA_RESULT) ?: return null
+        val f = runCatching { File(path).canonicalFile }.getOrNull() ?: return null
+        return f.takeIf { it.parentFile == filesDir.canonicalFile && it.name.startsWith("consent.") }
     }
 
     companion object {

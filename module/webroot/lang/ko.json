@@ -204,6 +204,7 @@
   "msg_err_dest_id": "대상 이름이 없거나 올바르지 않습니다.",
   "msg_err_dest_none": "해당 대상이 더 이상 존재하지 않습니다.",
   "msg_err_dest_type": "해당 대상 유형은 지원되지 않습니다.",
+  "msg_err_tg_kind": "Telegram 대상에는 앱 백업만 저장됩니다. 폴더 및 /data/adb 백업에는 다른 대상을 선택하세요.",
   "msg_err_dest_unreach": "대상에 연결할 수 없습니다.",
   "msg_err_drive": "Google Drive에 연결할 수 없습니다. 접근을 승인한 후 다시 시도해 주세요.",
   "msg_err_drive_consent": "Google Drive가 아직 승인되지 않았습니다. 접근을 승인한 후 다시 시도해 주세요.",

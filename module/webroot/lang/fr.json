@@ -204,6 +204,7 @@
   "msg_err_dest_id": "Le nom de la destination est manquant ou invalide.",
   "msg_err_dest_none": "Cette destination n'existe plus.",
   "msg_err_dest_type": "Ce type de destination n'est pas pris en charge.",
+  "msg_err_tg_kind": "Les destinations Telegram ne conservent que les sauvegardes d'apps. Choisissez une autre destination pour les sauvegardes de dossiers et de /data/adb.",
   "msg_err_dest_unreach": "La destination n'a pas pu être atteinte.",
   "msg_err_drive": "Google Drive n'a pas pu être atteint. Veuillez autoriser l'accès et réessayer.",
   "msg_err_drive_consent": "Google Drive n'est pas encore autorisé. Veuillez autoriser l'accès et réessayer.",

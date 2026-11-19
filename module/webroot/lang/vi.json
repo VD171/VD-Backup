@@ -204,6 +204,7 @@
   "msg_err_dest_id": "Tên đích đến bị thiếu hoặc không hợp lệ.",
   "msg_err_dest_none": "Đích đến đó không còn tồn tại.",
   "msg_err_dest_type": "Loại đích đến đó không được hỗ trợ.",
+  "msg_err_tg_kind": "Đích Telegram chỉ lưu bản sao lưu ứng dụng. Hãy chọn đích khác cho bản sao lưu thư mục và /data/adb.",
   "msg_err_dest_unreach": "Không thể kết nối tới đích đến.",
   "msg_err_drive": "Không thể kết nối tới Google Drive. Vui lòng cấp quyền truy cập và thử lại.",
   "msg_err_drive_consent": "Google Drive chưa được cấp quyền. Vui lòng cấp quyền truy cập và thử lại.",

@@ -204,6 +204,7 @@
   "msg_err_dest_id": "O nome do destino está ausente ou é inválido.",
   "msg_err_dest_none": "Esse destino não existe mais.",
   "msg_err_dest_type": "Esse tipo de destino não é suportado.",
+  "msg_err_tg_kind": "Os destinos do Telegram guardam apenas backups de apps. Escolha outro destino para backups de pastas e de /data/adb.",
   "msg_err_dest_unreach": "Não foi possível acessar o destino.",
   "msg_err_drive": "Não foi possível acessar o Google Drive. Autorize o acesso e tente novamente.",
   "msg_err_drive_consent": "O Google Drive ainda não está autorizado. Autorize o acesso e tente novamente.",
