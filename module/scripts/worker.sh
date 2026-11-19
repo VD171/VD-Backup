@@ -2309,6 +2309,18 @@ do_path_backup() {
 
 # Restore a standalone path backup: verify, anti-traversal guard, wipe the original
 # path and extract the archive back into place, restoring ownership/context.
+# The restore target comes from a manifest on /sdcard and is wiped before extraction:
+# refuse a whole user/storage root (or /data/x itself) and the root manager's /data/adb.
+path_restore_ok() {   # <abs path>; 0 = may be replaced
+  _p="${1%/}"
+  case "$_p" in
+    /data/adb|/data/adb/*) return 1 ;;
+    /data/user/*/*|/data/user_de/*/*|/data/media/*/*|/storage/emulated/*/*|/sdcard/?*) return 0 ;;
+    /data/user/*|/data/user_de/*|/data/media/*|/storage/emulated/*) return 1 ;;
+    /data/*/*) return 0 ;;
+  esac
+  return 1
+}
 do_path_restore() {
   REF="$(jget "$ARGS" '.ref')"
   case "$REF" in /data/media/*/VDBackup/.paths/*) : ;; *) finish false ERR_BAD_REF; return ;; esac
@@ -2327,6 +2339,7 @@ do_path_restore() {
   uid="$("$JQ" -r '.owner_uid // 0' "$M")"; gid="$("$JQ" -r '.owner_gid // 0' "$M")"
   case "$SRCP" in /storage/emulated/*|/data/media/*|/sdcard/*|/data/*) : ;; *) finish false ERR_BAD_PATH; return ;; esac
   case "$SRCP" in *..*) finish false ERR_BAD_PATH; return ;; esac
+  path_restore_ok "$SRCP" || { audit "path-restore refused $SRCP"; finish false ERR_BAD_PATH; return; }
   { [ -n "$arc" ] && [ "$arc" != null ]; } || { finish false ERR_NO_BACKUP; return; }
   if [ "$enc" = age ] && [ -z "$PW" ]; then finish false ERR_CRYPTO_PASS; return; fi
   if [ "$enc" = age ] && ! crypto_available; then finish false ERR_CRYPTO_UNAVAIL; return; fi
