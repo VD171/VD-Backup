@@ -28,6 +28,7 @@
 
 d="${0%/*}"; [ "$d" = "$0" ] && d="."; MODDIR="$(cd "$d/.." 2>/dev/null && pwd || echo "${d%/*}")"
 STATE=/data/adb/vdbackup
+valid_pkg() { case "$1" in ''|null|.*|*[!A-Za-z0-9._]*) return 1 ;; esac; }   # same rule as worker.sh
 bdir() { case "$1" in ''|*[!0-9]*) set -- 0 ;; esac; printf '/data/media/%s/VDBackup' "$1"; }  # /sdcard/VDBackup per Android user (credential-encrypted)
 # A backup sent to a local destination lives at that destination, not duplicated in the internal
 # store (destination-authoritative, issue #15): the user picks a local dest to keep the backup OFF
@@ -255,7 +256,7 @@ auto_backup_scan() {                              # <jq> <now>; echoes detached 
       | map(select(($s[.key] // null) != .value)) | .[].key' "$_cur" 2>/dev/null)"
   _n=0
   for _pkg in $_changed; do
-    case "$_pkg" in ''|*..*|*/*|*' '*) continue ;; esac
+    valid_pkg "$_pkg" || continue
     "$_jq" -e --arg p "$_pkg" '((.blocklist // []) | index($p)) != null' "$STATE/config.json" >/dev/null 2>&1 && continue
     _j="$("$_jq" -nc --arg p "$_pkg" --argjson u "$_u" --arg m "$_mode" --arg d "$_dest" \
         '{package:$p,user:$u,mode:$m,dest:$d,items:["apk","data","data_de","obb","external","media"],auto:true}')"
@@ -505,7 +506,7 @@ case "$verb" in
     pkg="$(printf '%s' "$j" | "$JQ" -r '.package // empty' 2>/dev/null)"
     u="$(printf '%s' "$j" | "$JQ" -r '.user // 0' 2>/dev/null)"; case "$u" in ''|*[!0-9]*) u=0 ;; esac
     vc="$(printf '%s' "$j" | "$JQ" -r '.vc // 0' 2>/dev/null)"; case "$vc" in ''|*[!0-9]*) vc=0 ;; esac
-    case "$pkg" in ''|*/*|*..*|*' '*) err ERR_ICON "invalid package"; exit 0 ;; esac
+    valid_pkg "$pkg" || { err ERR_ICON "invalid package"; exit 0; }
     mkdir -p "$STATE/iconcache" 2>/dev/null
     # cache key includes versionCode so the icon refreshes when the app updates;
     # drop any stale entry cached under an older versionCode for this package.
@@ -532,7 +533,7 @@ case "$verb" in
     TAB="$(printf '\t')"
     lst="$STATE/staging/icons.$$.lst"; : > "$lst"
     printf '%s' "$j" | "$JQ" -r '.items[]? | "\(.package // "")\t\(.vc // 0)"' 2>/dev/null | while IFS="$TAB" read -r pkg vc; do
-      case "$pkg" in ''|*/*|*..*|*' '*) continue ;; esac
+      valid_pkg "$pkg" || continue
       case "$vc" in ''|*[!0-9]*) vc=0 ;; esac
       png="$STATE/iconcache/$pkg-$vc.png"
       if [ ! -s "$png" ]; then
@@ -548,7 +549,7 @@ case "$verb" in
     printf '{"ok":true,"icons":{'
     first=1
     printf '%s' "$j" | "$JQ" -r '.items[]? | "\(.package // "")\t\(.vc // 0)"' 2>/dev/null | while IFS="$TAB" read -r pkg vc; do
-      case "$pkg" in ''|*/*|*..*|*' '*) continue ;; esac
+      valid_pkg "$pkg" || continue
       case "$vc" in ''|*[!0-9]*) vc=0 ;; esac
       png="$STATE/iconcache/$pkg-$vc.png"; [ -s "$png" ] || continue
       [ "$first" = 1 ] || printf ','; first=0
@@ -1424,7 +1425,7 @@ EOF
     j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
     pkg="$(printf '%s' "$j" | "$JQ" -r '.package // empty' 2>/dev/null)"
     priv="$(printf '%s' "$j" | "$JQ" -r '.priv // false' 2>/dev/null)"
-    case "$pkg" in ''|*..*|*/*|*' '*) err ERR_BAD_PKG "invalid package"; exit 0 ;; esac
+    valid_pkg "$pkg" || { err ERR_BAD_PKG "invalid package"; exit 0; }
     sub=app; [ "$priv" = true ] && sub=priv-app
     base="$(pm path "$pkg" 2>/dev/null | sed -n 's/^package://p' | grep '/base\.apk$' | head -1)"
     [ -n "$base" ] || base="$(pm path "$pkg" 2>/dev/null | sed -n 's/^package://p' | head -1)"
@@ -1481,7 +1482,7 @@ EOF
   sysmount-del)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
     pkg="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.package // empty' 2>/dev/null)"
-    case "$pkg" in ''|*..*|*/*|*' '*) err ERR_BAD_PKG "invalid package"; exit 0 ;; esac
+    valid_pkg "$pkg" || { err ERR_BAD_PKG "invalid package"; exit 0; }
     MM=/data/adb/modules/vdbackup_sysmount
     for sub in app priv-app; do
       d="$MM/system/$sub/$pkg"; [ -d "$d" ] || continue
@@ -1550,7 +1551,7 @@ EOF
     pkg="$(printf '%s' "$j" | "$JQ" -r '.package // empty' 2>/dev/null)"
     u="$(printf '%s' "$j" | "$JQ" -r '.user // 0' 2>/dev/null)"; case "$u" in ''|*[!0-9]*) u=0 ;; esac
     keep="$(printf '%s' "$j" | "$JQ" -r '.keep // 5' 2>/dev/null)"; case "$keep" in ''|*[!0-9]*) keep=5 ;; esac
-    case "$pkg" in ''|*..*|*/*|*' '*) err ERR_BAD_REF "invalid package"; exit 0 ;; esac
+    valid_pkg "$pkg" || { err ERR_BAD_REF "invalid package"; exit 0; }
     printf '{"ok":true,"pruned":['
     first=1
     for r in $(prune_pkg "$u" "$pkg" "$keep"); do

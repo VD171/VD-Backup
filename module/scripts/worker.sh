@@ -657,6 +657,9 @@ comp() { case "$1" in
   zstd:*) "$ZSTD" -q "-${1#zstd:}" ;; *) "$ZSTD" -q -10 ;; esac; }
 comp_ext() { case "$1" in none) echo tar ;; gzip) echo tar.gz ;; lz4) echo tar.lz4 ;; *) echo tar.zst ;; esac; }
 # decompress by filename (lz4 via zstd, so DataBackup imports also work).
+# package names are [A-Za-z0-9._] and never start with a dot, so "." / ".." or a
+# slash can't turn "/data/user/$U/$PKG" or "$BACKUPS/$PKG" into a parent path.
+valid_pkg() { case "$1" in ''|null|.*|*[!A-Za-z0-9._]*) return 1 ;; esac; }
 decomp() { case "$1" in
   *.tar.gz*) "$GZIP" -dc "$1" ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c "$1" ;;
   *.tar.zst*) "$ZSTD" -dqc "$1" ;; *.tar*) cat "$1" ;; *) "$ZSTD" -dqc "$1" ;; esac; }
@@ -1023,7 +1026,7 @@ do_mirror() {
 # ----------------------------------------------------------------------
 backup() {
   PKG="$(jget "$ARGS" '.package')"
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   is_root_manager "$PKG" && { audit "refused root manager backup: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
   BACKUPS="$(backups_dir "$U")"
@@ -1425,7 +1428,7 @@ backup() {
 do_restore_snapshot() {
   DESTID="$(jget "$ARGS" '.dest')"; SNAP="$(jget "$ARGS" '.snapshot')"
   PKG="$(jget "$ARGS" '.package')"; U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac   # same guard as backup()/restore(): a package with a slash feeds rm -rf "/data/user/$U/$PKG"
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }   # same guard as backup()/restore(): a package with a slash feeds rm -rf "/data/user/$U/$PKG"
   is_root_manager "$PKG" && { audit "refused root manager restore: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   { [ -z "$SNAP" ] || [ "$SNAP" = null ]; } && SNAP=latest
   resolve_dest
@@ -1483,7 +1486,7 @@ do_restore_snapshot() {
 # Restore from a Mirror: pm install the mirrored APKs, rsync the data dirs back, remap.
 do_restore_mirror() {
   DESTID="$(jget "$ARGS" '.dest')"; PKG="$(jget "$ARGS" '.package')"; U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac   # same guard as backup()/restore(): a package with a slash feeds rm -rf / rsync --delete on "/data/user/$U/$PKG"
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }   # same guard as backup()/restore(): a package with a slash feeds rm -rf / rsync --delete on "/data/user/$U/$PKG"
   is_root_manager "$PKG" && { audit "refused root manager restore: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   resolve_dest
   transport_guard mirror || return
@@ -1554,7 +1557,7 @@ restore() {
   PKG="$("$JQ" -r '.package.name' "$M")"; U="$("$JQ" -r '.user_id // 0' "$M")"
   is_root_manager "$PKG" && { audit "refused root manager restore: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   case "$U" in ""|*[!0-9]*) U=0 ;; esac
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
 
   # restore-test: extract every archive into a temp dir under the state dir and report
   # whether each extracts cleanly and its sha256 matches the manifest. Touches no live
@@ -1772,7 +1775,7 @@ do_import() {
 do_import_databackup() {
   PKG="$(basename "$(dirname "$REF")")"
   [ -d "$REF" ] || { finish false ERR_NO_BACKUP; return; }
-  case "$PKG" in ''|.|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   prog 5 fetching "$PKG"; audit "import-db start $PKG"; notify restore_start "$PKG"
   freeze "$PKG"
   prog 30 installing "$PKG"
@@ -1830,7 +1833,7 @@ do_import_databackup() {
 do_import_neo() {
   PROP="$REF.properties"; [ -f "$PROP" ] || { finish false ERR_NO_MANIFEST; return; }
   PKG="$("$JQ" -r '.packageName' "$PROP")"
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   # The real encryption signal is the per-file .enc suffix, NOT metadata cipherType/iv:
   # recent Neo writes cipherType/iv even when a given backup's archives are left plain.
   ENC=no; ls "$REF"/*.enc >/dev/null 2>&1 && ENC=yes
@@ -2712,7 +2715,7 @@ do_telegram_pull() {   # download a backup from Telegram into local storage; it 
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
   case "$NAME" in *__*.vdb.tar) : ;; *) finish false ERR_INVALID_REF; return ;; esac
   _rest="${NAME%.vdb.tar}"; PKG="${_rest%%__*}"; _tsvc="${_rest#*__}"
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   case "$_tsvc" in ''|*/*|*..*|*' '*) finish false ERR_INVALID_REF; return ;; esac   # feeds a backups path
   net_guard || return
   [ -x "$TGBIN" ] || { finish false ERR_TG_BIN; return; }
@@ -2735,7 +2738,7 @@ do_rclone_pull() {   # download an rclone remote-only backup into local storage;
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
   case "$_rref" in ''|/*|*..*) finish false ERR_INVALID_REF; return ;; esac
   PKG="${_rref%%/*}"; _tsvc="${_rref#*/}"
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   case "$_tsvc" in ''|*/*|*' '*) finish false ERR_INVALID_REF; return ;; esac
   resolve_dest
   { [ "$DTYPE" = rclone ] && [ -n "$DREMOTE" ]; } || { finish false ERR_INVALID_REF; return; }
@@ -2756,7 +2759,7 @@ do_gdrive_pull() {   # download a gdrive remote-only backup (its Drive folder) i
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
   case "$_rref" in ''|/*|*..*) finish false ERR_INVALID_REF; return ;; esac
   PKG="${_rref%%/*}"; _tsvc="${_rref#*/}"
-  case "$PKG" in ''|null|*/*|*' '*) finish false ERR_NO_PACKAGE; return ;; esac
+  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
   case "$_tsvc" in ''|*/*|*' '*) finish false ERR_INVALID_REF; return ;; esac
   case "$_gfolder" in ''|*[!A-Za-z0-9_-]*) finish false ERR_INVALID_REF; return ;; esac   # Drive file-id charset
   resolve_dest
