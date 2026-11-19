@@ -2048,8 +2048,12 @@ function setBlock(pkg, on) {
 // persist CFG; surface a failure instead of letting the in-memory toggle silently diverge from disk
 function saveCfg() { helper("config-set", CFG).then(function (r) { if (r && r.ok === false) modalAlert(errMsg(r)); }).catch(function () { modalAlert(errMsg()); }); }
 function persistBlocklist() { saveCfg(); }
+// The Settings pickers each hold a row per app. They are built only while the Settings tab is
+// shown (loadSettings rebuilds both whenever the tab opens), so loading the app list on the Apps
+// tab no longer renders every app three times.
+function settingsShown() { var p = $("#settings"); return !!(p && p.classList.contains("active")); }
 function buildBlockPicker() {
-  var ul = $("#block-applist"); if (!ul) return;
+  var ul = $("#block-applist"); if (!ul || !settingsShown()) return;
   if (iconObserver) _blockIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
   _blockIcons = []; ul.innerHTML = "";
   visibleApps("", true).forEach(function (a) {
@@ -2129,7 +2133,7 @@ function openAppItemsModal(pkg, label) {
 }
 function closeAppItemsModal() { $("#appitems-modal").hidden = true; _aiPkg = null; }
 function buildAppItemsPicker() {
-  var ul = $("#ai-applist"); if (!ul) return;
+  var ul = $("#ai-applist"); if (!ul || !settingsShown()) return;
   if (iconObserver) _aiIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
   _aiIcons = []; ul.innerHTML = "";
   visibleApps("", true).forEach(function (a) {
