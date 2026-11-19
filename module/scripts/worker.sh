@@ -406,10 +406,11 @@ freeze() {
   # only, but the wall merely moved to ~120 - the AMS call itself is the problem. kill makes
   # ZERO AMS calls, so it scales to any number of apps. Kill every process of the app's uid
   # (the main process AND its :sub-processes, which a `pidof` comm match alone would miss).
-  _fu="$(stat -c %u "/data/data/$1" 2>/dev/null)"
-  case "$_fu" in
-    ''|*[!0-9]*|0) kill -9 $(pidof "$1" 2>/dev/null) 2>/dev/null || true; return 0 ;;
-  esac
+  # Only for an app uid: a system app can share uid 1000 with system_server, and killing
+  # that uid soft-reboots the phone, so those fall back to the pidof match.
+  _fu="$(stat -c %u "/data/user/${U:-0}/$1" 2>/dev/null)"
+  case "$_fu" in ''|*[!0-9]*) _fu=0 ;; esac
+  if [ $(( _fu % 100000 )) -lt 10000 ]; then kill -9 $(pidof "$1" 2>/dev/null) 2>/dev/null || true; return 0; fi
   for _fd in /proc/[0-9]*; do
     [ "$(stat -c %u "$_fd" 2>/dev/null)" = "$_fu" ] && kill -9 "${_fd##*/}" 2>/dev/null
   done
