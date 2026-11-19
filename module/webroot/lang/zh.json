@@ -204,6 +204,7 @@
   "msg_err_dest_id": "目标名称缺失或无效。",
   "msg_err_dest_none": "该目标已不存在。",
   "msg_err_dest_type": "不支持该目标类型。",
+  "msg_err_tg_kind": "Telegram 目标仅保存应用备份。文件夹和 /data/adb 备份请选择其他目标。",
   "msg_err_dest_unreach": "无法连接到目标。",
   "msg_err_drive": "无法连接到 Google Drive。请授权访问后重试。",
   "msg_err_drive_consent": "Google Drive 尚未授权。请授权访问后重试。",

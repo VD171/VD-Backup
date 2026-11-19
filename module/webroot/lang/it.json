@@ -204,6 +204,7 @@
   "msg_err_dest_id": "Il nome della destinazione è mancante o non valido.",
   "msg_err_dest_none": "Quella destinazione non esiste più.",
   "msg_err_dest_type": "Quel tipo di destinazione non è supportato.",
+  "msg_err_tg_kind": "Le destinazioni Telegram contengono solo backup di app. Scegli un'altra destinazione per i backup di cartelle e di /data/adb.",
   "msg_err_dest_unreach": "Impossibile raggiungere la destinazione.",
   "msg_err_drive": "Impossibile raggiungere Google Drive. Autorizza l'accesso e riprova.",
   "msg_err_drive_consent": "Google Drive non è ancora autorizzato. Autorizza l'accesso e riprova.",

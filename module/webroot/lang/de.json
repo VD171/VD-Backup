@@ -204,6 +204,7 @@
   "msg_err_dest_id": "Der Zielname fehlt oder ist ungültig.",
   "msg_err_dest_none": "Dieses Ziel existiert nicht mehr.",
   "msg_err_dest_type": "Dieser Zieltyp wird nicht unterstützt.",
+  "msg_err_tg_kind": "Telegram-Ziele speichern nur App-Backups. Wähle für Ordner- und /data/adb-Backups ein anderes Ziel.",
   "msg_err_dest_unreach": "Das Ziel konnte nicht erreicht werden.",
   "msg_err_drive": "Google Drive konnte nicht erreicht werden. Bitte autorisiere den Zugriff und versuche es erneut.",
   "msg_err_drive_consent": "Google Drive ist noch nicht autorisiert. Bitte autorisiere den Zugriff und versuche es erneut.",

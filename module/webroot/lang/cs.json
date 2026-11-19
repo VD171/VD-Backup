@@ -204,6 +204,7 @@
   "msg_err_dest_id": "Název cíle chybí nebo je neplatný.",
   "msg_err_dest_none": "Tento cíl již neexistuje.",
   "msg_err_dest_type": "Tento typ cíle není podporován.",
+  "msg_err_tg_kind": "Cíle Telegram uchovávají jen zálohy aplikací. Pro zálohy složek a /data/adb vyberte jiný cíl.",
   "msg_err_dest_unreach": "Cíl nebylo možné kontaktovat.",
   "msg_err_drive": "Google Drive nebylo možné kontaktovat. Udělte prosím oprávnění a zkuste to znovu.",
   "msg_err_drive_consent": "Google Drive zatím není autorizován. Udělte prosím oprávnění a zkuste to znovu.",

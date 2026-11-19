@@ -204,6 +204,7 @@
   "msg_err_dest_id": "Målets namn saknas eller är ogiltigt.",
   "msg_err_dest_none": "Det målet finns inte längre.",
   "msg_err_dest_type": "Den måltypen stöds inte.",
+  "msg_err_tg_kind": "Telegram-mål sparar bara appsäkerhetskopior. Välj ett annat mål för mapp- och /data/adb-säkerhetskopior.",
   "msg_err_dest_unreach": "Målet kunde inte nås.",
   "msg_err_drive": "Google Drive kunde inte nås. Godkänn åtkomsten och försök igen.",
   "msg_err_drive_consent": "Google Drive är inte godkänt ännu. Godkänn åtkomsten och försök igen.",

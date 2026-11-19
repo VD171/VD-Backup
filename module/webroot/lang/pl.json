@@ -204,6 +204,7 @@
   "msg_err_dest_id": "Nazwa celu jest pusta lub nieprawidłowa.",
   "msg_err_dest_none": "Ten cel już nie istnieje.",
   "msg_err_dest_type": "Ten typ celu nie jest obsługiwany.",
+  "msg_err_tg_kind": "Miejsca docelowe Telegram przechowują tylko kopie aplikacji. Wybierz inne miejsce dla kopii folderów i /data/adb.",
   "msg_err_dest_unreach": "Nie można było połączyć się z celem.",
   "msg_err_drive": "Nie można było połączyć się z Google Drive. Autoryzuj dostęp i spróbuj ponownie.",
   "msg_err_drive_consent": "Google Drive nie jest jeszcze autoryzowany. Autoryzuj dostęp i spróbuj ponownie.",

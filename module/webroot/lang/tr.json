@@ -204,6 +204,7 @@
   "msg_err_dest_id": "Hedef adı eksik veya geçersiz.",
   "msg_err_dest_none": "Bu hedef artık mevcut değil.",
   "msg_err_dest_type": "Bu hedef türü desteklenmiyor.",
+  "msg_err_tg_kind": "Telegram hedefleri yalnızca uygulama yedeklerini tutar. Klasör ve /data/adb yedekleri için başka bir hedef seçin.",
   "msg_err_dest_unreach": "Hedefe ulaşılamadı.",
   "msg_err_drive": "Google Drive'a ulaşılamadı. Lütfen erişime izin verip tekrar deneyin.",
   "msg_err_drive_consent": "Google Drive henüz yetkilendirilmedi. Lütfen erişime izin verip tekrar deneyin.",

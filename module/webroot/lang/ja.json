@@ -204,6 +204,7 @@
   "msg_err_dest_id": "保存先の名前がないか無効です。",
   "msg_err_dest_none": "その保存先はもう存在しません。",
   "msg_err_dest_type": "その保存先の種類はサポートされていません。",
+  "msg_err_tg_kind": "Telegram の保存先はアプリのバックアップ専用です。フォルダと /data/adb のバックアップには別の保存先を選んでください。",
   "msg_err_dest_unreach": "保存先に到達できませんでした。",
   "msg_err_drive": "Google Drive に到達できませんでした。アクセスを許可してもう一度お試しください。",
   "msg_err_drive_consent": "Google Drive はまだ承認されていません。アクセスを許可してもう一度お試しください。",

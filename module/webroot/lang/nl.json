@@ -204,6 +204,7 @@
   "msg_err_dest_id": "De naam van de bestemming ontbreekt of is ongeldig.",
   "msg_err_dest_none": "Die bestemming bestaat niet meer.",
   "msg_err_dest_type": "Dat type bestemming wordt niet ondersteund.",
+  "msg_err_tg_kind": "Telegram-bestemmingen bewaren alleen app-back-ups. Kies een andere bestemming voor map- en /data/adb-back-ups.",
   "msg_err_dest_unreach": "De bestemming kon niet worden bereikt.",
   "msg_err_drive": "Google Drive kon niet worden bereikt. Autoriseer de toegang en probeer het opnieuw.",
   "msg_err_drive_consent": "Google Drive is nog niet geautoriseerd. Autoriseer de toegang en probeer het opnieuw.",
