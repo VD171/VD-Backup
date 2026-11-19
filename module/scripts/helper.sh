@@ -211,8 +211,10 @@ prune_pkg() {                                    # <user> <pkg> <keep>
   _d="$_bk/$1"; [ -d "$_d" ] || return 0
   _keep="$2"; case "$_keep" in ''|*[!0-9]*) _keep=5 ;; esac
   _n=0
+  # only finished backups count and get pruned: a dir without manifest.json is a backup still
+  # being written (or one that failed), and must neither push a good one out nor be deleted.
   for _sub in $(ls -1 "$_d" 2>/dev/null | sort -r); do
-    [ -d "$_d/$_sub" ] || continue
+    [ -f "$_d/$_sub/manifest.json" ] || continue
     _n=$(( _n + 1 ))
     [ "$_n" -gt "$_keep" ] || continue
     case "$_d/$_sub" in
@@ -227,7 +229,7 @@ prune_pkg() {                                    # <user> <pkg> <keep>
 # seeds the snapshot (never mass-backs-up an existing device). Honors the blocklist.
 # Framework-free degradation: without the dex helper only new installs are seen
 # (no versionCode), so updates are missed but installs still trigger.
-auto_backup_scan() {                              # <jq> <now>; echoes detached opids
+auto_backup_scan() {                              # <jq> <now>; echoes the detached opid
   _jq="$1"; _now="$2"
   [ -f "$STATE/config.json" ] || return 0
   _on="$("$_jq" -r '.auto_backup // false' "$STATE/config.json" 2>/dev/null)"
@@ -253,20 +255,23 @@ auto_backup_scan() {                              # <jq> <now>; echoes detached 
   _changed="$("$_jq" -r --slurpfile seen "$_seen" '
       ($seen[0] // {}) as $s | to_entries
       | map(select(($s[.key] // null) != .value)) | .[].key' "$_cur" 2>/dev/null)"
-  _n=0
+  # one backup-batch op for all of them (one worker, apps in sequence, as backup-batch was built
+  # for); the worker prunes each app to <keep> after its backup succeeds.
+  _opid="$(new_opid)-auto"; _pkgs=""
   for _pkg in $_changed; do
     case "$_pkg" in ''|*..*|*/*|*' '*) continue ;; esac
     "$_jq" -e --arg p "$_pkg" '((.blocklist // []) | index($p)) != null' "$STATE/config.json" >/dev/null 2>&1 && continue
-    _j="$("$_jq" -nc --arg p "$_pkg" --argjson u "$_u" --arg m "$_mode" --arg d "$_dest" \
-        '{package:$p,user:$u,mode:$m,dest:$d,items:["apk","data","data_de","obb","external","media"],auto:true}')"
-    _b64="$(printf '%s' "$_j" | base64 | tr -d '\n')"
-    _n=$(( _n + 1 )); _opid="$(new_opid)-auto$_n"
-    detach "$_opid" backup "$_b64"
+    _pkgs="$_pkgs$_pkg
+"
     printf '{"ts":"%s","op":"auto-backup","opid":"%s","package":"%s"}\n' \
       "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(jstr "$_opid")" "$(jstr "$_pkg")" >> "$LOGS/audit.jsonl"
-    for _r in $(prune_pkg "$_u" "$_pkg" "$_keep"); do :; done
-    printf '%s\n' "$_opid"
   done
+  if [ -n "$_pkgs" ]; then
+    _j="$(printf '%s' "$_pkgs" | "$_jq" -R -s -c --argjson u "$_u" --arg m "$_mode" --arg d "$_dest" --argjson k "$_keep" \
+        '{packages:(split("\n")|map(select(length>0))),user:$u,mode:$m,dest:$d,items:["apk","data","data_de","obb","external","media"],auto:true,keep:$k}')"
+    detach "$_opid" backup-batch "$(printf '%s' "$_j" | base64 | tr -d '\n')"
+    printf '%s\n' "$_opid"
+  fi
   cp "$_cur" "$_seen"; chmod 600 "$_seen"; rm -f "$_cur"
 }
 
@@ -1278,7 +1283,7 @@ EOF
     # so skip the whole tick until the user has unlocked once.
     ce_ready || { printf '{"ok":true,"skipped":"ce_locked"}\n'; exit 0; }
     mkdir -p "$STATE/jobs"
-    RAN=""; PRUNED=""; checked=0; launchn=0
+    RAN=""; checked=0; launchn=0
     # a transient gate skips the job WITHOUT stamping last_run (retries next tick) + audits
     gate_skip() { printf '{"ts":"%s","op":"scheduler-gated","id":"%s","reason":"%s"}\n' \
       "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(jstr "$id")" "$(jstr "$1")" >> "$LOGS/audit.jsonl"; }
@@ -1309,35 +1314,44 @@ EOF
       jmode="$("$JQ" -r '.mode // "full"' "$f" 2>/dev/null)"
       jdest="$("$JQ" -r '.dest // "local"' "$f" 2>/dev/null)"
       jref="$("$JQ" -r '.ref // empty' "$f" 2>/dev/null)"
-      fired=0
-      # resolve this job's target packages (single / list / all, minus blocklist) and
-      # launch one detached op per target: a backup, or a restore of its latest backup.
+      fired=0; items=""
+      # resolve this job's target packages (single / list / all, minus blocklist) and launch ONE
+      # detached batch op for the job: backup-batch of the packages, or restore-batch of each
+      # one's latest backup. The worker runs them in sequence and prunes each app to <keep>
+      # after its backup succeeds.
+      launchn=$(( launchn + 1 )); opid="$(new_opid)-$launchn"
       for pkg in $(job_targets "$JQ" "$f"); do
-        launchn=$(( launchn + 1 )); fired=1
-        opid="$(new_opid)-$launchn"
         if [ "$action" = restore ]; then
           ref="$jref"; [ -n "$ref" ] || ref="$(latest_ref "$juser" "$pkg")"
-          [ -n "$ref" ] || { launchn=$(( launchn - 1 )); continue; }   # nothing to restore for this pkg
-          argj="$("$JQ" -nc --arg ref "$ref" '{ref:$ref}')"
-          detach "$opid" restore "$(printf '%s' "$argj" | base64 | tr -d '\n')"
+          [ -n "$ref" ] || continue   # nothing to restore for this pkg
+          printf '%s' "$items" | grep -qxF -- "$ref" && continue   # a pinned .ref is restored once
+          items="$items$ref
+"
         else
-          argj="$("$JQ" -nc --arg p "$pkg" --argjson u "$juser" --arg m "$jmode" --arg d "$jdest" \
-            '{package:$p,user:$u,mode:$m,dest:$d,items:["apk","data","data_de","obb","external","media"],sched:true}')"
-          detach "$opid" backup "$(printf '%s' "$argj" | base64 | tr -d '\n')"
-          for r in $(prune_pkg "$juser" "$pkg" "$keep"); do PRUNED="$PRUNED$("$JQ" -cn --arg r "$r" '$r'),"; done
+          items="$items$pkg
+"
         fi
+        fired=1
         RAN="$RAN$("$JQ" -cn --arg id "$id" --arg opid "$opid" --arg pkg "$pkg" --arg a "$action" '{id:$id,opid:$opid,package:$pkg,action:$a}'),"
         printf '{"ts":"%s","op":"scheduler-run","id":"%s","opid":"%s","package":"%s","action":"%s"}\n' \
           "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(jstr "$id")" "$(jstr "$opid")" "$(jstr "$pkg")" "$(jstr "$action")" >> "$LOGS/audit.jsonl"
       done
       [ "$fired" = 1 ] || continue   # due but no target resolved: do not stamp, retry next tick
+      if [ "$action" = restore ]; then
+        argj="$(printf '%s' "$items" | "$JQ" -R -s -c '{refs:(split("\n")|map(select(length>0)))}')"
+        detach "$opid" restore-batch "$(printf '%s' "$argj" | base64 | tr -d '\n')"
+      else
+        argj="$(printf '%s' "$items" | "$JQ" -R -s -c --argjson u "$juser" --arg m "$jmode" --arg d "$jdest" --argjson k "$keep" \
+          '{packages:(split("\n")|map(select(length>0))),user:$u,mode:$m,dest:$d,items:["apk","data","data_de","obb","external","media"],sched:true,keep:$k}')"
+        detach "$opid" backup-batch "$(printf '%s' "$argj" | base64 | tr -d '\n')"
+      fi
       tmp="$STATE/jobs/.$id.tmp"
       "$JQ" --argjson now "$now" '.last_run=$now' "$f" > "$tmp" 2>/dev/null && mv "$tmp" "$f" && chmod 600 "$f"
     done
     AUTO=""
     for _ao in $(auto_backup_scan "$JQ" "$now"); do AUTO="$AUTO\"$(jstr "$_ao")\","; done
-    RAN="${RAN%,}"; PRUNED="${PRUNED%,}"; AUTO="${AUTO%,}"
-    printf '{"ok":true,"now":%s,"checked":%s,"ran":[%s],"pruned":[%s],"auto":[%s]}\n' "$now" "$checked" "$RAN" "$PRUNED" "$AUTO" ;;
+    RAN="${RAN%,}"; AUTO="${AUTO%,}"
+    printf '{"ok":true,"now":%s,"checked":%s,"ran":[%s],"auto":[%s]}\n' "$now" "$checked" "$RAN" "$AUTO" ;;
 
   companion-status)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"

@@ -2554,6 +2554,9 @@ backup_batch() {
   _base="$ARGS"; IN_BATCH=1; BATCH_I=0; _bok=0; _bfail=0; _bcodes=""
   _bu="$(jget "$_base" '.user // 0')"; case "$_bu" in ''|*[!0-9]*) _bu=0 ;; esac
   _BTO="$(cfg .batch_app_timeout)"; case "$_BTO" in ''|null|*[!0-9]*) _BTO=1800 ;; esac
+  # scheduled/auto batches carry .keep: prune each app to <keep> finished backups (helper.sh
+  # prune) only after ITS backup succeeded, so a failed run never costs an older good backup.
+  _bkeep="$(jget "$_base" '.keep // empty')"; case "$_bkeep" in *[!0-9]*) _bkeep="" ;; esac
   # Pre-run space check (issue #5): a batch to LOCAL storage keeps every app's archive, so a big
   # run can fill the disk partway and end with a bare partial deep in. For a local destination,
   # sum the uncompressed app data (data + data_de, the always-present core footprint) up front;
@@ -2596,6 +2599,8 @@ backup_batch() {
     _lok=false; _lcode=ERR_UNKNOWN; read -r _lok _lcode < "$_rcf" 2>/dev/null
     [ "$_lok" = true ] || _lok=false; [ -n "$_lcode" ] || _lcode=ERR_UNKNOWN
     if [ "$_lok" = true ]; then _bok=$((_bok + 1)); else _bfail=$((_bfail + 1)); _bcodes="$_bcodes $_lcode"; fi
+    [ "$_lok" = true ] && [ -n "$_bkeep" ] && "$MODDIR/scripts/helper.sh" prune \
+      "$("$JQ" -nc --arg p "$_p" --argjson u "$_bu" --argjson k "$_bkeep" '{package:$p,user:$u,keep:$k}' | base64 | tr -d '\n')" >/dev/null 2>&1
   done 3< "$_lst"
   rm -f "$_lst" "$_rcf"; ARGS="$_base"; IN_BATCH=0
   _bfails="$(printf '%s\n' $_bcodes | "$JQ" -R -s -c 'split("\n")|map(select(length>0))|group_by(.)|map({key:.[0],value:length})|from_entries' 2>/dev/null)"
