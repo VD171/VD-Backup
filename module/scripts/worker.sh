@@ -2131,6 +2131,7 @@ do_special_backup() {
   # gated by an explicit .system_settings flag exactly like ssaid; default OFF.
   SYSSET="$(jget "$ARGS" '.system_settings')"
   use_special_age() { [ -n "$PW" ]; }
+  if use_special_age && ! crypto_available; then finish false ERR_CRYPTO_UNAVAIL; return; fi
   prog 2 preparing "special"; audit "special-backup start $CATS"; notify backup_start "special"
   BK="$(backups_dir "$U")/.special"; TS="$(date -u +%Y%m%dT%H%M%SZ)"; DEST="$BK/$TS"
   media_own "$(backups_dir "$U")"; media_own "$BK"; mkdir -p "$DEST"
@@ -2158,20 +2159,37 @@ do_special_backup() {
           parent="$(dirname "$src")"; base="$(basename "$src")"
           ctx="$(ls -Zd "$src" 2>/dev/null | cut -d' ' -f1)"
           ext="$(comp_ext "$COMP")"; arc="$cat.$idx.$ext"; use_special_age && arc="$arc.age"
+          # same completeness checks as archive_dir: a fatal tar exit (>1) via the .trc sentinel,
+          # then the written archive must read back as a complete tar. A failure marks the whole
+          # backup failed (.sfail; this loop is a subshell) instead of silently dropping the path.
+          rm -f "$DEST/.trc"; _sok=true
           if use_special_age; then
-            exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" | enc_age "$DEST/$arc" \
-              || { audit "special archive failed $cat:$src"; continue; }
+            { exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null || { _tc=$?; [ "$_tc" -gt 1 ] && echo "$_tc" > "$DEST/.trc"; }; } | comp "$COMP" | enc_age "$DEST/$arc" \
+              && dec_age "$DEST/$arc" 2>/dev/null | { case "$COMP" in gzip) "$GZIP" -dc ;; lz4) "$ZSTD" -dq --format=lz4 -c ;; none) cat ;; *) "$ZSTD" -dqc ;; esac; } | exec_ns "$TAR" -t >/dev/null 2>&1 || _sok=false
           else
-            exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" > "$DEST/$arc" \
-              || { audit "special archive failed $cat:$src"; continue; }
+            { exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null || { _tc=$?; [ "$_tc" -gt 1 ] && echo "$_tc" > "$DEST/.trc"; }; } | comp "$COMP" > "$DEST/$arc" \
+              && decomp "$DEST/$arc" | exec_ns "$TAR" -t >/dev/null 2>&1 || _sok=false
+          fi
+          if [ "$_sok" != true ] || [ -f "$DEST/.trc" ]; then
+            audit "special archive failed $cat:$src"; rm -f "$DEST/$arc" "$DEST/.trc"; : > "$DEST/.sfail"; continue
           fi
           sha="$(sha256sum "$DEST/$arc" 2>/dev/null | cut -d' ' -f1)"
           emit_special "$cat" "$arc" "$src" "$ctx" "$sha"
         done
         [ "$PORTABLE" != false ] && special_export "$cat" "$DEST" ;;
     esac
+    # a selected category that produced nothing (no provider path on this device, or every
+    # archive failed) is a failed backup, not an empty success.
+    if [ "$cat" != system_settings ] || [ "$SYSSET" = true ]; then
+      "$JQ" -e --arg c "$cat" 'select(.category == $c)' "$IFILE" >/dev/null 2>&1 \
+        || { audit "special-backup: nothing backed up for $cat"; : > "$DEST/.sfail"; }
+    fi
     done_c=$((done_c+1)); prog $(( 10 + done_c * 80 / nc )) archiving "$cat"
   done
+  if [ -f "$DEST/.sfail" ]; then
+    case "$DEST" in "$BK"/?*) rm -rf "$DEST" ;; esac
+    finish false ERR_BACKUP; return
+  fi
   prog 92 manifest "special"
   FP="$(getprop ro.build.fingerprint)"; SDK="$(getprop ro.build.version.sdk)"; SEL="$(getenforce 2>/dev/null | tr 'A-Z' 'a-z')"
   "$JQ" -n --arg producer "VDBackup $(sed -n 's/^version=//p' "$MODDIR/module.prop")" \
