@@ -226,8 +226,8 @@ function setupBackNav() {
 // --- users --------------------------------------------------------------
 var USERS = [];
 var activeUser = 0;
-function loadUsers() {
-  helper("list-users").then(function (r) {
+function loadUsers() {   // returns a promise that settles once the app list request has
+  return helper("list-users").then(function (r) {
     USERS = (r && r.users) ? r.users : [];
     var sel = $("#user-sel"), field = $("#user-field");
     if (sel) {
@@ -242,7 +242,7 @@ function loadUsers() {
       sel.value = activeUser;
       if (field) field.hidden = USERS.length <= 1;
     }
-    loadApps();
+    return loadApps();
   });
 }
 
@@ -272,7 +272,8 @@ function cacheIcon(pkg, vc, b64) {
 // instead of one process per icon. Cache hits are instant.
 var _iconQ = [], _iconTimer = null, ICON_BATCH = 40;
 function loadIcon(ic) {
-  var pkg = ic.dataset.pkg; if (!pkg) return;
+  var pkg = ic.dataset.pkg;
+  if (!pkg) { if (ic.dataset.bref) loadBackupIcon(ic, ic.dataset.bref); return; }
   var vc = ic.dataset.vc || "0", cached = null;
   try { cached = localStorage.getItem(iconKey(pkg, vc)); } catch (e) {}
   if (cached) { setIcon(ic, cached); return; }
@@ -369,7 +370,7 @@ function setSelectMode(on) {
 }
 function loadApps() {
   $("#applist").innerHTML = "<li class='muted'>" + I18N.t("apps_loading") + "</li>";
-  helper("list-apps", { user: activeUser }).then(function (r) {
+  return helper("list-apps", { user: activeUser }).then(function (r) {
     APPS = (r && r.apps) ? r.apps : [];
     buildTagChips();
     renderApps($("#search").value);
@@ -391,8 +392,11 @@ function bkMatch(b, q) {
     || ((b.package || "").toLowerCase().indexOf(q) >= 0)
     || ((b.tags || []).some(function (t) { return (t || "").toLowerCase().indexOf(q) >= 0; }));
 }
+var _bkIcons = [];
 function renderBackups(list) {
   var ul = $("#backuplist"); ul.innerHTML = "";
+  if (iconObserver) _bkIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
+  _bkIcons = [];
   BACKUPS = list || [];
   var q = (bkQuery || "").toLowerCase().trim();
   var shown = q ? BACKUPS.filter(function (b) { return bkMatch(b, q); }) : BACKUPS;
@@ -421,7 +425,9 @@ function renderBackups(list) {
       li.onclick = function () { openBackupInfo(b); };
     }
     ul.appendChild(li);
-    loadBackupIcon(ic, b.ref);   // icon comes from the manifest, not the live app
+    // icon comes from the manifest, not the live app; loaded lazily on scroll, like app icons
+    ic.dataset.bref = b.ref || ""; _bkIcons.push(ic);
+    if (iconObserver) iconObserver.observe(ic); else loadBackupIcon(ic, b.ref);
   });
 }
 function toggleBkSel(b, on) {
@@ -457,15 +463,34 @@ function startBatchRestore() {
 }
 // Backup-list icon: read the icon stored in the manifest, so it shows even when
 // the app is uninstalled. Cached per backup ref; "0" marks a backup with no icon.
+// Batched like app icons (one helper call per ICON_BATCH refs), and a ref already
+// being fetched is not asked for again: re-renders just add their icon to the wait list.
+var _bicQ = [], _bicTimer = null, _bicPending = {};
 function loadBackupIcon(ic, ref) {
   if (!ref) return;
-  var key = "vdb_bic:" + ref, cached = null;
-  try { cached = localStorage.getItem(key); } catch (e) {}
+  var cached = null;
+  try { cached = localStorage.getItem("vdb_bic:" + ref); } catch (e) {}
   if (cached) { if (cached !== "0") setIcon(ic, cached); return; }
-  helper("backup-icon", { ref: ref }).then(function (r) {
-    if (r && r.ok && r.icon) { try { localStorage.setItem(key, r.icon); } catch (e) {} setIcon(ic, r.icon); }
-    else { try { localStorage.setItem(key, "0"); } catch (e) {} }
-  });
+  if (_bicPending[ref]) { _bicPending[ref].push(ic); return; }
+  _bicPending[ref] = [ic]; _bicQ.push(ref);
+  if (_bicQ.length >= ICON_BATCH) flushBackupIcons();
+  else if (!_bicTimer) _bicTimer = setTimeout(flushBackupIcons, 120);
+}
+function flushBackupIcons() {
+  if (_bicTimer) { clearTimeout(_bicTimer); _bicTimer = null; }
+  if (!_bicQ.length) return;
+  var refs = _bicQ.splice(0, ICON_BATCH);
+  var done = function (map) {
+    refs.forEach(function (ref) {
+      var ics = _bicPending[ref] || []; delete _bicPending[ref];
+      // only an answered ref is cached ("" = no icon); a failed call is retried on a later render
+      if (!map || !Object.prototype.hasOwnProperty.call(map, ref)) return;
+      try { localStorage.setItem("vdb_bic:" + ref, map[ref] || "0"); } catch (e) {}
+      if (map[ref]) ics.forEach(function (ic) { setIcon(ic, map[ref]); });
+    });
+  };
+  helper("backup-icons", { refs: refs }).then(function (r) { done(r && r.ok && r.icons); }, function () { done(null); });
+  if (_bicQ.length) _bicTimer = setTimeout(flushBackupIcons, 0);   // drain remaining
 }
 // backup details (tap a backup entry)
 function openBackupInfo(b) {
@@ -2023,8 +2048,12 @@ function setBlock(pkg, on) {
 // persist CFG; surface a failure instead of letting the in-memory toggle silently diverge from disk
 function saveCfg() { helper("config-set", CFG).then(function (r) { if (r && r.ok === false) modalAlert(errMsg(r)); }).catch(function () { modalAlert(errMsg()); }); }
 function persistBlocklist() { saveCfg(); }
+// The Settings pickers each hold a row per app. They are built only while the Settings tab is
+// shown (loadSettings rebuilds both whenever the tab opens), so loading the app list on the Apps
+// tab no longer renders every app three times.
+function settingsShown() { var p = $("#settings"); return !!(p && p.classList.contains("active")); }
 function buildBlockPicker() {
-  var ul = $("#block-applist"); if (!ul) return;
+  var ul = $("#block-applist"); if (!ul || !settingsShown()) return;
   if (iconObserver) _blockIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
   _blockIcons = []; ul.innerHTML = "";
   visibleApps("", true).forEach(function (a) {
@@ -2104,7 +2133,7 @@ function openAppItemsModal(pkg, label) {
 }
 function closeAppItemsModal() { $("#appitems-modal").hidden = true; _aiPkg = null; }
 function buildAppItemsPicker() {
-  var ul = $("#ai-applist"); if (!ul) return;
+  var ul = $("#ai-applist"); if (!ul || !settingsShown()) return;
   if (iconObserver) _aiIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
   _aiIcons = []; ul.innerHTML = "";
   visibleApps("", true).forEach(function (a) {
@@ -2963,13 +2992,20 @@ function boot() {
   initVdlu();   // VDLU: evaluate reboot banner + auto_on_webui_open on load (panel mounts on tab open)
 
   helper("config-get").then(function (c) { CFG = c || {}; activeUser = (CFG.user != null) ? (CFG.user | 0) : 0; return I18N.init(CFG.language || "auto"); })
-    .then(function () { I18N.apply(); loadDests(); loadSettings(); loadUsers(); loadOverview(); reattachOps(); recoverPendingAuth(); deferredUpdateCheck(); });
+    .then(function () {
+      I18N.apply();
+      // The bridge runs one exec at a time, so call order is load order. The app list is the
+      // first screen: ask for it first, and queue what the other tabs need only behind it.
+      var rest = function () {
+        loadOverview(); reattachOps(); loadDests(); loadSettings(); recoverPendingAuth(); deferredUpdateCheck();
+        helper("sanitize").catch(function () {});   // self-heal backup-folder perms, fire-and-forget
+      };
+      loadUsers().then(rest, rest);
+    });
 
   helper("ping").then(function (r) {
     if (r && r.version) { $("#ver").textContent = r.version; if ($("#about-ver")) $("#about-ver").textContent = r.version + " - " + (r.abi || ""); }
   });
 
-  // self-heal backup-folder perms once per load (fire-and-forget, never blocks the UI).
-  helper("sanitize").catch(function () {});
 }
 document.addEventListener("DOMContentLoaded", boot);

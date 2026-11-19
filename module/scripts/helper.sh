@@ -1018,6 +1018,17 @@ EOF
     ic="$("$JQ" -r '.package.icon // empty' "$m" 2>/dev/null)"
     if [ -n "$ic" ]; then ok "\"icon\":\"$ic\""; else err ERR_ICON "no icon in manifest"; fi ;;
 
+  backup-icons)
+    # batched backup-icon: {refs:[...]} -> {ok:true,icons:{<ref>:<b64 or "">}}, "" = the backup
+    # has no icon. Invalid refs and refs without a manifest are left out of the map.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.refs[]? | strings' 2>/dev/null \
+      | while IFS= read -r ref; do
+          [ -n "$(ref_root "$ref")" ] || continue
+          [ -f "$ref/manifest.json" ] || continue
+          "$JQ" -c --arg r "$ref" '{($r): (.package.icon // "")}' "$ref/manifest.json" 2>/dev/null
+        done | "$JQ" -s -c '{ok:true, icons:(add // {})}' ;;
+
   delete-backup)
     ref="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | \
            "$(command -v "$BIN/jq" 2>/dev/null || echo jq)" -r '.ref // empty' 2>/dev/null)"
