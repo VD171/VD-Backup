@@ -98,8 +98,9 @@ body {
   display: flex; align-items: center; gap: 12px;
   padding: 14px 16px calc(14px) 16px;
   padding-top: calc(14px + env(safe-area-inset-top));
-  background: color-mix(in srgb, var(--bg) 86%, transparent);
-  backdrop-filter: saturate(140%) blur(10px);
+  /* opaque, no backdrop-filter: a blur under a sticky bar re-composites everything that
+     scrolls beneath it every frame, which is what made scrolling stutter in the WebView */
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
 .topbar .logo { width: 38px; height: 38px; border-radius: 10px; flex: none; }
@@ -253,8 +254,7 @@ button { cursor: pointer; font-family: inherit; }
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
   display: flex; gap: 2px; padding: 6px 8px; overflow-x: auto; scrollbar-width: none;
   padding-bottom: calc(6px + env(safe-area-inset-bottom));
-  background: color-mix(in srgb, var(--bg) 90%, transparent);
-  backdrop-filter: saturate(140%) blur(12px);
+  background: var(--bg);   /* opaque, no backdrop-filter (see .topbar) */
   border-top: 1px solid var(--line);
 }
 .tabs::-webkit-scrollbar { display: none; }
@@ -312,7 +312,7 @@ button { cursor: pointer; font-family: inherit; }
 
 /* ---- modal (floating, centered) ---- */
 .modal { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center;
-  justify-content: center; background: rgba(2,6,16,.66); backdrop-filter: blur(2px);
+  justify-content: center; background: rgba(2,6,16,.72);
   padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); }
 .modal[hidden] { display: none; }
 /* the generic confirm/alert always opens on top of another modal (e.g. delete from
