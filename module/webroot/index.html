@@ -988,7 +988,8 @@
     <div class="modal-card">
       <div class="modal-title" data-i18n="ui_tg_backups_title">Backups in Telegram</div>
       <div class="modal-msg" data-i18n="ui_tg_backups_msg">Pull a backup from your Telegram channel back to this device; then restore it like any local backup.</div>
-      <ul id="tg-backups-list" class="list"></ul>
+      <input id="tg-backups-search" type="search" hidden data-i18n-ph="search_apps" placeholder="Search apps">
+      <ul id="tg-backups-list" class="list tgb-list"></ul>
       <div class="modal-actions">
         <button class="btn" id="tg-backups-close" data-i18n="ui_import_cancel">Cancel</button>
       </div>
