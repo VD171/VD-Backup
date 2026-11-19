@@ -226,8 +226,8 @@ function setupBackNav() {
 // --- users --------------------------------------------------------------
 var USERS = [];
 var activeUser = 0;
-function loadUsers() {
-  helper("list-users").then(function (r) {
+function loadUsers() {   // returns a promise that settles once the app list request has
+  return helper("list-users").then(function (r) {
     USERS = (r && r.users) ? r.users : [];
     var sel = $("#user-sel"), field = $("#user-field");
     if (sel) {
@@ -242,7 +242,7 @@ function loadUsers() {
       sel.value = activeUser;
       if (field) field.hidden = USERS.length <= 1;
     }
-    loadApps();
+    return loadApps();
   });
 }
 
@@ -370,7 +370,7 @@ function setSelectMode(on) {
 }
 function loadApps() {
   $("#applist").innerHTML = "<li class='muted'>" + I18N.t("apps_loading") + "</li>";
-  helper("list-apps", { user: activeUser }).then(function (r) {
+  return helper("list-apps", { user: activeUser }).then(function (r) {
     APPS = (r && r.apps) ? r.apps : [];
     buildTagChips();
     renderApps($("#search").value);
@@ -2992,13 +2992,20 @@ function boot() {
   initVdlu();   // VDLU: evaluate reboot banner + auto_on_webui_open on load (panel mounts on tab open)
 
   helper("config-get").then(function (c) { CFG = c || {}; activeUser = (CFG.user != null) ? (CFG.user | 0) : 0; return I18N.init(CFG.language || "auto"); })
-    .then(function () { I18N.apply(); loadDests(); loadSettings(); loadUsers(); loadOverview(); reattachOps(); recoverPendingAuth(); deferredUpdateCheck(); });
+    .then(function () {
+      I18N.apply();
+      // The bridge runs one exec at a time, so call order is load order. The app list is the
+      // first screen: ask for it first, and queue what the other tabs need only behind it.
+      var rest = function () {
+        loadOverview(); reattachOps(); loadDests(); loadSettings(); recoverPendingAuth(); deferredUpdateCheck();
+        helper("sanitize").catch(function () {});   // self-heal backup-folder perms, fire-and-forget
+      };
+      loadUsers().then(rest, rest);
+    });
 
   helper("ping").then(function (r) {
     if (r && r.version) { $("#ver").textContent = r.version; if ($("#about-ver")) $("#about-ver").textContent = r.version + " - " + (r.abi || ""); }
   });
 
-  // self-heal backup-folder perms once per load (fire-and-forget, never blocks the UI).
-  helper("sanitize").catch(function () {});
 }
 document.addEventListener("DOMContentLoaded", boot);
