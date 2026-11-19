@@ -945,7 +945,8 @@ transfer_full() {
               [ "$_lfree" -gt 0 ] && [ "${_lsz:-0}" -gt 0 ] && [ "$_lfree" -lt $(( _lsz + 10485760 )) ] \
                 && { audit "no space at dest $DPATH $PKG"; finish false ERR_NO_SPACE; return 1; }
               mkdir -p "$(remote_pfx)/$PKG" && cp -a "$DEST" "$(remote_pfx)/$PKG/" \
-                || { audit "local transfer failed $PKG"; finish false ERR_TRANSFER; return 1; }; fi ;;
+                || { audit "local transfer failed $PKG"; finish false ERR_TRANSFER; return 1; }
+              media_own -R "$(remote_pfx)/$PKG/$(basename "$DEST")"; fi ;;   # staging copy is root-only
   esac
 }
 
@@ -1152,7 +1153,8 @@ backup() {
   # root-only staging dir and cleaned on exit (stealth); otherwise it builds in BACKUPS, where it
   # lives and is listed.
   if remote_only; then
-    DEST="$(staging_root)/$PKG/${TS}_${VC}"
+    _sroot="$(staging_root)"; mkdir -p "$_sroot" && chmod 700 "$_sroot"   # root-only: plaintext data waits here for upload
+    DEST="$_sroot/$PKG/${TS}_${VC}"
   else
     DEST="$BACKUPS/$PKG/${TS}_${VC}"; media_own "$BACKUPS"; media_own "$BACKUPS/$PKG"
   fi
@@ -1381,7 +1383,7 @@ backup() {
       items:$items}' > "$DEST/manifest.json"
   rm -f "$IFILE"
   sha256sum "$DEST/manifest.json" | cut -d' ' -f1 > "$DEST/manifest.json.sha256"
-  media_own -R "$DEST"   # make the finished backup visible under /sdcard/VDBackup
+  remote_only || media_own -R "$DEST"   # make the finished backup visible under /sdcard/VDBackup (staging stays root-only)
 
   rm -f "$DUMPF"
 
