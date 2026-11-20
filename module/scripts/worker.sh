@@ -946,6 +946,10 @@ do_snapshot() {
   # it back from the restored tree.
   SNAPMETA="$STATE/snapmeta/$PKG.json"; mkdir -p "$STATE/snapmeta"; fwstate_capture > "$SNAPMETA" 2>/dev/null
   PATHS="$PATHS $SNAPMETA"
+  # restic exits 3 ("incomplete snapshot") when a listed source path does not exist, even though
+  # the snapshot is saved. Apps without Android/data, obb or media dirs hit this on every run and
+  # were reported as ERR_RESTIC. Back up only the paths that exist.
+  _EP=""; for _p in $PATHS; do exec_ns test -e "$_p" && _EP="$_EP $_p"; done; PATHS="$_EP"
   prog 20 snapshot-init "$PKG"
   export RESTIC_PASSWORD_FILE="$SECRETS/creds/$DESTID.pass"
   # initialize the repo on first use
