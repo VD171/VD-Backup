@@ -30,7 +30,11 @@ STATE_DIR=/data/adb/vdbackup
 # stop the detached scheduler heartbeat first, so it does not keep spinning every 900s
 # against a helper.sh that uninstall is about to remove (harmless but noisy until reboot).
 _lp="$(cat "$STATE_DIR/logs/scheduler.loop.pid" 2>/dev/null)"
-case "$_lp" in ''|*[!0-9]*) : ;; *) kill "$_lp" 2>/dev/null ;; esac
+# only signal the pid when it was recorded in this boot (scheduler.loop.boot == boot_id): the pid file
+# survives a reboot and Android reuses pids, so a stale pid could belong to an unrelated process.
+_lb="$(cat "$STATE_DIR/logs/scheduler.loop.boot" 2>/dev/null)"
+_bid="$(cat /proc/sys/kernel/random/boot_id 2>/dev/null)"
+case "$_lp" in ''|*[!0-9]*) : ;; *) [ "$_lb" = "$_bid" ] && kill "$_lp" 2>/dev/null ;; esac
 rm -rf "$STATE_DIR/staging" "$STATE_DIR/iconcache" 2>/dev/null
-rm -f "$STATE_DIR/logs"/*.pid "$STATE_DIR/logs"/*.out "$STATE_DIR/logs"/progress-*.json 2>/dev/null
+rm -f "$STATE_DIR/logs"/*.pid "$STATE_DIR/logs"/scheduler.loop.boot "$STATE_DIR/logs"/*.out "$STATE_DIR/logs"/progress-*.json 2>/dev/null
 exit 0
