@@ -107,7 +107,7 @@ VDBackup 的构建目标是不仅欢迎人，也欢迎 AI 助手和代理。引�
 
 ## 增量更新 (VDLU)
 
-VD Backup 附带 **VDLU** 引擎 (内置于 `vdlu/`)：模块只获取已更改的文件 (内容寻址的 blob + 一个带签名的 `manifest.json`) 来自我更新，而不是重新下载整个 `.zip`。**加固**配置：ed25519 签名是强制的，降级被阻止；完整的 `.zip` 仍作为回退保持有效。
+VD Backup 附带 **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** 引擎 (内置于 `vdlu/`)：模块只获取已更改的文件 (内容寻址的 blob + 一个带签名的 `manifest.json`) 来自我更新，而不是重新下载整个 `.zip`。**加固**配置：ed25519 签名是强制的，降级被阻止；完整的 `.zip` 仍作为回退保持有效。
 
 - **仅 LIVE** (无需重启)：更新会在下次启动时通过 `service.sh` 在后台应用，当没有可达的 feed 时则为空操作。
 - **状态**位于 `/data/adb/vdbackup/vdlu/`，在模块之外，因此重新刷入后仍然保留。
@@ -134,6 +134,8 @@ VD Backup 附带 **VDLU** 引擎 (内置于 `vdlu/`)：模块只获取已更改�
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: 在你的设备上无需联网即可读取你的 Google 服务 (RCS、Wallet、Play Integrity 证明)。
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: 一个设备伪装器，把全新的指纹变成连贯一致的配置。
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: 一个独立的 root SSH 守护进程 (Dropbear)。
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: 一个无需刷入的增量自更新引擎，嵌入到 KernelSU/APatch/Magisk 模块中。
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: 一个面向单个、批量和拆分 APK 的无摩擦 root 侧载安装器，带有 Play Protect 验证器开关和安装来源伪装。
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

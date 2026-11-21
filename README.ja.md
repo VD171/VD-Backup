@@ -125,7 +125,7 @@ VDBackup は、人だけでなく AI アシスタントやエージェントに�
 
 ## 差分アップデート (VDLU)
 
-VD Backup は **VDLU** エンジンを同梱しています (`vdlu/` に同梱)。モジュールは `.zip` 全体を再ダウンロードするのではなく、変更されたファイルだけを取得して自分自身を更新します (コンテンツアドレス指定のブロブ + 署名付きの `manifest.json`)。**堅牢化** プロファイル: ed25519 署名は必須で、ダウングレードはブロックされます。完全な `.zip` はフォールバックとして引き続き有効です。
+VD Backup は **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** エンジンを同梱しています (`vdlu/` に同梱)。モジュールは `.zip` 全体を再ダウンロードするのではなく、変更されたファイルだけを取得して自分自身を更新します (コンテンツアドレス指定のブロブ + 署名付きの `manifest.json`)。**堅牢化** プロファイル: ed25519 署名は必須で、ダウングレードはブロックされます。完全な `.zip` はフォールバックとして引き続き有効です。
 
 - **LIVE のみ** (再起動なし): アップデートは `service.sh` 経由で次回起動時にバックグラウンドで適用され、到達可能なフィードがない場合は何もしません。
 - **状態** は `/data/adb/vdbackup/vdlu/` にあり、モジュールの外にあるため再フラッシュしても残ります。
@@ -152,6 +152,8 @@ VD Backup は **VDLU** エンジンを同梱しています (`vdlu/` に同梱)�
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: あなたの Google サービス (RCS、Wallet、Play Integrity の構成証明) を、インターネットなしでデバイス上で読み取ります。
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: 新しいフィンガープリントを、首尾一貫した整合性のあるプロファイルに変えるデバイススプーファー。
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: 単体で動く root 権限の SSH デーモン (Dropbear)。
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: フラッシュ不要の増分セルフアップデートエンジンで、KernelSU/APatch/Magisk モジュールに組み込まれます。
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: 単一・バッチ・分割 APK に対応した、摩擦のない root サイドロードインストーラーで、Play Protect 検証のトグルとインストール元の偽装を備えます。
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

@@ -124,7 +124,7 @@ API mà WebUI dùng, xem toàn bộ bề mặt điều khiển tại **[docs/AI-
 
 ## Cập nhật tăng dần (VDLU)
 
-VD Backup đi kèm engine **VDLU** (được nhúng trong `vdlu/`): mô-đun tự cập nhật bằng cách chỉ tải về những
+VD Backup đi kèm engine **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** (được nhúng trong `vdlu/`): mô-đun tự cập nhật bằng cách chỉ tải về những
 tệp đã thay đổi (các blob định địa chỉ theo nội dung + một `manifest.json` đã ký), thay vì tải lại toàn bộ
 `.zip`. Hồ sơ **được gia cố**: chữ ký ed25519 là bắt buộc và việc hạ cấp bị chặn; `.zip` đầy đủ vẫn hợp lệ
 như một phương án dự phòng.
@@ -154,6 +154,8 @@ Các dự án anh em của cùng tác giả:
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: các dịch vụ Google của bạn (RCS, Wallet, các chứng thực Play Integrity), đọc ngay trên thiết bị của bạn mà không cần internet.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: một trình giả lập thiết bị biến một fingerprint mới thành một hồ sơ mạch lạc, nhất quán.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: một SSH daemon độc lập chạy với quyền root (Dropbear).
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: một engine tự cập nhật tăng dần không cần flash, được nhúng vào các module KernelSU/APatch/Magisk.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: một trình cài đặt sideload với quyền root không ma sát cho các APK đơn, hàng loạt và phân tách, với công tắc trình xác minh Play Protect và giả mạo nguồn cài đặt.
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

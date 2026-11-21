@@ -134,7 +134,7 @@ VDBackup створений так, щоб бути привітним до AI-�
 
 ## Інкрементні оновлення (VDLU)
 
-VD Backup постачається з рушієм **VDLU** (вбудований у `vdlu/`): модуль оновлює себе, завантажуючи лише ті
+VD Backup постачається з рушієм **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** (вбудований у `vdlu/`): модуль оновлює себе, завантажуючи лише ті
 файли, що змінилися (адресовані за вмістом блоби + підписаний `manifest.json`), замість повторного
 завантаження всього `.zip`. **Посилений** профіль: підпис ed25519 обов'язковий, а пониження версії
 блокуються; повний `.zip` залишається дійсним як запасний варіант.
@@ -164,6 +164,8 @@ VD Backup постачається з рушієм **VDLU** (вбудовани�
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: ваші сервіси Google (RCS, Wallet, атестації Play Integrity), прочитані на вашому пристрої без інтернету.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: підмінювач пристрою, який перетворює свіжий fingerprint на узгоджений, послідовний профіль.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: автономний SSH-демон із root-правами (Dropbear).
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: безфлешевий інкрементальний рушій самооновлення, вбудований у модулі KernelSU/APatch/Magisk.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: безперешкодний root-інсталятор sideload для одиночних, пакетних і розділених APK, з перемикачем верифікатора Play Protect та підробкою джерела встановлення.
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

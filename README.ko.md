@@ -128,7 +128,7 @@ JSON으로 말하고 (`helper.sh`의 모든 verb는 하나의 JSON 객체를 반
 
 ## 증분 업데이트 (VDLU)
 
-VD Backup은 **VDLU** 엔진을 포함합니다 (`vdlu/`에 내장). 모듈은 전체 `.zip`을 다시 내려받는 대신 변경된 파일만 가져와 자신을 업데이트합니다 (콘텐츠 주소 지정 블롭 + 서명된 `manifest.json`). **강화된** 프로파일: ed25519 서명이 필수이며 다운그레이드는 차단됩니다. 전체 `.zip`은 폴백으로 계속 유효합니다.
+VD Backup은 **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** 엔진을 포함합니다 (`vdlu/`에 내장). 모듈은 전체 `.zip`을 다시 내려받는 대신 변경된 파일만 가져와 자신을 업데이트합니다 (콘텐츠 주소 지정 블롭 + 서명된 `manifest.json`). **강화된** 프로파일: ed25519 서명이 필수이며 다운그레이드는 차단됩니다. 전체 `.zip`은 폴백으로 계속 유효합니다.
 
 - **LIVE 전용** (재부팅 없음): 업데이트는 `service.sh`를 통해 다음 부팅 시 백그라운드로 적용되며, 도달 가능한 피드가 없으면 아무 작업도 하지 않습니다.
 - **상태**는 `/data/adb/vdbackup/vdlu/`에 있으며, 모듈 외부에 있으므로 재플래시 후에도 유지됩니다.
@@ -155,6 +155,8 @@ VD Backup은 **VDLU** 엔진을 포함합니다 (`vdlu/`에 내장). 모듈은 �
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: 여러분의 Google 서비스 (RCS, Wallet, Play Integrity 증명)를 인터넷 없이 기기에서 읽습니다.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: 새 핑거프린트를 일관되고 정합성 있는 프로필로 바꾸는 기기 스푸퍼.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: 독립 실행형 루트 SSH 데몬 (Dropbear).
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: KernelSU/APatch/Magisk 모듈에 내장된, 플래시가 필요 없는 증분 자가 업데이트 엔진.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: 단일, 배치, 분할 APK 를 위한 마찰 없는 root 사이드로드 설치기로, Play Protect 검사기 토글과 설치 출처 위장을 갖추고 있습니다.
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

@@ -125,7 +125,7 @@ voir **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** pour la surface de contrôle com
 
 ## Mises à jour incrémentielles (VDLU)
 
-VD Backup embarque l'engine **VDLU** (intégré dans `vdlu/`): le module se met à jour en ne récupérant que les
+VD Backup embarque l'engine **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** (intégré dans `vdlu/`): le module se met à jour en ne récupérant que les
 fichiers qui ont changé (blobs adressés par contenu + un `manifest.json` signé), au lieu de retélécharger tout
 le `.zip`. Profil **durci**: la signature ed25519 est obligatoire et les rétrogradations sont bloquées; le
 `.zip` complet reste valide comme solution de repli.
@@ -155,6 +155,8 @@ Projets frères du même auteur :
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: vos services Google (RCS, Wallet, attestations Play Integrity), lus sur votre appareil sans internet.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: un spoofer d'appareil qui transforme une empreinte neuve en un profil cohérent et consistant.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: un démon SSH autonome en root (Dropbear).
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)** : un moteur d'auto-mise à jour incrémentale et sans flashage, intégré aux modules KernelSU/APatch/Magisk.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)** : un installateur sideload en root et sans friction pour les APK uniques, par lots et splittés, avec un interrupteur pour le vérificateur Play Protect et l'usurpation de la source d'installation.
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

@@ -122,7 +122,7 @@ Neo-Backup وAndroid-DataBackup الموجودة كي تنتقل إليها.
 
 ## التحديثات التزايدية (VDLU)
 
-يأتي VD Backup مزوّدًا بالمحرك **VDLU** (مُضمَّن في `vdlu/`): تُحدِّث الوحدة نفسها بجلب الملفات التي تغيّرت فقط (كتل معنونة بالمحتوى + ملف `manifest.json` موقَّع)، بدلًا من إعادة تنزيل ملف `.zip` بالكامل. ملف التعريف **المُقوَّى**: توقيع ed25519 إلزامي والرجوع إلى إصدار أقدم محظور؛ ويبقى ملف `.zip` الكامل صالحًا كبديل احتياطي.
+يأتي VD Backup مزوّدًا بالمحرك **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** (مُضمَّن في `vdlu/`): تُحدِّث الوحدة نفسها بجلب الملفات التي تغيّرت فقط (كتل معنونة بالمحتوى + ملف `manifest.json` موقَّع)، بدلًا من إعادة تنزيل ملف `.zip` بالكامل. ملف التعريف **المُقوَّى**: توقيع ed25519 إلزامي والرجوع إلى إصدار أقدم محظور؛ ويبقى ملف `.zip` الكامل صالحًا كبديل احتياطي.
 
 - **LIVE فقط** (دون إعادة تشغيل): تُطبَّق التحديثات عند الإقلاع التالي عبر `service.sh`، في الخلفية، ولا تفعل شيئًا عندما لا يكون هناك feed يمكن الوصول إليه.
 - **الحالة** في `/data/adb/vdbackup/vdlu/`، خارج الوحدة، لذا تبقى بعد إعادة الفلاش.
@@ -149,6 +149,8 @@ Neo-Backup وAndroid-DataBackup الموجودة كي تنتقل إليها.
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: خدمات Google لديك (RCS، Wallet، شهادات Play Integrity)، تُقرأ على جهازك دون إنترنت.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: مُزيِّف جهاز يحوّل بصمة جديدة إلى ملف تعريف متماسك ومتسق.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: خادم SSH مستقل يعمل بصلاحيات الجذر (Dropbear).
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: محرك تحديث ذاتي تزايدي بلا فلاش، مدمج في وحدات KernelSU/APatch/Magisk.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: مثبّت تحميل جانبي بصلاحيات الجذر وبلا احتكاك لحزم APK المفردة والمجمّعة والمقسّمة، مع مفتاح لمدقّق Play Protect وانتحال مصدر التثبيت.
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

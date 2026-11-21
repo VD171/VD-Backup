@@ -136,7 +136,7 @@ actie van de module headless beheren via dezelfde API die de WebUI gebruikt, zie
 
 ## Incrementele updates (VDLU)
 
-VD Backup bevat de **VDLU**-engine (ingebouwd in `vdlu/`): de module werkt zichzelf bij door alleen de
+VD Backup bevat de **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)**-engine (ingebouwd in `vdlu/`): de module werkt zichzelf bij door alleen de
 bestanden op te halen die zijn gewijzigd (inhoud-geadresseerde blobs + een ondertekende `manifest.json`), in
 plaats van de hele `.zip` opnieuw te downloaden. **Gehard** profiel: de ed25519-handtekening is verplicht en
 downgrades worden geblokkeerd; de volledige `.zip` blijft geldig als terugval.
@@ -166,6 +166,8 @@ Zusterprojecten van dezelfde auteur:
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: je Google-diensten (RCS, Wallet, Play Integrity-attestaties), op je apparaat gelezen zonder internet.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: een apparaatspoofer die een verse fingerprint omzet in een coherent, consistent profiel.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: een op zichzelf staande geroote SSH-daemon (Dropbear).
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: een flashloze, incrementele zelfupdate-engine, ingebed in KernelSU/APatch/Magisk-modules.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: een wrijvingsloze root-sideload-installer voor losse, batch- en split-APK's, met een Play Protect-verifier-schakelaar en vervalsing van de installatiebron.
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

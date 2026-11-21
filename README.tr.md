@@ -126,7 +126,7 @@ diğerleri gibi incelenip kabul edilir. Bir aracı, WebUI'nin kullandığı ayn�
 
 ## Artımlı güncellemeler (VDLU)
 
-VD Backup, **VDLU** motorunu içerir (`vdlu/` içine gömülü): modül, tüm `.zip` dosyasını yeniden indirmek
+VD Backup, **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** motorunu içerir (`vdlu/` içine gömülü): modül, tüm `.zip` dosyasını yeniden indirmek
 yerine yalnızca değişen dosyaları (içerik adresli bloblar + imzalı bir `manifest.json`) alarak kendini
 günceller. **Sağlamlaştırılmış** profil: ed25519 imzası zorunludur ve sürüm düşürmeleri engellenir; tam
 `.zip` bir yedek olarak geçerli kalır.
@@ -156,6 +156,8 @@ Aynı yazarın kardeş projeleri:
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: Google hizmetleriniz (RCS, Wallet, Play Integrity doğrulamaları), internet olmadan cihazınızda okunur.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: taze bir parmak izini tutarlı, uyumlu bir profile dönüştüren bir cihaz sahteleyici.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: bağımsız, root yetkili bir SSH artalan süreci (Dropbear).
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: KernelSU/APatch/Magisk modüllerine gömülü, flash'sız, artımlı bir kendini güncelleme motoru.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: tekli, toplu ve bölünmüş APK'lar için sürtünmesiz bir root sideload yükleyicisi; Play Protect doğrulayıcı anahtarı ve kurulum kaynağı sahteciliği ile birlikte.
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

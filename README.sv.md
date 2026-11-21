@@ -137,7 +137,7 @@ modulen huvudlöst via samma API som WebUI använder, se
 
 ## Inkrementella uppdateringar (VDLU)
 
-VD Backup levereras med **VDLU**-motorn (inbäddad i `vdlu/`): modulen uppdaterar sig själv genom att bara
+VD Backup levereras med **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)**-motorn (inbäddad i `vdlu/`): modulen uppdaterar sig själv genom att bara
 hämta de filer som har ändrats (innehållsadresserade blobbar + en signerad `manifest.json`), i stället för att
 ladda ner hela `.zip`-filen igen. **Härdad** profil: ed25519-signaturen är obligatorisk och nedgraderingar
 blockeras; den fullständiga `.zip`-filen förblir giltig som reservalternativ.
@@ -167,6 +167,8 @@ Systerprojekt av samma författare:
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: dina Google-tjänster (RCS, Wallet, Play Integrity-attesteringar), lästa på din enhet utan internet.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: en enhetsspoofer som förvandlar ett färskt fingerprint till en sammanhängande, konsekvent profil.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: en fristående rootad SSH-daemon (Dropbear).
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: en flashfri, inkrementell självuppdateringsmotor, inbäddad i KernelSU/APatch/Magisk-moduler.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: en friktionsfri root-sideload-installerare för enskilda, batch- och split-APK:er, med en växel för Play Protect-verifieraren och förfalskning av installationskällan.
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

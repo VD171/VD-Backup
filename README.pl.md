@@ -137,7 +137,7 @@ a aby współtworzyć, w [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welco
 
 ## Aktualizacje przyrostowe (VDLU)
 
-VD Backup zawiera silnik **VDLU** (wbudowany w `vdlu/`): moduł aktualizuje się, pobierając tylko te
+VD Backup zawiera silnik **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** (wbudowany w `vdlu/`): moduł aktualizuje się, pobierając tylko te
 pliki, które się zmieniły (bloby adresowane treścią + podpisany `manifest.json`), zamiast ponownie pobierać
 cały `.zip`. Profil **wzmocniony**: podpis ed25519 jest obowiązkowy, a downgrade'y są blokowane; pełny
 `.zip` pozostaje ważny jako rozwiązanie zapasowe.
@@ -167,6 +167,8 @@ Projekty siostrzane tego samego autora:
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: Twoje usługi Google (RCS, Wallet, atestacje Play Integrity) odczytywane na Twoim urządzeniu bez internetu.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: narzędzie do podszywania się urządzenia, które zamienia świeży fingerprint w spójny, konsekwentny profil.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: samodzielny zrootowany demon SSH (Dropbear).
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: bezflashowy, przyrostowy silnik samoaktualizacji, wbudowany w moduły KernelSU/APatch/Magisk.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: bezproblemowy rootowy instalator sideload dla pojedynczych, wsadowych i podzielonych APK, z przełącznikiem weryfikatora Play Protect i podszywaniem źródła instalacji.
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

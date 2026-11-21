@@ -124,7 +124,7 @@ stejné API, které používá WebUI, úplnou řídicí plochu najdete v
 
 ## Přírůstkové aktualizace (VDLU)
 
-VD Backup obsahuje **VDLU** engine (vestavěný v `vdlu/`): modul se aktualizuje tak, že stahuje jen
+VD Backup obsahuje **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** engine (vestavěný v `vdlu/`): modul se aktualizuje tak, že stahuje jen
 soubory, které se změnily (obsahově adresované bloby + podepsaný `manifest.json`), místo opětovného stažení
 celého `.zip`. **Zpevněný** profil: podpis ed25519 je povinný a downgrady jsou blokovány; úplný `.zip`
 zůstává platný jako záloha.
@@ -154,6 +154,8 @@ Sesterské projekty téhož autora:
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: vaše služby Google (RCS, Wallet, atestace Play Integrity) čtené na vašem zařízení bez internetu.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: nástroj pro podvržení zařízení, který promění čerstvý fingerprint v soudržný, konzistentní profil.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: samostatný rootovaný SSH démon (Dropbear).
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: bezflashový, inkrementální engine pro samoaktualizaci, vestavěný do modulů KernelSU/APatch/Magisk.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: bezproblémový rootový sideload instalátor pro jednotlivé, dávkové a rozdělené APK, s přepínačem ověřování Play Protect a podvržením zdroje instalace.
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 

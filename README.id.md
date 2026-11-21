@@ -123,7 +123,7 @@ lengkap, dan [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) untuk be
 
 ## Pembaruan inkremental (VDLU)
 
-VD Backup menyertakan mesin **VDLU** (tertanam di `vdlu/`): modul memperbarui dirinya sendiri dengan hanya
+VD Backup menyertakan mesin **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** (tertanam di `vdlu/`): modul memperbarui dirinya sendiri dengan hanya
 mengambil berkas yang berubah (blob yang dialamatkan berdasarkan konten + sebuah `manifest.json` bertanda
 tangan), alih-alih mengunduh ulang seluruh `.zip`. Profil **diperkuat**: tanda tangan ed25519 wajib dan
 penurunan versi diblokir; `.zip` lengkap tetap valid sebagai cadangan.
@@ -153,6 +153,8 @@ Proyek saudara dari penulis yang sama:
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: layanan Google Anda (RCS, Wallet, atestasi Play Integrity), dibaca di perangkat Anda tanpa internet.
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: sebuah pemalsu perangkat yang mengubah fingerprint baru menjadi profil yang koheren dan konsisten.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: sebuah daemon SSH mandiri dengan akses root (Dropbear).
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: sebuah mesin pembaruan-mandiri inkremental tanpa flash, tertanam di dalam modul KernelSU/APatch/Magisk.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: sebuah pemasang sideload ber-root tanpa hambatan untuk APK tunggal, batch, dan split, dengan sakelar verifier Play Protect dan pemalsuan sumber pemasangan.
 
 Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
 
