@@ -1,9 +1,9 @@
 {
-  "version": "v1.14",
-  "versionCode": 11400,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.14/VD-Backup-v1.14-universal-full.zip",
+  "version": "v1.14.1",
+  "versionCode": 11401,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.14.1/VD-Backup-v1.14.1-universal-full.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "v1.14 adds label filter chips: filter the app list by one or more labels as tap-to-toggle chips (an app shows if it carries any selected label), replacing the single-label dropdown. Also in this release: cancel a running backup or restore from the progress card, and a fix for the Telegram destination Test (it wrongly reported the type as unsupported). All in 21 languages.",
-  "size": 257579989,
-  "sha256": "575f1713ce459ea3f76fdac4b37115edff8688697dd7a81626a2a7e34ce0e762"
+  "notes": "Binary refresh: the bundled, pre-compiled upstream tools (rclone, restic, tar, ...) were updated to their latest versions. No app or feature changes from the previous release; per-binary source and SHA-256 are in bin/<abi>/PROVENANCE.json (see docs/BINARIES.md).",
+  "size": 267233431,
+  "sha256": "fec5d573ae41a8b7d793143284453ea33aeeee67939d9b5077ea0e904dfe54c5"
 }
