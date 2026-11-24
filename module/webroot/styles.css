@@ -80,6 +80,13 @@ html[data-theme="light"] {
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* Controls behave like app controls: a long press on a tab, button or tappable row no longer
+   starts a text selection or the link/callout menu, and taps skip the double-tap-zoom wait.
+   Text in rows, notices and dialogs stays selectable. */
+.tabs, .tab, .btn, .icon-btn, .segment, .row.tappable .name, .row.tappable .pkg, summary.section-head {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+button, .tab, .row.tappable, summary, input[type="checkbox"] { touch-action: manipulation; }
 html, body { margin: 0; }
 body {
   background: var(--bg); color: var(--text);
@@ -98,8 +105,9 @@ body {
   display: flex; align-items: center; gap: 12px;
   padding: 14px 16px calc(14px) 16px;
   padding-top: calc(14px + env(safe-area-inset-top));
-  background: color-mix(in srgb, var(--bg) 86%, transparent);
-  backdrop-filter: saturate(140%) blur(10px);
+  /* opaque, no backdrop-filter: a blur under a sticky bar re-composites everything that
+     scrolls beneath it every frame, which is what made scrolling stutter in the WebView */
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
 .topbar .logo { width: 38px; height: 38px; border-radius: 10px; flex: none; }
@@ -253,8 +261,7 @@ button { cursor: pointer; font-family: inherit; }
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
   display: flex; gap: 2px; padding: 6px 8px; overflow-x: auto; scrollbar-width: none;
   padding-bottom: calc(6px + env(safe-area-inset-bottom));
-  background: color-mix(in srgb, var(--bg) 90%, transparent);
-  backdrop-filter: saturate(140%) blur(12px);
+  background: var(--bg);   /* opaque, no backdrop-filter (see .topbar) */
   border-top: 1px solid var(--line);
 }
 .tabs::-webkit-scrollbar { display: none; }
@@ -309,10 +316,22 @@ button { cursor: pointer; font-family: inherit; }
 .op-sub { color: var(--muted); font-size: 13px; margin-top: 8px; }
 .op-sub[hidden] { display: none; }
 .op-cancel { margin-top: 10px; }
+/* #ops: download-manager stack of live-op cards (trackOp). Newest expanded; older collapse to a
+   one-line summary (label + progress + × close); a badge shows the count when more than one runs. */
+#ops { position: relative; }
+.op-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-top: 8px; }
+.op-card:first-child { margin-top: 0; }
+.op-card.collapsed { display: flex; align-items: center; gap: 10px; padding: 8px 12px; opacity: .9; }
+.op-card.collapsed .op-label { flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
+.op-card.collapsed .bar { flex: 1; margin-top: 0; }
+.op-card.collapsed .op-sub { display: none; }
+.op-card.collapsed .op-cancel { flex: none; margin-top: 0; padding: 2px 9px; font-size: 0; line-height: 1; }
+.op-card.collapsed .op-cancel::after { content: "\00d7"; font-size: 18px; }
+#ops.multi::before { content: attr(data-count); position: absolute; top: -7px; right: 8px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #06220f; font-weight: 700; font-size: 11px; line-height: 18px; text-align: center; z-index: 2; }
 
 /* ---- modal (floating, centered) ---- */
 .modal { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center;
-  justify-content: center; background: rgba(2,6,16,.66); backdrop-filter: blur(2px);
+  justify-content: center; background: rgba(2,6,16,.72);
   padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); }
 .modal[hidden] { display: none; }
 /* the generic confirm/alert always opens on top of another modal (e.g. delete from
@@ -660,7 +679,8 @@ input[type="checkbox"].switch:focus-visible { outline: 2px solid var(--accent); 
 /* ---- activity log: a full screen (its own panel), reached from Schedule. The
    log list fills it and scrolls with the page; the export result is a tap-to-copy
    path so the saved file is easy to find and attach to a bug report. ---- */
-.log-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.log-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 4px; }
+.log-bar .sh-t { flex: 0 1 auto; white-space: nowrap; }
 #log-export-result { margin: 10px 0; display: flex; flex-direction: column; gap: 6px; }
 #log-export-result[hidden] { display: none; }
 
@@ -678,6 +698,13 @@ input[type="checkbox"].switch:focus-visible { outline: 2px solid var(--accent); 
   animation: spin .8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* Pending state for a confirm/action button: keeps its label, adds a spinning ring in the button's
+   own text colour (currentColor), and blocks input until the action settles (#spinners). */
+.btn.busy { pointer-events: none; opacity: .9; }
+.btn.busy::after { content: ""; display: inline-block; width: 13px; height: 13px; margin-left: 8px;
+  vertical-align: -2px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%;
+  animation: spin .8s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .btn.busy::after { animation-duration: 2.4s; } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.4s; } }
 
 /* centered spinner + message used while a panel's content loads (activity log) */
@@ -743,3 +770,32 @@ details.grp[open] > summary.section-head::after { transform: rotate(180deg); col
   border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
 
 .app-note { font-size: .82em; opacity: .7; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Restore from Telegram: one collapsible card per app, one line per backup inside it. The lines wrap
+   their actions under the date on narrow screens instead of letting the buttons overlap. */
+#tg-backups .modal-card { overflow: hidden; }
+#tg-backups .tgb-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; gap: 10px; padding-right: 2px; }
+.tgb-card { flex: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.tgb-head { display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; list-style: none; }
+.tgb-head::-webkit-details-marker { display: none; }
+.tgb-head::after { content: "\25BC"; flex: none; width: 26px; height: 26px; display: grid; place-items: center;
+  font-size: 11px; border-radius: var(--r-sm); background: var(--bg-2); border: 1px solid var(--line);
+  color: var(--muted); transition: transform .2s ease, color .15s ease; }
+.tgb-group[open] > .tgb-head::after { transform: rotate(180deg); color: var(--accent); }
+.tgb-head .grow { flex: 1; min-width: 0; }
+.tgb-head .name { font-weight: 650; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tgb-head .pkg { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; word-break: normal; }
+.tgb-head .sub { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.tgb-head .sub .badge { font-size: 11px; padding: 0 7px; }
+.tgb-head .app-ic { width: 40px; height: 40px; border-radius: 10px; flex: none; background: var(--surface-2);
+  display: grid; place-items: center; font-weight: 800; color: var(--silver); font-size: 17px; }
+.tgb-vers { display: flex; flex-direction: column; border-top: 1px solid var(--line); background: var(--surface-2); }
+.tgb-ver { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px; }
+.tgb-ver + .tgb-ver { border-top: 1px solid var(--line); }
+.tgb-info { flex: 1 1 140px; min-width: 0; }
+.tgb-date { font-weight: 600; font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tgb-date .badge { font-size: 11px; padding: 0 7px; }
+.tgb-info .sub { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.tgb-acts { display: flex; gap: 8px; flex: 0 0 auto; margin-left: auto; }
+.tgb-acts .btn.small { min-height: 36px; padding: 0 12px; font-size: 13.5px; }
+[dir="rtl"] .tgb-acts { margin-left: 0; margin-right: auto; }

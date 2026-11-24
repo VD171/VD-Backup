@@ -74,6 +74,7 @@
           <option value="name" data-i18n="opt_sort_name">Name</option>
           <option value="package" data-i18n="opt_sort_pkg">Package</option>
         </select>
+        <label class="inline-chk"><input type="checkbox" id="app-show-excluded"><span data-i18n="ui_show_excluded">Show excluded</span></label>
         <button id="app-backuptag" class="btn go" hidden data-i18n="ui_backup_tag">Back up tag</button>
         <button id="app-select" class="btn" data-i18n="ui_select">Select</button>
       </div>
@@ -109,6 +110,7 @@
         <button id="bk-selall" class="btn" data-i18n="ui_select_all">All</button>
         <button id="bk-selnone" class="btn" data-i18n="ui_select_none">None</button>
         <button id="bk-restoresel" class="btn go" data-i18n="ui_restore_selected">Restore</button>
+        <button id="bk-deletesel" class="btn danger" data-i18n="ui_delete_selected">Delete</button>
       </div>
       <ul id="backuplist" class="list"></ul>
       <p id="backups-empty" class="muted" data-i18n="backups_empty">No backups yet.</p>
@@ -189,6 +191,9 @@
         <div id="d-rclone-hint" class="notice" hidden>
           <div class="notice-msg" data-i18n="ui_dest_rclone_hint">rclone needs a remote. Pick one below, or add a new one:</div>
           <button id="d-add-remote" class="btn small" type="button" data-i18n="ui_dest_add_remote_btn">Add a remote</button>
+        </div>
+        <div id="d-gdrive-hint" class="notice" hidden>
+          <div class="notice-msg" data-i18n="ui_dest_gdrive_hint">The Google Drive companion needs its own Google Cloud OAuth client set at build time. For Drive with no setup, add a "Google Drive (rclone)" remote below instead.</div>
         </div>
         <input id="d-path" type="text" data-i18n-ph="ph_dest_path" placeholder="path / sub-folder">
         <button id="d-browse" class="btn" data-i18n="ui_browse">Browse</button>
@@ -347,6 +352,7 @@
           <div class="modal-msg" data-i18n="settings_gpass_msg">Optional. Set a master passphrase and encrypted backups use it automatically, without retyping it. Stored encrypted on this device (root-only); a specific app can override it with its own.</div>
           <div class="muted"><span data-i18n="settings_gpass_cur">Current:</span> <b id="set-gpass-state">-</b></div>
           <input id="set-gpass" type="password" autocomplete="new-password" spellcheck="false" data-i18n-ph="settings_gpass_ph" placeholder="New passphrase (leave empty to keep)">
+          <input id="set-gpass-confirm" type="password" autocomplete="new-password" spellcheck="false" data-i18n-ph="settings_pass_confirm_ph" placeholder="Confirm passphrase">
           <button class="btn small" id="set-gpass-clear" type="button" data-i18n="settings_gpass_clear">Clear</button>
         </div>
       </div>
@@ -423,6 +429,13 @@
         <div class="muted" data-i18n="settings_spoof_hint">Restored apps report the Play Store as their install source instead of looking sideloaded. On by default; you can turn it off here or per restore, and when off the original install source is kept.</div>
       </div>
 
+      <div class="card">
+        <div class="field check">
+          <input type="checkbox" class="switch" id="set-relaunch"><span data-i18n="settings_relaunch">Reopen apps after a backup</span>
+        </div>
+        <div class="muted" data-i18n="settings_relaunch_hint">After a single backup, reopen the app that was running when it was paused for the snapshot. Off by default; batch and scheduled backups are not affected.</div>
+      </div>
+
       <div class="notice warn">
         <label class="notice-toggle">
           <input type="checkbox" class="switch" id="set-ssaid">
@@ -456,6 +469,14 @@
           <summary class="section-head"><span class="sh-ic"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg></span><span class="sh-t" data-i18n="settings_wipe_credentials">Wipe stored credentials</span></summary>
           <div class="muted" data-i18n="settings_wipe_credentials_hint">Remove saved remote passwords and the device encryption key. Your destinations, schedules and backups stay, but you will need to re-enter passwords next time.</div>
           <button id="cfg-wipe" class="btn danger block" data-i18n="settings_wipe_credentials">Wipe stored credentials</button>
+        </details>
+        <details class="grp">
+          <summary class="section-head"><span class="sh-ic"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg></span><span class="sh-t" data-i18n="settings_reset">Reset / start fresh</span></summary>
+          <div class="muted" data-i18n="settings_reset_hint">Choose what to wipe to start over. This is permanent and cannot be undone. Cloud remotes are never touched - only this module's own settings and local backups.</div>
+          <label class="field check"><input type="checkbox" id="set-reset-config"><span data-i18n="settings_reset_config">Reset settings (destinations, schedules, presets, credentials)</span></label>
+          <label class="field check"><input type="checkbox" id="set-reset-backups"><span data-i18n="settings_reset_backups">Delete all local backups</span></label>
+          <button id="cfg-reset" class="btn danger block" data-i18n="settings_reset_btn">Reset selected</button>
+          <div id="cfg-reset-status" class="muted"></div>
         </details>
       </div>
     </section>
@@ -578,6 +599,7 @@
         <a href="https://github.com/VD171/VD-Google"><span class="k">VDGoogle</span><span class="val" data-i18n="about_sib_vdgoogle">your Google services (RCS, Wallet, Play Integrity attestations), read on your device with no internet.</span></a>
         <a href="https://github.com/VD171/COPG-VD"><span class="k">COPG-VD</span><span class="val" data-i18n="about_sib_copg">a device spoofer that turns a fresh fingerprint into a coherent, consistent profile.</span></a>
         <a href="https://github.com/VD171/VD-dropbear"><span class="k">VD-dropbear</span><span class="val" data-i18n="about_sib_vddropbear">a standalone rooted SSH daemon (Dropbear).</span></a>
+        <a href="https://github.com/VD171/VD-Installer"><span class="k">VDInstaller</span><span class="val" data-i18n="about_sib_vdinstaller">a frictionless root installer for sideloaded APKs: no grant-su prompt, no terminal, no Play Protect fight.</span></a>
       </div>
       <h2 class="section-head"><span class="sh-ic"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span><span class="sh-t" data-i18n="about_credits">Credits</span></h2>
       <div class="links stack">
@@ -595,6 +617,7 @@
         <span class="sh-ic"><svg viewBox="0 0 24 24"><path d="M4 5h16"/><path d="M4 10h16"/><path d="M4 15h10"/><path d="M4 20h7"/></svg></span>
         <span class="sh-t" data-i18n="ui_log_title">Activity log</span>
         <button id="log-export" class="btn small" data-i18n="ui_export_logs">Export logs</button>
+        <button id="log-clear" class="btn small danger" data-i18n="ui_clear_logs">Clear log</button>
       </h2>
       <div id="log-export-result" hidden></div>
       <ul id="log-list" class="list"></ul>
@@ -768,6 +791,7 @@
       </div>
       <input id="backup-pass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"
              hidden data-i18n-ph="backup_passphrase" placeholder="Encryption passphrase">
+      <div id="backup-pass-info" class="modal-msg" hidden data-i18n="msg_backup_pass_stored">🔒 Encrypted with your saved passphrase (set in Settings).</div>
       <div class="modal-actions">
         <button class="btn" id="backup-cancel" data-i18n="ui_import_cancel">Cancel</button>
         <button class="btn go" id="backup-ok" data-i18n="backup">Back up</button>
@@ -808,6 +832,7 @@
           <div class="modal-msg" data-i18n="appitems_pass_msg">Optional. Overrides the default passphrase for this app's encrypted backups.</div>
           <div class="muted"><span data-i18n="settings_gpass_cur">Current:</span> <b id="ai-pass-state">-</b></div>
           <input id="ai-pass" type="password" autocomplete="new-password" spellcheck="false" data-i18n-ph="appitems_pass_ph" placeholder="New passphrase (leave empty to keep)">
+          <input id="ai-pass-confirm" type="password" autocomplete="new-password" spellcheck="false" data-i18n-ph="settings_pass_confirm_ph" placeholder="Confirm passphrase">
           <button class="btn small" id="ai-pass-clear" type="button" data-i18n="settings_gpass_clear">Clear</button>
         </div>
       </div>
@@ -988,7 +1013,8 @@
     <div class="modal-card">
       <div class="modal-title" data-i18n="ui_tg_backups_title">Backups in Telegram</div>
       <div class="modal-msg" data-i18n="ui_tg_backups_msg">Pull a backup from your Telegram channel back to this device; then restore it like any local backup.</div>
-      <ul id="tg-backups-list" class="list"></ul>
+      <input id="tg-backups-search" type="search" hidden data-i18n-ph="search_apps" placeholder="Search apps">
+      <ul id="tg-backups-list" class="list tgb-list"></ul>
       <div class="modal-actions">
         <button class="btn" id="tg-backups-close" data-i18n="ui_import_cancel">Cancel</button>
       </div>

@@ -67,6 +67,13 @@ if [ -d "$MODPATH/vdlu/verify" ]; then
   done
 fi
 
+# --- integrity: flash-time .sha256 gate (STANDARDS 8; owner decision 19/11: ABORT on mismatch) ---
+# Vendored byte-identical from VD-ModuleKit/tooling/sha256-gate.sh (guarded by vendor-parity.sh).
+# Sourcing it runs the gate on $MODPATH - after the per-ABI pruning, so it checks the files that
+# stay - and aborts the flash if any shipped file does not match its .sha256 companion. It skips
+# safely when the environment has no `sha256sum -c`. The VDLU manifest signature stays the tamper layer.
+. "$MODPATH/.vd/sha256-gate.sh"
+
 # --- one-time migration (old layout) -----------------------------------
 # Backups used to live under $STATE_DIR/backups; the engine now writes to
 # /data/media/<user>/VDBackup. Move any leftovers there and drop the old dir.

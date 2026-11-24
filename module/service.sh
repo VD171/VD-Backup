@@ -25,6 +25,8 @@ d="${0%/*}"; [ "$d" = "$0" ] && d="."; MODDIR="$(cd "$d" 2>/dev/null && pwd || e
 STATE_DIR=/data/adb/vdbackup
 LOGS="$STATE_DIR/logs"
 LOOPPID="$LOGS/scheduler.loop.pid"
+LOOPBOOT="$LOGS/scheduler.loop.boot"
+BOOTID="$(cat /proc/sys/kernel/random/boot_id 2>/dev/null)"
 INTERVAL=900
 
 # wait for boot to complete before touching the framework
@@ -48,11 +50,15 @@ mkdir -p "$LOGS"
 # honour the skip flag
 [ -f "$MODDIR/.scheduler.skip" ] && exit 0
 
-# single-instance guard: bail out if a scheduler loop is already alive
-if [ -f "$LOOPPID" ] && kill -0 "$(cat "$LOOPPID" 2>/dev/null)" 2>/dev/null; then exit 0; fi
+# single-instance guard: bail out if a scheduler loop is already alive. The pid file survives a
+# reboot and Android reuses pids quickly, so a bare kill -0 can match an unrelated process and make
+# this script exit before the scheduler and the VDLU boot update; only trust a pid recorded in the
+# current boot (boot_id).
+if [ -f "$LOOPPID" ] && [ "$(cat "$LOOPBOOT" 2>/dev/null)" = "$BOOTID" ] && kill -0 "$(cat "$LOOPPID" 2>/dev/null)" 2>/dev/null; then exit 0; fi
 
 # recurring, detached heartbeat (survives boot, never blocks it): the loop
 # records its own pid for the guard, then runs scheduler-tick every INTERVAL.
+echo "$BOOTID" > "$LOOPBOOT"
 setsid nohup sh -c '
   echo "$$" > "$1"
   while :; do
@@ -71,6 +77,11 @@ VDLU_DIR="$STATE_DIR/vdlu"
 if [ -f "$MODDIR/vdlu/update.sh" ]; then
   if [ ! -f "$VDLU_DIR/config" ] && [ -f "$MODDIR/vdlu/config.default" ]; then
     mkdir -p "$VDLU_DIR"; cp -f "$MODDIR/vdlu/config.default" "$VDLU_DIR/config"; chmod 600 "$VDLU_DIR/config"
+  fi
+  # migrate already-seeded configs (seed-if-missing above only covers fresh installs): add the
+  # apply-busy key so the mid-op deferral activates fleet-wide after an upgrade, not just new installs.
+  if [ -f "$VDLU_DIR/config" ] && ! grep -q '^apply_busy_file=' "$VDLU_DIR/config" 2>/dev/null; then
+    printf 'apply_busy_file=%s/apply.busy\n' "$STATE_DIR" >> "$VDLU_DIR/config"
   fi
   if grep -q '^auto_on_reboot=1' "$VDLU_DIR/config" 2>/dev/null; then
     case "$(getprop ro.product.cpu.abi)" in

@@ -31,13 +31,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Shell lint
         run: |
           sudo apt-get update && sudo apt-get install -y shellcheck
-          shellcheck -s sh module/*.sh || true
-          shellcheck .github/scripts/*.sh || true
+          shellcheck -S error -s sh module/*.sh
+          shellcheck -S error .github/scripts/*.sh
 
       - name: Validate JSON
         run: |
@@ -45,14 +45,23 @@ jobs:
             python3 -c "import json,sys; json.load(open('$f'))" && echo "ok $f"
           done
 
+      - name: Kit guards (release-workflow-lint + SELinux staging)
+        run: |
+          # Self-contained guards (check only this repo) - gate HERE. vendor-parity (vs the private
+          # kit) and engine-parity (vs VDLiveUpdate) compare against separate canonical repos not
+          # fetched in CI, so they are enforced in the local pre-push ritual (no CI secret, by design).
+          sh .github/scripts/release-workflow-lint.sh .
+          sh .github/scripts/selinux-pm-stage-lint.sh .
+          echo "vendor-parity + engine-parity: enforced in the local pre-push ritual"
+
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           packages: ''          # the obsolete 'tools' default fails; we install exactly what we need below
 
@@ -69,7 +78,7 @@ jobs:
         run: |
           cd module && zip -r9 ../VD-Backup-ci.zip . -x 'bin/*/.gitkeep'
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: VD-Backup-ci
           path: VD-Backup-ci.zip

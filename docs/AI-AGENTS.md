@@ -67,6 +67,7 @@ destinations (`rclone`/`restic`/ssh) talk to the network.
 | `provenance` | `{}` | the bundled-binary audit manifest (`PROVENANCE.json`). |
 | `backup-info` | `{ref}` | `{ok,...}` one backup's full details (version, install source, state, date, mode, size, items, permission counts, device) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG from the manifest (works when the app is uninstalled) |
+| `backup-icons` | `{refs:[...]}` | `{ok,icons:{<ref>:<b64 or "">}}` batched `backup-icon`; `""` = no icon, unknown refs left out |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref must be under the backups dir) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` keep newest N of a package |
 | `log-read` | `{limit?}` | `{ok,entries:[...]}` audit log, newest first |

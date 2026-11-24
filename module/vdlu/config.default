@@ -1,7 +1,10 @@
-auto_on_webui_open=0
+auto_on_webui_open=1
 auto_on_reboot=1
 source=https://vd171.github.io/VD-Modules/VD-Backup
 channel=stable
 profile=hardened
 allow_metered=0
 pubkey_dir=keyring
+# VDLU defers APPLY while this marker exists (the worker touches it during a backup/restore), so an
+# update never swaps module files mid-op. Must equal $STATE/apply.busy in worker.sh/helper.sh.
+apply_busy_file=/data/adb/vdbackup/apply.busy

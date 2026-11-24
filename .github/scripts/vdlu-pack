@@ -1,4 +1,21 @@
 #!/usr/bin/env python3
+# ======================================================================
+#  VDLiveUpdate (VDLU)  ::  flashless, incremental module updates
+#  A self-update engine for KernelSU/APatch/Magisk modules.
+#
+#  Copyright (C) 2026  VD171
+#  SPDX-License-Identifier: Apache-2.0
+#
+#  Site           : https://vd171.ru
+#  Site           : https://vd.priv8.ru
+#  Source         : https://github.com/VD171/VDLiveUpdate
+#  GitHub         : @VD171 https://github.com/VD171
+#  XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+#  Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+#  Channel        : @Priv8_VD https://t.me/Priv8_VD
+#  Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+#  E-mail         : vd.priv8@pm.me
+# ======================================================================
 """vdlu-pack - build a VDLU content-addressed manifest + blob store from a module tree.
 
 Usage:
@@ -8,7 +25,7 @@ Usage:
 Produces <out_dir>/manifest.json (canonical, UNSIGNED) and <out_dir>/blobs/<sha256>[.gz].
 The manifest carries empty "key_id" and "sig" placeholders; run vdlu-sign afterwards.
 Determinism: files are sorted by path; set SOURCE_DATE_EPOCH for a reproducible `built`.
-See INTERFACES.md §3 and MODULO_VDLU.md §4/§5/§12.
+See INTERFACES.md §3 and producer/README.md.
 """
 import argparse
 import datetime
@@ -19,7 +36,7 @@ import shutil
 import subprocess
 import sys
 
-GZ_MIN_SIZE = 4096       # below this, HTTP gzip-on-the-wire already covers it (doc §2.2)
+GZ_MIN_SIZE = 4096       # below this, HTTP gzip-on-the-wire already covers it
 GZ_MIN_GAIN = 0.90       # keep the gz blob only when it saves >= 10%
 
 SOFT_NAMES = {"service.sh", "post-fs-data.sh", "boot-completed.sh"}
@@ -30,7 +47,7 @@ def log(msg):
 
 
 def classify(relpath):
-    """Reboot-need class from path (INTERFACES §3, doc §4). Never downgrades reboot->live."""
+    """Reboot-need class from path (INTERFACES.md §3). Never downgrades reboot->live."""
     parts = relpath.split("/")
     base = parts[-1]
     if relpath.startswith("system/"):
@@ -75,6 +92,49 @@ def iso_built():
     return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def exclusion_reason(rel):
+    """Log reason if rel must NOT be packed into the feed, else None.
+
+    Single source of truth for the raw-path exclusion predicate: walk_files uses
+    it to drop files, and the --prev delete[] computation runs prev paths through
+    it so an already-excluded path never leaks back as a spurious delete entry.
+    """
+    # baseline.json IS a copy of the signed manifest (the from:0 seed); including it in the
+    # manifest is a self-reference regress (manifest -> baseline -> manifest). Never pack it.
+    if rel == "vdlu/baseline.json" or rel == "baseline.json":
+        return "skip baseline.json (install seed, not a fetchable blob)"
+    # Per-file .sha256 companions belong only in the flashable zip, never in the
+    # feed: packing them doubles the manifest and they go stale after an incremental update. This
+    # lets committed-binary modules track them and CI-built modules keep them gitignored, either way.
+    if rel.endswith(".sha256"):
+        return "skip .sha256 companion (flashable-zip only, not VDLU content): " + rel
+    # Installer scaffolding: ksud consumes META-INF/* and customize.sh at FLASH and does not keep
+    # them in the installed module, and they ship in the full .zip, never via VDLU. Listing them
+    # serves useless blobs, and if one ever changes between versions it would be "pending" and get
+    # written as an installer file into the LIVE module dir. They are not VDLU content.
+    if rel.startswith("META-INF/") or rel == "customize.sh" or rel.startswith(".vd/"):
+        return "skip installer/flash scaffolding (ships in the .zip, not via VDLU): " + rel
+    # update.json / update-mmrl.json get their size/sha filled by CI AFTER the zips and baseline
+    # are built, so the shipped copy differs from the feed copy -> a phantom single-file fetch on
+    # every install's first self-update. On device they are vestigial (the manager reads the remote
+    # raw updateJson). Not VDLU content.
+    if rel in ("update.json", "update-mmrl.json"):
+        return "skip CI-filled update manifest (differs from feed, vestigial on device): " + rel
+    # Dev / release docs and repo files are never on the installed device (the build strips them;
+    # some are gitignored). Listing them serves useless blobs AND makes a doc edit churn the signed
+    # canon on every release. Not VDLU content.
+    if os.path.basename(rel) in ("RELEASE.md", "CLAUDE.md", ".gitignore"):
+        return "skip dev/doc file (not shipped to device): " + rel
+    # Vendored TRUST ROOT: keyring/ (RAW 32B trust-anchor pubkeys) and verify/ (ed25519-mini
+    # verifier binaries) are flash-only by design - the keyring is stable / verify-not-copy. Shipping
+    # them over the feed would let a manifest overwrite the on-device trust anchor in the trusted
+    # profile. NEVER feed-deliverable.
+    if rel.startswith("vdlu/keyring/") or rel.startswith("keyring/") or \
+       rel.startswith("vdlu/verify/") or rel.startswith("verify/"):
+        return "skip vendored trust root (keyring/verify are flash-only, never feed-deliverable): " + rel
+    return None
+
+
 def walk_files(tree):
     """Yield (relpath, abspath) for regular files only, sorted, never leaving the tree."""
     out = []
@@ -83,27 +143,9 @@ def walk_files(tree):
         for name in files:
             ap = os.path.join(dp, name)
             rel = os.path.relpath(ap, tree).replace(os.sep, "/")
-            # baseline.json IS a copy of the signed manifest (the from:0 seed); including it in the
-            # manifest is a self-reference regress (manifest -> baseline -> manifest). Never pack it.
-            if rel == "vdlu/baseline.json" or rel == "baseline.json":
-                log("skip baseline.json (install seed, not a fetchable blob)")
-                continue
-            # Installer scaffolding: ksud consumes META-INF/* and customize.sh at FLASH and does not keep
-            # them in the installed module, and they ship in the full .zip, never via VDLU. Listing them
-            # serves useless blobs, and if one ever changes between versions it would be "pending" and get
-            # written as an installer file into the LIVE module dir. They are not VDLU content.
-            if rel.startswith("META-INF/") or rel == "customize.sh":
-                log("skip installer scaffolding (ships in the .zip, not via VDLU): " + rel)
-                continue
-            # Dev / release docs and repo files are never on the installed device (the build strips them;
-            # some are gitignored). Listing them serves useless blobs AND makes a doc edit churn the signed
-            # canon on every release. Not VDLU content.
-            # update.json / update-mmrl.json are filled with size/sha AFTER the zips+baseline are built,
-            # so the shipped copy and the feed copy differ -> a phantom single-file fetch on the first
-            # self-update of every install. On device they are vestigial anyway (the manager's update
-            # check reads the remote raw URL, not the local file), so keep them out of the VDLU feed.
-            if os.path.basename(rel) in ("RELEASE.md", "CLAUDE.md", ".gitignore", "update.json", "update-mmrl.json"):
-                log("skip dev/doc file (not shipped to device): " + rel)
+            reason = exclusion_reason(rel)
+            if reason is not None:
+                log(reason)
                 continue
             if os.path.islink(ap):
                 log("skip symlink (not followed, no manifest type): " + rel)
@@ -129,8 +171,9 @@ def main():
     ap.add_argument("--engine-min", type=int, default=3)
     ap.add_argument("--raw", action="store_true",
                     help="store every blob raw (no gzip). For a feed whose files are served raw at a fixed "
-                         "path instead of blobs/<sha>.gz - e.g. the tools-feed, where the ~1MB curl is a "
-                         "one-time fetch not worth decompressing. Keeps enc=raw consistent with what is served.")
+                         "path instead of blobs/<sha>.gz - e.g. a feed fetched whole in a single one-time "
+                         "download, where decompressing each blob is not worth it. Keeps enc=raw consistent "
+                         "with what is served.")
     a = ap.parse_args()
 
     tree = os.path.realpath(a.module_tree_dir)
@@ -169,8 +212,13 @@ def main():
         with open(a.prev, "r", encoding="utf-8") as pf:
             prev = json.load(pf)
         now_paths = {f["path"] for f in files_meta}
+        # Run every prev path through the SAME exclusion predicate walk_files uses: a --prev that
+        # points at a pre-exclusion manifest still lists now-excluded paths (baseline.json, META-INF/*,
+        # keyring/, verify/, ...), and emitting them as delete[] would order the device to remove files
+        # that were never feed content. An excluded path is simply not ours to delete.
         deleted = sorted(f["path"] for f in prev.get("files", [])
-                         if f["path"] not in now_paths)
+                         if f["path"] not in now_paths
+                         and exclusion_reason(f["path"]) is None)
 
     manifest = {
         "schema": 1,

@@ -43,7 +43,7 @@ jobs:
     env:
       HAS_COMPANION: ${{ secrets.VDB_COMPANION_KEYSTORE_B64 != '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build per-ABI binaries
         run: bash .github/scripts/build_bin.sh
@@ -63,13 +63,13 @@ jobs:
           echo "provenance present for every bundled ABI"
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           packages: ''          # the obsolete 'tools' default fails; we install exactly what we need below
 
@@ -201,12 +201,17 @@ jobs:
           # 1. universal-full: all ABIs, every binary
           cp -a module _m_unifull
           seed_baseline _m_unifull
+          # STANDARDS 8: write a <file>.sha256 next to every shipped file, on the final pruned tree
+          # right before each zip, so companions match exactly what that variant ships. vdlu-pack
+          # excludes *.sha256, so they never enter the VDLU feed/baseline; a human-checkable fail-safe.
+          sh .github/scripts/gen-sha256.sh _m_unifull
           ( cd _m_unifull && zip -r9 "../VD-Backup-${VER}-universal-full.zip" . -x 'bin/*/.gitkeep' )
           # 2. universal-lite: all ABIs, without the two largest binaries (rclone, restic)
           cp -a module _m_unilite
           rm -f _m_unilite/bin/*/rclone _m_unilite/bin/*/restic
           set_updatejson _m_unilite update-universal-lite.json
           seed_baseline _m_unilite
+          sh .github/scripts/gen-sha256.sh _m_unilite
           ( cd _m_unilite && zip -r9 "../VD-Backup-${VER}-universal-lite.zip" . -x 'bin/*/.gitkeep' )
           # 3-6. per-ABI full: one ABI dir only, every binary for that architecture
           for abi in arm64-v8a armeabi-v7a x86 x86_64; do
@@ -216,6 +221,7 @@ jobs:
             done
             set_updatejson "_m_$abi" "update-$abi.json"
             seed_baseline "_m_$abi"
+            sh .github/scripts/gen-sha256.sh "_m_$abi"
             ( cd "_m_$abi" && zip -r9 "../VD-Backup-${VER}-$abi-full.zip" . -x 'bin/*/.gitkeep' )
           done
           # 7. mmrl-stub: a minimal module (VDLU engine + a static curl + the install scaffolding)
@@ -240,6 +246,7 @@ jobs:
             cp "module/bin/$abi/curl" "_m_stub/bin/$abi/curl"
             [ -d "module/bin/$abi/lib" ] && cp -a "module/bin/$abi/lib" "_m_stub/bin/$abi/lib"
           done
+          sh .github/scripts/gen-sha256.sh _m_stub
           ( cd _m_stub && zip -r9 "../VD-Backup-${VER}-mmrl-stub.zip" . )
           _stubsz=$(stat -c%s "VD-Backup-${VER}-mmrl-stub.zip")
           echo "mmrl-stub zip: $_stubsz bytes ($((_stubsz/1048576)) MiB)"
@@ -304,11 +311,12 @@ jobs:
 
       # Always commit the release artifacts (regenerated screenshots, filled update.json and
       # any version bump), so no manual follow-up is ever pending after a release, including
-      # the no-bump path. VD171 authorship to match the repo's clean-commit convention.
+      # the no-bump path. Authored as github-actions[bot] so every CI-made commit is auditably
+      # distinct from a human VD171 commit (owner HARD rule; the gh release is already the bot).
       - name: Commit release changes
         run: |
-          git config user.name  'VD $ VD171 @ Priv8'
-          git config user.email '80125987+VD171@users.noreply.github.com'
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           # Never commit the CI-injected OAuth client id: it belongs only in the built APK,
           # not in the tree. Restore the placeholder before the blanket artifact commit so
           # "git commit -am" cannot sweep the real id onto the public branch.
@@ -358,3 +366,19 @@ jobs:
             assets-${VER}-*.tar.zst \
             --title "VDBackup ${VER}" \
             --notes-file release-notes.md
+
+      # Auditability guard (owner HARD rule, github_release_sempre_bot_author): every release MUST be
+      # published by github-actions[bot], never a human account. GH_TOKEN above is github.token (the
+      # Actions bot), so this holds - but assert it, so a future switch to a user PAT (which would
+      # publish the release under that user) fails the workflow loud instead of shipping unaudited.
+      - name: Assert the release author is github-actions[bot]
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VER: ${{ steps.v.outputs.name }}
+        run: |
+          author="$(gh release view "$VER" --json author -q '.author.login')"
+          if [ "$author" != "github-actions[bot]" ]; then
+            echo "::error::Release $VER was authored by '$author', not github-actions[bot] - auditability rule violated. The release step must use github.token, never a user PAT."
+            exit 1
+          fi
+          echo "Release author verified: github-actions[bot]"

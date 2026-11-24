@@ -6,6 +6,31 @@
 
 All notable changes to VDBackup are documented here. English only.
 
+## v1.15
+
+New:
+
+- Set a default passphrase once and encrypted backups use it automatically: the backup screen no longer asks for it every time, and shows a small note that the backup is encrypted. (#17)
+- Setting a passphrase (the global default, or an app's own) now has a Confirm field and only saves when both match, so a typo can no longer silently lock your backups. (#17)
+- Every file in a flashable zip now ships a .sha256 companion that the installer verifies at flash: a corrupt or truncated download is refused instead of installed.
+- Telegram restore is now a full screen: your Telegram backups are listed grouped by app, with names and a search box, so you can find and restore one quickly. (#18)
+- When several backups or restores run at once, the progress area stacks them like a download manager: the newest is expanded, the others collapse to a line with their progress and a close button, with a running count.
+- A new "Reopen apps after a backup" setting brings an app back to the foreground if it was open when its backup started. (#27)
+- You can select several backups and delete them in one go. (#28)
+- Settings has a "Reset / start fresh" option (a guarded danger zone) to wipe the app's own config and/or its backups. (#26)
+- The app list gained a "Show excluded" toggle, and the activity log a "Clear log" button. (#31)
+
+Fixes:
+
+- Restoring an encrypted backup now tries your saved passphrase first and only asks if it does not fit (for example an older backup made with a different password), instead of prompting every time. (#17)
+- The out-of-space message now points you to a remote (Telegram, an rclone cloud, or SFTP/SMB) so only one app needs room at a time. (#5)
+- Large storage is measured correctly: free-space and quota checks no longer overflow on volumes or backups larger than 2 GB. (#33)
+- A snapshot (restic) backup that could not read a few files is no longer reported as failed; the snapshot is still saved, with a note, instead of an error. (#32)
+- Excluding an app now hides it from the list immediately, and clearing the activity log actually empties the on-screen list. (#31)
+- Confirm buttons show a spinner while the action runs instead of a silent pause, and the WebUI boots and scrolls faster with no flash of English before your language loads. (#23)
+- Clearer messages when an operation fails, and more complete translations across all 22 languages. (#22)
+- Self-update is safer: an update can no longer replace the module's own updater or signing keys, and it waits for a running backup to finish before applying.
+
 ## v1.14
 
 New:

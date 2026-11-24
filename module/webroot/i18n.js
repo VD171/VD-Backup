@@ -26,6 +26,10 @@ window.I18N = (function () {
                    "ko","nl","pl","pt","ru","sv","th","tr","uk","vi","zh"];
   var EN = window.__I18N_EN || {};
   var strings = Object.assign({}, EN);
+  // localStorage cache (guarded: some WebViews disable it). Lets the last-used language paint on
+  // the first frame instead of flashing English until the (slow, root) config-get + fetch resolve.
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
   function t(key, vars) {
     var s = strings[key] != null ? strings[key] : (EN[key] != null ? EN[key] : key);
@@ -51,12 +55,15 @@ window.I18N = (function () {
   }
   function set(code) {
     if (code === "en" || AVAILABLE.indexOf(code) < 0) {
-      strings = Object.assign({}, EN); setDir("en"); apply(); return Promise.resolve();
+      strings = Object.assign({}, EN); setDir("en"); lsSet("vdb_i18n_last", "en"); apply(); return Promise.resolve();
     }
+    // paint instantly from the cached copy if we have one (no English flash), then refresh from disk.
+    var cached = lsGet("vdb_i18n_" + code);
+    if (cached) { try { strings = Object.assign({}, EN, JSON.parse(cached)); setDir(code); apply(); } catch (e) {} }
     return fetch("lang/" + code + ".json")
       .then(function (r) { return r.json(); })
-      .then(function (j) { strings = Object.assign({}, EN, j); setDir(code); apply(); })
-      .catch(function () { strings = Object.assign({}, EN); setDir("en"); apply(); });
+      .then(function (j) { strings = Object.assign({}, EN, j); setDir(code); lsSet("vdb_i18n_" + code, JSON.stringify(j)); lsSet("vdb_i18n_last", code); apply(); })
+      .catch(function () { if (!cached) { strings = Object.assign({}, EN); setDir("en"); apply(); } });
   }
   function detect() {
     var l = (navigator.language || "en").toLowerCase().slice(0, 2);
@@ -64,6 +71,14 @@ window.I18N = (function () {
     return AVAILABLE.indexOf(l) >= 0 ? l : "en";
   }
   function init(code) { return set(code && code !== "auto" ? code : detect()); }
+  // apply the last-used language synchronously from cache, before any async config-get, so the
+  // first visible frame is already translated. No-op on the first ever run (nothing cached yet).
+  function primeFromCache() {
+    var last = lsGet("vdb_i18n_last");
+    if (!last || last === "en" || AVAILABLE.indexOf(last) < 0) return;
+    var cached = lsGet("vdb_i18n_" + last);
+    if (cached) { try { strings = Object.assign({}, EN, JSON.parse(cached)); setDir(last); apply(); } catch (e) {} }
+  }
 
-  return { AVAILABLE: AVAILABLE, t: t, apply: apply, set: set, init: init };
+  return { AVAILABLE: AVAILABLE, t: t, apply: apply, set: set, init: init, primeFromCache: primeFromCache };
 })();

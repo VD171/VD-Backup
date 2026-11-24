@@ -1,6 +1,6 @@
 # VDLU release step - VD-Backup
 
-VD-Backup carries the vendored VDLU engine (`module/vdlu/`, profile `hardened`). Besides the usual
+VD-Backup carries the vendored [VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU) engine (`module/vdlu/`, profile `hardened`). Besides the usual
 flashable `.zip` assets, each release also publishes a content-addressed feed (`manifest.json` + `blobs/`)
 so installed devices update **flashlessly and incrementally** - fetching only the files that changed,
 applying the live ones without a reboot. The `.zip` stays the first-install and fallback path; VDLU is

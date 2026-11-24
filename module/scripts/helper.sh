@@ -28,6 +28,7 @@
 
 d="${0%/*}"; [ "$d" = "$0" ] && d="."; MODDIR="$(cd "$d/.." 2>/dev/null && pwd || echo "${d%/*}")"
 STATE=/data/adb/vdbackup
+valid_pkg() { case "$1" in ''|null|.*|*[!A-Za-z0-9._]*) return 1 ;; esac; }   # same rule as worker.sh
 bdir() { case "$1" in ''|*[!0-9]*) set -- 0 ;; esac; printf '/data/media/%s/VDBackup' "$1"; }  # /sdcard/VDBackup per Android user (credential-encrypted)
 # A backup sent to a local destination lives at that destination, not duplicated in the internal
 # store (destination-authoritative, issue #15): the user picks a local dest to keep the backup OFF
@@ -135,6 +136,7 @@ detach() {               # detach <opid> <worker-verb> <b64args>
   setsid nohup "$MODDIR/scripts/worker.sh" "$wverb" "$opid" "$wargs" \
       >"$LOGS/$opid.out" 2>&1 </dev/null &
   echo "$!" > "$LOGS/$opid.pid"
+  : > "$STATE/apply.busy"   # VDLU apply-busy: defer the updater's file-swap while this op runs; worker cleanup() drops it
 }
 
 # call the Drive companion synchronously (list/delete/check are quick): drive_hcmd <op> [-e k v...]
@@ -211,8 +213,10 @@ prune_pkg() {                                    # <user> <pkg> <keep>
   _d="$_bk/$1"; [ -d "$_d" ] || return 0
   _keep="$2"; case "$_keep" in ''|*[!0-9]*) _keep=5 ;; esac
   _n=0
+  # only finished backups count and get pruned: a dir without manifest.json is a backup still
+  # being written (or one that failed), and must neither push a good one out nor be deleted.
   for _sub in $(ls -1 "$_d" 2>/dev/null | sort -r); do
-    [ -d "$_d/$_sub" ] || continue
+    [ -f "$_d/$_sub/manifest.json" ] || continue
     _n=$(( _n + 1 ))
     [ "$_n" -gt "$_keep" ] || continue
     case "$_d/$_sub" in
@@ -227,7 +231,29 @@ prune_pkg() {                                    # <user> <pkg> <keep>
 # seeds the snapshot (never mass-backs-up an existing device). Honors the blocklist.
 # Framework-free degradation: without the dex helper only new installs are seen
 # (no versionCode), so updates are missed but installs still trigger.
-auto_backup_scan() {                              # <jq> <now>; echoes detached opids
+# write the current non-system user apps as {pkg:versionCode} JSON to <outfile> (dex gives the
+# real versionCode; the pm fallback gives 0). Shared by the auto-backup scan and its seed.
+autobackup_snapshot() {   # <jq> <user> <outfile>
+  if [ -f "$MODDIR/etc/vdbackup_helper.dex" ]; then
+    LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" /system/bin \
+      ru.vd171.vdbackup.Helper list-apps "$2" 2>/dev/null \
+      | "$1" -c '[.apps[]? | select(.system|not) | {(.package): (.versionCode // 0)}] | add // {}' > "$3" 2>/dev/null
+  else
+    pm list packages -3 --user "$2" 2>/dev/null | sed 's/^package://' \
+      | "$1" -R -s 'split("\n")|map(select(length>0))|map({(.):0})|add // {}' > "$3" 2>/dev/null
+  fi
+}
+# seed the auto-backup baseline from the apps installed right now, if not already seeded (#30). The
+# scan only seeds on its first tick (up to one INTERVAL after the toggle), so an app installed in
+# that window was baked into the baseline and never backed up; config-set calls this the moment
+# auto-backup is enabled so the baseline is the state at enable-time and later installs are caught.
+seed_autobackup() {   # <jq> <user>
+  _sseen="$STATE/autobackup_seen.json"; [ -f "$_sseen" ] && return 0
+  _scur="$STATE/staging/abseed.$$.json"; mkdir -p "$STATE/staging"
+  autobackup_snapshot "$1" "${2:-0}" "$_scur"
+  [ -s "$_scur" ] && { cp "$_scur" "$_sseen"; chmod 600 "$_sseen"; }; rm -f "$_scur"
+}
+auto_backup_scan() {                              # <jq> <now>; echoes the detached opid
   _jq="$1"; _now="$2"
   [ -f "$STATE/config.json" ] || return 0
   _on="$("$_jq" -r '.auto_backup // false' "$STATE/config.json" 2>/dev/null)"
@@ -238,35 +264,30 @@ auto_backup_scan() {                              # <jq> <now>; echoes detached 
   _u="$("$_jq" -r '.user // 0' "$STATE/config.json")"; case "$_u" in ''|*[!0-9]*) _u=0 ;; esac
   _seen="$STATE/autobackup_seen.json"
   _cur="$STATE/staging/autobackup_cur.$$.json"; mkdir -p "$STATE/staging"
-  # current user apps as {pkg:vc}; dex gives versionCode, pm fallback gives vc=0
-  if [ -f "$MODDIR/etc/vdbackup_helper.dex" ]; then
-    LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" /system/bin \
-      ru.vd171.vdbackup.Helper list-apps "$_u" 2>/dev/null \
-      | "$_jq" -c '[.apps[]? | select(.system|not) | {(.package): (.versionCode // 0)}] | add // {}' > "$_cur" 2>/dev/null
-  else
-    pm list packages -3 --user "$_u" 2>/dev/null | sed 's/^package://' \
-      | "$_jq" -R -s 'split("\n")|map(select(length>0))|map({(.):0})|add // {}' > "$_cur" 2>/dev/null
-  fi
+  autobackup_snapshot "$_jq" "$_u" "$_cur"
   [ -s "$_cur" ] || { rm -f "$_cur"; return 0; }
   if [ ! -f "$_seen" ]; then cp "$_cur" "$_seen"; chmod 600 "$_seen"; rm -f "$_cur"; return 0; fi   # seed only
   # packages whose vc is new or changed vs the snapshot, minus the blocklist
   _changed="$("$_jq" -r --slurpfile seen "$_seen" '
       ($seen[0] // {}) as $s | to_entries
       | map(select(($s[.key] // null) != .value)) | .[].key' "$_cur" 2>/dev/null)"
-  _n=0
+  # one backup-batch op for all of them (one worker, apps in sequence, as backup-batch was built
+  # for); the worker prunes each app to <keep> after its backup succeeds.
+  _opid="$(new_opid)-auto"; _pkgs=""
   for _pkg in $_changed; do
-    case "$_pkg" in ''|*..*|*/*|*' '*) continue ;; esac
+    valid_pkg "$_pkg" || continue
     "$_jq" -e --arg p "$_pkg" '((.blocklist // []) | index($p)) != null' "$STATE/config.json" >/dev/null 2>&1 && continue
-    _j="$("$_jq" -nc --arg p "$_pkg" --argjson u "$_u" --arg m "$_mode" --arg d "$_dest" \
-        '{package:$p,user:$u,mode:$m,dest:$d,items:["apk","data","data_de","obb","external","media"],auto:true}')"
-    _b64="$(printf '%s' "$_j" | base64 | tr -d '\n')"
-    _n=$(( _n + 1 )); _opid="$(new_opid)-auto$_n"
-    detach "$_opid" backup "$_b64"
+    _pkgs="$_pkgs$_pkg
+"
     printf '{"ts":"%s","op":"auto-backup","opid":"%s","package":"%s"}\n' \
       "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(jstr "$_opid")" "$(jstr "$_pkg")" >> "$LOGS/audit.jsonl"
-    for _r in $(prune_pkg "$_u" "$_pkg" "$_keep"); do :; done
-    printf '%s\n' "$_opid"
   done
+  if [ -n "$_pkgs" ]; then
+    _j="$(printf '%s' "$_pkgs" | "$_jq" -R -s -c --argjson u "$_u" --arg m "$_mode" --arg d "$_dest" --argjson k "$_keep" \
+        '{packages:(split("\n")|map(select(length>0))),user:$u,mode:$m,dest:$d,items:["apk","data","data_de","obb","external","media"],auto:true,keep:$k}')"
+    detach "$_opid" backup-batch "$(printf '%s' "$_j" | base64 | tr -d '\n')"
+    printf '%s\n' "$_opid"
+  fi
   cp "$_cur" "$_seen"; chmod 600 "$_seen"; rm -f "$_cur"
 }
 
@@ -389,6 +410,7 @@ case "$verb" in
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
     _sd="$("$JQ" -r '.staging_dir // empty' "$STATE/config.json" 2>/dev/null)"; case "$_sd" in /*) : ;; *) _sd=/data/local/tmp ;; esac
     rm -rf "$_sd/.vdstage" /data/local/tmp/.vdstage 2>/dev/null
+    rm -f "$STATE/apply.busy" 2>/dev/null   # VDLU apply-busy: a -9'd op can leave this; clear at boot so the boot update is not wrongly deferred
     _r=0
     for _d in /data/media/*/VDBackup/*/[0-9]*Z_[0-9]*; do
       [ -d "$_d" ] || continue
@@ -451,7 +473,8 @@ case "$verb" in
        '(($cur[0] // {}) * .) | .format_version = (.format_version // $cur[0].format_version // 1)' 2>/dev/null)"
     if [ -n "$_cfgmerged" ]; then
       printf '%s\n' "$_cfgmerged" > "$STATE/config.json" && chmod 600 "$STATE/config.json" \
-        && ok '"saved":true' || err ERR_CONFIG_WRITE "could not write config"
+        && { [ "$("$JQ" -r '.auto_backup // false' "$STATE/config.json")" = true ] && seed_autobackup "$JQ" "$("$JQ" -r '.user // 0' "$STATE/config.json")"; ok '"saved":true'; } \
+        || err ERR_CONFIG_WRITE "could not write config"
     else
       err ERR_CONFIG_WRITE "config merge failed (invalid JSON?)"
     fi ;;
@@ -505,7 +528,7 @@ case "$verb" in
     pkg="$(printf '%s' "$j" | "$JQ" -r '.package // empty' 2>/dev/null)"
     u="$(printf '%s' "$j" | "$JQ" -r '.user // 0' 2>/dev/null)"; case "$u" in ''|*[!0-9]*) u=0 ;; esac
     vc="$(printf '%s' "$j" | "$JQ" -r '.vc // 0' 2>/dev/null)"; case "$vc" in ''|*[!0-9]*) vc=0 ;; esac
-    case "$pkg" in ''|*/*|*..*|*' '*) err ERR_ICON "invalid package"; exit 0 ;; esac
+    valid_pkg "$pkg" || { err ERR_ICON "invalid package"; exit 0; }
     mkdir -p "$STATE/iconcache" 2>/dev/null
     # cache key includes versionCode so the icon refreshes when the app updates;
     # drop any stale entry cached under an older versionCode for this package.
@@ -532,7 +555,7 @@ case "$verb" in
     TAB="$(printf '\t')"
     lst="$STATE/staging/icons.$$.lst"; : > "$lst"
     printf '%s' "$j" | "$JQ" -r '.items[]? | "\(.package // "")\t\(.vc // 0)"' 2>/dev/null | while IFS="$TAB" read -r pkg vc; do
-      case "$pkg" in ''|*/*|*..*|*' '*) continue ;; esac
+      valid_pkg "$pkg" || continue
       case "$vc" in ''|*[!0-9]*) vc=0 ;; esac
       png="$STATE/iconcache/$pkg-$vc.png"
       if [ ! -s "$png" ]; then
@@ -548,7 +571,7 @@ case "$verb" in
     printf '{"ok":true,"icons":{'
     first=1
     printf '%s' "$j" | "$JQ" -r '.items[]? | "\(.package // "")\t\(.vc // 0)"' 2>/dev/null | while IFS="$TAB" read -r pkg vc; do
-      case "$pkg" in ''|*/*|*..*|*' '*) continue ;; esac
+      valid_pkg "$pkg" || continue
       case "$vc" in ''|*[!0-9]*) vc=0 ;; esac
       png="$STATE/iconcache/$pkg-$vc.png"; [ -s "$png" ] || continue
       [ "$first" = 1 ] || printf ','; first=0
@@ -696,6 +719,35 @@ case "$verb" in
     rm -f "$SECRETS/creds"/* "$SECRETS/keys"/* 2>/dev/null
     ok '"wiped":true' ;;
 
+  reset-data)
+    # Scoped self-reset to start fresh (#26). DESTRUCTIVE - the WebUI gates it behind an explicit
+    # confirm. Only ever touches this module's own state ($STATE), its credentials ($SECRETS) and
+    # the backup roots (each guarded to a */VDBackup or */vdbackup path) - never anything else and
+    # never a cloud remote. ARGS: {config:bool, backups:bool}; either/both.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    _j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    _rc="$(printf '%s' "$_j" | "$JQ" -r '.config // false' 2>/dev/null)"
+    _rb="$(printf '%s' "$_j" | "$JQ" -r '.backups // false' 2>/dev/null)"
+    _did=""
+    if [ "$_rb" = true ]; then
+      # collect every backup root FIRST (local_dest_roots reads $STATE/dests, which a config reset
+      # below would remove), then delete each - guarded so only a VDBackup/vdbackup dir is ever hit.
+      { for _u in $(ls -d /data/media/[0-9]* 2>/dev/null | sed 's|.*/||'); do bdir "$_u"; done; local_dest_roots; } \
+        | while IFS= read -r _r; do
+            [ -n "$_r" ] || continue
+            case "$_r" in */VDBackup|*/vdbackup) [ -d "$_r" ] && rm -rf "$_r" 2>/dev/null ;; esac
+          done
+      _did="backups"
+    fi
+    if [ "$_rc" = true ]; then
+      printf '{}\n' > "$STATE/config.json" 2>/dev/null; chmod 600 "$STATE/config.json" 2>/dev/null
+      rm -rf "$STATE/dests" "$STATE/jobs" "$STATE/iconcache" "$STATE/staging" 2>/dev/null
+      rm -f "$SECRETS/creds"/* "$SECRETS/keys"/* 2>/dev/null; rm -rf "$SECRETS/telegram" 2>/dev/null
+      _did="${_did:+$_did,}config"
+    fi
+    printf '{"ts":"%s","op":"reset-data","scope":"%s"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$_did" >> "$LOGS/audit.jsonl" 2>/dev/null
+    ok "\"reset\":\"$_did\"" ;;
+
   cloud-status)
     # what cloud binaries are available (embedded in bin/ or fetched into $STATE/bin),
     # and whether this (lite) build can fetch them on demand + the download size.
@@ -779,7 +831,7 @@ case "$verb" in
     case "$p" in *..*) err ERR_BAD_PATH "traversal"; exit 0 ;; esac
     [ -e "$p" ] || { err ERR_NO_PATH "no path"; exit 0; }
     sz="$(du -sk "$p" 2>/dev/null | cut -f1)"; case "$sz" in ''|*[!0-9]*) sz=0 ;; esac   # toybox du: -k (KiB), no -B
-    ok "\"path\":\"$(jstr "$p")\",\"size\":$((sz * 1024))" ;;
+    ok "\"path\":\"$(jstr "$p")\",\"size\":$("$JQ" -n "${sz:-0} * 1024")" ;;
 
   adb-backups)
     # list the /data/adb filesystem backups (local .adb store, like path-list)
@@ -982,12 +1034,12 @@ EOF
     done
     paths=0; for d in "$bk"/.paths/*/; do [ -d "$d" ] && paths=$(( paths + 1 )); done
     jobs=0; for f in "$STATE/jobs"/*.json; do [ -f "$f" ] && jobs=$(( jobs + 1 )); done
-    size=0; if [ -d "$bk" ]; then size="$(du -s -B1 "$bk" 2>/dev/null | cut -f1)"; case "$size" in ''|*[!0-9]*) size=0 ;; esac; fi
+    size=0; if [ -d "$bk" ]; then _sk="$(du -sk "$bk" 2>/dev/null | cut -f1)"; case "$_sk" in ''|*[!0-9]*) _sk=0 ;; esac; size="$("$JQ" -n "${_sk:-0} * 1024")"; fi   # toybox du: -k (KiB), never -B
     _dfp="$bk"; [ -d "$_dfp" ] || _dfp="/data/media/$u"; [ -d "$_dfp" ] || _dfp=/data
     free=0; total=0
     set -- $(df -kP "$_dfp" 2>/dev/null | tail -1)
-    case "${2:-}" in *[0-9]*) total=$(( $2 * 1024 )) ;; esac
-    case "${4:-}" in *[0-9]*) free=$(( $4 * 1024 )) ;; esac
+    case "${2:-}" in *[0-9]*) total="$("$JQ" -n "${2:-0} * 1024")" ;; esac
+    case "${4:-}" in *[0-9]*) free="$("$JQ" -n "${4:-0} * 1024")" ;; esac
     "$JQ" -nc --argjson apps "$apps" --argjson instances "$insts" --argjson paths "$paths" \
       --argjson jobs "$jobs" --argjson size "$size" --argjson free "$free" --argjson total "$total" \
       '{ok:true, apps:$apps, instances:$instances, path_backups:$paths, jobs:$jobs,
@@ -998,7 +1050,7 @@ EOF
     ref="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.ref // empty' 2>/dev/null)"
     [ -n "$(ref_root "$ref")" ] || { err ERR_BAD_REF "invalid ref"; exit 0; }
     m="$ref/manifest.json"; [ -f "$m" ] || { err ERR_NO_BACKUP "manifest not found"; exit 0; }
-    size="$(du -sk "$ref" 2>/dev/null | cut -f1)"; size="$((${size:-0} * 1024))"
+    size="$(du -sk "$ref" 2>/dev/null | cut -f1)"; case "$size" in ''|*[!0-9]*) size=0 ;; esac; size="$("$JQ" -n "${size:-0} * 1024")"
     "$JQ" -c --argjson size "${size:-0}" \
       '{ok:true, ref:(.ref // ""), created_at:.created_at, mode:.mode, user_id:.user_id,
         size:$size, package:(.package|del(.icon)), device:.device,
@@ -1017,6 +1069,17 @@ EOF
     m="$ref/manifest.json"; [ -f "$m" ] || { err ERR_NO_BACKUP "manifest not found"; exit 0; }
     ic="$("$JQ" -r '.package.icon // empty' "$m" 2>/dev/null)"
     if [ -n "$ic" ]; then ok "\"icon\":\"$ic\""; else err ERR_ICON "no icon in manifest"; fi ;;
+
+  backup-icons)
+    # batched backup-icon: {refs:[...]} -> {ok:true,icons:{<ref>:<b64 or "">}}, "" = the backup
+    # has no icon. Invalid refs and refs without a manifest are left out of the map.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.refs[]? | strings' 2>/dev/null \
+      | while IFS= read -r ref; do
+          [ -n "$(ref_root "$ref")" ] || continue
+          [ -f "$ref/manifest.json" ] || continue
+          "$JQ" -c --arg r "$ref" '{($r): (.package.icon // "")}' "$ref/manifest.json" 2>/dev/null
+        done | "$JQ" -s -c '{ok:true, icons:(add // {})}' ;;
 
   delete-backup)
     ref="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | \
@@ -1278,7 +1341,7 @@ EOF
     # so skip the whole tick until the user has unlocked once.
     ce_ready || { printf '{"ok":true,"skipped":"ce_locked"}\n'; exit 0; }
     mkdir -p "$STATE/jobs"
-    RAN=""; PRUNED=""; checked=0; launchn=0
+    RAN=""; checked=0; launchn=0
     # a transient gate skips the job WITHOUT stamping last_run (retries next tick) + audits
     gate_skip() { printf '{"ts":"%s","op":"scheduler-gated","id":"%s","reason":"%s"}\n' \
       "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(jstr "$id")" "$(jstr "$1")" >> "$LOGS/audit.jsonl"; }
@@ -1309,35 +1372,44 @@ EOF
       jmode="$("$JQ" -r '.mode // "full"' "$f" 2>/dev/null)"
       jdest="$("$JQ" -r '.dest // "local"' "$f" 2>/dev/null)"
       jref="$("$JQ" -r '.ref // empty' "$f" 2>/dev/null)"
-      fired=0
-      # resolve this job's target packages (single / list / all, minus blocklist) and
-      # launch one detached op per target: a backup, or a restore of its latest backup.
+      fired=0; items=""
+      # resolve this job's target packages (single / list / all, minus blocklist) and launch ONE
+      # detached batch op for the job: backup-batch of the packages, or restore-batch of each
+      # one's latest backup. The worker runs them in sequence and prunes each app to <keep>
+      # after its backup succeeds.
+      launchn=$(( launchn + 1 )); opid="$(new_opid)-$launchn"
       for pkg in $(job_targets "$JQ" "$f"); do
-        launchn=$(( launchn + 1 )); fired=1
-        opid="$(new_opid)-$launchn"
         if [ "$action" = restore ]; then
           ref="$jref"; [ -n "$ref" ] || ref="$(latest_ref "$juser" "$pkg")"
-          [ -n "$ref" ] || { launchn=$(( launchn - 1 )); continue; }   # nothing to restore for this pkg
-          argj="$("$JQ" -nc --arg ref "$ref" '{ref:$ref}')"
-          detach "$opid" restore "$(printf '%s' "$argj" | base64 | tr -d '\n')"
+          [ -n "$ref" ] || continue   # nothing to restore for this pkg
+          printf '%s' "$items" | grep -qxF -- "$ref" && continue   # a pinned .ref is restored once
+          items="$items$ref
+"
         else
-          argj="$("$JQ" -nc --arg p "$pkg" --argjson u "$juser" --arg m "$jmode" --arg d "$jdest" \
-            '{package:$p,user:$u,mode:$m,dest:$d,items:["apk","data","data_de","obb","external","media"],sched:true}')"
-          detach "$opid" backup "$(printf '%s' "$argj" | base64 | tr -d '\n')"
-          for r in $(prune_pkg "$juser" "$pkg" "$keep"); do PRUNED="$PRUNED$("$JQ" -cn --arg r "$r" '$r'),"; done
+          items="$items$pkg
+"
         fi
+        fired=1
         RAN="$RAN$("$JQ" -cn --arg id "$id" --arg opid "$opid" --arg pkg "$pkg" --arg a "$action" '{id:$id,opid:$opid,package:$pkg,action:$a}'),"
         printf '{"ts":"%s","op":"scheduler-run","id":"%s","opid":"%s","package":"%s","action":"%s"}\n' \
           "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(jstr "$id")" "$(jstr "$opid")" "$(jstr "$pkg")" "$(jstr "$action")" >> "$LOGS/audit.jsonl"
       done
       [ "$fired" = 1 ] || continue   # due but no target resolved: do not stamp, retry next tick
+      if [ "$action" = restore ]; then
+        argj="$(printf '%s' "$items" | "$JQ" -R -s -c '{refs:(split("\n")|map(select(length>0)))}')"
+        detach "$opid" restore-batch "$(printf '%s' "$argj" | base64 | tr -d '\n')"
+      else
+        argj="$(printf '%s' "$items" | "$JQ" -R -s -c --argjson u "$juser" --arg m "$jmode" --arg d "$jdest" --argjson k "$keep" \
+          '{packages:(split("\n")|map(select(length>0))),user:$u,mode:$m,dest:$d,items:["apk","data","data_de","obb","external","media"],sched:true,keep:$k}')"
+        detach "$opid" backup-batch "$(printf '%s' "$argj" | base64 | tr -d '\n')"
+      fi
       tmp="$STATE/jobs/.$id.tmp"
       "$JQ" --argjson now "$now" '.last_run=$now' "$f" > "$tmp" 2>/dev/null && mv "$tmp" "$f" && chmod 600 "$f"
     done
     AUTO=""
     for _ao in $(auto_backup_scan "$JQ" "$now"); do AUTO="$AUTO\"$(jstr "$_ao")\","; done
-    RAN="${RAN%,}"; PRUNED="${PRUNED%,}"; AUTO="${AUTO%,}"
-    printf '{"ok":true,"now":%s,"checked":%s,"ran":[%s],"pruned":[%s],"auto":[%s]}\n' "$now" "$checked" "$RAN" "$PRUNED" "$AUTO" ;;
+    RAN="${RAN%,}"; AUTO="${AUTO%,}"
+    printf '{"ok":true,"now":%s,"checked":%s,"ran":[%s],"auto":[%s]}\n' "$now" "$checked" "$RAN" "$AUTO" ;;
 
   companion-status)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
@@ -1424,7 +1496,7 @@ EOF
     j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
     pkg="$(printf '%s' "$j" | "$JQ" -r '.package // empty' 2>/dev/null)"
     priv="$(printf '%s' "$j" | "$JQ" -r '.priv // false' 2>/dev/null)"
-    case "$pkg" in ''|*..*|*/*|*' '*) err ERR_BAD_PKG "invalid package"; exit 0 ;; esac
+    valid_pkg "$pkg" || { err ERR_BAD_PKG "invalid package"; exit 0; }
     sub=app; [ "$priv" = true ] && sub=priv-app
     base="$(pm path "$pkg" 2>/dev/null | sed -n 's/^package://p' | grep '/base\.apk$' | head -1)"
     [ -n "$base" ] || base="$(pm path "$pkg" 2>/dev/null | sed -n 's/^package://p' | head -1)"
@@ -1481,7 +1553,7 @@ EOF
   sysmount-del)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
     pkg="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.package // empty' 2>/dev/null)"
-    case "$pkg" in ''|*..*|*/*|*' '*) err ERR_BAD_PKG "invalid package"; exit 0 ;; esac
+    valid_pkg "$pkg" || { err ERR_BAD_PKG "invalid package"; exit 0; }
     MM=/data/adb/modules/vdbackup_sysmount
     for sub in app priv-app; do
       d="$MM/system/$sub/$pkg"; [ -d "$d" ] || continue
@@ -1499,6 +1571,14 @@ EOF
     f="$BIN/PROVENANCE.json"
     if [ -f "$f" ]; then cat "$f"
     else err ERR_NO_PROVENANCE "no provenance manifest in this build"; fi ;;
+
+  log-clear)
+    # wipe the activity log, keeping a single stamp that records it was cleared (and when), so the
+    # clear is itself auditable. Only ever touches audit.jsonl under the logs dir.
+    : > "$LOGS/audit.jsonl" 2>/dev/null
+    printf '{"ts":"%s","op":"log-clear"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$LOGS/audit.jsonl" 2>/dev/null
+    chmod 600 "$LOGS/audit.jsonl" 2>/dev/null
+    ok '"cleared":true' ;;
 
   log-read)
     # the newest audit entries (delete/restore/schedule/prune), newest first, for the
@@ -1550,7 +1630,7 @@ EOF
     pkg="$(printf '%s' "$j" | "$JQ" -r '.package // empty' 2>/dev/null)"
     u="$(printf '%s' "$j" | "$JQ" -r '.user // 0' 2>/dev/null)"; case "$u" in ''|*[!0-9]*) u=0 ;; esac
     keep="$(printf '%s' "$j" | "$JQ" -r '.keep // 5' 2>/dev/null)"; case "$keep" in ''|*[!0-9]*) keep=5 ;; esac
-    case "$pkg" in ''|*..*|*/*|*' '*) err ERR_BAD_REF "invalid package"; exit 0 ;; esac
+    valid_pkg "$pkg" || { err ERR_BAD_REF "invalid package"; exit 0; }
     printf '{"ok":true,"pruned":['
     first=1
     for r in $(prune_pkg "$u" "$pkg" "$keep"); do

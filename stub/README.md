@@ -4,7 +4,7 @@ The MMRL client app refuses to install a module whose zip is over ~50 MB. Every 
 variant is larger than that (universal-lite is 62 MB, the smallest per-ABI is 56 MB), so MMRL
 users cannot install VD-Backup directly.
 
-The **stub** solves this permanently. It is a minimal module - just the VDLU flashless updater
+The **stub** solves this permanently. It is a minimal module - just the [VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU) flashless updater
 engine, a static `curl`, the signature verifier and the install scaffolding - that fits well under
 the 50 MB cap (a few MB). It installs as `vdbackup`, and on the first boot its `service.sh` runs
 the VDLU engine, which fetches the full module from the signed feed and applies it in place,
@@ -55,6 +55,7 @@ module; on the boot trigger the engine fetched the manifest, verified the ed2551
 with no second flash. `reboot_pending` is set for the shared `.so`s (a reboot finalizes those).
 The from:0 baseline was the one fix needed (see above).
 
-Still to do before switching MMRL to the stub: a CI-built stub zip (universal, all ABIs), point
-VD-Modules `modules.json` at it, and ideally a lite/per-ABI feed so the first-boot fetch is not the
-full ~245 MB.
+**Live:** the CI builds the universal `mmrl-stub.zip` (every ABI's `curl` + the VDLU engine, asserted
+< 50 MB), `update-mmrl.json` points at it, and the VD-Modules `vdbackup` track serves it (~25 MB, well
+under the 50 MB cap - the original >50 MB pain is gone). Remaining optional optimization: a lite or
+per-ABI feed so the first-boot fetch is not the full ~245 MB universal-full tree.

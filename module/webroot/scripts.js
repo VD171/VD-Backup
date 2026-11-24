@@ -226,8 +226,8 @@ function setupBackNav() {
 // --- users --------------------------------------------------------------
 var USERS = [];
 var activeUser = 0;
-function loadUsers() {
-  helper("list-users").then(function (r) {
+function loadUsers() {   // returns a promise that settles once the app list request has
+  return helper("list-users").then(function (r) {
     USERS = (r && r.users) ? r.users : [];
     var sel = $("#user-sel"), field = $("#user-field");
     if (sel) {
@@ -242,7 +242,7 @@ function loadUsers() {
       sel.value = activeUser;
       if (field) field.hidden = USERS.length <= 1;
     }
-    loadApps();
+    return loadApps();
   });
 }
 
@@ -272,7 +272,8 @@ function cacheIcon(pkg, vc, b64) {
 // instead of one process per icon. Cache hits are instant.
 var _iconQ = [], _iconTimer = null, ICON_BATCH = 40;
 function loadIcon(ic) {
-  var pkg = ic.dataset.pkg; if (!pkg) return;
+  var pkg = ic.dataset.pkg;
+  if (!pkg) { if (ic.dataset.bref) loadBackupIcon(ic, ic.dataset.bref); return; }
   var vc = ic.dataset.vc || "0", cached = null;
   try { cached = localStorage.getItem(iconKey(pkg, vc)); } catch (e) {}
   if (cached) { setIcon(ic, cached); return; }
@@ -303,6 +304,9 @@ function visibleApps(filter, ignoreTag) {
   var list = APPS.filter(function (a) {
     if (f === "user" && a.system) return false;
     if (f === "system" && !a.system) return false;
+    // apps excluded from auto/scheduled backups are hidden from the manual list too, unless
+    // "show excluded" is on (so a one-off manual backup of an excluded app is still possible). #31
+    if (isBlocked(a.package) && !($("#app-show-excluded") && $("#app-show-excluded").checked)) return false;
     if (!ignoreTag && tagFilters.length && !appTags(a.package).some(function (t) { return tagFilters.indexOf(t) >= 0; })) return false;
     return !q || a.package.toLowerCase().indexOf(q) >= 0 || (a.label || "").toLowerCase().indexOf(q) >= 0;
   });
@@ -369,7 +373,7 @@ function setSelectMode(on) {
 }
 function loadApps() {
   $("#applist").innerHTML = "<li class='muted'>" + I18N.t("apps_loading") + "</li>";
-  helper("list-apps", { user: activeUser }).then(function (r) {
+  return helper("list-apps", { user: activeUser }).then(function (r) {
     APPS = (r && r.apps) ? r.apps : [];
     buildTagChips();
     renderApps($("#search").value);
@@ -391,8 +395,11 @@ function bkMatch(b, q) {
     || ((b.package || "").toLowerCase().indexOf(q) >= 0)
     || ((b.tags || []).some(function (t) { return (t || "").toLowerCase().indexOf(q) >= 0; }));
 }
+var _bkIcons = [];
 function renderBackups(list) {
   var ul = $("#backuplist"); ul.innerHTML = "";
+  if (iconObserver) _bkIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
+  _bkIcons = [];
   BACKUPS = list || [];
   var q = (bkQuery || "").toLowerCase().trim();
   var shown = q ? BACKUPS.filter(function (b) { return bkMatch(b, q); }) : BACKUPS;
@@ -421,7 +428,9 @@ function renderBackups(list) {
       li.onclick = function () { openBackupInfo(b); };
     }
     ul.appendChild(li);
-    loadBackupIcon(ic, b.ref);   // icon comes from the manifest, not the live app
+    // icon comes from the manifest, not the live app; loaded lazily on scroll, like app icons
+    ic.dataset.bref = b.ref || ""; _bkIcons.push(ic);
+    if (iconObserver) iconObserver.observe(ic); else loadBackupIcon(ic, b.ref);
   });
 }
 function toggleBkSel(b, on) {
@@ -433,6 +442,7 @@ function updateBkSelCount() {
   var n = Object.keys(bkSelected).length;
   $("#bk-selcount").textContent = I18N.t("ui_selected_n", { n: n });
   $("#bk-restoresel").disabled = n === 0;
+  if ($("#bk-deletesel")) $("#bk-deletesel").disabled = n === 0;
 }
 function setBkSelectMode(on) {
   bkSelectMode = on; bkSelected = {};
@@ -455,17 +465,48 @@ function startBatchRestore() {
     run();
   });
 }
+// batch delete: one confirm, then delete each selected backup and reload the list.
+function startBatchDelete() {
+  var refs = Object.keys(bkSelected); if (!refs.length) return;
+  modalConfirmAction(I18N.t("confirm_delete_n", { n: refs.length }), I18N.t("delete"), function () {
+    return Promise.all(refs.map(function (ref) {
+      return helper("delete-backup", { ref: ref }).then(function (r) { if (r && r.ok) clearBackupIconCache(ref); return r; });
+    }));
+  }).then(function (r) {
+    if (r === null) return;
+    setBkSelectMode(false); loadBackups();
+  });
+}
 // Backup-list icon: read the icon stored in the manifest, so it shows even when
 // the app is uninstalled. Cached per backup ref; "0" marks a backup with no icon.
+// Batched like app icons (one helper call per ICON_BATCH refs), and a ref already
+// being fetched is not asked for again: re-renders just add their icon to the wait list.
+var _bicQ = [], _bicTimer = null, _bicPending = {};
 function loadBackupIcon(ic, ref) {
   if (!ref) return;
-  var key = "vdb_bic:" + ref, cached = null;
-  try { cached = localStorage.getItem(key); } catch (e) {}
+  var cached = null;
+  try { cached = localStorage.getItem("vdb_bic:" + ref); } catch (e) {}
   if (cached) { if (cached !== "0") setIcon(ic, cached); return; }
-  helper("backup-icon", { ref: ref }).then(function (r) {
-    if (r && r.ok && r.icon) { try { localStorage.setItem(key, r.icon); } catch (e) {} setIcon(ic, r.icon); }
-    else { try { localStorage.setItem(key, "0"); } catch (e) {} }
-  });
+  if (_bicPending[ref]) { _bicPending[ref].push(ic); return; }
+  _bicPending[ref] = [ic]; _bicQ.push(ref);
+  if (_bicQ.length >= ICON_BATCH) flushBackupIcons();
+  else if (!_bicTimer) _bicTimer = setTimeout(flushBackupIcons, 120);
+}
+function flushBackupIcons() {
+  if (_bicTimer) { clearTimeout(_bicTimer); _bicTimer = null; }
+  if (!_bicQ.length) return;
+  var refs = _bicQ.splice(0, ICON_BATCH);
+  var done = function (map) {
+    refs.forEach(function (ref) {
+      var ics = _bicPending[ref] || []; delete _bicPending[ref];
+      // only an answered ref is cached ("" = no icon); a failed call is retried on a later render
+      if (!map || !Object.prototype.hasOwnProperty.call(map, ref)) return;
+      try { localStorage.setItem("vdb_bic:" + ref, map[ref] || "0"); } catch (e) {}
+      if (map[ref]) ics.forEach(function (ic) { setIcon(ic, map[ref]); });
+    });
+  };
+  helper("backup-icons", { refs: refs }).then(function (r) { done(r && r.ok && r.icons); }, function () { done(null); });
+  if (_bicQ.length) _bicTimer = setTimeout(flushBackupIcons, 0);   // drain remaining
 }
 // backup details (tap a backup entry)
 function openBackupInfo(b) {
@@ -598,12 +639,10 @@ function startRestore(ref, pkg, items) {
   });
 }
 function deleteBackup(ref, onGone) {
-  modalConfirm(I18N.t("confirm_delete_backup"), I18N.t("delete")).then(function (ok) {
-    if (!ok) return;
-    helper("delete-backup", { ref: ref }).then(function (r) {
-      if (r && r.ok) { clearBackupIconCache(ref); if (onGone) onGone(); }
-      else modalAlert(errMsg(r));
-    });
+  modalConfirmAction(I18N.t("confirm_delete_backup"), I18N.t("delete"), function () { return helper("delete-backup", { ref: ref }); }).then(function (r) {
+    if (r === null) return;
+    if (r && r.ok) { clearBackupIconCache(ref); if (onGone) onGone(); }
+    else modalAlert(errMsg(r));
   });
 }
 function clearBackupIconCache(ref) { try { localStorage.removeItem("vdb_bic:" + ref); } catch (e) {} }
@@ -743,6 +782,31 @@ function openMsg(o) {
 }
 function modalAlert(body, title) { return openMsg({ body: body, title: title || "", confirm: false }); }
 function modalConfirm(body, title) { return openMsg({ body: body, title: title || "", confirm: true }); }
+// Confirm dialog that runs an async action while STAYING OPEN, with the OK button disabled and
+// spinning, until the action settles - then it closes. (#spinners: every confirm-then-wait shows
+// progress instead of a silent pause.) actionFn returns a Promise (the async wait only; keep the
+// result-handling in the caller's .then). Resolves: null = cancelled (run nothing), the action's
+// value on success, or undefined if the action rejected (caller treats that as a failure, as before).
+function modalConfirmAction(body, title, actionFn) {
+  return new Promise(function (resolve) {
+    var m = $("#msg-modal"), ok = $("#msg-ok"), cancel = $("#msg-cancel");
+    $("#msg-title").textContent = title || "";
+    $("#msg-body").textContent = body || "";
+    cancel.style.display = "";
+    m.hidden = false;
+    function finish(v) {
+      m.hidden = true; ok.onclick = null; cancel.onclick = null;
+      ok.disabled = false; cancel.disabled = false; ok.classList.remove("busy");
+      resolve(v);
+    }
+    cancel.onclick = function () { finish(null); };
+    ok.onclick = function () {
+      ok.disabled = true; cancel.disabled = true; ok.classList.add("busy");
+      var p; try { p = actionFn(); } catch (e) { p = Promise.reject(e); }
+      Promise.resolve(p).then(function (r) { finish(r); }, function () { finish(undefined); });
+    };
+  });
+}
 
 // per-app backup history: tap an app to see its backups and restore one
 function openAppBackups(pkg, label) {
@@ -993,6 +1057,9 @@ function pollAuthorize() {
       return;
     }
     if (r.done) {
+      // focus, visibilitychange and the interval can each have a poll in flight:
+      // only the first one that sees done may store the remote
+      if (!_authActive) return;
       _authActive = false;
       stopAuthorizePoll();
       _authorizedToken = r.token || "";
@@ -1013,9 +1080,9 @@ function cancelAuthorize() {
   resetAuthorizeUI();
 }
 function delRemote(name) {
-  modalConfirm(I18N.t("confirm_delete", { name: name })).then(function (ok) {
-    if (!ok) return;
-    helper("remote-del", { name: name }).then(loadRemotes);
+  modalConfirmAction(I18N.t("confirm_delete", { name: name }), "", function () { return helper("remote-del", { name: name }); }).then(function (r) {
+    if (r === null) return;
+    if (!r || !r.ok) modalAlert(errMsg(r)); loadRemotes();
   });
 }
 // Populate a <select> with every destination (local + configured) and preselect
@@ -1041,6 +1108,7 @@ function syncDestFields() {
   set("#d-browse", type === "local");   // folder browser only makes sense for a local path
   set("#remote-box", type === "rclone");
   var hint = $("#d-rclone-hint"); if (hint) hint.hidden = (type !== "rclone");
+  var ghint = $("#d-gdrive-hint"); if (ghint) ghint.hidden = (type !== "gdrive");
 }
 // jump to the Add-cloud-remote section and briefly highlight it, so choosing the
 // rclone destination type makes clear that a remote is required and where to add it.
@@ -1126,9 +1194,9 @@ function testDest(id) {
   });
 }
 function delDest(id) {
-  modalConfirm(I18N.t("confirm_delete", { name: id })).then(function (ok) {
-    if (!ok) return;
-    helper("dest-del", { id: id }).then(loadDests);
+  modalConfirmAction(I18N.t("confirm_delete", { name: id }), "", function () { return helper("dest-del", { id: id }); }).then(function (r) {
+    if (r === null) return;
+    if (!r || !r.ok) modalAlert(errMsg(r)); loadDests();
   });
 }
 
@@ -1236,42 +1304,115 @@ function openTelegramLogin() {
 
 // list the backups stored in the Telegram channel and let the user PULL one back to local
 // storage (where the normal restore flow then handles it). Not logged in -> run the login first.
+// The archives are self-describing (<pkg>__<ts>_<vc>.vdb.tar), so the list is grouped per app:
+// one collapsed card per package (icon + app label, "Not installed" when it is gone) that
+// opens to one line per backup (date, size, version) with its own Pull / Delete actions.
+function tgParseName(name) {
+  var mt = (name || "").match(/^(.+)__([^_]+)_(-?\d+)\.vdb\.tar$/);
+  if (!mt) return null;
+  var ts = mt[2], d = null, tm = ts.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/);
+  if (tm) d = new Date(Date.UTC(+tm[1], +tm[2] - 1, +tm[3], +tm[4], +tm[5], +tm[6]));
+  return { pkg: mt[1], ts: ts, vc: mt[3], when: d };
+}
+function tgWhen(b, info) {
+  var d = info && info.when;
+  if (!d && b.date != null) { var n = Number(b.date); d = new Date(isNaN(n) ? b.date : (n < 1e12 ? n * 1000 : n)); }
+  return (d && !isNaN(d.getTime())) ? d : null;
+}
 function openTelegramBackups() {
-  var m = $("#tg-backups"), box = $("#tg-backups-list");
+  var m = $("#tg-backups"), box = $("#tg-backups-list"), q = $("#tg-backups-search");
   box.innerHTML = "<li class='muted'>" + I18N.t("apps_loading") + "</li>"; m.hidden = false;
+  if (q) { q.hidden = true; q.value = ""; }
   $("#tg-backups-close").onclick = function () { m.hidden = true; };
   helper("telegram-check").then(function (c) {
     if (!c || !c.ok || !c.is_auth) { m.hidden = true; openTelegramLogin().then(function (ok) { if (ok) openTelegramBackups(); }); return; }
     helper("telegram-list").then(function (r) {
-      box.innerHTML = "";
       var items = ((r && r.ok && r.backups) ? r.backups : []).filter(function (b) { return /\.vdb\.tar$/.test(b.name || ""); });
-      if (!items.length) { box.innerHTML = "<li class='muted'>" + I18N.t("ui_tg_no_backups") + "</li>"; return; }
+      // group by package, newest backup first inside each group
+      var groups = {}, order = [];
       items.forEach(function (b) {
-        var mt = (b.name || "").match(/^(.+)__([^_]+)_(\d+)\.vdb\.tar$/);
-        var li = el("li", "row");
-        li.appendChild(el("div", "grow", (mt ? mt[1] : b.name)));
-        var btn = el("button", "btn small go", I18N.t("ui_tg_pull"));
-        btn.onclick = function () {
-          m.hidden = true;
-          helper("telegram-pull", { message_id: b.message_id, name: b.name }).then(function (op) {
-            if (op && op.opid) trackOp(op.opid, { onDone: function (p) { if (p.ok) { loadBackups(); modalAlert(I18N.t("msg_tg_pulled")); } } });
-            else modalAlert(errMsg(op));
-          }).catch(function () { modalAlert(errMsg()); });
-        };
-        var del = el("button", "btn small danger", I18N.t("delete"));
-        del.onclick = function () {
-          modalConfirm(I18N.t("msg_tg_delete_confirm"), I18N.t("delete")).then(function (yes) {
-            if (!yes) return;
-            helper("telegram-delete", { message_id: b.message_id }).then(function (r) {
-              if (r && r.ok) { modalAlert(I18N.t("msg_tg_deleted")); openTelegramBackups(); }
-              else modalAlert(errMsg(r));
-            }).catch(function () { modalAlert(errMsg()); });
-          });
-        };
-        li.appendChild(del); li.appendChild(btn); box.appendChild(li);
+        var info = tgParseName(b.name), pkg = info ? info.pkg : b.name;
+        if (!groups[pkg]) {
+          // the archive name only carries the package: take the label from the installed app,
+          // else from the upload's caption meta (newer uploads), else from a local backup of it
+          var app = APPS.filter(function (a) { return a.package === pkg; })[0];
+          var local = BACKUPS.filter(function (x) { return x.package === pkg && x.label; })[0];
+          groups[pkg] = { pkg: pkg, app: app, label: (app && app.label) || (local && local.label) || "", list: [] };
+          order.push(pkg);
+        }
+        if (!groups[pkg].app && b.meta && b.meta.label) groups[pkg].label = b.meta.label;
+        groups[pkg].list.push({ b: b, info: info, when: tgWhen(b, info) });
       });
+      order.forEach(function (k) { groups[k].list.sort(function (x, y) { return (y.when ? y.when.getTime() : 0) - (x.when ? x.when.getTime() : 0); }); });
+      function newest(k) { var w = groups[k].list[0].when; return w ? w.getTime() : 0; }
+      order.sort(function (a, b) { return newest(b) - newest(a); });   // most recently backed-up app first
+      function render() {
+        var f = q && !q.hidden ? (q.value || "").toLowerCase().trim() : "";
+        box.innerHTML = "";
+        if (!items.length) { box.innerHTML = "<li class='muted'>" + I18N.t("ui_tg_no_backups") + "</li>"; return; }
+        var shown = order.filter(function (k) { return !f || k.toLowerCase().indexOf(f) >= 0 || groups[k].label.toLowerCase().indexOf(f) >= 0; });
+        if (!shown.length) { box.innerHTML = "<li class='muted'>" + I18N.t("ui_job_no_match") + "</li>"; return; }
+        shown.forEach(function (k) { box.appendChild(tgGroupCard(groups[k], m)); });
+      }
+      if (q) { q.hidden = order.length < 6; q.oninput = render; }
+      render();
     }).catch(function () { box.innerHTML = "<li class='muted'>" + errMsg() + "</li>"; });
   }).catch(function () { box.innerHTML = "<li class='muted'>" + errMsg() + "</li>"; });
+}
+function tgGroupCard(g, m) {
+  // native <details>: every app starts collapsed, tapping its header shows its backups
+  var li = el("li", "tgb-card"), grp = el("details", "tgb-group");
+  var head = el("summary", "tgb-head");
+  var ic = el("div", "app-ic", (g.label || g.pkg).charAt(0).toUpperCase());
+  var meta = el("div", "grow");
+  meta.appendChild(el("div", "name", g.label || g.pkg));
+  if (g.label) meta.appendChild(el("div", "pkg", g.pkg));
+  var bits = [], newest = g.list[0].when, sub = el("div", "sub");
+  if (g.list.length > 1) bits.push(I18N.t("ui_tg_n_backups", { n: g.list.length }));
+  if (newest) bits.push(shortDate(newest.toISOString()));
+  if (!g.app) sub.appendChild(statusBadge("warn", I18N.t("ui_tg_not_installed")));
+  if (bits.length) sub.appendChild(el("span", null, bits.join(" \u00b7 ")));
+  if (sub.childNodes.length) meta.appendChild(sub);
+  head.appendChild(ic); head.appendChild(meta);
+  grp.appendChild(head);
+  if (g.app) { ic.dataset.pkg = g.pkg; ic.dataset.vc = (g.app.versionCode != null) ? String(g.app.versionCode) : "0"; loadIcon(ic); }
+  var vers = el("div", "tgb-vers");
+  g.list.forEach(function (e, i) {
+    var b = e.b, row = el("div", "tgb-ver");
+    var txt = el("div", "tgb-info");
+    var line = el("div", "tgb-date", e.when ? shortDate(e.when.toISOString()) : (e.info ? e.info.ts : b.name));
+    if (i === 0 && g.list.length > 1) { line.appendChild(document.createTextNode(" ")); line.appendChild(el("span", "badge ok", I18N.t("ui_tg_latest"))); }
+    txt.appendChild(line);
+    var bits = [];
+    if (b.size) bits.push(fmtSize(b.size));
+    if (e.info && e.info.vc && e.info.vc !== "0") bits.push("v" + e.info.vc);
+    if (bits.length) txt.appendChild(el("div", "sub", bits.join(" \u00b7 ")));
+    row.appendChild(txt);
+    var acts = el("div", "tgb-acts");
+    var del = el("button", "btn small danger", I18N.t("delete"));
+    del.type = "button";
+    del.onclick = function () {
+      modalConfirmAction(I18N.t("msg_tg_delete_confirm"), I18N.t("delete"), function () { return helper("telegram-delete", { message_id: b.message_id }); }).then(function (r) {
+        if (r === null) return;
+        if (r && r.ok) { modalAlert(I18N.t("msg_tg_deleted")); openTelegramBackups(); }
+        else modalAlert(errMsg(r));
+      });
+    };
+    var btn = el("button", "btn small go", I18N.t("ui_tg_pull"));
+    btn.type = "button";
+    btn.onclick = function () {
+      m.hidden = true;
+      helper("telegram-pull", { message_id: b.message_id, name: b.name }).then(function (op) {
+        if (op && op.opid) trackOp(op.opid, { onDone: function (p) { if (p.ok) { loadBackups(); modalAlert(I18N.t("msg_tg_pulled")); } } });
+        else modalAlert(errMsg(op));
+      }).catch(function () { modalAlert(errMsg()); });
+    };
+    acts.appendChild(del); acts.appendChild(btn);
+    row.appendChild(acts);
+    vers.appendChild(row);
+  });
+  grp.appendChild(vers); li.appendChild(grp);
+  return li;
 }
 
 // list Full backups stored remote-only on the configured rclone destinations and let the user PULL
@@ -1318,15 +1459,14 @@ function renderRcloneBackups(box, m, items) {
     };
     var del = el("button", "btn small danger", I18N.t("delete"));
     del.onclick = function () {
-      modalConfirm(I18N.t("msg_rc_delete_confirm"), I18N.t("delete")).then(function (yes) {
-        if (!yes) return;
-        var delReq = b.dtype === "gdrive"
+      modalConfirmAction(I18N.t("msg_rc_delete_confirm"), I18N.t("delete"), function () {
+        return b.dtype === "gdrive"
           ? helper("gdrive-delete", { dest: b.dest, folder: b.folder })
           : helper("rclone-delete", { dest: b.dest, rref: b.rref });
-        delReq.then(function (r) {
-          if (r && r.ok) { modalAlert(I18N.t("msg_rc_deleted")); openRcloneBackups(); }
-          else modalAlert(errMsg(r));
-        }).catch(function () { modalAlert(errMsg()); });
+      }).then(function (r) {
+        if (r === null) return;
+        if (r && r.ok) { modalAlert(I18N.t("msg_rc_deleted")); openRcloneBackups(); }
+        else modalAlert(errMsg(r));
       });
     };
     li.appendChild(del); li.appendChild(pull); box.appendChild(li);
@@ -1337,10 +1477,10 @@ function renderRcloneBackups(box, m, items) {
 // ask which items to include before backing up
 function openBackupModal(pkg, label) {
   return new Promise(function (resolve) {
-    var m = $("#backup-modal"), pass = $("#backup-pass");
+    var m = $("#backup-modal"), pass = $("#backup-pass"), passInfo = $("#backup-pass-info");
     var enc = !!(CFG.encrypt_data || CFG.encrypt_apk);   // encryption needs a passphrase
     $("#backup-title").textContent = label || pkg;
-    pass.value = ""; pass.hidden = !enc;
+    pass.value = "";
     fillDestOptions($("#backup-dest"), CFG.default_dest);   // per-backup destination, defaults to the default
     // pre-fill the item ticks: a per-app override (set in Settings) is the default here;
     // a single backup stays editable. Reset to full, then apply the app's override if any.
@@ -1349,22 +1489,30 @@ function openBackupModal(pkg, label) {
       var e = $("#bi-" + k); if (e) e.checked = _ov ? (_ov.indexOf(k) >= 0) : true;
     });
     fillPresetSelect();   // preset picker (pre-fills the item ticks); hidden when no presets exist
-    m.hidden = false;
     function done(res) {
       m.hidden = true; pass.value = ""; $("#backup-ok").onclick = null; $("#backup-cancel").onclick = null;
       resolve(res);
     }
-    $("#backup-ok").onclick = function () {
-      var items = ["apk", "data", "data_de", "obb", "external", "media"].filter(function (k) {
-        var e = $("#bi-" + k); return e && e.checked;
-      });
-      if (!items.length) return done(null);          // nothing ticked = nothing to do
-      if (enc && !pass.value) { pass.focus(); return; }   // encryption on, require a passphrase
-      var destSel = $("#backup-dest");
-      done({ items: items, password: enc ? pass.value : null, dest: destSel ? destSel.value : null,
-             verify: $("#bi-verify").checked, dry_run: $("#bi-dryrun").checked });
-    };
-    $("#backup-cancel").onclick = function () { done(null); };
+    // #17: the worker uses a stored passphrase automatically (this app's override, else the global
+    // default), so when one exists we neither show the field nor require it - just note it is encrypted.
+    function build(havePass) {
+      pass.hidden = !enc || havePass;
+      if (passInfo) passInfo.hidden = !(enc && havePass);
+      m.hidden = false;
+      $("#backup-ok").onclick = function () {
+        var items = ["apk", "data", "data_de", "obb", "external", "media"].filter(function (k) {
+          var e = $("#bi-" + k); return e && e.checked;
+        });
+        if (!items.length) return done(null);          // nothing ticked = nothing to do
+        if (enc && !havePass && !pass.value) { pass.focus(); return; }   // require only when nothing is stored
+        var destSel = $("#backup-dest");
+        done({ items: items, password: (enc && !havePass) ? pass.value : null, dest: destSel ? destSel.value : null,
+               verify: $("#bi-verify").checked, dry_run: $("#bi-dryrun").checked });
+      };
+      $("#backup-cancel").onclick = function () { done(null); };
+    }
+    if (enc) helper("pass-status", { package: pkg }).then(function (r) { build(!!(r && (r.app || r.global))); }).catch(function () { build(false); });
+    else build(false);
   });
 }
 function backupArgs(pkg, res, manual) {
@@ -1433,24 +1581,42 @@ function updateProgSub(sub, p) {
 function fetchCloudThenRetry(retryFn) {
   helper("cloud-status").then(function (s) {
     var mb = (s && s.size) ? Math.round(s.size / 1048576) : 0;
-    modalConfirm(I18N.t("cloud_fetch_prompt", { mb: mb }), I18N.t("cloud_fetch_title")).then(function (yes) {
-      if (!yes) return;
-      helper("cloud-fetch").then(function (r) {
-        if (r && r.opid) trackOp(r.opid, { onDone: function (p) {
-          if (p && p.ok) { if (retryFn) retryFn(); }
-          else modalAlert(errMsg(p));
-        } });
-        else modalAlert(errMsg(r));
-      });
+    modalConfirmAction(I18N.t("cloud_fetch_prompt", { mb: mb }), I18N.t("cloud_fetch_title"), function () { return helper("cloud-fetch"); }).then(function (r) {
+      if (r === null) return;
+      if (r && r.opid) trackOp(r.opid, { onDone: function (p) {
+        if (p && p.ok) { if (retryFn) retryFn(); }
+        else modalAlert(errMsg(p));
+      } });
+      else modalAlert(errMsg(r));
     });
   });
 }
-var _curOpId = null;   // the op the single #ops slot is showing; a newer trackOp supersedes it
+// #ops is a download-manager-style stack of live-op cards: the newest card is expanded, older ones
+// collapse to a one-line summary + progress + a × close, with a count badge. Cards are keyed by opid,
+// so a repeat trackOp (reattach / retry) reuses the card instead of stacking a duplicate.
+function opCard(opid) {
+  var ops = $("#ops");
+  var box = ops.querySelector('.op-card[data-opid="' + opid + '"]');
+  if (box) { if (box._timer) { clearInterval(box._timer); box._timer = null; } return box; }
+  box = el("div", "op-card"); box.dataset.opid = opid; ops.appendChild(box); return box;
+}
+function layoutOps() {
+  var ops = $("#ops"), cards = ops.querySelectorAll(".op-card");
+  ops.hidden = cards.length === 0;
+  ops.dataset.count = cards.length;                       // the count badge reads this
+  ops.classList.toggle("multi", cards.length > 1);
+  for (var i = 0; i < cards.length; i++) {                // newest (last) expanded, the rest collapsed
+    cards[i].classList.toggle("expanded", i === cards.length - 1);
+    cards[i].classList.toggle("collapsed", i !== cards.length - 1);
+  }
+}
+function closeCard(box) {
+  if (box) { if (box._timer) { clearInterval(box._timer); box._timer = null; } if (box.parentNode) box.parentNode.removeChild(box); }
+  layoutOps();
+}
 function trackOp(opid, ctx) {
-  _curOpId = opid;
-  var box = $("#ops"); box.hidden = false;
-  box.innerHTML = "";
-  var label = el("div", null, I18N.t("op_running"));
+  var box = opCard(opid); box.innerHTML = "";
+  var label = el("div", "op-label", I18N.t("op_running"));
   var bar = el("div", "bar"); var fill = el("i"); bar.appendChild(fill);
   var sub = el("div", "op-sub"); sub.hidden = true;
   box.appendChild(label); box.appendChild(bar); box.appendChild(sub);
@@ -1462,16 +1628,17 @@ function trackOp(opid, ctx) {
     modalConfirm(I18N.t(isRestore ? "msg_cancel_restore" : (ctx ? "msg_cancel_backup" : "msg_cancel_op"))).then(function (yes) {
       if (!yes) return;
       cancelBtn.disabled = true;
-      helper("cancel", opid, true);   // the poller below sees the op vanish and hides the card
+      helper("cancel", opid, true);   // the poller below sees the op vanish and closes the card
     });
   };
   box.appendChild(cancelBtn);
+  layoutOps();
   var missing = 0, stuck = 0;
   var timer = setInterval(function () {
-    if (_curOpId !== opid) { clearInterval(timer); return; }   // a newer op took the slot: stop this poller so it neither leaks nor hides the current op
+    if (!box.parentNode) { clearInterval(timer); return; }   // card was closed/cancelled: stop polling
     helper("progress", opid, true).then(function (p) {
       if (!p || (!p.phase && !p.done)) {   // op vanished (finished + cleaned, or never started)
-        if (++missing >= 3) { clearInterval(timer); box.hidden = true; }
+        if (++missing >= 3) { clearInterval(timer); closeCard(box); }
         return;
       }
       missing = 0;
@@ -1482,12 +1649,12 @@ function trackOp(opid, ctx) {
         clearInterval(timer);
         cancelBtn.style.display = "none";
         if (!p.ok && ctx && ctx.entry && p.code === "ERR_IMPORT_ENCRYPTED") {
-          box.hidden = true;
+          closeCard(box);
           startImport(ctx.from, ctx.entry, true);
           return;
         }
         if (!p.ok && ctx && ctx.specialRef && p.code === "ERR_CRYPTO_PASS") {
-          box.hidden = true;
+          closeCard(box);
           openOpModal({ needPassword: true, titleKey: "restore", confirmKey: "restore",
                         msg: I18N.t("special_pass_msg") }).then(function (res) {
             if (res == null) return;
@@ -1501,7 +1668,7 @@ function trackOp(opid, ctx) {
           return;
         }
         if (!p.ok && ctx && ctx.pathRef && p.code === "ERR_CRYPTO_PASS") {
-          box.hidden = true;   // encrypted folder backup: ask for the passphrase and retry
+          closeCard(box);   // encrypted folder backup: ask for the passphrase and retry
           openOpModal({ needPassword: true, titleKey: "ui_pathbk_restore_title", confirmKey: "restore",
                         msg: I18N.t("ui_pathbk_restore_confirm", { path: ctx.pathSource }) }).then(function (res) {
             if (res == null) return;
@@ -1512,7 +1679,7 @@ function trackOp(opid, ctx) {
           return;
         }
         if (!p.ok && ctx && ctx.restoreRef && p.code === "ERR_CRYPTO_PASS") {
-          box.hidden = true;   // encrypted backup: ask for the passphrase and retry
+          closeCard(box);   // encrypted backup: ask for the passphrase and retry
           openOpModal({ needPassword: true, titleKey: "restore", confirmKey: "restore",
                         msg: I18N.t("msg_restore_passphrase", { name: ctx.restorePkg }) }).then(function (res) {
             if (res == null) return;
@@ -1523,7 +1690,7 @@ function trackOp(opid, ctx) {
           return;
         }
         if (!p.ok && ctx && ctx.retry && p.code === "ERR_CLOUD_FETCHABLE") {
-          box.hidden = true;        // lite edition: offer the one-time rclone+restic download, then retry
+          closeCard(box);        // lite edition: offer the one-time rclone+restic download, then retry
           fetchCloudThenRetry(ctx.retry);
           return;
         }
@@ -1533,16 +1700,17 @@ function trackOp(opid, ctx) {
           label.textContent = p.ok ? I18N.t("op_done") : errMsg(p);
         }
         if (ctx && ctx.onDone) ctx.onDone(p);
-        setTimeout(function () { box.hidden = true; }, 4000);
+        setTimeout(function () { closeCard(box); }, 4000);
         return;
       }
       // a live op leaves "starting" within a second; if it is still stuck there
       // with no progress, its worker died at launch; drop the stale card.
       if (p.phase === "starting" && (p.percent || 0) === 0) {
-        if (++stuck >= 15) { clearInterval(timer); box.hidden = true; }
+        if (++stuck >= 15) { clearInterval(timer); closeCard(box); }
       } else stuck = 0;
-    }).catch(function () { if (++missing >= 3) { clearInterval(timer); box.hidden = true; } });
+    }).catch(function () { if (++missing >= 3) { clearInterval(timer); closeCard(box); } });
   }, 1000);
+  box._timer = timer;
 }
 function reattachOps() {
   helper("list-ops").then(function (r) {
@@ -1700,9 +1868,9 @@ function saveJob() {
   });
 }
 function delJob(id) {
-  modalConfirm(I18N.t("confirm_delete", { name: id })).then(function (ok) {
-    if (!ok) return;
-    helper("schedule-delete", { id: id }).then(loadSchedule);
+  modalConfirmAction(I18N.t("confirm_delete", { name: id }), "", function () { return helper("schedule-delete", { id: id }); }).then(function (r) {
+    if (r === null) return;
+    if (!r || !r.ok) modalAlert(errMsg(r)); loadSchedule();
   });
 }
 
@@ -1873,12 +2041,13 @@ function loadSettings() {
   if ($("#set-gpass")) {
     $("#set-gpass").value = "";
     helper("pass-status", {}).then(function (r) { var e = $("#set-gpass-state"); if (e) e.textContent = I18N.t((r && r.global) ? "settings_gpass_set" : "settings_gpass_unset"); }).catch(function () {});
-    if ($("#set-gpass-clear")) $("#set-gpass-clear").onclick = function () { helper("pass-set-global", { password: "" }).then(function () { var e = $("#set-gpass-state"); if (e) e.textContent = I18N.t("settings_gpass_unset"); $("#set-gpass").value = ""; }); };
+    if ($("#set-gpass-clear")) $("#set-gpass-clear").onclick = function () { helper("pass-set-global", { password: "" }).then(function (r) { if (!r || !r.ok) { modalAlert(errMsg(r)); return; } var e = $("#set-gpass-state"); if (e) e.textContent = I18N.t("settings_gpass_unset"); $("#set-gpass").value = ""; }); };
   }
   if ($("#set-enc-data")) $("#set-enc-data").checked = !!CFG.encrypt_data;
   if ($("#set-enc-apk"))  $("#set-enc-apk").checked = !!CFG.encrypt_apk;
   if ($("#set-ssaid"))    $("#set-ssaid").checked = !!CFG.ssaid;
   if ($("#set-app-netpolicy")) $("#set-app-netpolicy").checked = !!CFG.app_netpolicy;
+  if ($("#set-relaunch")) $("#set-relaunch").checked = !!CFG.relaunch_apps;
   if ($("#set-mode"))     $("#set-mode").value = CFG.default_mode || "full";
   if ($("#set-netpolicy")) $("#set-netpolicy").value = CFG.network_policy || "any";
   if ($("#set-auto"))     $("#set-auto").checked = !!CFG.auto_backup;
@@ -1907,10 +2076,15 @@ function saveSettings() {
   CFG.encrypt_apk = $("#set-enc-apk").checked;
   CFG.ssaid = $("#set-ssaid").checked;
   CFG.app_netpolicy = $("#set-app-netpolicy").checked;
+  if ($("#set-relaunch")) CFG.relaunch_apps = $("#set-relaunch").checked;
   CFG.default_mode = $("#set-mode").value;
   CFG.default_dest = $("#set-dest").value;
   if ($("#set-staging")) CFG.staging_dir = $("#set-staging").value.trim();
-  if ($("#set-gpass") && $("#set-gpass").value) { helper("pass-set-global", { password: $("#set-gpass").value }).then(function () { var e = $("#set-gpass-state"); if (e) e.textContent = I18N.t("settings_gpass_set"); }); $("#set-gpass").value = ""; }
+  if ($("#set-gpass") && $("#set-gpass").value) {   // #17: setting a NEW passphrase must be confirmed (typo -> unrecoverable backups)
+    var _gc = $("#set-gpass-confirm");
+    if (_gc && _gc.value !== $("#set-gpass").value) { var _ge = $("#set-gpass-state"); if (_ge) _ge.textContent = I18N.t("settings_pass_mismatch"); }
+    else { helper("pass-set-global", { password: $("#set-gpass").value }).then(function (r) { var e = $("#set-gpass-state"); if (e) e.textContent = (r && r.ok !== false) ? I18N.t("settings_gpass_set") : errMsg(r); }); $("#set-gpass").value = ""; if (_gc) _gc.value = ""; }
+  }
   if ($("#set-netpolicy")) CFG.network_policy = $("#set-netpolicy").value;
   if ($("#set-auto")) CFG.auto_backup = $("#set-auto").checked;
   if ($("#set-auto-keep")) CFG.auto_backup_keep = parseInt($("#set-auto-keep").value, 10) || 5;
@@ -1994,12 +2168,19 @@ function runConfigImport(ex) {
   });
   });
 }
+function resetData() {
+  var rc = $("#set-reset-config") && $("#set-reset-config").checked;
+  var rb = $("#set-reset-backups") && $("#set-reset-backups").checked;
+  if (!rc && !rb) return;   // nothing selected - no-op
+  modalConfirmAction(I18N.t("confirm_reset_data"), I18N.t("settings_reset_btn"), function () { return helper("reset-data", { config: !!rc, backups: !!rb }); }).then(function (r) {
+    if (r === null) return;
+    if (r && r.ok) location.reload(); else modalAlert(errMsg(r));
+  });
+}
 function wipeCredentials() {
-  modalConfirm(I18N.t("settings_wipe_credentials_confirm"), I18N.t("settings_wipe_credentials")).then(function (yes) {
-    if (!yes) return;
-    helper("wipe-credentials").then(function (r) {
-      $("#cfg-config-status").textContent = (r && r.ok !== false) ? I18N.t("settings_wipe_credentials_done") : errMsg(r);
-    });
+  modalConfirmAction(I18N.t("settings_wipe_credentials_confirm"), I18N.t("settings_wipe_credentials"), function () { return helper("wipe-credentials"); }).then(function (r) {
+    if (r === null) return;
+    $("#cfg-config-status").textContent = (r && r.ok !== false) ? I18N.t("settings_wipe_credentials_done") : errMsg(r);
   });
 }
 
@@ -2019,12 +2200,27 @@ function setBlock(pkg, on) {
   if (on && i < 0) CFG.blocklist.push(pkg);
   else if (!on && i >= 0) CFG.blocklist.splice(i, 1);
   persistBlocklist(); updateBlockCount();
+  reflectBlockInApps(pkg, on);
+}
+// #31b: surgically hide/show ONLY the affected app's row in the Apps list, so excluding (or
+// re-including) it takes effect immediately with no full re-render. A later renderApps (search /
+// filter / show-excluded toggle) rebuilds from visibleApps and stays consistent.
+function reflectBlockInApps(pkg, on) {
+  var list = $("#applist"); if (!list) return;
+  var ic = list.querySelector('.app-ic[data-pkg="' + pkg + '"]');
+  var row = ic && ic.closest(".row"); if (!row) return;
+  var showExcl = $("#app-show-excluded") && $("#app-show-excluded").checked;
+  row.style.display = (on && !showExcl) ? "none" : "";
 }
 // persist CFG; surface a failure instead of letting the in-memory toggle silently diverge from disk
 function saveCfg() { helper("config-set", CFG).then(function (r) { if (r && r.ok === false) modalAlert(errMsg(r)); }).catch(function () { modalAlert(errMsg()); }); }
 function persistBlocklist() { saveCfg(); }
+// The Settings pickers each hold a row per app. They are built only while the Settings tab is
+// shown (loadSettings rebuilds both whenever the tab opens), so loading the app list on the Apps
+// tab no longer renders every app three times.
+function settingsShown() { var p = $("#settings"); return !!(p && p.classList.contains("active")); }
 function buildBlockPicker() {
-  var ul = $("#block-applist"); if (!ul) return;
+  var ul = $("#block-applist"); if (!ul || !settingsShown()) return;
   if (iconObserver) _blockIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
   _blockIcons = []; ul.innerHTML = "";
   visibleApps("", true).forEach(function (a) {
@@ -2098,13 +2294,13 @@ function openAppItemsModal(pkg, label) {
   if ($("#ai-pass")) {
     $("#ai-pass").value = "";
     helper("pass-status", { package: pkg }).then(function (r) { var e = $("#ai-pass-state"); if (e) e.textContent = I18N.t((r && r.app) ? "settings_gpass_set" : "settings_gpass_unset"); }).catch(function () {});
-    if ($("#ai-pass-clear")) $("#ai-pass-clear").onclick = function () { helper("pass-set-app", { package: pkg, password: "" }).then(function () { var e = $("#ai-pass-state"); if (e) e.textContent = I18N.t("settings_gpass_unset"); $("#ai-pass").value = ""; }); };
+    if ($("#ai-pass-clear")) $("#ai-pass-clear").onclick = function () { helper("pass-set-app", { package: pkg, password: "" }).then(function (r) { if (!r || !r.ok) { modalAlert(errMsg(r)); return; } var e = $("#ai-pass-state"); if (e) e.textContent = I18N.t("settings_gpass_unset"); $("#ai-pass").value = ""; }); };
   }
   $("#appitems-modal").hidden = false;
 }
 function closeAppItemsModal() { $("#appitems-modal").hidden = true; _aiPkg = null; }
 function buildAppItemsPicker() {
-  var ul = $("#ai-applist"); if (!ul) return;
+  var ul = $("#ai-applist"); if (!ul || !settingsShown()) return;
   if (iconObserver) _aiIcons.forEach(function (ic) { iconObserver.unobserve(ic); });
   _aiIcons = []; ul.innerHTML = "";
   visibleApps("", true).forEach(function (a) {
@@ -2342,9 +2538,9 @@ function openSpecialRestore(bk) {
   m.hidden = false;
   $("#special-cancel").onclick = function () { m.hidden = true; };
   $("#special-delete").onclick = function () {
-    modalConfirm(I18N.t("confirm_delete_backup"), I18N.t("delete")).then(function (yes) {
-      if (!yes) return;
-      helper("delete-backup", { ref: bk.ref }).then(function () { m.hidden = true; loadSpecial(); });
+    modalConfirmAction(I18N.t("confirm_delete_backup"), I18N.t("delete"), function () { return helper("delete-backup", { ref: bk.ref }); }).then(function (r) {
+      if (r === null) return;
+      m.hidden = true; loadSpecial();
     });
   };
   ok.onclick = function () {
@@ -2578,7 +2774,7 @@ function adbRender() {
   adbUpdateSel();
 }
 function adbRowEl(n) {
-  var row = el("div", "adb-row"); row.style.paddingLeft = (10 + n.depth * 16) + "px";
+  var row = el("div", "adb-row"); row.style.paddingInlineStart = (10 + n.depth * 16) + "px";
   var branch = n.type === "dir" && n.hasKids;
   var tw = el("span", "adb-twisty" + (branch ? "" : " leaf"), n.expanded ? "▾" : "▸");
   if (branch) tw.onclick = function (e) { e.stopPropagation(); adbToggle(n); };
@@ -2855,6 +3051,7 @@ function autoCheckUpdates() {
 
 // --- boot ---------------------------------------------------------------
 function boot() {
+  if (I18N.primeFromCache) I18N.primeFromCache();   // #31: paint the saved language before the async config-get (no English flash)
   applyTheme(getTheme());
   applyAccent(getAccent());
   applyDensity(getDensity());
@@ -2865,6 +3062,7 @@ function boot() {
   $("#search").oninput = debounce(function () { renderApps($("#search").value); }, 120);
   $("#app-filter").onchange = function () { renderApps($("#search").value); };
   $("#app-sort").onchange = function () { renderApps($("#search").value); };
+  if ($("#app-show-excluded")) $("#app-show-excluded").onchange = function () { renderApps($("#search").value); };
   if ($("#app-backuptag")) $("#app-backuptag").onclick = startTagBackup;
   $("#app-select").onclick = function () { setSelectMode(!selectMode); };
   $("#app-selall").onclick = function () { visibleApps($("#search").value).forEach(function (a) { selected[a.package] = { package: a.package, label: a.label }; }); updateSelCount(); renderApps($("#search").value); };
@@ -2875,6 +3073,7 @@ function boot() {
   $("#bk-selall").onclick = function () { (BACKUPS || []).forEach(function (b) { bkSelected[b.ref] = { ref: b.ref, package: b.package, items: b.items }; }); updateBkSelCount(); renderBackups(BACKUPS); };
   $("#bk-selnone").onclick = function () { bkSelected = {}; updateBkSelCount(); renderBackups(BACKUPS); };
   $("#bk-restoresel").onclick = startBatchRestore;
+  if ($("#bk-deletesel")) $("#bk-deletesel").onclick = startBatchDelete;
   if ($("#tg-backups-open")) $("#tg-backups-open").onclick = openTelegramBackups;
   if ($("#rc-backups-open")) $("#rc-backups-open").onclick = openRcloneBackups;
   $("#job-save").onclick = saveJob;
@@ -2883,13 +3082,23 @@ function boot() {
   $("#job-app-search").oninput = function () { filterJobPicker(this.value); };
   $("#log-open").onclick = function () { navTab("log"); };
   if ($("#log-export")) $("#log-export").onclick = exportLogs;
+  if ($("#log-clear")) $("#log-clear").onclick = function () {
+    modalConfirmAction(I18N.t("confirm_clear_logs"), I18N.t("ui_clear_logs"), function () { return helper("log-clear", {}); }).then(function (r) {
+      if (r === null) return;
+      if (r && r.ok) openLog(); else modalAlert(errMsg(r));
+    });
+  };
   $("#block-app-search").oninput = function () { filterBlockPicker(this.value); };
   if ($("#ai-app-search")) $("#ai-app-search").oninput = function () { filterAppItemsPicker(this.value); };
   if ($("#appitems-save")) $("#appitems-save").onclick = function () {
     if (!_aiPkg) return;
     var items = AI_ITEMS.filter(function (k) { var e = $("#ai-" + k); return e && e.checked; });
     if ($("#ai-note")) setAppNote(_aiPkg, $("#ai-note").value);
-    if ($("#ai-pass") && $("#ai-pass").value) { helper("pass-set-app", { package: _aiPkg, password: $("#ai-pass").value }); $("#ai-pass").value = ""; }
+    if ($("#ai-pass") && $("#ai-pass").value) {   // #17: confirm a NEW passphrase before saving (typo -> unrecoverable backups)
+      var _ac = $("#ai-pass-confirm");
+      if (_ac && _ac.value !== $("#ai-pass").value) { var _ae = $("#ai-pass-state"); if (_ae) _ae.textContent = I18N.t("settings_pass_mismatch"); return; }
+      helper("pass-set-app", { package: _aiPkg, password: $("#ai-pass").value }).then(function (r) { if (!r || !r.ok) modalAlert(errMsg(r)); }); $("#ai-pass").value = ""; if (_ac) _ac.value = "";
+    }
     setAppItems(_aiPkg, items); closeAppItemsModal(); buildAppItemsPicker(); renderApps($("#search") ? $("#search").value : "");
   };
   if ($("#appitems-clear")) $("#appitems-clear").onclick = function () {
@@ -2925,6 +3134,7 @@ function boot() {
   if ($("#cfg-export")) $("#cfg-export").onclick = exportConfig;
   if ($("#cfg-import")) $("#cfg-import").onclick = importConfig;
   if ($("#cfg-wipe")) $("#cfg-wipe").onclick = wipeCredentials;
+  if ($("#cfg-reset")) $("#cfg-reset").onclick = resetData;
   $("#d-save").onclick = addDest;
   $("#d-type").onchange = syncDestFields;
   if ($("#d-add-remote")) $("#d-add-remote").onclick = focusAddRemote;
@@ -2963,13 +3173,20 @@ function boot() {
   initVdlu();   // VDLU: evaluate reboot banner + auto_on_webui_open on load (panel mounts on tab open)
 
   helper("config-get").then(function (c) { CFG = c || {}; activeUser = (CFG.user != null) ? (CFG.user | 0) : 0; return I18N.init(CFG.language || "auto"); })
-    .then(function () { I18N.apply(); loadDests(); loadSettings(); loadUsers(); loadOverview(); reattachOps(); recoverPendingAuth(); deferredUpdateCheck(); });
+    .then(function () {
+      I18N.apply();
+      // The bridge runs one exec at a time, so call order is load order. The app list is the
+      // first screen: ask for it first, and queue what the other tabs need only behind it.
+      var rest = function () {
+        loadOverview(); reattachOps(); loadDests(); loadSettings(); recoverPendingAuth(); deferredUpdateCheck();
+        helper("sanitize").catch(function () {});   // self-heal backup-folder perms, fire-and-forget
+      };
+      loadUsers().then(rest, rest);
+    });
 
   helper("ping").then(function (r) {
     if (r && r.version) { $("#ver").textContent = r.version; if ($("#about-ver")) $("#about-ver").textContent = r.version + " - " + (r.abi || ""); }
   });
 
-  // self-heal backup-folder perms once per load (fire-and-forget, never blocks the UI).
-  helper("sanitize").catch(function () {});
 }
 document.addEventListener("DOMContentLoaded", boot);
