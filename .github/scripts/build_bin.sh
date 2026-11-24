@@ -176,7 +176,7 @@ fetch_abx() {
 # newest tag, the provenance records package/version so the lock catches a change, and bin-refresh does a
 # .patch bump on its own. No manual pin bump when mtproto-store ships a new version. MTPROTO_FALLBACK is the
 # floor used only when the GitHub API is unreachable at build time.
-MTPROTO_FALLBACK="v1.1.1"
+MTPROTO_FALLBACK="v1.2.0"
 mtproto_latest() {
   local url="https://api.github.com/repos/VictorGabriel7Dev/mtproto-store/releases/latest"
   if [ -n "${GITHUB_TOKEN:-}" ]; then
@@ -185,7 +185,7 @@ mtproto_latest() {
     curl -fsSL "$url" 2>/dev/null
   fi | sed -n 's/.*"tag_name"[: ]*"\([^"]*\)".*/\1/p' | head -1
 }
-MTPROTO_RELEASE="$(mtproto_latest)"; [ -n "$MTPROTO_RELEASE" ] || MTPROTO_RELEASE="$MTPROTO_FALLBACK"
+MTPROTO_RELEASE="$(mtproto_latest || true)"; [ -n "$MTPROTO_RELEASE" ] || MTPROTO_RELEASE="$MTPROTO_FALLBACK"   # || true: a rate-limited/offline API must fall back, never kill the build under set -e
 mtproto_asset() { case "$1" in arm64-v8a) echo linux-arm64 ;; armeabi-v7a) echo linux-armv7 ;; x86) echo linux-386 ;; x86_64) echo linux-amd64 ;; esac; }
 fetch_mtproto() {
   local abi="$1" asset out bin url

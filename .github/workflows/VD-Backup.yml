@@ -46,6 +46,8 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Build per-ABI binaries
+        env:
+          GITHUB_TOKEN: ${{ github.token }}   # authenticate the mtproto-store release lookup (unauth API rate-limits on shared runner IPs -> curl 22)
         run: bash .github/scripts/build_bin.sh
 
       # Supply-chain gate: never ship a release without per-ABI provenance. The v1.04
