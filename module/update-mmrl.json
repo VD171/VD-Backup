@@ -1,9 +1,9 @@
 {
-  "version": "v1.15",
-  "versionCode": 11500,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.15/VD-Backup-v1.15-mmrl-stub.zip",
+  "version": "v1.07",
+  "versionCode": 10700,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.07/VD-Backup-v1.07-universal-lite.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "v1.15\n\nNew:\n- Telegram restore is now a full screen: your backups are listed grouped by app, with names and a search box.\n- When several backups or restores run at once, the progress area stacks them like a download manager: the newest expanded, the others collapsed with their progress and a close button, plus a count.\n- A new \"Reopen apps after a backup\" setting brings an app back to the foreground if it was open when its backup started.\n- Multi-select delete for backups; a \"Reset / start fresh\" option in Settings; a \"Show excluded\" toggle in the app list and a \"Clear log\" button.\n\nFixes:\n- Free space and quota are measured correctly on storage over 2 GB.\n- A snapshot that could not read a few files is no longer reported as failed; the snapshot is still saved, with a note.\n- Excluding an app hides it from the list immediately; confirm buttons show a spinner while the action runs; the WebUI boots and scrolls faster.\n- Self-update is safer (an update cannot replace the module's own updater or keys, and waits for a running backup to finish), and translations are more complete across all 22 languages.",
-  "size": 26353271,
-  "sha256": "9849c14cb271745794f97c62322a3a34856ddead79871614d8a18e75ae784903"
+  "notes": "Reliability: unattended and scheduled backups no longer stop when you leave the app - the backup now runs fully outside the app's process group.\n\nRestore: app permissions restore correctly on custom ROMs - per-UID permission modes and a restored app's network-access policy are reapplied (Android 16 and 17). You can opt in, per app, to also back up its network policy.\n\nSettings: exporting settings, or any encrypted backup, now reports a clear message when encryption cannot run on this device, instead of a generic error.\n\nInterface: dragging the interface-scale slider no longer switches tabs.\n\nLanguages: Ukrainian added - 22 languages.",
+  "size": 49628589,
+  "sha256": "4979f4db88a84e9f7176bfea87a98ad00c94fa1044af120162693f04196f4d34"
 }

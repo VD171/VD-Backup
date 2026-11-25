@@ -1,9 +1,9 @@
 {
-  "version": "v1.15",
-  "versionCode": 11500,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.15/VD-Backup-v1.15-x86_64-full.zip",
+  "version": "v1.10",
+  "versionCode": 11000,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.10/VD-Backup-v1.10-x86_64-full.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "v1.15\n\nNew:\n- Telegram restore is now a full screen: your backups are listed grouped by app, with names and a search box.\n- When several backups or restores run at once, the progress area stacks them like a download manager: the newest expanded, the others collapsed with their progress and a close button, plus a count.\n- A new \"Reopen apps after a backup\" setting brings an app back to the foreground if it was open when its backup started.\n- Multi-select delete for backups; a \"Reset / start fresh\" option in Settings; a \"Show excluded\" toggle in the app list and a \"Clear log\" button.\n\nFixes:\n- Free space and quota are measured correctly on storage over 2 GB.\n- A snapshot that could not read a few files is no longer reported as failed; the snapshot is still saved, with a note.\n- Excluding an app hides it from the list immediately; confirm buttons show a spinner while the action runs; the WebUI boots and scrolls faster.\n- Self-update is safer (an update cannot replace the module's own updater or keys, and waits for a running backup to finish), and translations are more complete across all 22 languages.",
-  "size": 72732729,
-  "sha256": "2bd5898004e0d4057556507b3888355884f536143b268a78ab87cb93297ae265"
+  "notes": "",
+  "size": 0,
+  "sha256": ""
 }

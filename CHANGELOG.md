@@ -6,6 +6,15 @@
 
 All notable changes to VDBackup are documented here. English only.
 
+## v1.16
+
+Fixes:
+
+- A Google Drive backup that fails now records the real Drive error (the HTTP code and Drive's message) in the activity log, instead of a generic "try again", so a failed upload can be diagnosed. (#24)
+- The live-progress panel floats in a fixed spot again, the same on every tab, instead of being pinned inline at the bottom of the page. (#24)
+- A partial batch backup now names which apps failed and why, in the activity log and in an on-screen list at the end of the run, not just how many. (#5)
+- A bulk restore can take one optional shared password (with a tick) for backups whose saved password does not open them; it is tried for an app only after its own passphrase fails, so a mixed batch finishes without asking app by app. (#17)
+
 ## v1.15
 
 New:

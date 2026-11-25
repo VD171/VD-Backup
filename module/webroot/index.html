@@ -666,6 +666,10 @@
       <input id="pw-input" type="password" autocomplete="off" autocapitalize="off"
              spellcheck="false" data-i18n-ph="ui_import_password" placeholder="Backup password">
       <div class="modal-err" id="pw-err"></div>
+      <label class="notice-toggle" id="pw-batch-row" hidden>
+        <input type="checkbox" class="switch" id="pw-batch-apply">
+        <span data-i18n="ui_batch_pass_label">Try this password on apps whose saved password does not work</span>
+      </label>
       <div class="notice warn" id="pw-ssaid-row">
         <label class="notice-toggle">
           <input type="checkbox" class="switch" id="pw-ssaid">

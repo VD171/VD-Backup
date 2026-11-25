@@ -454,13 +454,14 @@ function setBkSelectMode(on) {
 // batch restore: one options modal (applies to all), then restore each in turn.
 function startBatchRestore() {
   var refs = Object.keys(bkSelected); if (!refs.length) return;
-  openOpModal({ needPassword: false, overwriteAck: true, allowTest: true, allowSpoof: true,
+  openOpModal({ batchPassword: true, overwriteAck: true, allowTest: true, allowSpoof: true,
                 titleKey: "restore", confirmKey: "restore",
                 msg: I18N.t("confirm_restore_n", { n: refs.length }) }).then(function (res) {
     if (res == null) return;
     setBkSelectMode(false);
     // ONE detached op restores the whole list server-side (survives the WebUI closing).
     var args = { refs: refs, ssaid: res.ssaid, netpolicy: res.netpolicy, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
+    if (res.batch_password) args.batch_password = res.batch_password;   // #17: shared password for apps whose default fails
     var run = function () { helper("restore-batch", args).then(function (r) { if (r && r.opid) trackOp(r.opid, { batch: true, retry: run }); else modalAlert(errMsg(r)); }).catch(function () { modalAlert(errMsg()); }); };
     run();
   });
@@ -701,7 +702,8 @@ function openOpModal(o) {
     var okBtn = $("#pw-ok"), ackRow = $("#pw-overwrite-row"), ack = $("#pw-overwrite");
     var ssaidRow = $("#pw-ssaid-row"); ssaidRow.hidden = (o.allowSsaid === false);   // hide for flows where SSAID is irrelevant (e.g. settings backup)
     var appnetRow = $("#pw-app-netpolicy-row"); appnetRow.hidden = (o.allowSsaid === false);   // same gating: system-file opt-ins are irrelevant for settings backup
-    input.value = ""; ssaid.checked = false; appnet.checked = false; input.hidden = !o.needPassword;
+    input.value = ""; ssaid.checked = false; appnet.checked = false; input.hidden = !(o.needPassword || o.batchPassword);
+    var batchRow = $("#pw-batch-row"), batchApply = $("#pw-batch-apply"); batchApply.checked = false; batchRow.hidden = !o.batchPassword;
     errBox.textContent = (o.needPassword && o.retry) ? I18N.t("msg_import_password_wrong") : "";
     $("#pw-title").textContent = I18N.t(o.titleKey || "ui_import_password");
     $("#pw-msg").textContent = o.msg || "";
@@ -738,7 +740,7 @@ function openOpModal(o) {
     function cleanup() {
       input.value = ""; errBox.textContent = ""; modal.hidden = true; input.hidden = false;
       okBtn.disabled = false; ackRow.hidden = true; ackRow.classList.remove("needsack"); ack.onchange = null; itemsBox.hidden = true; itemsBox.innerHTML = ""; ssaidRow.hidden = false; appnetRow.hidden = false;
-      testRow.hidden = true; test.onchange = null; spoofRow.hidden = true;
+      testRow.hidden = true; test.onchange = null; spoofRow.hidden = true; batchRow.hidden = true;
       deepRow.hidden = true; deep.disabled = false; spoof.onchange = null;
       okBtn.onclick = null; $("#pw-cancel").onclick = null; input.onkeydown = null;
     }
@@ -750,6 +752,7 @@ function openOpModal(o) {
         return;
       }
       var r = { password: o.needPassword ? input.value : null, ssaid: ssaid.checked, netpolicy: appnet.checked };
+      if (o.batchPassword && batchApply.checked && input.value) r.batch_password = input.value;   // #17: one shared password tried on apps the default cannot open
       if (o.allowTest) r.test = test.checked;
       if (o.allowSpoof) { r.spoof_installer = spoof.checked; r.deep_spoof = deep.checked; }
       if (o.items && o.items.length) {
@@ -1696,6 +1699,20 @@ function trackOp(opid, ctx) {
         }
         if (ctx && ctx.batch && typeof p.of === "number" && p.of > 0) {
           label.textContent = I18N.t("msg_batch_done", { n: p.n || 0, of: p.of });   // e.g. "148 of 150 done"
+          if (p.failed && p.failed.length) {   // #5: list WHICH apps failed (package + reason); keep the card open with a Close button
+            var fl = el("div", "op-failed");
+            fl.appendChild(el("div", "op-failed-h", I18N.t("msg_batch_failed_head", { n: p.failed.length })));
+            p.failed.forEach(function (f) {
+              var row = el("div", "op-failed-row");
+              row.appendChild(el("span", "op-failed-pkg", f.pkg));
+              row.appendChild(el("span", "op-failed-why", errMsg({ code: f.code })));
+              fl.appendChild(row);
+            });
+            box.appendChild(fl);
+            cancelBtn.textContent = I18N.t("ui_close"); cancelBtn.onclick = function () { closeCard(box); }; cancelBtn.style.display = "";
+            if (ctx && ctx.onDone) ctx.onDone(p);
+            return;   // no auto-close: the user reads the failed list and closes it
+          }
         } else {
           label.textContent = p.ok ? I18N.t("op_done") : errMsg(p);
         }

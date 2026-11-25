@@ -317,8 +317,10 @@ button { cursor: pointer; font-family: inherit; }
 .op-sub[hidden] { display: none; }
 .op-cancel { margin-top: 10px; }
 /* #ops: download-manager stack of live-op cards (trackOp). Newest expanded; older collapse to a
-   one-line summary (label + progress + × close); a badge shows the count when more than one runs. */
-#ops { position: relative; }
+   one-line summary (label + progress + × close); a badge shows the count when more than one runs.
+   #ops keeps the floating-panel position from .ops (fixed, bottom); it must NOT set its own
+   position (an earlier #ops{position:relative} overrode .ops and dropped the panel inline at the
+   page bottom). .ops's fixed is also the positioning context the count badge anchors to. */
 .op-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-top: 8px; }
 .op-card:first-child { margin-top: 0; }
 .op-card.collapsed { display: flex; align-items: center; gap: 10px; padding: 8px 12px; opacity: .9; }
@@ -327,6 +329,12 @@ button { cursor: pointer; font-family: inherit; }
 .op-card.collapsed .op-sub { display: none; }
 .op-card.collapsed .op-cancel { flex: none; margin-top: 0; padding: 2px 9px; font-size: 0; line-height: 1; }
 .op-card.collapsed .op-cancel::after { content: "\00d7"; font-size: 18px; }
+/* #5: the per-app failure list on a partial batch (which apps failed + why). */
+.op-failed { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px; max-height: 40vh; overflow-y: auto; }
+.op-failed-h { font-size: 13px; font-weight: 650; color: var(--muted); margin-bottom: 6px; }
+.op-failed-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; padding: 3px 0; }
+.op-failed-pkg { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.op-failed-why { color: var(--muted); flex: 0 0 auto; text-align: right; white-space: nowrap; }
 #ops.multi::before { content: attr(data-count); position: absolute; top: -7px; right: 8px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #06220f; font-weight: 700; font-size: 11px; line-height: 18px; text-align: center; z-index: 2; }
 
 /* ---- modal (floating, centered) ---- */

@@ -786,6 +786,7 @@ drive_cmd() {                               # drive_cmd <op> [extra -e args...] 
   else exec_ns rm -f "$_res" "$_res.done" 2>/dev/null; printf '{"ok":false,"code":"ERR_DRIVE_TIMEOUT"}\n'; fi
 }
 drive_ok() { printf '%s' "$1" | "$JQ" -e '.ok==true' >/dev/null 2>&1; }
+drive_err() { printf '%s %s' "$(jget "$1" '.code // "?"')" "$(jget "$1" '.message // ""')"; }   # companion code+message, for the audit trail
 
 # Telegram destination: the backup lands in a private Telegram channel via the bundled
 # mtproto-store binary (static Go, runs as root). The session is a sensitive credential, so
@@ -967,11 +968,12 @@ transfer_full() {
             _cau="$(stat -c %u "/data/data/$COMPANION_PKG" 2>/dev/null)"
             for _f in "$DEST"/*; do [ -f "$_f" ] || continue
               _b="$(basename "$_f")"; _sf="$_stg/$_b"
-              exec_ns cp "$_f" "$_sf" || { exec_ns rm -rf "$_stg"; finish false ERR_DRIVE_UPLOAD; return 1; }
+              exec_ns cp "$_f" "$_sf" || { exec_ns rm -rf "$_stg"; audit "gdrive stage failed $_b"; finish false ERR_DRIVE_UPLOAD; return 1; }
               case "$_cau" in ''|*[!0-9]*) : ;; *) exec_ns chown "$_cau:$_cau" "$_sf" 2>/dev/null ;; esac
               exec_ns chmod 0644 "$_sf" 2>/dev/null; exec_ns restorecon "$_sf" 2>/dev/null
-              drive_ok "$(drive_cmd upload -e src "$_sf" -e name "$_pfx/$_b")" \
-                || { exec_ns rm -rf "$_stg"; audit "gdrive upload failed $_b"; finish false ERR_DRIVE_UPLOAD; return 1; }
+              _dr="$(drive_cmd upload -e src "$_sf" -e name "$_pfx/$_b")"
+              drive_ok "$_dr" \
+                || { exec_ns rm -rf "$_stg"; audit "gdrive upload failed $_b: $(drive_err "$_dr")"; finish false ERR_DRIVE_UPLOAD; return 1; }
               exec_ns rm -f "$_sf"
             done
             exec_ns rm -rf "$_stg" ;;
@@ -1641,7 +1643,15 @@ restore() {
     # an older backup made with a different password) prompts cleanly instead of failing partway
     # through the restore. A wrong age scrypt passphrase decrypts to nothing.
     _vt="$(ls -S "$REF"/*.age 2>/dev/null | tail -n1)"
-    if [ -n "$_vt" ] && [ -z "$(dec_age "$_vt" 2>/dev/null | head -c1)" ]; then finish false ERR_CRYPTO_PASS; return; fi
+    if [ -n "$_vt" ] && [ -z "$(dec_age "$_vt" 2>/dev/null | head -c1)" ]; then
+      # #17: the default/own passphrase did not decrypt. If a batch restore supplied one shared
+      # password (for older backups made with a different passphrase), try it before giving up, so
+      # a mixed batch completes with the extra password entered once. Session-only, never stored.
+      _bpw="$(jget "$ARGS" '.batch_password')"
+      if [ -n "$_bpw" ]; then _opw="$PW"; PW="$_bpw"
+        [ -n "$(dec_age "$_vt" 2>/dev/null | head -c1)" ] || { PW="$_opw"; finish false ERR_CRYPTO_PASS; return; }
+      else finish false ERR_CRYPTO_PASS; return; fi
+    fi
   fi
 
   # restore-test: extract every archive into a temp dir under the state dir and report
@@ -2691,20 +2701,21 @@ thermal_pace() {
     sleep 20; _tpw=$(( _tpw + 20 ))
   done
 }
-batch_finish() {  # <ok_count> <total> <fail_count> <fails_json> <free_bytes>
+batch_finish() {  # <ok_count> <total> <fail_count> <fails_json> <free_bytes> <failed_json>
   # `fails` names WHY apps failed (a {code:count} tally) so a partial result is never a blind
   # "something went wrong" - e.g. {"ERR_NO_SPACE":24} says the destination filled (issue #5).
+  # `failed` names WHICH apps failed ([{pkg,code}]) so the UI can list them by name (issue #5).
   # `free` is the bytes left on the backups filesystem, so the UI can say how much space remains.
-  printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":%s,"code":"%s","n":%s,"of":%s,"fails":%s,"free":%s}\n' \
+  printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":%s,"code":"%s","n":%s,"of":%s,"fails":%s,"failed":%s,"free":%s}\n' \
     "$OPID" "$([ "$3" -eq 0 ] && echo true || echo false)" \
-    "$([ "$3" -eq 0 ] && echo ERR_NONE || echo ERR_BATCH_PARTIAL)" "$1" "$2" "$4" "$5" > "$PROG"; }
+    "$([ "$3" -eq 0 ] && echo ERR_NONE || echo ERR_BATCH_PARTIAL)" "$1" "$2" "$4" "${6:-[]}" "$5" > "$PROG"; }
 backup_batch() {
   _lst="$STATE/staging/batch.$OPID"; _rcf="$STATE/staging/batchrc.$OPID"; mkdir -p "$STATE/staging"
   jget "$ARGS" '.packages[]?' > "$_lst"
   BATCH_N="$(grep -c . "$_lst" 2>/dev/null)"; case "$BATCH_N" in ''|*[!0-9]*) BATCH_N=0 ;; esac
   [ "$BATCH_N" -gt 0 ] || { rm -f "$_lst"; finish false ERR_NO_PACKAGE; return; }
   audit "batch backup start: $BATCH_N apps"
-  _base="$ARGS"; IN_BATCH=1; BATCH_I=0; _bok=0; _bfail=0; _bcodes=""
+  _base="$ARGS"; IN_BATCH=1; BATCH_I=0; _bok=0; _bfail=0; _bcodes=""; _bff="$STATE/staging/batchfail.$OPID"; rm -f "$_bff"
   _bu="$(jget "$_base" '.user // 0')"; case "$_bu" in ''|*[!0-9]*) _bu=0 ;; esac
   _BTO="$(cfg .batch_app_timeout)"; case "$_BTO" in ''|null|*[!0-9]*) _BTO=1800 ;; esac
   # scheduled/auto batches carry .keep: prune each app to <keep> finished backups (helper.sh
@@ -2732,7 +2743,7 @@ backup_batch() {
     if ngt "$_pffree" 0 && ngt "$_pfneed" "$_pffree"; then
       rm -f "$_lst" "$_rcf"
       audit "space preflight abort: estimate=$_pfneed free=$_pffree at $_pfdir (batch of $BATCH_N)"
-      printf '{"opid":"%s","percent":0,"phase":"finished","done":true,"ok":false,"code":"ERR_NO_SPACE","n":0,"of":%s,"fails":{},"free":%s,"need":%s}\n' \
+      printf '{"opid":"%s","percent":0,"phase":"finished","done":true,"ok":false,"code":"ERR_NO_SPACE","n":0,"of":%s,"fails":{},"failed":[],"free":%s,"need":%s}\n' \
         "$OPID" "$BATCH_N" "$_pffree" "$_pfneed" > "$PROG"
       return
     fi
@@ -2751,16 +2762,19 @@ backup_batch() {
     _run_item backup "$_rcf" "$_p"
     _lok=false; _lcode=ERR_UNKNOWN; read -r _lok _lcode < "$_rcf" 2>/dev/null
     [ "$_lok" = true ] || _lok=false; [ -n "$_lcode" ] || _lcode=ERR_UNKNOWN
-    if [ "$_lok" = true ]; then _bok=$((_bok + 1)); else _bfail=$((_bfail + 1)); _bcodes="$_bcodes $_lcode"; fi
+    if [ "$_lok" = true ]; then _bok=$((_bok + 1)); else _bfail=$((_bfail + 1)); _bcodes="$_bcodes $_lcode"; printf '%s %s\n' "$_p" "$_lcode" >> "$_bff"; fi
     [ "$_lok" = true ] && [ -n "$_bkeep" ] && "$MODDIR/scripts/helper.sh" prune \
       "$("$JQ" -nc --arg p "$_p" --argjson u "$_bu" --argjson k "$_bkeep" '{package:$p,user:$u,keep:$k}' | base64 | tr -d '\n')" >/dev/null 2>&1
   done 3< "$_lst"
   rm -f "$_lst" "$_rcf"; ARGS="$_base"; IN_BATCH=0
   _bfails="$(printf '%s\n' $_bcodes | "$JQ" -R -s -c 'split("\n")|map(select(length>0))|group_by(.)|map({key:.[0],value:length})|from_entries' 2>/dev/null)"
   case "$_bfails" in ''|null) _bfails='{}' ;; esac
+  _bfailed="$("$JQ" -R -s -c 'split("\n")|map(select(length>0)|split(" ")|{pkg:.[0],code:.[1]})' "$_bff" 2>/dev/null)"
+  case "$_bfailed" in ''|null) _bfailed='[]' ;; esac
+  rm -f "$_bff"
   _bfree="$(fs_free "$(backups_dir "$_bu")" 2>/dev/null)"; case "$_bfree" in ''|*[!0-9]*) _bfree=0 ;; esac
-  audit "batch backup done: $_bok ok, $_bfail failed, fails=$_bfails free=$_bfree"
-  batch_finish "$_bok" "$BATCH_N" "$_bfail" "$_bfails" "$_bfree"; }
+  audit "batch backup done: $_bok ok, $_bfail failed, fails=$_bfails failed=$_bfailed free=$_bfree"
+  batch_finish "$_bok" "$BATCH_N" "$_bfail" "$_bfails" "$_bfree" "$_bfailed"; }
 restore_batch() {
   _lst="$STATE/staging/batch.$OPID"; _rcf="$STATE/staging/batchrc.$OPID"; mkdir -p "$STATE/staging"
   jget "$ARGS" '.refs[]?' > "$_lst"
@@ -2914,7 +2928,7 @@ do_gdrive_pull() {   # download a gdrive remote-only backup (its Drive folder) i
   drive_ok "$(drive_cmd check)" || { finish false ERR_DRIVE_CONSENT; return; }
   prog 10 fetching "$PKG"; audit "gdrive-pull start $PKG from $DESTID:$_rref"
   _lf="$(drive_cmd list-folder -e id "$_gfolder")"
-  drive_ok "$_lf" || { audit "gdrive-pull list failed $PKG"; finish false ERR_DOWNLOAD; return; }
+  drive_ok "$_lf" || { audit "gdrive-pull list failed $PKG: $(drive_err "$_lf")"; finish false ERR_DOWNLOAD; return; }
   _n="$(printf '%s' "$_lf" | "$JQ" -r '.data.files | length' 2>/dev/null)"; case "$_n" in ''|*[!0-9]*) _n=0 ;; esac
   [ "$_n" -gt 0 ] || { audit "gdrive-pull empty folder $PKG"; finish false ERR_NO_BACKUP; return; }
   BACKUPS="$(backups_dir "$U")"; _ddir="$BACKUPS/$PKG/$_tsvc"
@@ -2931,8 +2945,9 @@ do_gdrive_pull() {   # download a gdrive remote-only backup (its Drive folder) i
     case "$_fnm" in ''|*/*|*..*|.) continue ;; esac   # the file name feeds the local backup path
     case "$_fid" in ''|*[!A-Za-z0-9_-]*) continue ;; esac
     exec_ns rm -f "$_dl/$_fnm"
-    drive_ok "$(drive_cmd download -e id "$_fid" -e dst "$_dl/$_fnm")" \
-      || { exec_ns rm -rf "$_dl"; rm -rf "$_ddir"; audit "gdrive-pull download failed $_fnm"; finish false ERR_DOWNLOAD; return; }
+    _dd="$(drive_cmd download -e id "$_fid" -e dst "$_dl/$_fnm")"
+    drive_ok "$_dd" \
+      || { exec_ns rm -rf "$_dl"; rm -rf "$_ddir"; audit "gdrive-pull download failed $_fnm: $(drive_err "$_dd")"; finish false ERR_DOWNLOAD; return; }
     exec_ns cp "$_dl/$_fnm" "$_ddir/$_fnm" \
       || { exec_ns rm -rf "$_dl"; rm -rf "$_ddir"; audit "gdrive-pull stage failed $_fnm"; finish false ERR_DOWNLOAD; return; }
     exec_ns rm -f "$_dl/$_fnm"
