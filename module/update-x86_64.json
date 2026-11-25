@@ -1,9 +1,9 @@
 {
-  "version": "v1.10",
-  "versionCode": 11000,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.10/VD-Backup-v1.10-x86_64-full.zip",
+  "version": "v1.17",
+  "versionCode": 11700,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.17/VD-Backup-v1.17-x86_64-full.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "",
-  "size": 0,
-  "sha256": ""
+  "notes": "Fixes:\n\n- Google Drive uploads no longer fail with a \"source not found\" error; the companion app can read the staged archives again. (#24)\n- A batch backup or restore retries an app once on a transient failure, counts apps it deliberately skips (the root manager, or an app not installed) apart from real failures, and reports a specific backup reason - archive, incomplete, or APK - instead of one generic error. (#5)\n- A restore waits for the app's data directory and keeps the data owned by the app, even on a slow device; a mirror restore no longer deletes live data from an empty backup component; the install verifier is put back on the next boot if an operation is stopped before it can be re-enabled. (#5)\n- The dashboard counters now include backups on a local destination (SD/USB), not only the internal store; switching to the Backups tab is faster; a long package name no longer overflows the progress line. (#34)\n- A module updated ahead of the feed is never reverted: the installed versionCode floors the update engine, and a stale downgrade plan is cleared on boot.",
+  "size": 72746263,
+  "sha256": "8caeb9f4ecd38274e67cc4b38b6e77532bb345d464043bbe3aebc5d1d50b80a1"
 }
