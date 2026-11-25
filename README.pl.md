@@ -42,7 +42,7 @@
 
 ---
 
-## Czym jest
+## Dlaczego
 
 VDBackup to root-**moduł WebUI**, który tworzy kopie zapasowe i przywraca Twoje
 aplikacje oraz ich dane **bez aplikacji towarzyszącej dla podstawowych funkcji** -
@@ -89,6 +89,16 @@ importować istniejące kopie zapasowe Neo-Backup i Android-DataBackup, abyś m�
 - **Migracja:** importuje istniejące kopie zapasowe Neo-Backup i Android-DataBackup,
   w tym zaszyfrowane hasłem.
 
+## Agenci AI
+
+VDBackup jest zbudowany tak, aby być przyjaznym dla asystentów i agentów AI, a nie tylko
+dla ludzi. Silnik mówi w JSON (każdy czasownik `helper.sh` zwraca pojedynczy obiekt JSON),
+kod, dokumentacja i struktura plików są ułożone pod kątem odczytu maszynowego, a wkład
+wspomagany przez AI jest recenzowany i przyjmowany jak każdy inny. Agent może
+administrować **każdym** działaniem modułu bezgłowo przez to samo API, którego używa
+WebUI, pełną powierzchnię sterowania znajdziesz w **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**,
+a aby współtworzyć, w [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
+
 ## Instalacja
 
 1. Pobierz najnowszy `VD-Backup-vX.Y.zip` z [Wydań](https://github.com/VD171/VD-Backup/releases).
@@ -112,12 +122,9 @@ Zobacz [Wydania](https://github.com/VD171/VD-Backup/releases).
 
 Jesteś tu nowy? [Przewodnik użytkownika](docs/USER-GUIDE.md) przeprowadzi Cię od instalacji do przywracania.
 
-## Przenośność
+## Bezpieczeństwo
 
-Twoje kopie zapasowe **nie są uwięzione w tym module**. Wszystko korzysta ze standardowych
-formatów (`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`), które otwierają się w systemach
-Windows, macOS i Linux za pomocą popularnych narzędzi lub menedżerów plików. Każda
-zaszyfrowana kopia zawiera notatkę **RECOVERY** z dokładnymi poleceniami do odszyfrowania i rozpakowania na komputerze.
+VDBackup działa jako root i obsługuje dane twoich aplikacji oraz, opcjonalnie, twoje poświadczenia i hasła szyfrujące; kopia zapasowa może zawierać dane wrażliwe, więc chroń ją hasłem i przechowuj w zaufanym miejscu. Poświadczenia są przechowywane w postaci zaszyfrowanej w spoczynku, nigdy jako zwykły tekst, a szyfrowanie nigdy nie jest powiązane ze sprzętem urządzenia, więc to hasło chroni zaszyfrowaną kopię. Zgłoś lukę w zabezpieczeniach zgodnie z [SECURITY.md](SECURITY.md).
 
 ## Budowanie
 
@@ -125,15 +132,12 @@ Moduł to shell + WebUI oraz statyczne pliki binarne dla każdej ABI (`tar`, `zs
 `rclone`, `rsync`, ssh, `restic`) zbudowane dla `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Zobacz [CONTRIBUTING.md](CONTRIBUTING.md) oraz przepływy pracy CI.
 
-## Przyjazny dla AI
+## Przenośność
 
-VDBackup jest zbudowany tak, aby być przyjaznym dla asystentów i agentów AI, a nie tylko
-dla ludzi. Silnik mówi w JSON (każdy czasownik `helper.sh` zwraca pojedynczy obiekt JSON),
-kod, dokumentacja i struktura plików są ułożone pod kątem odczytu maszynowego, a wkład
-wspomagany przez AI jest recenzowany i przyjmowany jak każdy inny. Agent może
-administrować **każdym** działaniem modułu bezgłowo przez to samo API, którego używa
-WebUI, pełną powierzchnię sterowania znajdziesz w **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**,
-a aby współtworzyć, w [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
+Twoje kopie zapasowe **nie są uwięzione w tym module**. Wszystko korzysta ze standardowych
+formatów (`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`), które otwierają się w systemach
+Windows, macOS i Linux za pomocą popularnych narzędzi lub menedżerów plików. Każda
+zaszyfrowana kopia zawiera notatkę **RECOVERY** z dokładnymi poleceniami do odszyfrowania i rozpakowania na komputerze.
 
 ## Aktualizacje przyrostowe (VDLU)
 
@@ -161,16 +165,15 @@ cały `.zip`. Profil **wzmocniony**: podpis ed25519 jest obowiązkowy, a downgra
 
 ## Zobacz także
 
-Projekty siostrzane tego samego autora:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: debugger metod urządzenia: odczytuje każdy element wszystkimi metodami, które mogą go odczytać, i porównuje je obok siebie.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: Twoje usługi Google (RCS, Wallet, atestacje Play Integrity) odczytywane na Twoim urządzeniu bez internetu.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: narzędzie do podszywania się urządzenia, które zamienia świeży fingerprint w spójny, konsekwentny profil.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: podszywanie się pod globalny fingerprint urządzenia / Play Integrity, dla całego urządzenia z zakresem dla poszczególnych aplikacji i WebUI.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: samodzielny zrootowany demon SSH (Dropbear).
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: bezflashowy, przyrostowy silnik samoaktualizacji, wbudowany w moduły KernelSU/APatch/Magisk.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: Twoje usługi Google (RCS, Wallet, atestacje Play Integrity) odczytywane na Twoim urządzeniu bez internetu.
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: bezproblemowy rootowy instalator sideload dla pojedynczych, wsadowych i podzielonych APK, z przełącznikiem weryfikatora Play Protect i podszywaniem źródła instalacji.
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: debugger metod urządzenia: odczytuje każdy element wszystkimi metodami, które mogą go odczytać, i porównuje je obok siebie.
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: bezflashowy, przyrostowy silnik samoaktualizacji, wbudowany w moduły KernelSU/APatch/Magisk.
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: nasze repozytorium modułów MMRL/WebUI-X (zainstaluj je wszystkie ze swojego menedżera roota).
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: zbiór danych fingerprintów build.prop urządzeń Pixel (fork @T3SL4).
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: użyj Telegrama jako magazynu obiektów z małego CLI w Go.
 
 ## Kontakty
 

@@ -42,7 +42,7 @@
 
 ---
 
-## Vad det är
+## Varför
 
 VDBackup är en root-**WebUI-modul** som säkerhetskopierar och återställer dina appar och
 deras data **utan en följeslagarapp för kärnfunktionerna**: eftersom modulen redan är
@@ -90,6 +90,16 @@ importera befintliga säkerhetskopior från Neo-Backup och Android-DataBackup s�
 - **Migrera in:** importerar befintliga säkerhetskopior från Neo-Backup och
   Android-DataBackup, inklusive lösenordskrypterade.
 
+## AI-agenter
+
+VDBackup är byggt för att välkomna AI-assistenter och -agenter, inte bara människor.
+Motorn talar JSON (varje `helper.sh`-verb returnerar ett enda JSON-objekt), koden,
+dokumentationen och filstrukturen är upplagda för maskinläsning, och AI-stödda bidrag
+granskas och accepteras som alla andra. En agent kan administrera **varje** åtgärd i
+modulen huvudlöst via samma API som WebUI använder, se
+**[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** för hela styrytan, och
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) för att bidra.
+
 ## Installation
 
 1. Ladda ner den senaste `VD-Backup-vX.Y.zip` från [Utgåvor](https://github.com/VD171/VD-Backup/releases).
@@ -112,12 +122,9 @@ inbäddat utan några nedladdningar (offline / återställning) -> en full-utgå
 
 Ny här? [Användarguiden](docs/USER-GUIDE.md) tar dig från installation till återställning.
 
-## Portabilitet
+## Säkerhet
 
-Dina säkerhetskopior **är inte låsta till den här modulen**. Allt använder standardformat
-(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) som öppnas på Windows, macOS och Linux med
-vanliga verktyg eller filhanterare. Varje krypterad säkerhetskopia levereras med en
-**RECOVERY**-anteckning som innehåller de exakta kommandona för att dekryptera och packa upp på en dator.
+VDBackup körs som root och hanterar dina appdata och, valfritt, dina autentiseringsuppgifter och krypteringslösenfraser; en säkerhetskopia kan innehålla känsliga data, så skydda den med en lösenfras och förvara den på en plats du litar på. Autentiseringsuppgifter lagras krypterade i vila, aldrig i klartext, och krypteringen är aldrig bunden till enhetens hårdvara, så det är lösenfrasen som skyddar en krypterad säkerhetskopia. Rapportera en sårbarhet enligt [SECURITY.md](SECURITY.md).
 
 ## Bygga
 
@@ -125,15 +132,12 @@ Modulen är shell + WebUI plus statiska binärer per ABI (`tar`, `zstd`, `lz4`,
 `rclone`, `rsync`, ssh, `restic`) byggda för `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Se [CONTRIBUTING.md](CONTRIBUTING.md) och CI-arbetsflödena.
 
-## AI-vänligt
+## Portabilitet
 
-VDBackup är byggt för att välkomna AI-assistenter och -agenter, inte bara människor.
-Motorn talar JSON (varje `helper.sh`-verb returnerar ett enda JSON-objekt), koden,
-dokumentationen och filstrukturen är upplagda för maskinläsning, och AI-stödda bidrag
-granskas och accepteras som alla andra. En agent kan administrera **varje** åtgärd i
-modulen huvudlöst via samma API som WebUI använder, se
-**[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** för hela styrytan, och
-[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) för att bidra.
+Dina säkerhetskopior **är inte låsta till den här modulen**. Allt använder standardformat
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) som öppnas på Windows, macOS och Linux med
+vanliga verktyg eller filhanterare. Varje krypterad säkerhetskopia levereras med en
+**RECOVERY**-anteckning som innehåller de exakta kommandona för att dekryptera och packa upp på en dator.
 
 ## Inkrementella uppdateringar (VDLU)
 
@@ -161,16 +165,15 @@ blockeras; den fullständiga `.zip`-filen förblir giltig som reservalternativ.
 
 ## Se även
 
-Systerprojekt av samma författare:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: en felsökare för enhetsmetoder: läser varje objekt genom varje metod som kan läsa det och jämför dem sida vid sida.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: dina Google-tjänster (RCS, Wallet, Play Integrity-attesteringar), lästa på din enhet utan internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: en enhetsspoofer som förvandlar ett färskt fingerprint till en sammanhängande, konsekvent profil.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: förfalskning av den globala enhets-fingerprinten / Play Integrity, för hela enheten med omfattning per app och ett WebUI.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: en fristående rootad SSH-daemon (Dropbear).
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: en flashfri, inkrementell självuppdateringsmotor, inbäddad i KernelSU/APatch/Magisk-moduler.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: dina Google-tjänster (RCS, Wallet, Play Integrity-attesteringar), lästa på din enhet utan internet.
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: en friktionsfri root-sideload-installerare för enskilda, batch- och split-APK:er, med en växel för Play Protect-verifieraren och förfalskning av installationskällan.
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: en felsökare för enhetsmetoder: läser varje objekt genom varje metod som kan läsa det och jämför dem sida vid sida.
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: en flashfri, inkrementell självuppdateringsmotor, inbäddad i KernelSU/APatch/Magisk-moduler.
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: vårt MMRL/WebUI-X-modulförråd (installera alla dessa från din root-hanterare).
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: en datamängd med Pixel-build.prop-fingerprints (fork av @T3SL4).
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: använd Telegram som objektlagring från ett pyttelitet Go-CLI.
 
 ## Kontakter
 

@@ -1,10 +1,19 @@
-> **Languages:** English · [العربية](docs/ar/CHANGELOG.md) · [Čeština](docs/cs/CHANGELOG.md) · [Deutsch](docs/de/CHANGELOG.md) · [Español](docs/es/CHANGELOG.md) · [فارسی](docs/fa/CHANGELOG.md) · [Français](docs/fr/CHANGELOG.md) · [हिन्दी](docs/hi/CHANGELOG.md) · [Bahasa Indonesia](docs/id/CHANGELOG.md) · [Italiano](docs/it/CHANGELOG.md) · [日本語](docs/ja/CHANGELOG.md) · [한국어](docs/ko/CHANGELOG.md) · [Nederlands](docs/nl/CHANGELOG.md) · [Polski](docs/pl/CHANGELOG.md) · [Português](docs/pt/CHANGELOG.md) · [Русский](docs/ru/CHANGELOG.md) · [Svenska](docs/sv/CHANGELOG.md) · [ไทย](docs/th/CHANGELOG.md) · [Türkçe](docs/tr/CHANGELOG.md) · [Українська](docs/uk/CHANGELOG.md) · [Tiếng Việt](docs/vi/CHANGELOG.md) · [中文](docs/zh/CHANGELOG.md)
-
----
-
 # Changelog
 
 All notable changes to VDBackup are documented here. English only.
+
+## v1.17
+
+Fixes:
+
+- A Google Drive backup now stages each archive with the ownership and SELinux context the companion app needs to read it, so uploads no longer fail with a "source not found" error. (#24)
+- A batch backup or restore now retries an app once when it fails for a transient reason (a verification miss, a truncated write, a worker stopped under memory pressure), and counts apps it deliberately skipped (the root manager, or an app that is not installed) separately from real failures. (#5)
+- A failed backup now reports a specific reason - the archive could not be written, it came out incomplete, or the app's APK could not be saved - instead of one generic backup error. (#5)
+- A restore now waits longer for the system to recreate an app's data directory before it sets ownership, so the restored data is reliably owned by the app and readable, even for a large app on a slow device. (#5)
+- A mirror restore no longer deletes live app data when a backed-up component is empty, guarding against data loss from a partial backup. (#5)
+- The app-install verifier is put back on the next boot if a backup or restore is stopped before it can be re-enabled, so the device's install protection is never left off. (#5)
+- The pre-run space check for a batch now measures the correct user's data for a secondary user. (#5)
+- A backup plan no longer miscounts an app whose installed APKs total more than 2 GB. (#5)
 
 ## v1.16
 

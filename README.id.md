@@ -42,7 +42,7 @@
 
 ---
 
-## Apa ini
+## Mengapa
 
 VDBackup adalah **modul WebUI** root yang mencadangkan dan memulihkan aplikasi Anda beserta
 datanya **tanpa aplikasi pendamping untuk fitur inti**: karena modulnya sudah root, tidak ada yang
@@ -89,6 +89,15 @@ mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada agar Anda bi
 - **Impor masuk:** mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada,
   termasuk yang terenkripsi dengan kata sandi.
 
+## Agen AI
+
+VDBackup dibangun agar menyambut asisten dan agen AI, bukan hanya orang. Mesinnya berbicara JSON
+(setiap verba `helper.sh` mengembalikan satu objek JSON), kode, dokumentasi, dan struktur berkasnya
+ditata untuk pembacaan mesin, dan kontribusi berbantuan AI ditinjau serta diterima seperti kontribusi
+lainnya. Sebuah agen dapat mengelola **setiap** tindakan modul tanpa antarmuka melalui API yang sama
+yang digunakan WebUI, lihat **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** untuk permukaan kendali
+lengkap, dan [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) untuk berkontribusi.
+
 ## Pemasangan
 
 1. Unduh `VD-Backup-vX.Y.zip` terbaru dari [Rilis](https://github.com/VD171/VD-Backup/releases).
@@ -99,12 +108,9 @@ mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada agar Anda bi
 
 Baru di sini? [Panduan pengguna](docs/USER-GUIDE.md) memandu Anda dari pemasangan hingga pemulihan.
 
-## Portabilitas
+## Keamanan
 
-Cadangan Anda **tidak terkunci di modul ini**. Semuanya memakai format standar
-(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) yang terbuka di Windows, macOS, dan Linux dengan
-alat umum atau manajer berkas. Setiap cadangan terenkripsi disertai catatan **RECOVERY** yang berisi
-perintah persis untuk mendekripsi dan mengekstrak di PC.
+VDBackup berjalan sebagai root dan menangani data aplikasi Anda dan, secara opsional, kredensial serta frasa sandi enkripsi Anda; sebuah cadangan dapat memuat data sensitif, jadi lindungi dengan frasa sandi dan simpan di tempat yang Anda percayai. Kredensial disimpan terenkripsi saat tidak digunakan, tidak pernah dalam teks biasa, dan enkripsi tidak pernah terikat pada perangkat keras perangkat, sehingga frasa sandilah yang melindungi cadangan terenkripsi. Laporkan kerentanan sesuai [SECURITY.md](SECURITY.md).
 
 ## Pembangunan
 
@@ -112,14 +118,12 @@ Modul ini adalah shell + WebUI ditambah biner statis per-ABI (`tar`, `zstd`, `lz
 `rclone`, `rsync`, ssh, `restic`) yang dibangun untuk `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Lihat [CONTRIBUTING.md](CONTRIBUTING.md) dan alur kerja CI.
 
-## Ramah AI
+## Portabilitas
 
-VDBackup dibangun agar menyambut asisten dan agen AI, bukan hanya orang. Mesinnya berbicara JSON
-(setiap verba `helper.sh` mengembalikan satu objek JSON), kode, dokumentasi, dan struktur berkasnya
-ditata untuk pembacaan mesin, dan kontribusi berbantuan AI ditinjau serta diterima seperti kontribusi
-lainnya. Sebuah agen dapat mengelola **setiap** tindakan modul tanpa antarmuka melalui API yang sama
-yang digunakan WebUI, lihat **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** untuk permukaan kendali
-lengkap, dan [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) untuk berkontribusi.
+Cadangan Anda **tidak terkunci di modul ini**. Semuanya memakai format standar
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) yang terbuka di Windows, macOS, dan Linux dengan
+alat umum atau manajer berkas. Setiap cadangan terenkripsi disertai catatan **RECOVERY** yang berisi
+perintah persis untuk mendekripsi dan mengekstrak di PC.
 
 ## Pembaruan inkremental (VDLU)
 
@@ -147,16 +151,15 @@ penurunan versi diblokir; `.zip` lengkap tetap valid sebagai cadangan.
 
 ## Lihat juga
 
-Proyek saudara dari penulis yang sama:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: sebuah debugger metode perangkat: membaca setiap item melalui setiap metode yang dapat membacanya dan membandingkannya berdampingan.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: layanan Google Anda (RCS, Wallet, atestasi Play Integrity), dibaca di perangkat Anda tanpa internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: sebuah pemalsu perangkat yang mengubah fingerprint baru menjadi profil yang koheren dan konsisten.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: pemalsuan fingerprint perangkat global / Play Integrity, seluruh perangkat dengan cakupan per-aplikasi dan sebuah WebUI.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: sebuah daemon SSH mandiri dengan akses root (Dropbear).
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: sebuah mesin pembaruan-mandiri inkremental tanpa flash, tertanam di dalam modul KernelSU/APatch/Magisk.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: layanan Google Anda (RCS, Wallet, atestasi Play Integrity), dibaca di perangkat Anda tanpa internet.
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: sebuah pemasang sideload ber-root tanpa hambatan untuk APK tunggal, batch, dan split, dengan sakelar verifier Play Protect dan pemalsuan sumber pemasangan.
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: sebuah debugger metode perangkat: membaca setiap item melalui setiap metode yang dapat membacanya dan membandingkannya berdampingan.
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: sebuah mesin pembaruan-mandiri inkremental tanpa flash, tertanam di dalam modul KernelSU/APatch/Magisk.
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: repositori modul MMRL/WebUI-X kami (pasang semua ini dari pengelola root Anda).
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: sebuah dataset fingerprint build.prop Pixel (fork dari @T3SL4).
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: gunakan Telegram sebagai penyimpanan objek dari sebuah CLI Go mungil.
 
 ## Kontak
 

@@ -42,7 +42,7 @@
 
 ---
 
-## 这是什么
+## 为什么
 
 VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及其数据，**核心功能无需配套应用** -
 因为模块本身已是 root，没有什么需要「允许」的。它的目标是在一个地方、用简洁的 WebUI 完成热门
@@ -75,6 +75,14 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 - **后台:** 备份/还原以分离方式运行，关闭 WebUI 后仍会继续，并在开始和完成时发送通知。
 - **迁移导入:** 导入现有的 Neo-Backup 和 Android-DataBackup 备份，包括用密码加密的备份。
 
+## AI 代理
+
+VDBackup 的构建目标是不仅欢迎人，也欢迎 AI 助手和代理。引擎讲 JSON (`helper.sh` 的每个 verb
+都返回单个 JSON 对象)，代码、文档和文件结构都为机器读取而布局，AI 辅助的贡献会像其他贡献一样
+被审查和接受。代理可以通过 WebUI 所用的同一 API，以无头方式管理模块的**每一个**操作, 完整的
+控制面请见 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**，参与贡献请见
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)。
+
 ## 安装
 
 1. 从 [发布](https://github.com/VD171/VD-Backup/releases) 下载最新的 `VD-Backup-vX.Y.zip`。
@@ -85,11 +93,9 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 
 初次使用？[用户指南](docs/USER-GUIDE.md) 将带你从安装一路走到还原。
 
-## 可移植性
+## 安全
 
-你的备份**不会被锁定在本模块中**。一切都使用标准格式
-(`tar`、`gzip`、`zstd`、`age`、`zip`、`restic`)，可在 Windows、macOS 和 Linux 上用常见工具或
-文件管理器打开。每个加密备份都附带一个 **RECOVERY** 说明，其中包含在 PC 上解密和解压的确切命令。
+VDBackup 以 root 身份运行，处理你的应用数据，并可选地处理你的凭据和加密口令；备份可能包含敏感数据，因此请用口令保护它，并存放在你信任的地方。凭据在静态时以加密形式存储，绝不以明文保存，加密也绝不绑定到设备硬件，因此保护加密备份的正是口令。请按照 [SECURITY.md](SECURITY.md) 报告漏洞。
 
 ## 构建
 
@@ -97,13 +103,11 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 (`tar`、`zstd`、`lz4`、`rclone`、`rsync`、ssh、`restic`) 组成。请参阅
 [CONTRIBUTING.md](CONTRIBUTING.md) 和 CI 工作流。
 
-## 对 AI 友好
+## 可移植性
 
-VDBackup 的构建目标是不仅欢迎人，也欢迎 AI 助手和代理。引擎讲 JSON (`helper.sh` 的每个 verb
-都返回单个 JSON 对象)，代码、文档和文件结构都为机器读取而布局，AI 辅助的贡献会像其他贡献一样
-被审查和接受。代理可以通过 WebUI 所用的同一 API，以无头方式管理模块的**每一个**操作, 完整的
-控制面请见 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**，参与贡献请见
-[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)。
+你的备份**不会被锁定在本模块中**。一切都使用标准格式
+(`tar`、`gzip`、`zstd`、`age`、`zip`、`restic`)，可在 Windows、macOS 和 Linux 上用常见工具或
+文件管理器打开。每个加密备份都附带一个 **RECOVERY** 说明，其中包含在 PC 上解密和解压的确切命令。
 
 ## 增量更新 (VDLU)
 
@@ -128,16 +132,15 @@ VD Backup 附带 **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)*
 
 ## 另见
 
-同一作者的姊妹项目:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: 一个设备方法调试器: 通过每一种能读取某项的方法去读取它，并将结果并排比较。
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: 在你的设备上无需联网即可读取你的 Google 服务 (RCS、Wallet、Play Integrity 证明)。
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: 一个设备伪装器，把全新的指纹变成连贯一致的配置。
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: 全局设备指纹 / Play Integrity 伪装，作用于整个设备并带有按应用的作用域和一个 WebUI。
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: 一个独立的 root SSH 守护进程 (Dropbear)。
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: 一个无需刷入的增量自更新引擎，嵌入到 KernelSU/APatch/Magisk 模块中。
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: 在你的设备上无需联网即可读取你的 Google 服务 (RCS、Wallet、Play Integrity 证明)。
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: 一个面向单个、批量和拆分 APK 的无摩擦 root 侧载安装器，带有 Play Protect 验证器开关和安装来源伪装。
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: 一个设备方法调试器: 通过每一种能读取某项的方法去读取它，并将结果并排比较。
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: 一个无需刷入的增量自更新引擎，嵌入到 KernelSU/APatch/Magisk 模块中。
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: 我们的 MMRL/WebUI-X 模块仓库 (从你的 root 管理器中安装所有这些)。
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: 一个 Pixel build.prop 指纹的数据集 (@T3SL4 的分支)。
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: 通过一个小巧的 Go CLI 把 Telegram 用作对象存储。
 
 ## Contacts
 

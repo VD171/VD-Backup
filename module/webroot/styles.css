@@ -313,7 +313,10 @@ button { cursor: pointer; font-family: inherit; }
 .bar { height: 9px; background: var(--line); border-radius: 6px; overflow: hidden; margin-top: 10px; }
 .bar > i { display: block; height: 100%; width: 0; border-radius: 6px;
   background: linear-gradient(90deg, var(--backup), var(--accent)); transition: width .3s ease; }
-.op-sub { color: var(--muted); font-size: 13px; margin-top: 8px; }
+.op-sub { color: var(--muted); font-size: 13px; margin-top: 8px;
+  /* the current item is a package name (long, unbroken, e.g. com.google.android.apps.docs):
+     break it so the line wraps inside the op-card instead of overflowing its container. */
+  overflow-wrap: anywhere; word-break: break-word; }
 .op-sub[hidden] { display: none; }
 .op-cancel { margin-top: 10px; }
 /* #ops: download-manager stack of live-op cards (trackOp). Newest expanded; older collapse to a
@@ -330,6 +333,7 @@ button { cursor: pointer; font-family: inherit; }
 .op-card.collapsed .op-cancel { flex: none; margin-top: 0; padding: 2px 9px; font-size: 0; line-height: 1; }
 .op-card.collapsed .op-cancel::after { content: "\00d7"; font-size: 18px; }
 /* #5: the per-app failure list on a partial batch (which apps failed + why). */
+.op-skipped { margin-top: 6px; font-size: 12px; color: var(--muted); }
 .op-failed { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px; max-height: 40vh; overflow-y: auto; }
 .op-failed-h { font-size: 13px; font-weight: 650; color: var(--muted); margin-bottom: 6px; }
 .op-failed-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; padding: 3px 0; }

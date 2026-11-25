@@ -42,7 +42,7 @@
 
 ---
 
-## O que é
+## Por que
 
 O VDBackup é um **módulo WebUI** root que faz backup e restauração dos seus apps e dos
 seus dados **sem um app complementar para os recursos principais**: porque o módulo já
@@ -89,6 +89,16 @@ importar backups existentes do Neo-Backup e do Android-DataBackup para que você
 - **Migrar para cá:** importa backups existentes do Neo-Backup e do Android-DataBackup,
   inclusive os protegidos por senha.
 
+## Agentes de IA
+
+O VDBackup foi feito para ser receptivo a assistentes e agentes de IA, não só a pessoas.
+O engine fala JSON (todo verbo do `helper.sh` retorna um único objeto JSON), o
+código, a documentação e a estrutura de arquivos são organizados para leitura por máquina, e
+contribuições assistidas por IA são revisadas e aceitas como qualquer outra. Um agente pode administrar
+**cada** ação do módulo sem interface através da mesma API que a WebUI usa -
+veja **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** para a superfície de controle completa, e
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) para contribuir.
+
 ## Instalação
 
 1. Baixe o `VD-Backup-vX.Y.zip` mais recente em [Versões](https://github.com/VD171/VD-Backup/releases).
@@ -110,12 +120,9 @@ Veja [Versões](https://github.com/VD171/VD-Backup/releases).
 
 Chegou agora? O [Guia do usuário](docs/USER-GUIDE.md) leva você da instalação ao restore.
 
-## Portabilidade
+## Segurança
 
-Seus backups **não ficam presos a este módulo**. Tudo usa formatos padrão
-(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) que abrem no Windows, macOS e
-Linux com ferramentas comuns ou gerenciadores de arquivos. Todo backup criptografado vem com uma
-nota **RECOVERY** contendo os comandos exatos para descriptografar e extrair num PC.
+O VDBackup roda como root e lida com os dados dos seus apps e, opcionalmente, com suas credenciais e senhas de criptografia; um backup pode conter dados sensíveis, então proteja-o com uma senha e guarde-o em um lugar em que você confia. As credenciais são armazenadas criptografadas em repouso, nunca em texto claro, e a criptografia nunca é atrelada ao hardware do dispositivo, então a senha é o que protege um backup criptografado. Reporte uma vulnerabilidade conforme o [SECURITY.md](SECURITY.md).
 
 ## Build
 
@@ -123,15 +130,12 @@ O módulo é shell + WebUI mais binários estáticos por ABI (`tar`, `zstd`, `lz
 `rclone`, `rsync`, ssh, `restic`) compilados para `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Veja [CONTRIBUTING.md](CONTRIBUTING.md) e os workflows de CI.
 
-## Amigável à IA
+## Portabilidade
 
-O VDBackup foi feito para ser receptivo a assistentes e agentes de IA, não só a pessoas.
-O engine fala JSON (todo verbo do `helper.sh` retorna um único objeto JSON), o
-código, a documentação e a estrutura de arquivos são organizados para leitura por máquina, e
-contribuições assistidas por IA são revisadas e aceitas como qualquer outra. Um agente pode administrar
-**cada** ação do módulo sem interface através da mesma API que a WebUI usa -
-veja **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** para a superfície de controle completa, e
-[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) para contribuir.
+Seus backups **não ficam presos a este módulo**. Tudo usa formatos padrão
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) que abrem no Windows, macOS e
+Linux com ferramentas comuns ou gerenciadores de arquivos. Todo backup criptografado vem com uma
+nota **RECOVERY** contendo os comandos exatos para descriptografar e extrair num PC.
 
 ## Atualizações incrementais (VDLU)
 
@@ -159,16 +163,15 @@ arquivos que mudaram (blobs endereçados por conteúdo + um `manifest.json` assi
 
 ## Veja também
 
-Projetos irmãos do mesmo autor:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: um depurador de métodos do dispositivo: lê cada item por todos os métodos que conseguem lê-lo e os compara lado a lado.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: seus serviços Google (RCS, Wallet, atestações do Play Integrity), lidos no seu dispositivo sem internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: um spoofer de dispositivo que transforma um fingerprint novo em um perfil coerente e consistente.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: falsificação do fingerprint global do dispositivo / Play Integrity, no dispositivo inteiro com escopo por aplicativo e uma WebUI.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: um daemon SSH independente com root (Dropbear).
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: um motor de autoatualização incremental e sem flash, embarcado em módulos KernelSU/APatch/Magisk.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: seus serviços Google (RCS, Wallet, atestações do Play Integrity), lidos no seu dispositivo sem internet.
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: um instalador sideload com root e sem atrito para APKs únicos, em lote e divididos, com um interruptor para o verificador do Play Protect e falsificação da origem de instalação.
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: um depurador de métodos do dispositivo: lê cada item por todos os métodos que conseguem lê-lo e os compara lado a lado.
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: um motor de autoatualização incremental e sem flash, embarcado em módulos KernelSU/APatch/Magisk.
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: nosso repositório de módulos MMRL/WebUI-X (instale todos eles pelo seu gerenciador de root).
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: um conjunto de dados de fingerprints build.prop de Pixel (fork de @T3SL4).
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: use o Telegram como armazenamento de objetos a partir de uma pequena CLI em Go.
 
 ## Contatos
 

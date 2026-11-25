@@ -207,8 +207,13 @@
   function showToast() { ensureToast(); elToast.hidden = false; }
   function hideToast() { if (elToast) elToast.hidden = true; }
 
+  // A journal whose target is a real number <= 0 is a stale placeholder (e.g. the baseline 0 a
+  // removed stub left behind). It is never a live update, so never render an "updating -> v0" UI.
+  function staleTarget(j) { var t = (j && j.target != null) ? Number(j.target) : null; return t !== null && t <= 0; }
+
   function renderToast(j, opts) {
     ensureToast(); opts = opts || {};
+    if (staleTarget(j)) { hideToast(); return; }   // stale v<=0 placeholder: no-op, stay idle
     var total = Number(j && j.total) || 0, done = Number(j && j.done) || 0;
     var pct = total > 0 ? Math.max(0, Math.min(100, Math.round(done / total * 100))) : 0;
     tr('ttl').textContent = T('updating') + ' ' + (C.module || C.modid) + (j && j.target != null ? ' → v' + j.target : '');
@@ -604,9 +609,12 @@
     ensureBanner();
     return readConfig().then(function (cfg) {
       return readJournal().then(function (j) {
-        lastJournal = j || null;
-        if (j && j.state === 'PENDING_REBOOT') { showBanner(j.target); }
-        else if (j && !isTerminal(j.state)) {
+        // A target<=0 journal is a stale placeholder (removed stub's baseline 0): treat as no
+        // transaction - never banner/resume a bogus v0; let autoUpdate run as a clean idle state.
+        var stale = staleTarget(j);
+        lastJournal = (j && !stale) ? j : null;
+        if (!stale && j && j.state === 'PENDING_REBOOT') { showBanner(j.target); }
+        else if (!stale && j && !isTerminal(j.state)) {
           // non-terminal transaction left by a previous session/boot: offer to resume
           renderToast(j, {
             kind: 'warn',
@@ -614,7 +622,7 @@
             buttons: [{ label: T('resume'), cls: 'pri', on: function () { resume(); } }, { label: T('notNow'), cls: 'ghost', on: hideToast }]
           });
         }
-        if (truthy((cfg.map || {}).auto_on_webui_open) && (!j || isTerminal(j.state))) autoUpdate();
+        if (truthy((cfg.map || {}).auto_on_webui_open) && (stale || !j || isTerminal(j.state))) autoUpdate();
         return j;
       });
     });

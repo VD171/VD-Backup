@@ -42,7 +42,7 @@
 
 ---
 
-## 개요
+## 이유
 
 VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모듈**로, **핵심 기능에는 동반 앱이
 필요 없습니다**: 모듈 자체가 이미 root이므로 "허용"할 대상이 없기 때문입니다. 인기 있는 백업
@@ -85,6 +85,15 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
 - **마이그레이션 (가져오기):** 기존 Neo-Backup 및 Android-DataBackup 백업을, 암호로 암호화된
   것을 포함하여 가져옵니다.
 
+## AI 에이전트
+
+VDBackup은 사람뿐 아니라 AI 어시스턴트와 에이전트에게도 친근하도록 만들어졌습니다. 엔진은
+JSON으로 말하고 (`helper.sh`의 모든 verb는 하나의 JSON 객체를 반환합니다), 코드, 문서, 파일
+구조는 기계 판독을 염두에 두고 배치되었으며, AI 지원 기여도 다른 기여와 똑같이 검토되고
+수용됩니다. 에이전트는 WebUI가 사용하는 것과 동일한 API를 통해 모듈의 **모든** 작업을 헤드리스로
+관리할 수 있습니다, 전체 제어 표면은 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**를, 기여는
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)를 참고하세요.
+
 ## 설치
 
 1. [릴리스](https://github.com/VD171/VD-Backup/releases)에서 최신 `VD-Backup-vX.Y.zip`을
@@ -104,12 +113,9 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
 
 처음이신가요? [사용자 가이드](docs/USER-GUIDE.md)가 설치부터 복원까지 안내합니다.
 
-## 이식성
+## 보안
 
-여러분의 백업은 **이 모듈에 묶이지 않습니다**. 모든 것이 표준 형식
-(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`)을 사용하며, Windows, macOS, Linux에서 흔한
-도구나 파일 관리자로 열 수 있습니다. 암호화된 각 백업에는 PC에서 복호화하고 추출하는 정확한
-명령이 담긴 **RECOVERY** 노트가 함께 제공됩니다.
+VDBackup는 root로 실행되며 앱 데이터와, 선택적으로 자격 증명 및 암호화 암호문구를 다룹니다. 백업에는 민감한 데이터가 포함될 수 있으므로 암호문구로 보호하고 신뢰할 수 있는 곳에 보관하세요. 자격 증명은 저장 시 암호화되어 보관되며 결코 평문으로 저장되지 않고, 암호화는 기기 하드웨어에 묶이지 않으므로 암호화된 백업을 지키는 것은 암호문구입니다. 취약점은 [SECURITY.md](SECURITY.md)에 따라 신고해 주세요.
 
 ## 빌드
 
@@ -117,14 +123,12 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
 정적 바이너리 (`tar`, `zstd`, `lz4`, `rclone`, `rsync`, ssh, `restic`)로 구성됩니다.
 [CONTRIBUTING.md](CONTRIBUTING.md)와 CI 워크플로를 참고하세요.
 
-## AI 친화적
+## 이식성
 
-VDBackup은 사람뿐 아니라 AI 어시스턴트와 에이전트에게도 친근하도록 만들어졌습니다. 엔진은
-JSON으로 말하고 (`helper.sh`의 모든 verb는 하나의 JSON 객체를 반환합니다), 코드, 문서, 파일
-구조는 기계 판독을 염두에 두고 배치되었으며, AI 지원 기여도 다른 기여와 똑같이 검토되고
-수용됩니다. 에이전트는 WebUI가 사용하는 것과 동일한 API를 통해 모듈의 **모든** 작업을 헤드리스로
-관리할 수 있습니다, 전체 제어 표면은 **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**를, 기여는
-[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)를 참고하세요.
+여러분의 백업은 **이 모듈에 묶이지 않습니다**. 모든 것이 표준 형식
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`)을 사용하며, Windows, macOS, Linux에서 흔한
+도구나 파일 관리자로 열 수 있습니다. 암호화된 각 백업에는 PC에서 복호화하고 추출하는 정확한
+명령이 담긴 **RECOVERY** 노트가 함께 제공됩니다.
 
 ## 증분 업데이트 (VDLU)
 
@@ -149,16 +153,15 @@ VD Backup은 **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** �
 
 ## 함께 보기
 
-같은 작성자의 자매 프로젝트:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: 기기 메서드 디버거. 각 항목을 그것을 읽을 수 있는 모든 메서드로 읽어 나란히 비교합니다.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: 여러분의 Google 서비스 (RCS, Wallet, Play Integrity 증명)를 인터넷 없이 기기에서 읽습니다.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: 새 핑거프린트를 일관되고 정합성 있는 프로필로 바꾸는 기기 스푸퍼.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: 전역 기기 핑거프린트 / Play Integrity 위장. 기기 전체에 적용하면서 앱별 범위와 WebUI 를 갖춥니다.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: 독립 실행형 루트 SSH 데몬 (Dropbear).
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: KernelSU/APatch/Magisk 모듈에 내장된, 플래시가 필요 없는 증분 자가 업데이트 엔진.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: 여러분의 Google 서비스 (RCS, Wallet, Play Integrity 증명)를 인터넷 없이 기기에서 읽습니다.
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: 단일, 배치, 분할 APK 를 위한 마찰 없는 root 사이드로드 설치기로, Play Protect 검사기 토글과 설치 출처 위장을 갖추고 있습니다.
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: 기기 메서드 디버거. 각 항목을 그것을 읽을 수 있는 모든 메서드로 읽어 나란히 비교합니다.
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: KernelSU/APatch/Magisk 모듈에 내장된, 플래시가 필요 없는 증분 자가 업데이트 엔진.
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: 우리의 MMRL/WebUI-X 모듈 저장소 (이 모두를 루트 관리자에서 설치하세요).
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: Pixel build.prop 핑거프린트 데이터셋 (@T3SL4 의 포크).
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: 작은 Go CLI 에서 Telegram 을 객체 저장소로 사용하세요.
 
 ## 연락처
 

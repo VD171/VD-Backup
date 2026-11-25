@@ -42,7 +42,7 @@
 
 ---
 
-## Wat het is
+## Waarom
 
 VDBackup is een root-**WebUI-module** die je apps en hun gegevens back-upt en herstelt
 **zonder begeleidende app voor de kernfuncties**: omdat de module al root is, valt er
@@ -89,6 +89,16 @@ bestaande back-ups van Neo-Backup en Android-DataBackup importeren zodat je kunt
 - **Migreren:** importeert bestaande back-ups van Neo-Backup en Android-DataBackup,
   inclusief met wachtwoord versleutelde.
 
+## AI-agents
+
+VDBackup is gebouwd om AI-assistenten en -agenten welkom te heten, niet alleen mensen.
+De engine spreekt JSON (elk `helper.sh`-werkwoord geeft één JSON-object terug), de code,
+documentatie en bestandsstructuur zijn ingericht voor machinaal lezen, en bijdragen met
+AI-hulp worden net als alle andere beoordeeld en geaccepteerd. Een agent kan **elke**
+actie van de module headless beheren via dezelfde API die de WebUI gebruikt, zie
+**[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** voor het volledige besturingsoppervlak, en
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) om bij te dragen.
+
 ## Installatie
 
 1. Download de nieuwste `VD-Backup-vX.Y.zip` van [Releases](https://github.com/VD171/VD-Backup/releases).
@@ -111,12 +121,9 @@ downloads (offline / herstel) -> een full-editie. Zie
 
 Nieuw hier? De [Gebruikershandleiding](docs/USER-GUIDE.md) leidt je van installatie tot herstel.
 
-## Overdraagbaarheid
+## Beveiliging
 
-Je back-ups zitten **niet vast aan deze module**. Alles gebruikt standaardformaten
-(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) die op Windows, macOS en Linux openen met
-gangbare hulpmiddelen of bestandsbeheerders. Elke versleutelde back-up wordt geleverd met
-een **RECOVERY**-notitie met de exacte opdrachten om op een pc te ontsleutelen en uit te pakken.
+VDBackup draait als root en verwerkt je app-gegevens en, optioneel, je inloggegevens en versleutelingswachtwoorden; een back-up kan gevoelige gegevens bevatten, bescherm hem dus met een wachtwoord en bewaar hem op een plek die je vertrouwt. Inloggegevens worden versleuteld opgeslagen in rust, nooit in platte tekst, en de versleuteling is nooit gebonden aan de hardware van het apparaat, dus het wachtwoord is wat een versleutelde back-up beschermt. Meld een kwetsbaarheid volgens [SECURITY.md](SECURITY.md).
 
 ## Bouwen
 
@@ -124,15 +131,12 @@ De module is shell + WebUI plus statische binaries per ABI (`tar`, `zstd`, `lz4`
 `rclone`, `rsync`, ssh, `restic`) gebouwd voor `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Zie [CONTRIBUTING.md](CONTRIBUTING.md) en de CI-workflows.
 
-## AI-vriendelijk
+## Overdraagbaarheid
 
-VDBackup is gebouwd om AI-assistenten en -agenten welkom te heten, niet alleen mensen.
-De engine spreekt JSON (elk `helper.sh`-werkwoord geeft één JSON-object terug), de code,
-documentatie en bestandsstructuur zijn ingericht voor machinaal lezen, en bijdragen met
-AI-hulp worden net als alle andere beoordeeld en geaccepteerd. Een agent kan **elke**
-actie van de module headless beheren via dezelfde API die de WebUI gebruikt, zie
-**[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** voor het volledige besturingsoppervlak, en
-[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) om bij te dragen.
+Je back-ups zitten **niet vast aan deze module**. Alles gebruikt standaardformaten
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) die op Windows, macOS en Linux openen met
+gangbare hulpmiddelen of bestandsbeheerders. Elke versleutelde back-up wordt geleverd met
+een **RECOVERY**-notitie met de exacte opdrachten om op een pc te ontsleutelen en uit te pakken.
 
 ## Incrementele updates (VDLU)
 
@@ -160,16 +164,15 @@ downgrades worden geblokkeerd; de volledige `.zip` blijft geldig als terugval.
 
 ## Zie ook
 
-Zusterprojecten van dezelfde auteur:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: een debugger voor apparaatmethoden: leest elk item via elke methode die het kan lezen en vergelijkt ze naast elkaar.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: je Google-diensten (RCS, Wallet, Play Integrity-attestaties), op je apparaat gelezen zonder internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: een apparaatspoofer die een verse fingerprint omzet in een coherent, consistent profiel.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: spoofing van de globale apparaat-fingerprint / Play Integrity, apparaatbreed met bereik per app en een WebUI.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: een op zichzelf staande geroote SSH-daemon (Dropbear).
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: een flashloze, incrementele zelfupdate-engine, ingebed in KernelSU/APatch/Magisk-modules.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: je Google-diensten (RCS, Wallet, Play Integrity-attestaties), op je apparaat gelezen zonder internet.
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: een wrijvingsloze root-sideload-installer voor losse, batch- en split-APK's, met een Play Protect-verifier-schakelaar en vervalsing van de installatiebron.
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: een debugger voor apparaatmethoden: leest elk item via elke methode die het kan lezen en vergelijkt ze naast elkaar.
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: een flashloze, incrementele zelfupdate-engine, ingebed in KernelSU/APatch/Magisk-modules.
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: onze MMRL/WebUI-X-module-repository (installeer deze allemaal vanuit je root-manager).
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: een dataset van Pixel-build.prop-fingerprints (fork van @T3SL4).
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: gebruik Telegram als objectopslag vanuit een kleine Go-CLI.
 
 ## Contacten
 

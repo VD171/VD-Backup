@@ -411,6 +411,15 @@ case "$verb" in
     _sd="$("$JQ" -r '.staging_dir // empty' "$STATE/config.json" 2>/dev/null)"; case "$_sd" in /*) : ;; *) _sd=/data/local/tmp ;; esac
     rm -rf "$_sd/.vdstage" /data/local/tmp/.vdstage 2>/dev/null
     rm -f "$STATE/apply.busy" 2>/dev/null   # VDLU apply-busy: a -9'd op can leave this; clear at boot so the boot update is not wrongly deferred
+    # issue #5: a -9 kill during install/restore skips verifier_restore, leaving the device package
+    # verifier disabled for good. A surviving snapshot means no clean restore ran; put the user's
+    # ORIGINAL verifier settings back (exactly, leaving absent when they were absent) and drop it.
+    if [ -f "$STATE/verifier.snap" ]; then
+      _vq="$(sed -n 1p "$STATE/verifier.snap" 2>/dev/null)"; _vp="$(sed -n 2p "$STATE/verifier.snap" 2>/dev/null)"
+      case "$_vq" in ""|null|"null") : ;; *) env -u LD_LIBRARY_PATH /system/bin/settings put global verifier_verify_adb_installs "$_vq" 2>/dev/null ;; esac
+      case "$_vp" in ""|null|"null") : ;; *) env -u LD_LIBRARY_PATH /system/bin/settings put global package_verifier_enable "$_vp" 2>/dev/null ;; esac
+      rm -f "$STATE/verifier.snap" 2>/dev/null
+    fi
     _r=0
     for _d in /data/media/*/VDBackup/*/[0-9]*Z_[0-9]*; do
       [ -d "$_d" ] || continue
@@ -542,7 +551,7 @@ case "$verb" in
       LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" /system/bin \
         ru.vd171.vdbackup.Helper icon "$pkg" "$png" "$u" >/dev/null 2>&1
     fi
-    if [ -s "$png" ]; then ok "\"package\":\"$(jstr "$pkg")\",\"icon\":\"$(base64 -w0 < "$png")\""
+    if [ -s "$png" ]; then ok "\"package\":\"$(jstr "$pkg")\",\"icon\":\"$(base64 < "$png" | tr -d '\n')\""
     else err ERR_ICON "no icon"; fi ;;
 
   icons)
@@ -575,7 +584,7 @@ case "$verb" in
       case "$vc" in ''|*[!0-9]*) vc=0 ;; esac
       png="$STATE/iconcache/$pkg-$vc.png"; [ -s "$png" ] || continue
       [ "$first" = 1 ] || printf ','; first=0
-      printf '"%s":"%s"' "$(jstr "$pkg")" "$(base64 -w0 < "$png")"
+      printf '"%s":"%s"' "$(jstr "$pkg")" "$(base64 < "$png" | tr -d '\n')"
     done
     printf '}}\n' ;;
 
@@ -1024,17 +1033,28 @@ EOF
     _a="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
     u="$(printf '%s' "$_a" | "$JQ" -r '.user // 0' 2>/dev/null)"; case "$u" in ''|*[!0-9]*) u=0 ;; esac
     bk="$(bdir "$u")"
-    apps=0; insts=0
-    for d in "$bk"/*/; do
-      [ -d "$d" ] || continue
-      case "$d" in "$bk"/.paths/) continue ;; esac
-      _c=0; for s in "$d"*/; do [ -d "$s" ] && _c=$(( _c + 1 )); done
-      [ "$_c" -gt 0 ] || continue
-      apps=$(( apps + 1 )); insts=$(( insts + _c ))
+    # Count across EVERY backup root (internal store + each configured local destination), exactly
+    # like list-backups: a backup sent to a local dest lives there, not in the internal store, so
+    # counting only bdir reported 0 for a user whose backups sit on an SD/USB local dest (issue #34).
+    # apps is de-duplicated by package (an app backed up to two roots is one app, N instances).
+    apps=0; insts=0; paths=0; size=0
+    _ovapps="$STATE/staging/overview.$$.apps"; mkdir -p "$STATE/staging"; : > "$_ovapps"
+    for _r in $(backup_roots "$u"); do          # roots are validated, newline-separated, no spaces
+      [ -d "$_r" ] || continue
+      for d in "$_r"/*/; do
+        [ -d "$d" ] || continue
+        case "$d" in "$_r"/.paths/) continue ;; esac
+        _c=0; for s in "$d"*/; do [ -d "$s" ] && _c=$(( _c + 1 )); done
+        [ "$_c" -gt 0 ] || continue
+        insts=$(( insts + _c )); _b="${d%/}"; printf '%s\n' "${_b##*/}" >> "$_ovapps"
+      done
+      for d in "$_r"/.paths/*/; do [ -d "$d" ] && paths=$(( paths + 1 )); done
+      _sk="$(du -sk "$_r" 2>/dev/null | cut -f1)"; case "$_sk" in ''|*[!0-9]*) _sk=0 ;; esac
+      size="$("$JQ" -n "${size:-0} + ${_sk:-0} * 1024")"   # toybox du: -k (KiB), never -B
     done
-    paths=0; for d in "$bk"/.paths/*/; do [ -d "$d" ] && paths=$(( paths + 1 )); done
+    apps="$(sort -u "$_ovapps" 2>/dev/null | grep -c .)"; case "$apps" in ''|*[!0-9]*) apps=0 ;; esac
+    rm -f "$_ovapps"
     jobs=0; for f in "$STATE/jobs"/*.json; do [ -f "$f" ] && jobs=$(( jobs + 1 )); done
-    size=0; if [ -d "$bk" ]; then _sk="$(du -sk "$bk" 2>/dev/null | cut -f1)"; case "$_sk" in ''|*[!0-9]*) _sk=0 ;; esac; size="$("$JQ" -n "${_sk:-0} * 1024")"; fi   # toybox du: -k (KiB), never -B
     _dfp="$bk"; [ -d "$_dfp" ] || _dfp="/data/media/$u"; [ -d "$_dfp" ] || _dfp=/data
     free=0; total=0
     set -- $(df -kP "$_dfp" 2>/dev/null | tail -1)

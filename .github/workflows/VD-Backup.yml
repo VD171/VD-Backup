@@ -50,19 +50,14 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}   # authenticate the mtproto-store release lookup (unauth API rate-limits on shared runner IPs -> curl 22)
         run: bash .github/scripts/build_bin.sh
 
-      # Supply-chain gate: never ship a release without per-ABI provenance. The v1.04
-      # payload went out without it because that build was done by hand (bypassing
-      # build_bin.sh); this fails the release if any bundled ABI lacks PROVENANCE.json.
-      - name: Verify provenance present
-        run: |
-          set -e
-          miss=0
-          for d in module/bin/*/; do
-            b="$(basename "$d")"; [ "$b" = "lib" ] && continue
-            if [ ! -s "${d}PROVENANCE.json" ]; then echo "::error::missing PROVENANCE.json in $d"; miss=1; fi
-          done
-          [ "$miss" = 0 ] || { echo "Refusing to release binaries without provenance."; exit 1; }
-          echo "provenance present for every bundled ABI"
+      # Supply-chain gate (STANDARDS 8, vendored kit guard): never ship a release without
+      # per-ABI provenance. The v1.04 payload went out without it because that build was done
+      # by hand (bypassing build_bin.sh). provenance-check fails the release if any bundled
+      # binary under module/bin/<abi>/ lacks a PROVENANCE.json beside it that NAMES it. It runs
+      # right after build_bin.sh, which writes bin/<abi>/PROVENANCE.json (source + sha256 of
+      # every shipped file) for every ABI, so a clean build passes and a hand-made one fails.
+      - name: Verify binary provenance (kit guard)
+        run: sh .github/scripts/provenance-check.sh module
 
       - name: Set up JDK 17
         uses: actions/setup-java@v6
@@ -226,33 +221,17 @@ jobs:
             sh .github/scripts/gen-sha256.sh "_m_$abi"
             ( cd "_m_$abi" && zip -r9 "../VD-Backup-${VER}-$abi-full.zip" . -x 'bin/*/.gitkeep' )
           done
-          # 7. mmrl-stub: a minimal module (VDLU engine + a static curl + the install scaffolding)
-          # that fits under the MMRL ~50 MB install cap; on first boot it fetches the full module
-          # via VDLU and applies it in place. No baseline, so the engine does a from:0 fetch of the
-          # universal-full tree. See stub/README.md (and its note on a future lite/per-ABI feed).
-          rm -rf _m_stub && mkdir -p _m_stub/bin
-          cp module/module.prop _m_stub/module.prop
-          cp stub/customize.sh _m_stub/customize.sh
-          cp stub/service.sh _m_stub/service.sh
-          cp -a module/vdlu _m_stub/vdlu
-          rm -f _m_stub/vdlu/RELEASE.md
-          # from:0 baseline so the engine sees nothing installed and fetches the whole tree on
-          # first boot. WITHOUT this the engine reads the stub's module.prop (the real versionCode)
-          # as the current version, decides it is already up to date, and never fetches - validated
-          # on-device. The baseline is not signature-checked (it is copied straight to current.json).
-          printf '%s' '{"schema":1,"module":"vdbackup","version":0,"version_name":"0","channel":"stable","engine_min":3,"files":[],"delete":[]}' > _m_stub/vdlu/baseline.json
-          [ -d module/META-INF ] && cp -a module/META-INF _m_stub/META-INF
-          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-            [ -x "module/bin/$abi/curl" ] || { echo "stub: no curl for $abi"; exit 1; }
-            mkdir -p "_m_stub/bin/$abi"
-            cp "module/bin/$abi/curl" "_m_stub/bin/$abi/curl"
-            [ -d "module/bin/$abi/lib" ] && cp -a "module/bin/$abi/lib" "_m_stub/bin/$abi/lib"
-          done
-          sh .github/scripts/gen-sha256.sh _m_stub
-          ( cd _m_stub && zip -r9 "../VD-Backup-${VER}-mmrl-stub.zip" . )
-          _stubsz=$(stat -c%s "VD-Backup-${VER}-mmrl-stub.zip")
-          echo "mmrl-stub zip: $_stubsz bytes ($((_stubsz/1048576)) MiB)"
-          [ "$_stubsz" -lt 52428800 ] || { echo "ERROR: mmrl-stub exceeds the 50 MiB MMRL cap ($_stubsz bytes)"; exit 1; }
+
+      # STANDARDS 8 (vendored kit guard): a flashable zip must never ship an orphan
+      # `<file>.sha256` whose target file was dropped by the `zip -x`. On-device the
+      # mandatory sha256-gate would then abort the ENTIRE flash. zip-orphan-check reads
+      # the FINAL artifacts, so a bad prune fails here in CI instead of on a user device.
+      - name: Check release zips for orphan .sha256 companions
+        env:
+          VER: ${{ steps.v.outputs.name }}
+        run: |
+          command -v unzip >/dev/null 2>&1 || sudo apt-get install -y unzip
+          sh .github/scripts/zip-orphan-check.sh VD-Backup-${VER}-*.zip
 
       # Fill update.json size/sha256 from the built universal-full zip + the release
       # notes, so the in-app update-check verb can show download size and what is new.
@@ -294,16 +273,15 @@ jobs:
           gen x86-full         update-x86.json
           gen x86_64-full      update-x86_64.json
 
-      # MMRL: the MMRL client caps installs at 50MB, which the universal-lite (~62MB) exceeds, so
-      # it cannot install VDBackup directly. Point update-mmrl.json at the mmrl-stub zip (<50MB):
-      # it installs under the cap and fetches the full module via the signed VDLU feed on first
-      # boot (see stub/README.md), while the in-app update.json stays on the full zip.
-      - name: Fill update-mmrl.json (MMRL stub, under the 50MB client cap)
+      # MMRL: the client has no 50MB install cap (confirmed against the official MMRL repo), so the
+      # feed serves the universal-lite directly - smaller footprint, cloud binaries (rclone/restic)
+      # fetched on demand via the signed VDLU feed. The in-app update.json stays on the full zip.
+      - name: Fill update-mmrl.json (universal-lite channel)
         env:
           VER: ${{ steps.v.outputs.name }}
         run: |
           set -e
-          zip="VD-Backup-${VER}-mmrl-stub.zip"
+          zip="VD-Backup-${VER}-universal-lite.zip"
           sz=$(stat -c%s "$zip")
           sh=$(sha256sum "$zip" | cut -d' ' -f1)
           url="https://github.com/VD171/VD-Backup/releases/download/${VER}/${zip}"
@@ -364,7 +342,6 @@ jobs:
             "VD-Backup-${VER}-armeabi-v7a-full.zip" \
             "VD-Backup-${VER}-x86-full.zip" \
             "VD-Backup-${VER}-x86_64-full.zip" \
-            "VD-Backup-${VER}-mmrl-stub.zip" \
             assets-${VER}-*.tar.zst \
             --title "VDBackup ${VER}" \
             --notes-file release-notes.md

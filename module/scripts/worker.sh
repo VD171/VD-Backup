@@ -520,10 +520,21 @@ deep_spoof_installer() {   # <pkg> <installer-pkg>
 VERIFIER_OLD=""
 PKGVERIF_OLD=""
 verifier_off() {
-  VERIFIER_OLD="$(fw settings get global verifier_verify_adb_installs 2>/dev/null)"
+  # Recover the TRUE pre-disable values from a surviving snapshot (a prior op was -9 killed before
+  # its restore ran, so the live settings are already the disabled 0 and reading them now would lose
+  # the original); otherwise snapshot the live values and PERSIST them, so the boot-sweep can put
+  # them back if THIS op is killed before verifier_restore runs (issue #5: an uncatchable kill
+  # otherwise leaves the device package verifier disabled for good).
+  if [ -f "$STATE/verifier.snap" ]; then
+    VERIFIER_OLD="$(sed -n 1p "$STATE/verifier.snap" 2>/dev/null)"
+    PKGVERIF_OLD="$(sed -n 2p "$STATE/verifier.snap" 2>/dev/null)"
+  else
+    VERIFIER_OLD="$(fw settings get global verifier_verify_adb_installs 2>/dev/null)"
+    PKGVERIF_OLD="$(fw settings get global package_verifier_enable 2>/dev/null)"
+    printf '%s\n%s\n' "$VERIFIER_OLD" "$PKGVERIF_OLD" > "$STATE/verifier.snap" 2>/dev/null
+  fi
   fw settings put global verifier_verify_adb_installs 0 2>/dev/null
   # also silence the Play Protect scan around the install (Swift Backup does both)
-  PKGVERIF_OLD="$(fw settings get global package_verifier_enable 2>/dev/null)"
   fw settings put global package_verifier_enable 0 2>/dev/null
 }
 verifier_restore() {
@@ -531,11 +542,16 @@ verifier_restore() {
   # (a 0/1 where there was none is itself a tell on a stealth device).
   case "$VERIFIER_OLD" in ""|null|"null") : ;; *) fw settings put global verifier_verify_adb_installs "$VERIFIER_OLD" 2>/dev/null ;; esac
   case "$PKGVERIF_OLD" in ""|null|"null") : ;; *) fw settings put global package_verifier_enable "$PKGVERIF_OLD" 2>/dev/null ;; esac
+  rm -f "$STATE/verifier.snap" 2>/dev/null   # clean restore ran: no stale snapshot for the boot-sweep to act on
   VERIFIER_OLD=""; PKGVERIF_OLD=""
 }
 # wait for the freshly installed app's data dir to exist before chown (it may lag
 # a moment after install-commit; without this the chown is silently skipped).
-wait_datadir() { _w=0; while [ "$_w" -lt 25 ]; do [ -d "$1" ] && return 0; exec_ns sleep 0.2 2>/dev/null; _w=$((_w+1)); done; }
+# Wait for the package manager to (re)create an app's data dir after install, so the live uid and
+# SELinux context can be read before we chown the restored tree onto it. A large app on a slow
+# device can take well over 5s; 15s avoids a race that left LIVEU=0 and the data root-owned and
+# unreadable by the app (issue #5). Returns 1 if the dir never appears, so callers can tell.
+wait_datadir() { _w=0; while [ "$_w" -lt 75 ]; do [ -d "$1" ] && return 0; exec_ns sleep 0.2 2>/dev/null; _w=$((_w+1)); done; return 1; }
 # install_ok <op>: after a restore's APK-install step, the package must actually be installed for
 # $U - otherwise we would chown/restore data into a package that is not there. Fail ERR_INSTALL
 # instead (restore() already does this inline; snapshot/mirror/import did not).
@@ -558,7 +574,8 @@ install_ok() {
 remap_restored() {   # <type> <target>
   case "$1" in
     data|data_de)
-      [ "${LIVEU:-0}" != 0 ] && exec_ns chown -hR "$LIVEU:$LIVEG" "$2" 2>/dev/null
+      if [ "${LIVEU:-0}" != 0 ]; then exec_ns chown -hR "$LIVEU:$LIVEG" "$2" 2>/dev/null
+      else audit "remap: live uid unresolved for $PKG ($1); data left root-owned, app may not read it"; fi
       case "$LIVECTX" in
         *:object_r:*:c[0-9]*) exec_ns chcon -R "$LIVECTX" "$2" 2>/dev/null || exec_ns restorecon -R "$2" 2>/dev/null ;;
         *) exec_ns restorecon -R "$2" 2>/dev/null ;;
@@ -775,6 +792,21 @@ companion_resdir() {                        # echo an app-writable result dir (i
   exec_ns restorecon "$_d" 2>/dev/null
   printf '%s' "$_d"
 }
+# Hand a root-created node inside the companion sandbox to the app uid: owner, a mode the app
+# can use, and the app's LIVE SELinux context (its per-app MCS categories). A plain restorecon
+# applies only the base app_data_file label, and a root-created node keeps root ownership plus an
+# ambient-umask mode, so the untrusted_app companion cannot traverse or read it (issue #24). Same
+# chcon-to-live-context idea as remap_restored.
+companion_own() {                           # <path> <mode>
+  _co_au="$(stat -c %u "/data/data/$COMPANION_PKG" 2>/dev/null)"
+  _co_ctx="$(exec_ns ls -Zd "/data/data/$COMPANION_PKG" 2>/dev/null | cut -d' ' -f1)"
+  case "$_co_au" in ''|*[!0-9]*) : ;; *) exec_ns chown "$_co_au:$_co_au" "$1" 2>/dev/null ;; esac
+  exec_ns chmod "$2" "$1" 2>/dev/null
+  case "$_co_ctx" in
+    *:object_r:*:c[0-9]*) exec_ns chcon "$_co_ctx" "$1" 2>/dev/null || exec_ns restorecon "$1" 2>/dev/null ;;
+    *) exec_ns restorecon "$1" 2>/dev/null ;;
+  esac
+}
 drive_cmd() {                               # drive_cmd <op> [extra -e args...] -> prints result JSON
   _op="$1"; shift
   _drv="$(companion_resdir)"; _res="$_drv/res.$OPID.$$"
@@ -964,13 +996,11 @@ transfer_full() {
             _pfx="$(remote_pfx)/$PKG/${TS}_${VC}"
             # the companion runs as its own app uid and cannot read /data/adb; stage
             # each archive into its sandbox (app-readable), upload, then remove it.
-            _stg="$(companion_resdir)/up.$OPID"; exec_ns mkdir -p "$_stg"
-            _cau="$(stat -c %u "/data/data/$COMPANION_PKG" 2>/dev/null)"
+            _stg="$(companion_resdir)/up.$OPID"; exec_ns mkdir -p "$_stg"; companion_own "$_stg" 0700
             for _f in "$DEST"/*; do [ -f "$_f" ] || continue
               _b="$(basename "$_f")"; _sf="$_stg/$_b"
               exec_ns cp "$_f" "$_sf" || { exec_ns rm -rf "$_stg"; audit "gdrive stage failed $_b"; finish false ERR_DRIVE_UPLOAD; return 1; }
-              case "$_cau" in ''|*[!0-9]*) : ;; *) exec_ns chown "$_cau:$_cau" "$_sf" 2>/dev/null ;; esac
-              exec_ns chmod 0644 "$_sf" 2>/dev/null; exec_ns restorecon "$_sf" 2>/dev/null
+              companion_own "$_sf" 0644
               _dr="$(drive_cmd upload -e src "$_sf" -e name "$_pfx/$_b")"
               drive_ok "$_dr" \
                 || { exec_ns rm -rf "$_stg"; audit "gdrive upload failed $_b: $(drive_err "$_dr")"; finish false ERR_DRIVE_UPLOAD; return 1; }
@@ -1144,7 +1174,7 @@ backup() {
       PLAN="$(printf '%s' "$PLAN" | "$JQ" --arg t "$1" --arg p "$2" --argjson b "$sz" '. + [{type:$t,path:$p,bytes:$b}]')"; }
     if echo " $ITEMS " | grep -q ' apk '; then
       asz=0; for p in $(fw pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do
-        s="$(stat -c %s "$p" 2>/dev/null || echo 0)"; asz=$((asz+s)); done
+        s="$(stat -c %s "$p" 2>/dev/null || echo 0)"; asz="$(nsum "$asz" "$s")"; done
       PLAN="$(printf '%s' "$PLAN" | "$JQ" --argjson b "$asz" '. + [{type:"apk",path:"(installed base + splits)",bytes:$b}]')"
     fi
     echo " $ITEMS " | grep -q ' data '     && add_plan data     "/data/user/$U/$PKG"
@@ -1194,7 +1224,7 @@ backup() {
     _ic="$STATE/staging/ic.$OPID.png"
     LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" /system/bin \
       ru.vd171.vdbackup.Helper icon "$PKG" "$_ic" "$U" >/dev/null 2>&1
-    [ -s "$_ic" ] && ICON_B64="$(base64 -w0 < "$_ic")"
+    [ -s "$_ic" ] && ICON_B64="$(base64 < "$_ic" | tr -d '\n')"
     rm -f "$_ic"
   fi
 
@@ -1263,16 +1293,16 @@ backup() {
     else
       { exec_ns "$TAR" $TARC $EXCL -C "$parent" -c "$base" 2>/dev/null || { _tc=$?; [ "$_tc" -gt 1 ] && echo "$_tc" > "$DEST/.trc"; }; } | comp "$COMP" > "$out"
     fi
-    [ -f "$DEST/.trc" ] && { audit "backup tar aborted (exit $(cat "$DEST/.trc" 2>/dev/null)) $typ $PKG"; rm -f "$DEST/.trc"; finish false ERR_BACKUP; return 1; }
+    [ -f "$DEST/.trc" ] && { audit "backup tar aborted (exit $(cat "$DEST/.trc" 2>/dev/null)) $typ $PKG"; rm -f "$DEST/.trc"; finish false ERR_BACKUP_TAR; return 1; }
     # completeness check: GNU tar may exit 1 on live data (file changed) which is
     # fine, so we cannot trust the pipeline rc; instead confirm the written archive
     # reads back as a complete tar (catches a truncated write: disk full, interrupt).
     if [ "$enc" = age ]; then
       dec_age "$out" 2>/dev/null | { case "$COMP" in gzip) "$GZIP" -dc ;; lz4) "$ZSTD" -dq --format=lz4 -c ;; none) cat ;; *) "$ZSTD" -dqc ;; esac; } | exec_ns "$TAR" -t >/dev/null 2>&1 \
-        || { audit "backup archive incomplete $typ $PKG"; finish false ERR_BACKUP; return 1; }
+        || { audit "backup archive incomplete $typ $PKG"; finish false ERR_BACKUP_INCOMPLETE; return 1; }
     else
       decomp "$out" | exec_ns "$TAR" -t >/dev/null 2>&1 \
-        || { audit "backup archive incomplete $typ $PKG"; finish false ERR_BACKUP; return 1; }
+        || { audit "backup archive incomplete $typ $PKG"; finish false ERR_BACKUP_INCOMPLETE; return 1; }
     fi
     stored="$(stat -c %s "$out" 2>/dev/null || echo 0)"
     sha="$(sha256sum "$out" 2>/dev/null | cut -d' ' -f1)"
@@ -1316,11 +1346,11 @@ backup() {
       name="$(basename "$p")"
       if use_apk_age; then
         "$ZSTD" -q "-$APKLEVEL" -c "$p" | enc_age "$DEST/${name}.zst.age" \
-          || { audit "backup apk write failed $PKG ($name)"; finish false ERR_BACKUP; return; }
+          || { audit "backup apk write failed $PKG ($name)"; finish false ERR_BACKUP_APK; return; }
         an="${name}.zst.age"
       else
         "$ZSTD" -q "-$APKLEVEL" -c "$p" > "$DEST/${name}.zst" \
-          || { audit "backup apk write failed $PKG ($name)"; finish false ERR_BACKUP; return; }
+          || { audit "backup apk write failed $PKG ($name)"; finish false ERR_BACKUP_APK; return; }
         an="${name}.zst"
       fi
       APKS="$(printf '%s' "$APKS" | "$JQ" --arg a "$an" '. + [$a]')"
@@ -1464,6 +1494,9 @@ backup() {
       vi=$((vi+1))
       { [ -z "$varc" ] || [ -z "$vwant" ]; } && continue
       vgot="$(sha256sum "$DEST/$varc" 2>/dev/null | cut -d' ' -f1)"
+      # a killed/short sha read yields an empty hash; re-read once from disk before calling it a
+      # mismatch, so transient resource pressure never fakes a corruption (issue #5).
+      [ -n "$vgot" ] || vgot="$(sha256sum "$DEST/$varc" 2>/dev/null | cut -d' ' -f1)"
       [ "$vgot" = "$vwant" ] || VERR="$VERR $varc"
     done
     if [ -n "$VERR" ]; then audit "verify FAILED $PKG:$VERR"; finish false ERR_VERIFY; return; fi
@@ -1591,6 +1624,11 @@ do_restore_mirror() {
   prog 70 extracting "$PKG"
   _mfail=0
   restore_one() { # <label> <dst>
+    # Gate ONLY on the component dir's presence, never on it being non-empty. A present-but-empty
+    # component is legitimate (the live source was empty at backup time, and a failed mirror backup
+    # finishes false instead of being kept), so Mirror must still run rsync --delete to empty the
+    # live dir and keep its 1:1 contract. An ABSENT component (source did not exist at backup) is
+    # skipped. Do NOT add a non-empty guard here: it silently retains stale live data (issue #34).
     [ -d "$SRC/$1" ] || return 0
     mkdir -p "$2"
     exec_ns "$RSYNC" -a --delete "$SRC/$1/" "$2/" >/dev/null 2>&1 || { _mfail=1; audit "restore-mirror rsync failed $PKG ($1)"; }
@@ -2239,7 +2277,7 @@ do_special_backup() {
   rm -f "$IFILE"
   sha256sum "$DEST/manifest.json" | cut -d' ' -f1 > "$DEST/manifest.json.sha256"
   media_own -R "$DEST"
-  [ -s "$DEST/manifest.json" ] || { finish false ERR_BACKUP; return; }
+  [ -s "$DEST/manifest.json" ] || { finish false ERR_BACKUP_INCOMPLETE; return; }
   audit "special-backup done $CATS -> $DEST"; notify backup_done "special"
   finish true ERR_NONE
 }
@@ -2338,7 +2376,9 @@ do_cloud_fetch() {
   while kill -0 "$_cpid" 2>/dev/null; do
     if [ "$_total" -gt 0 ] && [ -f "$_tmp" ]; then
       _sz="$(stat -c%s "$_tmp" 2>/dev/null || echo 0)"
-      _pct=$(( 10 + 70 * _sz / _total )); [ "$_pct" -gt 80 ] && _pct=80
+      # jq (64-bit) not mksh $(( )): a lite cloud addon is ~60 MB and 70*_sz overflows 32-bit
+      _pct="$("$JQ" -n "(10 + 70 * ${_sz:-0} / $_total)|floor" 2>/dev/null)"
+      case "$_pct" in ''|*[!0-9]*) _pct=10 ;; *) [ "$_pct" -gt 80 ] && _pct=80 ;; esac
       prog "$_pct" downloading "cloud"
     fi
     sleep 1
@@ -2391,18 +2431,18 @@ do_path_backup() {
   prog 20 archiving "path"
   if use_data_age; then enc=age; arc="$arc.age"
     exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" | enc_age "$DEST/$arc" \
-      || { audit "path-backup archive failed $SRCP"; finish false ERR_BACKUP; return; }
+      || { audit "path-backup archive failed $SRCP"; finish false ERR_BACKUP_TAR; return; }
   else
     exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" > "$DEST/$arc" \
-      || { audit "path-backup archive failed $SRCP"; finish false ERR_BACKUP; return; }
+      || { audit "path-backup archive failed $SRCP"; finish false ERR_BACKUP_TAR; return; }
   fi
   # completeness check: the written archive reads back as a full tar (catches truncation)
   if [ "$enc" = age ]; then
     dec_age "$DEST/$arc" | { case "$COMP" in gzip) "$GZIP" -dc ;; lz4) "$ZSTD" -dq --format=lz4 -c ;; none) cat ;; *) "$ZSTD" -dqc ;; esac; } | exec_ns "$TAR" -t >/dev/null 2>&1 \
-      || { audit "path-backup incomplete $SRCP"; finish false ERR_BACKUP; return; }
+      || { audit "path-backup incomplete $SRCP"; finish false ERR_BACKUP_INCOMPLETE; return; }
   else
     decomp "$DEST/$arc" | exec_ns "$TAR" -t >/dev/null 2>&1 \
-      || { audit "path-backup incomplete $SRCP"; finish false ERR_BACKUP; return; }
+      || { audit "path-backup incomplete $SRCP"; finish false ERR_BACKUP_INCOMPLETE; return; }
   fi
   sha="$(sha256sum "$DEST/$arc" 2>/dev/null | cut -d' ' -f1)"
   prog 90 manifest "path"
@@ -2419,7 +2459,7 @@ do_path_backup() {
   sha256sum "$DEST/manifest.json" | cut -d' ' -f1 > "$DEST/manifest.json.sha256"
   use_data_age && cp "$MODDIR/etc/RECOVERY.md" "$DEST/RECOVERY.md" 2>/dev/null
   media_own -R "$DEST"
-  [ -s "$DEST/manifest.json" ] || { finish false ERR_BACKUP; return; }
+  [ -s "$DEST/manifest.json" ] || { finish false ERR_BACKUP_INCOMPLETE; return; }
   # reuse the full-backup transfer path (namespaced under .paths/<sanitized>)
   PKG=".paths/$SAFE"; VC="$TS"
   prog 95 transfer "path"; transfer_full || return
@@ -2542,12 +2582,12 @@ do_adb_backup() {
   prog 20 archiving "adb"
   if use_data_age; then enc=age; arc="$arc.age"
     { exec_ns "$TAR" $TARC -C /data/adb --exclude-from="$_exl" -c -T "$_lst" 2>/dev/null || { _tc=$?; [ "$_tc" -gt 1 ] && echo "$_tc" > "$_trc"; }; } | comp "$COMP" | enc_age "$DEST/$arc" \
-      || { audit "adb-backup archive failed"; rm -f "$_lst" "$_exl" "$_trc"; finish false ERR_BACKUP; return; }
+      || { audit "adb-backup archive failed"; rm -f "$_lst" "$_exl" "$_trc"; finish false ERR_BACKUP_TAR; return; }
   else
     { exec_ns "$TAR" $TARC -C /data/adb --exclude-from="$_exl" -c -T "$_lst" 2>/dev/null || { _tc=$?; [ "$_tc" -gt 1 ] && echo "$_tc" > "$_trc"; }; } | comp "$COMP" > "$DEST/$arc" \
-      || { audit "adb-backup archive failed"; rm -f "$_lst" "$_exl" "$_trc"; finish false ERR_BACKUP; return; }
+      || { audit "adb-backup archive failed"; rm -f "$_lst" "$_exl" "$_trc"; finish false ERR_BACKUP_TAR; return; }
   fi
-  [ -f "$_trc" ] && { audit "adb-backup: tar aborted (exit $(cat "$_trc" 2>/dev/null)), archive incomplete"; rm -f "$_lst" "$_exl" "$_trc"; finish false ERR_BACKUP; return; }
+  [ -f "$_trc" ] && { audit "adb-backup: tar aborted (exit $(cat "$_trc" 2>/dev/null)), archive incomplete"; rm -f "$_lst" "$_exl" "$_trc"; finish false ERR_BACKUP_TAR; return; }
   prog 80 manifest "adb"
   # verbose index; this read-back doubles as the completeness check (a truncated archive fails tar)
   if [ "$enc" = age ]; then
@@ -2555,7 +2595,7 @@ do_adb_backup() {
   else decomp "$DEST/$arc" | exec_ns "$TAR" -tv > "$DEST/index.txt" 2>/dev/null; _irc=$?; fi
   # gate on the readback tar's exit (last in the pipe, so its status survives pipefail-off): a
   # truncated archive makes tar -tv fail, which a non-empty-index check alone would pass as success.
-  { [ "$_irc" -eq 0 ] && [ -s "$DEST/index.txt" ]; } || { audit "adb-backup incomplete/index failed"; rm -f "$_lst" "$_exl"; finish false ERR_BACKUP; return; }
+  { [ "$_irc" -eq 0 ] && [ -s "$DEST/index.txt" ]; } || { audit "adb-backup incomplete/index failed"; rm -f "$_lst" "$_exl"; finish false ERR_BACKUP_INCOMPLETE; return; }
   "$GZIP" -f "$DEST/index.txt" 2>/dev/null
   sha="$(sha256sum "$DEST/$arc" 2>/dev/null | cut -d' ' -f1)"
   _paths="$("$JQ" -R -s -c 'split("\n")|map(select(length>0))' < "$_lst")"
@@ -2570,7 +2610,7 @@ do_adb_backup() {
   sha256sum "$DEST/manifest.json" | cut -d' ' -f1 > "$DEST/manifest.json.sha256"
   use_data_age && cp "$MODDIR/etc/RECOVERY.md" "$DEST/RECOVERY.md" 2>/dev/null
   media_own -R "$DEST"; rm -f "$_lst" "$_exl" "$_trc"
-  [ -s "$DEST/manifest.json" ] || { finish false ERR_BACKUP; return; }
+  [ -s "$DEST/manifest.json" ] || { finish false ERR_BACKUP_INCOMPLETE; return; }
   PKG=".adb/$TS"; VC="$TS"
   prog 95 transfer "adb"; transfer_full || return
   audit "adb-backup done -> $DEST ($_mode)"; notify backup_done "adb"
@@ -2701,21 +2741,45 @@ thermal_pace() {
     sleep 20; _tpw=$(( _tpw + 20 ))
   done
 }
+# One retry is worth it for a transient resource/IO failure (a write truncated under memory
+# pressure, a killed sha, a flaky remote); a deterministic refusal or a hang never clears.
+_transient_code() {
+  case "$1" in
+    ERR_VERIFY|ERR_BACKUP|ERR_BACKUP_TAR|ERR_BACKUP_INCOMPLETE|ERR_BACKUP_APK|ERR_TRANSFER|ERR_WORKER_DIED|ERR_UNKNOWN) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+# A refusal or not-applicable outcome is a SKIP, not a failure: the app was never going to be
+# backed up (it is the root manager, or is not installed), so no retry or free space fixes it.
+# ERR_NO_PACKAGE (a malformed package name) is deliberately NOT a skip: in a backup it is a bad
+# entry and in a restore it means a corrupt/tampered manifest, both of which must surface as a
+# failure rather than be silently counted as skipped.
+_skip_code() {
+  case "$1" in ERR_ROOT_MANAGER|ERR_PKG_NOT_FOUND) return 0 ;; *) return 1 ;; esac
+}
+# Read an item's result into _lok/_lcode. An EMPTY rc file means the subshell was killed before it
+# could report (LMK / signal); that is ERR_WORKER_DIED, distinct from a non-empty "false
+# ERR_UNKNOWN" (a real in-app gap), so no outcome is ever a blind ERR_UNKNOWN again.
+_read_rc() {
+  _lok=false; _lcode=""; read -r _lok _lcode < "$1" 2>/dev/null
+  [ "$_lok" = true ] || _lok=false
+  [ -n "$_lcode" ] || { [ -s "$1" ] && _lcode=ERR_UNKNOWN || _lcode=ERR_WORKER_DIED; }
+}
 batch_finish() {  # <ok_count> <total> <fail_count> <fails_json> <free_bytes> <failed_json>
   # `fails` names WHY apps failed (a {code:count} tally) so a partial result is never a blind
   # "something went wrong" - e.g. {"ERR_NO_SPACE":24} says the destination filled (issue #5).
   # `failed` names WHICH apps failed ([{pkg,code}]) so the UI can list them by name (issue #5).
   # `free` is the bytes left on the backups filesystem, so the UI can say how much space remains.
-  printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":%s,"code":"%s","n":%s,"of":%s,"fails":%s,"failed":%s,"free":%s}\n' \
+  printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":%s,"code":"%s","n":%s,"of":%s,"skipped":%s,"fails":%s,"failed":%s,"free":%s}\n' \
     "$OPID" "$([ "$3" -eq 0 ] && echo true || echo false)" \
-    "$([ "$3" -eq 0 ] && echo ERR_NONE || echo ERR_BATCH_PARTIAL)" "$1" "$2" "$4" "${6:-[]}" "$5" > "$PROG"; }
+    "$([ "$3" -eq 0 ] && echo ERR_NONE || echo ERR_BATCH_PARTIAL)" "$1" "$2" "${7:-0}" "$4" "${6:-[]}" "$5" > "$PROG"; }
 backup_batch() {
   _lst="$STATE/staging/batch.$OPID"; _rcf="$STATE/staging/batchrc.$OPID"; mkdir -p "$STATE/staging"
   jget "$ARGS" '.packages[]?' > "$_lst"
   BATCH_N="$(grep -c . "$_lst" 2>/dev/null)"; case "$BATCH_N" in ''|*[!0-9]*) BATCH_N=0 ;; esac
   [ "$BATCH_N" -gt 0 ] || { rm -f "$_lst"; finish false ERR_NO_PACKAGE; return; }
   audit "batch backup start: $BATCH_N apps"
-  _base="$ARGS"; IN_BATCH=1; BATCH_I=0; _bok=0; _bfail=0; _bcodes=""; _bff="$STATE/staging/batchfail.$OPID"; rm -f "$_bff"
+  _base="$ARGS"; IN_BATCH=1; BATCH_I=0; _bok=0; _bfail=0; _bskip=0; _bcodes=""; _bff="$STATE/staging/batchfail.$OPID"; rm -f "$_bff"
   _bu="$(jget "$_base" '.user // 0')"; case "$_bu" in ''|*[!0-9]*) _bu=0 ;; esac
   _BTO="$(cfg .batch_app_timeout)"; case "$_BTO" in ''|null|*[!0-9]*) _BTO=1800 ;; esac
   # scheduled/auto batches carry .keep: prune each app to <keep> finished backups (helper.sh
@@ -2734,7 +2798,7 @@ backup_batch() {
     _pfneed=0
     while IFS= read -r _pfp; do
       [ -n "$_pfp" ] || continue
-      for _pfd in "/data/data/$_pfp" "/data/user_de/$_bu/$_pfp"; do
+      for _pfd in "/data/user/$_bu/$_pfp" "/data/user_de/$_bu/$_pfp"; do
         [ -d "$_pfd" ] && { _pfneed="$(nsum "$_pfneed" "$(du_bytes "$_pfd")")"; }
       done
     done < "$_lst"
@@ -2759,10 +2823,14 @@ backup_batch() {
     BATCH_I=$((BATCH_I + 1)); BATCH_CUR="$_p"
     ARGS="$("$JQ" -nc --argjson b "$_base" --arg p "$_p" '$b + {package:$p} | del(.packages)')"
     thermal_pace
-    _run_item backup "$_rcf" "$_p"
-    _lok=false; _lcode=ERR_UNKNOWN; read -r _lok _lcode < "$_rcf" 2>/dev/null
-    [ "$_lok" = true ] || _lok=false; [ -n "$_lcode" ] || _lcode=ERR_UNKNOWN
-    if [ "$_lok" = true ]; then _bok=$((_bok + 1)); else _bfail=$((_bfail + 1)); _bcodes="$_bcodes $_lcode"; printf '%s %s\n' "$_p" "$_lcode" >> "$_bff"; fi
+    _run_item backup "$_rcf" "$_p"; _read_rc "$_rcf"
+    if [ "$_lok" != true ] && _transient_code "$_lcode"; then
+      audit "batch: $_p failed $_lcode, retrying once"
+      _run_item backup "$_rcf" "$_p"; _read_rc "$_rcf"
+    fi
+    if [ "$_lok" = true ]; then _bok=$((_bok + 1))
+    elif _skip_code "$_lcode"; then _bskip=$((_bskip + 1))
+    else _bfail=$((_bfail + 1)); _bcodes="$_bcodes $_lcode"; printf '%s %s\n' "$_p" "$_lcode" >> "$_bff"; fi
     [ "$_lok" = true ] && [ -n "$_bkeep" ] && "$MODDIR/scripts/helper.sh" prune \
       "$("$JQ" -nc --arg p "$_p" --argjson u "$_bu" --argjson k "$_bkeep" '{package:$p,user:$u,keep:$k}' | base64 | tr -d '\n')" >/dev/null 2>&1
   done 3< "$_lst"
@@ -2774,14 +2842,14 @@ backup_batch() {
   rm -f "$_bff"
   _bfree="$(fs_free "$(backups_dir "$_bu")" 2>/dev/null)"; case "$_bfree" in ''|*[!0-9]*) _bfree=0 ;; esac
   audit "batch backup done: $_bok ok, $_bfail failed, fails=$_bfails failed=$_bfailed free=$_bfree"
-  batch_finish "$_bok" "$BATCH_N" "$_bfail" "$_bfails" "$_bfree" "$_bfailed"; }
+  batch_finish "$_bok" "$BATCH_N" "$_bfail" "$_bfails" "$_bfree" "$_bfailed" "$_bskip"; }
 restore_batch() {
   _lst="$STATE/staging/batch.$OPID"; _rcf="$STATE/staging/batchrc.$OPID"; mkdir -p "$STATE/staging"
   jget "$ARGS" '.refs[]?' > "$_lst"
   BATCH_N="$(grep -c . "$_lst" 2>/dev/null)"; case "$BATCH_N" in ''|*[!0-9]*) BATCH_N=0 ;; esac
   [ "$BATCH_N" -gt 0 ] || { rm -f "$_lst"; finish false ERR_NO_REF; return; }
   audit "batch restore start: $BATCH_N backups"
-  _base="$ARGS"; IN_BATCH=1; BATCH_I=0; _bok=0; _bfail=0; _bcodes=""
+  _base="$ARGS"; IN_BATCH=1; BATCH_I=0; _bok=0; _bfail=0; _bskip=0; _bcodes=""
   _bu="$(jget "$_base" '.user // 0')"; case "$_bu" in ''|*[!0-9]*) _bu=0 ;; esac
   _BTO="$(cfg .batch_app_timeout)"; case "$_BTO" in ''|null|*[!0-9]*) _BTO=1800 ;; esac
   # the verifier is switched off here, once, and put back by the parent: a subshell runs no
@@ -2794,17 +2862,21 @@ restore_batch() {
     BATCH_I=$((BATCH_I + 1)); BATCH_CUR="$_r"
     ARGS="$("$JQ" -nc --argjson b "$_base" --arg r "$_r" '$b + {ref:$r} | del(.refs)')"
     thermal_pace
-    _run_item restore "$_rcf" "$_r"
-    _lok=false; _lcode=ERR_UNKNOWN; read -r _lok _lcode < "$_rcf" 2>/dev/null
-    [ "$_lok" = true ] || _lok=false; [ -n "$_lcode" ] || _lcode=ERR_UNKNOWN
-    if [ "$_lok" = true ]; then _bok=$((_bok + 1)); else _bfail=$((_bfail + 1)); _bcodes="$_bcodes $_lcode"; fi
+    _run_item restore "$_rcf" "$_r"; _read_rc "$_rcf"
+    if [ "$_lok" != true ] && _transient_code "$_lcode"; then
+      audit "batch: $_r failed $_lcode, retrying once"
+      _run_item restore "$_rcf" "$_r"; _read_rc "$_rcf"
+    fi
+    if [ "$_lok" = true ]; then _bok=$((_bok + 1))
+    elif _skip_code "$_lcode"; then _bskip=$((_bskip + 1))
+    else _bfail=$((_bfail + 1)); _bcodes="$_bcodes $_lcode"; fi
   done 3< "$_lst"
   rm -f "$_lst" "$_rcf"; ARGS="$_base"; IN_BATCH=0; verifier_restore
   _bfails="$(printf '%s\n' $_bcodes | "$JQ" -R -s -c 'split("\n")|map(select(length>0))|group_by(.)|map({key:.[0],value:length})|from_entries' 2>/dev/null)"
   case "$_bfails" in ''|null) _bfails='{}' ;; esac
   _bfree="$(fs_free "$(backups_dir "$_bu")" 2>/dev/null)"; case "$_bfree" in ''|*[!0-9]*) _bfree=0 ;; esac
   audit "batch restore done: $_bok ok, $_bfail failed, fails=$_bfails"
-  batch_finish "$_bok" "$BATCH_N" "$_bfail" "$_bfails" "$_bfree"; }
+  batch_finish "$_bok" "$BATCH_N" "$_bfail" "$_bfails" "$_bfree" "[]" "$_bskip"; }
 
 # --- portable config export / import ----------------------------------------------------
 # Carry the module's own state (config + jobs + destinations + credentials + keys) to a new
@@ -2933,10 +3005,7 @@ do_gdrive_pull() {   # download a gdrive remote-only backup (its Drive folder) i
   [ "$_n" -gt 0 ] || { audit "gdrive-pull empty folder $PKG"; finish false ERR_NO_BACKUP; return; }
   BACKUPS="$(backups_dir "$U")"; _ddir="$BACKUPS/$PKG/$_tsvc"
   media_own "$BACKUPS"; media_own "$BACKUPS/$PKG"; rm -rf "$_ddir"; mkdir -p "$_ddir"
-  _cau="$(stat -c %u "/data/data/$COMPANION_PKG" 2>/dev/null)"
-  _dl="$(companion_resdir)/dl.$OPID"; exec_ns rm -rf "$_dl"; exec_ns mkdir -p "$_dl"
-  case "$_cau" in ''|*[!0-9]*) : ;; *) exec_ns chown "$_cau:$_cau" "$_dl" 2>/dev/null ;; esac
-  exec_ns restorecon "$_dl" 2>/dev/null
+  _dl="$(companion_resdir)/dl.$OPID"; exec_ns rm -rf "$_dl"; exec_ns mkdir -p "$_dl"; companion_own "$_dl" 0700
   _k=0
   while [ "$_k" -lt "$_n" ]; do
     _fid="$(printf '%s' "$_lf" | "$JQ" -r ".data.files[$_k].id // empty" 2>/dev/null)"

@@ -1,9 +1,9 @@
 {
-  "version": "v1.16",
-  "versionCode": 11600,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.16/VD-Backup-v1.16-universal-lite.zip",
+  "version": "v1.10",
+  "versionCode": 11000,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.10/VD-Backup-v1.10-universal-lite.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "v1.16\n\nFixes:\n- A failed Google Drive backup now records the real Drive error in the activity log, instead of a generic message, so it can be diagnosed.\n- The live-progress panel floats in a fixed spot again, the same on every tab, instead of sitting pinned at the bottom of the page.\n- A partial batch backup names which apps failed and why, in the activity log and on screen at the end of the run, not just how many.\n- A bulk restore can take one optional shared password (with a tick) for backups whose saved password does not open them, so a mixed batch finishes without asking app by app.",
-  "size": 65411653,
-  "sha256": "edec182011452c0bed7d089e81d7af999081f63379deac32c38a9335858fed10"
+  "notes": "",
+  "size": 0,
+  "sha256": ""
 }

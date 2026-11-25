@@ -42,7 +42,7 @@
 
 ---
 
-## Nó là gì
+## Tại sao
 
 VDBackup là một **mô-đun WebUI** root giúp sao lưu và khôi phục các ứng dụng cùng dữ liệu của chúng
 **mà không cần ứng dụng đồng hành cho các tính năng cốt lõi**: bởi vì mô-đun đã sẵn là root, nên
@@ -90,6 +90,15 @@ các bản sao lưu Neo-Backup và Android-DataBackup hiện có để bạn chu
 - **Di chuyển vào (nhập):** nhập các bản sao lưu Neo-Backup và Android-DataBackup hiện có, kể cả
   các bản được mã hóa bằng mật khẩu.
 
+## Tác nhân AI
+
+VDBackup được xây dựng để chào đón các trợ lý và tác nhân AI, không chỉ con người. Engine nói JSON
+(mọi verb của `helper.sh` trả về một đối tượng JSON duy nhất), mã nguồn, tài liệu và cấu trúc tệp
+được bố trí để máy đọc, và các đóng góp có hỗ trợ của AI được xem xét và chấp nhận như mọi đóng góp
+khác. Một tác nhân có thể quản trị **mọi** hành động của mô-đun theo kiểu không giao diện qua cùng
+API mà WebUI dùng, xem toàn bộ bề mặt điều khiển tại **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**, và
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) để đóng góp.
+
 ## Cài đặt
 
 1. Tải `VD-Backup-vX.Y.zip` mới nhất từ [Bản phát hành](https://github.com/VD171/VD-Backup/releases).
@@ -100,12 +109,9 @@ các bản sao lưu Neo-Backup và Android-DataBackup hiện có để bạn chu
 
 Mới làm quen? [Hướng dẫn người dùng](docs/USER-GUIDE.md) sẽ dẫn bạn từ cài đặt đến khôi phục.
 
-## Tính khả chuyển
+## Bảo mật
 
-Các bản sao lưu của bạn **không bị khóa vào mô-đun này**. Mọi thứ đều dùng các định dạng tiêu chuẩn
-(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) mở được trên Windows, macOS và Linux bằng các công
-cụ thông dụng hoặc trình quản lý tệp. Mỗi bản sao lưu được mã hóa đều kèm một ghi chú **RECOVERY**
-chứa các lệnh chính xác để giải mã và giải nén trên PC.
+VDBackup chạy với quyền root và xử lý dữ liệu ứng dụng của bạn và, tùy chọn, thông tin đăng nhập cùng cụm mật khẩu mã hóa của bạn; một bản sao lưu có thể chứa dữ liệu nhạy cảm, vì vậy hãy bảo vệ nó bằng một cụm mật khẩu và lưu ở nơi bạn tin tưởng. Thông tin đăng nhập được lưu trữ ở dạng mã hóa khi ở trạng thái nghỉ, không bao giờ ở dạng văn bản thuần, và việc mã hóa không bao giờ gắn với phần cứng thiết bị, nên cụm mật khẩu chính là thứ bảo vệ một bản sao lưu đã mã hóa. Hãy báo cáo lỗ hổng theo [SECURITY.md](SECURITY.md).
 
 ## Xây dựng (Build)
 
@@ -113,14 +119,12 @@ Mô-đun gồm shell + WebUI cộng với các tệp nhị phân tĩnh theo từ
 `rclone`, `rsync`, ssh, `restic`) được xây dựng cho `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Xem [CONTRIBUTING.md](CONTRIBUTING.md) và các quy trình CI.
 
-## Thân thiện với AI
+## Tính khả chuyển
 
-VDBackup được xây dựng để chào đón các trợ lý và tác nhân AI, không chỉ con người. Engine nói JSON
-(mọi verb của `helper.sh` trả về một đối tượng JSON duy nhất), mã nguồn, tài liệu và cấu trúc tệp
-được bố trí để máy đọc, và các đóng góp có hỗ trợ của AI được xem xét và chấp nhận như mọi đóng góp
-khác. Một tác nhân có thể quản trị **mọi** hành động của mô-đun theo kiểu không giao diện qua cùng
-API mà WebUI dùng, xem toàn bộ bề mặt điều khiển tại **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**, và
-[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) để đóng góp.
+Các bản sao lưu của bạn **không bị khóa vào mô-đun này**. Mọi thứ đều dùng các định dạng tiêu chuẩn
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) mở được trên Windows, macOS và Linux bằng các công
+cụ thông dụng hoặc trình quản lý tệp. Mỗi bản sao lưu được mã hóa đều kèm một ghi chú **RECOVERY**
+chứa các lệnh chính xác để giải mã và giải nén trên PC.
 
 ## Cập nhật tăng dần (VDLU)
 
@@ -148,16 +152,15 @@ như một phương án dự phòng.
 
 ## Xem thêm
 
-Các dự án anh em của cùng tác giả:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: một trình gỡ lỗi phương thức của thiết bị: đọc từng mục qua mọi phương thức có thể đọc nó và so sánh chúng cạnh nhau.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: các dịch vụ Google của bạn (RCS, Wallet, các chứng thực Play Integrity), đọc ngay trên thiết bị của bạn mà không cần internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: một trình giả lập thiết bị biến một fingerprint mới thành một hồ sơ mạch lạc, nhất quán.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: giả mạo fingerprint toàn thiết bị / Play Integrity, trên toàn thiết bị với phạm vi theo từng ứng dụng và một WebUI.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: một SSH daemon độc lập chạy với quyền root (Dropbear).
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: một engine tự cập nhật tăng dần không cần flash, được nhúng vào các module KernelSU/APatch/Magisk.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: các dịch vụ Google của bạn (RCS, Wallet, các chứng thực Play Integrity), đọc ngay trên thiết bị của bạn mà không cần internet.
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: một trình cài đặt sideload với quyền root không ma sát cho các APK đơn, hàng loạt và phân tách, với công tắc trình xác minh Play Protect và giả mạo nguồn cài đặt.
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: một trình gỡ lỗi phương thức của thiết bị: đọc từng mục qua mọi phương thức có thể đọc nó và so sánh chúng cạnh nhau.
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: một engine tự cập nhật tăng dần không cần flash, được nhúng vào các module KernelSU/APatch/Magisk.
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: kho module MMRL/WebUI-X của chúng tôi (cài đặt tất cả những thứ này từ trình quản lý root của bạn).
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: một tập dữ liệu các fingerprint build.prop của Pixel (bản fork của @T3SL4).
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: dùng Telegram làm kho lưu trữ đối tượng từ một Go CLI nhỏ gọn.
 
 ## Contacts
 

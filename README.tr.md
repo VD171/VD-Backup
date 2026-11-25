@@ -42,7 +42,7 @@
 
 ---
 
-## Nedir
+## Neden
 
 VDBackup, uygulamalarınızı ve verilerini **temel özellikler için bir yardımcı uygulama olmadan**
 yedekleyip geri yükleyen bir root **WebUI modülüdür**: modül zaten root olduğundan "izin verilecek"
@@ -91,6 +91,16 @@ Neo-Backup ve Android-DataBackup yedeklerini içe aktarabilir.
 - **İçe taşıma:** mevcut Neo-Backup ve Android-DataBackup yedeklerini, parolayla şifrelenenler
   dahil, içe aktarır.
 
+## Yapay zekâ ajanları
+
+VDBackup, yalnızca insanlara değil, yapay zeka asistanlarına ve aracılarına da kucak açacak
+şekilde inşa edilmiştir. Motor JSON konuşur (her `helper.sh` fiili tek bir JSON nesnesi döndürür),
+kod, belgeler ve dosya yapısı makine okumasına göre düzenlenmiştir ve yapay zeka destekli katkılar
+diğerleri gibi incelenip kabul edilir. Bir aracı, WebUI'nin kullandığı aynı API üzerinden modülün
+**her** eylemini arayüzsüz yönetebilir, tam kontrol yüzeyi için
+**[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**'ye, katkıda bulunmak için ise
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)'ye bakın.
+
 ## Kurulum
 
 1. En son `VD-Backup-vX.Y.zip` dosyasını [Sürümler](https://github.com/VD171/VD-Backup/releases) sayfasından indirin.
@@ -101,12 +111,9 @@ Neo-Backup ve Android-DataBackup yedeklerini içe aktarabilir.
 
 Yeni misiniz? [Kullanıcı kılavuzu](docs/USER-GUIDE.md) sizi kurulumdan geri yüklemeye kadar adım adım götürür.
 
-## Taşınabilirlik
+## Güvenlik
 
-Yedekleriniz **bu modüle kilitli değildir**. Her şey, Windows, macOS ve Linux'ta yaygın araçlar
-veya dosya yöneticileriyle açılan standart biçimler (`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`)
-kullanır. Şifrelenmiş her yedek, bir PC'de şifre çözme ve çıkarmaya yönelik tam komutları içeren bir
-**RECOVERY** notuyla birlikte gelir.
+VDBackup root olarak çalışır ve uygulama verilerinizi ve isteğe bağlı olarak kimlik bilgilerinizi ve şifreleme parolalarınızı işler; bir yedek hassas veriler içerebilir, bu yüzden onu bir parolayla koruyun ve güvendiğiniz bir yerde saklayın. Kimlik bilgileri beklemede şifreli olarak saklanır, asla düz metin olarak değil ve şifreleme hiçbir zaman cihaz donanımına bağlı değildir, dolayısıyla şifreli bir yedeği koruyan şey paroladır. Bir güvenlik açığını [SECURITY.md](SECURITY.md) uyarınca bildirin.
 
 ## Derleme
 
@@ -114,15 +121,12 @@ Modül, shell + WebUI'nin yanı sıra `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64
 ABI başına statik ikili dosyalardan (`tar`, `zstd`, `lz4`, `rclone`, `rsync`, ssh, `restic`) oluşur.
 [CONTRIBUTING.md](CONTRIBUTING.md) dosyasına ve CI iş akışlarına bakın.
 
-## Yapay zeka dostu
+## Taşınabilirlik
 
-VDBackup, yalnızca insanlara değil, yapay zeka asistanlarına ve aracılarına da kucak açacak
-şekilde inşa edilmiştir. Motor JSON konuşur (her `helper.sh` fiili tek bir JSON nesnesi döndürür),
-kod, belgeler ve dosya yapısı makine okumasına göre düzenlenmiştir ve yapay zeka destekli katkılar
-diğerleri gibi incelenip kabul edilir. Bir aracı, WebUI'nin kullandığı aynı API üzerinden modülün
-**her** eylemini arayüzsüz yönetebilir, tam kontrol yüzeyi için
-**[docs/AI-AGENTS.md](docs/AI-AGENTS.md)**'ye, katkıda bulunmak için ise
-[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome)'ye bakın.
+Yedekleriniz **bu modüle kilitli değildir**. Her şey, Windows, macOS ve Linux'ta yaygın araçlar
+veya dosya yöneticileriyle açılan standart biçimler (`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`)
+kullanır. Şifrelenmiş her yedek, bir PC'de şifre çözme ve çıkarmaya yönelik tam komutları içeren bir
+**RECOVERY** notuyla birlikte gelir.
 
 ## Artımlı güncellemeler (VDLU)
 
@@ -150,16 +154,15 @@ günceller. **Sağlamlaştırılmış** profil: ed25519 imzası zorunludur ve s�
 
 ## Ayrıca bakınız
 
-Aynı yazarın kardeş projeleri:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: bir cihaz yöntem hata ayıklayıcısı: her öğeyi, onu okuyabilen her yöntemle okur ve bunları yan yana karşılaştırır.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: Google hizmetleriniz (RCS, Wallet, Play Integrity doğrulamaları), internet olmadan cihazınızda okunur.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: taze bir parmak izini tutarlı, uyumlu bir profile dönüştüren bir cihaz sahteleyici.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: küresel cihaz parmak izi / Play Integrity sahteciliği, uygulama başına kapsam ve bir WebUI ile cihazın tamamında.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: bağımsız, root yetkili bir SSH artalan süreci (Dropbear).
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: KernelSU/APatch/Magisk modüllerine gömülü, flash'sız, artımlı bir kendini güncelleme motoru.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: Google hizmetleriniz (RCS, Wallet, Play Integrity doğrulamaları), internet olmadan cihazınızda okunur.
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: tekli, toplu ve bölünmüş APK'lar için sürtünmesiz bir root sideload yükleyicisi; Play Protect doğrulayıcı anahtarı ve kurulum kaynağı sahteciliği ile birlikte.
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: bir cihaz yöntem hata ayıklayıcısı: her öğeyi, onu okuyabilen her yöntemle okur ve bunları yan yana karşılaştırır.
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: KernelSU/APatch/Magisk modüllerine gömülü, flash'sız, artımlı bir kendini güncelleme motoru.
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: MMRL/WebUI-X modül depomuz (bunların hepsini root yöneticinizden yükleyin).
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: Pixel build.prop parmak izlerinden oluşan bir veri kümesi (@T3SL4 fork'u).
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: Telegram'ı küçük bir Go CLI'sinden nesne deposu olarak kullanın.
 
 ## İletişim
 

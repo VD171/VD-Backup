@@ -184,7 +184,7 @@ function switchTab(name) {
   document.querySelectorAll(".tab").forEach(function (t) { t.classList.toggle("active", t.dataset.tab === name); });
   document.querySelectorAll(".panel").forEach(function (p) { p.classList.toggle("active", p.id === name); });
   if (name === "apps") loadOverview();
-  if (name === "backups") { loadBackups(); loadSpecial(); }
+  if (name === "backups") { if (!backupsLoaded) { backupsLoaded = true; loadBackups(); loadSpecial(); } }
   if (name === "dests") loadDests();
   if (name === "settings") loadSettings();
   if (name === "schedule") loadSchedule();
@@ -384,6 +384,11 @@ function loadApps() {
 
 // --- backups ------------------------------------------------------------
 var BACKUPS = [];
+// the Backups panel is cached: its list + special/path/adb sections are queried once
+// (five shell round-trips) on the first visit and kept in the DOM, so every later
+// Apps<->Backups switch is instant instead of re-querying and re-rendering the lot.
+// Any completed op and a user switch flip this back to false, so the next visit reloads.
+var backupsLoaded = false;
 var SUSFS_DISMISSED = false;
 var bkSelectMode = false, bkSelected = {};   // ref -> {ref,package,items} while selecting
 var bkQuery = "";
@@ -1650,6 +1655,7 @@ function trackOp(opid, ctx) {
       updateProgSub(sub, p);
       if (p.done) {
         clearInterval(timer);
+        backupsLoaded = false;   // an op finished: the cached Backups panel reloads on the next visit
         cancelBtn.style.display = "none";
         if (!p.ok && ctx && ctx.entry && p.code === "ERR_IMPORT_ENCRYPTED") {
           closeCard(box);
@@ -1699,6 +1705,9 @@ function trackOp(opid, ctx) {
         }
         if (ctx && ctx.batch && typeof p.of === "number" && p.of > 0) {
           label.textContent = I18N.t("msg_batch_done", { n: p.n || 0, of: p.of });   // e.g. "148 of 150 done"
+          if (p.skipped > 0) {   // #5: apps intentionally skipped (root manager / not installed), distinct from failures
+            box.appendChild(el("div", "op-skipped", I18N.t("msg_batch_skipped", { n: p.skipped })));
+          }
           if (p.failed && p.failed.length) {   // #5: list WHICH apps failed (package + reason); keep the card open with a Close button
             var fl = el("div", "op-failed");
             fl.appendChild(el("div", "op-failed-h", I18N.t("msg_batch_failed_head", { n: p.failed.length })));
@@ -3135,7 +3144,7 @@ function boot() {
   if ($("#prov-open")) $("#prov-open").onclick = openProvenance;
   if ($("#update-check")) $("#update-check").onclick = checkForUpdates;
   if ($("#update-banner-x")) $("#update-banner-x").onclick = function () { $("#update-banner").classList.remove("show"); };
-  $("#user-sel").onchange = function () { activeUser = this.value | 0; CFG.user = activeUser; loadApps(); loadOverview(); };
+  $("#user-sel").onchange = function () { activeUser = this.value | 0; CFG.user = activeUser; backupsLoaded = false; loadApps(); loadOverview(); };
   $("#set-save").onclick = saveSettings;
   // Auto-save: persist every Settings control the moment it changes (the app-pickers already did),
   // removing the deferred-Save island where toggling a field and leaving silently lost it. Scoped to

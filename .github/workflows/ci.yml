@@ -54,6 +54,12 @@ jobs:
           sh .github/scripts/selinux-pm-stage-lint.sh .
           echo "vendor-parity + engine-parity: enforced in the local pre-push ritual"
 
+      - name: i18n accent-fold guard (docs translations)
+        run: |
+          # Catch ASCII-folded accented-Latin translations (docs/, README.<code>.md, webroot/lang).
+          # Guards the docs on every push/PR that touches them; this is NOT a release gate.
+          sh .github/scripts/i18n-accents.sh .
+
       - name: Set up JDK 17
         uses: actions/setup-java@v6
         with:

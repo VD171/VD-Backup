@@ -42,7 +42,7 @@
 
 ---
 
-## これは何か
+## なぜ
 
 VDBackup は、アプリとそのデータをバックアップおよび復元する root の **WebUI モジュール** です。
 **主要機能にコンパニオンアプリは不要**: モジュール自体がすでに root なので、「許可」する対象が
@@ -89,6 +89,16 @@ Android-DataBackup のバックアップをインポートして移行するこ�
 - **移行 (インポート):** 既存の Neo-Backup および Android-DataBackup のバックアップを、
   パスワードで暗号化されたものも含めてインポートします。
 
+## AI エージェント
+
+VDBackup は、人だけでなく AI アシスタントやエージェントにも親しみやすいように作られています。
+エンジンは JSON を話し (`helper.sh` のすべての verb は単一の JSON オブジェクトを返します)、コード、
+ドキュメント、ファイル構成は機械による読み取りを念頭に配置され、AI 支援による貢献も他と同じように
+レビューされ受け入れられます。エージェントは、WebUI が使うのと同じ API を通じて、モジュールの
+**すべての** アクションをヘッドレスで操作できます, 完全な制御面については
+**[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** を、貢献については
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) を参照してください。
+
 ## インストール
 
 1. 最新の `VD-Backup-vX.Y.zip` を [リリース](https://github.com/VD171/VD-Backup/releases) から
@@ -100,12 +110,9 @@ Android-DataBackup のバックアップをインポートして移行するこ�
 
 はじめての方へ: [ユーザーガイド](docs/USER-GUIDE.md) がインストールから復元までを案内します。
 
-## ポータビリティ
+## セキュリティ
 
-バックアップは **このモジュールに縛られません**。すべて標準フォーマット
-(`tar`、`gzip`、`zstd`、`age`、`zip`、`restic`) を使用し、Windows、macOS、Linux で一般的な
-ツールやファイルマネージャーから開けます。暗号化された各バックアップには、PC で復号して展開する
-ための正確なコマンドを記した **RECOVERY** ノートが同梱されます。
+VDBackup は root として動作し、アプリのデータと、必要に応じて認証情報や暗号化パスフレーズを扱います。バックアップには機微なデータが含まれることがあるため、パスフレーズで保護し、信頼できる場所に保管してください。認証情報は保存時に暗号化され、平文で保存されることはなく、暗号化が端末のハードウェアに結び付けられることもないため、暗号化されたバックアップを守るのはパスフレーズです。脆弱性は [SECURITY.md](SECURITY.md) に従って報告してください。
 
 ## ビルド
 
@@ -113,15 +120,12 @@ Android-DataBackup のバックアップをインポートして移行するこ�
 ABI ごとの静的バイナリ (`tar`、`zstd`、`lz4`、`rclone`、`rsync`、ssh、`restic`) で構成されます。
 [CONTRIBUTING.md](CONTRIBUTING.md) と CI ワークフローを参照してください。
 
-## AI フレンドリー
+## ポータビリティ
 
-VDBackup は、人だけでなく AI アシスタントやエージェントにも親しみやすいように作られています。
-エンジンは JSON を話し (`helper.sh` のすべての verb は単一の JSON オブジェクトを返します)、コード、
-ドキュメント、ファイル構成は機械による読み取りを念頭に配置され、AI 支援による貢献も他と同じように
-レビューされ受け入れられます。エージェントは、WebUI が使うのと同じ API を通じて、モジュールの
-**すべての** アクションをヘッドレスで操作できます, 完全な制御面については
-**[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** を、貢献については
-[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) を参照してください。
+バックアップは **このモジュールに縛られません**。すべて標準フォーマット
+(`tar`、`gzip`、`zstd`、`age`、`zip`、`restic`) を使用し、Windows、macOS、Linux で一般的な
+ツールやファイルマネージャーから開けます。暗号化された各バックアップには、PC で復号して展開する
+ための正確なコマンドを記した **RECOVERY** ノートが同梱されます。
 
 ## 差分アップデート (VDLU)
 
@@ -146,16 +150,15 @@ VD Backup は **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** �
 
 ## 関連項目
 
-同じ作者による姉妹プロジェクト:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: デバイスのメソッドを調べるデバッガー。各項目を、それを読み取れるあらゆるメソッドで読み取り、結果を並べて比較します。
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: あなたの Google サービス (RCS、Wallet、Play Integrity の構成証明) を、インターネットなしでデバイス上で読み取ります。
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: 新しいフィンガープリントを、首尾一貫した整合性のあるプロファイルに変えるデバイススプーファー。
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: 端末全体のフィンガープリント / Play Integrity のなりすまし。端末全体に適用しつつ、アプリごとのスコープと WebUI を備えます。
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: 単体で動く root 権限の SSH デーモン (Dropbear)。
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: フラッシュ不要の増分セルフアップデートエンジンで、KernelSU/APatch/Magisk モジュールに組み込まれます。
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: あなたの Google サービス (RCS、Wallet、Play Integrity の構成証明) を、インターネットなしでデバイス上で読み取ります。
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: 単一・バッチ・分割 APK に対応した、摩擦のない root サイドロードインストーラーで、Play Protect 検証のトグルとインストール元の偽装を備えます。
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: デバイスのメソッドを調べるデバッガー。各項目を、それを読み取れるあらゆるメソッドで読み取り、結果を並べて比較します。
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: フラッシュ不要の増分セルフアップデートエンジンで、KernelSU/APatch/Magisk モジュールに組み込まれます。
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: 私たちの MMRL/WebUI-X モジュールリポジトリ (これらすべてを root マネージャーからインストールできます)。
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: Pixel の build.prop フィンガープリントのデータセット (@T3SL4 のフォーク)。
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: 小さな Go CLI から Telegram をオブジェクトストアとして使います。
 
 ## 連絡先
 

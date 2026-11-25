@@ -42,7 +42,7 @@
 
 ---
 
-## Co to je
+## Proč
 
 VDBackup je root-**modul WebUI**, který zálohuje a obnovuje vaše aplikace a jejich data
 **bez doprovodné aplikace pro základní funkce**: protože modul už běží jako root, není co
@@ -89,6 +89,16 @@ importovat existující zálohy Neo-Backup a Android-DataBackup, abyste mohli p�
 - **Migrace:** importuje existující zálohy Neo-Backup a Android-DataBackup, včetně těch
   zašifrovaných heslem.
 
+## AI agenti
+
+VDBackup je postaven tak, aby byl vstřícný k asistentům a agentům AI, nejen k lidem.
+Engine mluví JSON (každé sloveso `helper.sh` vrací jediný objekt JSON), kód, dokumentace
+a struktura souborů jsou uspořádány pro strojové čtení a příspěvky s pomocí AI se posuzují
+a přijímají jako kterékoli jiné. Agent může spravovat **každou** akci modulu bezhlavě přes
+stejné API, které používá WebUI, úplnou řídicí plochu najdete v
+**[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** a chcete-li přispět, v
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
+
 ## Instalace
 
 1. Stáhněte nejnovější `VD-Backup-vX.Y.zip` z [Vydání](https://github.com/VD171/VD-Backup/releases).
@@ -99,12 +109,9 @@ importovat existující zálohy Neo-Backup a Android-DataBackup, abyste mohli p�
 
 Jste tu noví? [Uživatelská příručka](docs/USER-GUIDE.md) vás provede od instalace až po obnovu.
 
-## Přenositelnost
+## Bezpečnost
 
-Vaše zálohy **nejsou uzamčené v tomto modulu**. Vše používá standardní formáty
-(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`), které se otevřou ve Windows, macOS i
-Linuxu běžnými nástroji nebo správci souborů. Každá šifrovaná záloha je dodávána s
-poznámkou **RECOVERY** obsahující přesné příkazy pro dešifrování a rozbalení na počítači.
+VDBackup běží jako root a pracuje s daty vašich aplikací a volitelně s vašimi přihlašovacími údaji a šifrovacími heslovými frázemi; záloha může obsahovat citlivá data, proto ji chraňte heslovou frází a uchovávejte na místě, kterému důvěřujete. Přihlašovací údaje jsou uloženy šifrovaně v klidu, nikdy v otevřeném textu, a šifrování není nikdy vázáno na hardware zařízení, takže to, co chrání šifrovanou zálohu, je heslová fráze. Zranitelnost nahlaste podle [SECURITY.md](SECURITY.md).
 
 ## Sestavení
 
@@ -112,15 +119,12 @@ Modul tvoří shell + WebUI plus statické binárky pro každou ABI (`tar`, `zst
 `rclone`, `rsync`, ssh, `restic`) sestavené pro `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Viz [CONTRIBUTING.md](CONTRIBUTING.md) a pracovní postupy CI.
 
-## Přívětivý k AI
+## Přenositelnost
 
-VDBackup je postaven tak, aby byl vstřícný k asistentům a agentům AI, nejen k lidem.
-Engine mluví JSON (každé sloveso `helper.sh` vrací jediný objekt JSON), kód, dokumentace
-a struktura souborů jsou uspořádány pro strojové čtení a příspěvky s pomocí AI se posuzují
-a přijímají jako kterékoli jiné. Agent může spravovat **každou** akci modulu bezhlavě přes
-stejné API, které používá WebUI, úplnou řídicí plochu najdete v
-**[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** a chcete-li přispět, v
-[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome).
+Vaše zálohy **nejsou uzamčené v tomto modulu**. Vše používá standardní formáty
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`), které se otevřou ve Windows, macOS i
+Linuxu běžnými nástroji nebo správci souborů. Každá šifrovaná záloha je dodávána s
+poznámkou **RECOVERY** obsahující přesné příkazy pro dešifrování a rozbalení na počítači.
 
 ## Přírůstkové aktualizace (VDLU)
 
@@ -148,16 +152,15 @@ zůstává platný jako záloha.
 
 ## Viz také
 
-Sesterské projekty téhož autora:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: debugger metod zařízení: čte každou položku všemi metodami, které ji dokážou přečíst, a porovnává je vedle sebe.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: vaše služby Google (RCS, Wallet, atestace Play Integrity) čtené na vašem zařízení bez internetu.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: nástroj pro podvržení zařízení, který promění čerstvý fingerprint v soudržný, konzistentní profil.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: podvržení globálního otisku zařízení / Play Integrity, pro celé zařízení s rozsahem pro jednotlivé aplikace a s WebUI.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: samostatný rootovaný SSH démon (Dropbear).
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: bezflashový, inkrementální engine pro samoaktualizaci, vestavěný do modulů KernelSU/APatch/Magisk.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: vaše služby Google (RCS, Wallet, atestace Play Integrity) čtené na vašem zařízení bez internetu.
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: bezproblémový rootový sideload instalátor pro jednotlivé, dávkové a rozdělené APK, s přepínačem ověřování Play Protect a podvržením zdroje instalace.
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: debugger metod zařízení: čte každou položku všemi metodami, které ji dokážou přečíst, a porovnává je vedle sebe.
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: bezflashový, inkrementální engine pro samoaktualizaci, vestavěný do modulů KernelSU/APatch/Magisk.
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: náš repozitář modulů MMRL/WebUI-X (nainstalujte je všechny ze svého správce rootu).
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: datová sada otisků build.prop ze zařízení Pixel (fork od @T3SL4).
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: použijte Telegram jako úložiště objektů z drobného Go CLI.
 
 ## Kontakty
 

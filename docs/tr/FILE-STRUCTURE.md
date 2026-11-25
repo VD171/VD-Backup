@@ -64,7 +64,7 @@ docs/                               # all public documentation
 ├── AI-AGENTS.md                    # notes for AI agents working on the repo
 ├── <code>/                         # 20 translations (ar cs de es fa fr hi in it ja ko nl pl pt ru sv th tr vi zh)
 │   ├── USER-GUIDE.md  ARCHITECTURE.md  FILE-STRUCTURE.md  BINARIES.md  AI-AGENTS.md
-│   ├── CHANGELOG.md  SECURITY.md  CODE_OF_CONDUCT.md  CONTRIBUTING.md
+│   ├── SECURITY.md  CODE_OF_CONDUCT.md  CONTRIBUTING.md
 │   └── RECOVERY.md  bug_report.md  feature_request.md  PULL_REQUEST_TEMPLATE.md
 └── screenshots/<code>/             # generated WebUI screenshots, per language
 ```

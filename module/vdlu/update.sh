@@ -20,7 +20,7 @@
 # POSIX sh (mksh/busybox/toybox). Env in: VDLU_DIR, MODULE_DIR, MODID.
 # Contract: docs/INTERFACES.md (CLI/layout/JSON keys = immutable).
 
-ENGINE_VERSION=5             # bumped 4->5 (VDLU#2 trust-anchor exclusion + the 128/2 MiB ceilings); ANY engine logic change (verify/apply/path rules) bumps this - keep engine_min honest
+ENGINE_VERSION=7             # bumped 6->7 (never revert a module ahead of the feed: installed versionCode floors FROMVER; boot self-heal of a stale downgrade plan); ANY engine logic change (verify/apply/path rules) bumps this - keep engine_min honest
 MAX_FILE_BYTES=134217728     # 128 MiB per-file ceiling: anti decompression-bomb / disk DoS
 MAX_MANIFEST_BYTES=2097152   # 2 MiB manifest ceiling: anti OOM
 TAB=$(printf '\t')
@@ -113,6 +113,24 @@ cfg() { # key default
 	[ -n "$v" ] && printf '%s' "$v" || printf '%s' "$2"
 }
 
+# LIVE installed versionCode from the module's own module.prop. This is LOCAL trusted device state (NOT
+# hostile feed input), so it is read directly - never routed through manifest validation. Prints the numeric
+# versionCode, else 0. The manifest `version` is the same numeric scale (the release passes module.prop's
+# versionCode to vdlu-pack as the feed version), so it is directly comparable to FROMVER.
+installed_ver() {
+	local v
+	v=$(sed -n 's/^versionCode=//p' "$MODULE_DIR/module.prop" 2>/dev/null | head -n1)
+	isnum "$v" && printf '%s' "$v" || printf '0'
+}
+# FROMVER floor: the live installed versionCode is a FLOOR under FROMVER, so a module the manager already
+# updated past a stale feed reads as AHEAD (validate_meta returns 4, benign) and is never reverted. Forward
+# updates (feed > installed) are unaffected.
+fromver_floor() {
+	local iv; iv=$(installed_ver)
+	isnum "$iv" || return 0
+	{ isnum "$FROMVER" && [ "$FROMVER" -ge "$iv" ]; } || FROMVER=$iv
+}
+
 # ---- paths ----------------------------------------------------------------
 init_paths() {
 	: "${VDLU_DIR:?VDLU_DIR not set}"
@@ -136,6 +154,7 @@ init_paths() {
 	SOURCE=$(cfg source "")
 	TGTVER=0
 	FROMVER=0
+	fromver_floor
 }
 
 # ---- lock -----------------------------------------------------------------
@@ -528,6 +547,36 @@ write_journal() { # phase state current [error]
 }
 
 journal_state() { grep -o '"state":"[^"]*"' "$JOURNAL" 2>/dev/null | head -n1 | cut -d'"' -f4; }
+journal_target() { grep -o '"target":-\{0,1\}[0-9]\{1,\}' "$JOURNAL" 2>/dev/null | head -n1 | cut -d: -f2; }
+
+# Boot self-heal. Two leftover states are cleared before any resume/diff:
+#  (a) a journal whose target is <=0 is a stale placeholder (e.g. the baseline 0 a removed stub left behind),
+#      never a real resumable update (real targets are >=1);
+#  (b) a persisted plan whose TARGET version is BELOW the live installed module would DOWNGRADE it - the
+#      stale-feed + manager-updated-module case: its resume must not run. Clear it so the install self-heals.
+# A real forward in-flight transaction (target>=1 and >= installed) is left untouched.
+clear_stale_journal() {
+	local t tv iv
+	if [ -f "$JOURNAL" ]; then
+		t=$(journal_target)
+		case "$t" in ''|-|*[!0-9-]*) : ;; *)
+			if [ "$t" -le 0 ]; then
+				rm -f "$JOURNAL" "$PLAN" "$PLANDEL" "$TARGET" 2>/dev/null
+				echo "VDLU: cleared stale journal (target=$t)" >&2
+				return 0
+			fi ;;
+		esac
+	fi
+	if [ -f "$TARGET" ]; then
+		iv=$(installed_ver)
+		tv=$(json_flatten "$TARGET" 2>/dev/null | grep -m1 "^version$TAB" | cut -f2)
+		if isnum "$tv" && isnum "$iv" && [ "$tv" -lt "$iv" ]; then
+			rm -f "$JOURNAL" "$PLAN" "$PLANDEL" "$TARGET" 2>/dev/null
+			echo "VDLU: cleared stale downgrade plan (target=$tv < installed=$iv)" >&2
+		fi
+	fi
+	return 0
+}
 
 set_st() { # path newst
 	awk -F'\t' -v p="$1" -v ns="$2" 'BEGIN{OFS="\t"} { if($7==p)$2=ns; print }' "$PLAN" >"$PLAN.n" 2>/dev/null && mv -f "$PLAN.n" "$PLAN"
@@ -662,6 +711,7 @@ load_target() {
 		FROMVER=$(grep -m1 "^version$TAB" "$WORK/current.flat" | cut -f2)
 	fi
 	isnum "$FROMVER" || FROMVER=0
+	fromver_floor
 }
 
 do_fetch() {
@@ -827,6 +877,7 @@ do_diff() { # persist(0|1); rc: 2 fetch/parse, 3 verify/meta fail, 4 device AHEA
 		FROMVER=$(grep -m1 "^version$TAB" "$WORK/current.flat" | cut -f2)
 		isnum "$FROMVER" || FROMVER=0
 	fi
+	fromver_floor   # live installed versionCode floors FROMVER: a manager-updated module reads as AHEAD, never reverted
 	validate_meta || { _vr=$?; [ "$_vr" = 4 ] && return 4; return 3; }
 	build_plan "$WORK/manifest.flat" >"$WORK/plan.raw"
 	finalize_plan "$WORK/plan.raw" >"$WORK/plan.work"
@@ -914,6 +965,7 @@ cmd_resume() {
 cmd_boot() {
 	acquire_lock
 	local rc interval cap tries
+	clear_stale_journal    # self-heal a leftover target<=0 journal before any resume/diff
 	if [ -f "$TARGET" ]; then
 		run_pipeline 1; rc=$?; release_lock; return "$rc"
 	fi

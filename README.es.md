@@ -42,7 +42,7 @@
 
 ---
 
-## Qué es
+## Por qué
 
 VDBackup es un **módulo WebUI** root que hace copias de seguridad y restaura tus apps y sus
 datos **sin una app complementaria para las funciones principales**: porque el módulo ya
@@ -89,6 +89,16 @@ importar copias de seguridad existentes de Neo-Backup y Android-DataBackup para 
 - **Migrar hacia aquí:** importa copias de seguridad existentes de Neo-Backup y Android-DataBackup,
   incluidas las protegidas con contraseña.
 
+## Agentes de IA
+
+VDBackup está hecho para ser acogedor con asistentes y agentes de IA, no solo con personas.
+El engine habla JSON (cada verbo de `helper.sh` devuelve un único objeto JSON), el
+código, la documentación y la estructura de archivos están dispuestos para la lectura por máquina, y
+las contribuciones asistidas por IA se revisan y aceptan como cualquier otra. Un agente puede administrar
+**cada** acción del módulo sin interfaz a través de la misma API que usa la WebUI -
+mira **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** para la superficie de control completa, y
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) para contribuir.
+
 ## Instalación
 
 1. Descarga el `VD-Backup-vX.Y.zip` más reciente desde [Versiones](https://github.com/VD171/VD-Backup/releases).
@@ -99,12 +109,9 @@ importar copias de seguridad existentes de Neo-Backup y Android-DataBackup para 
 
 ¿Recién llegas? La [Guía de usuario](docs/USER-GUIDE.md) te lleva desde la instalación hasta la restauración.
 
-## Portabilidad
+## Seguridad
 
-Tus copias de seguridad **no quedan atrapadas en este módulo**. Todo usa formatos estándar
-(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) que se abren en Windows, macOS y
-Linux con herramientas comunes o gestores de archivos. Cada copia cifrada incluye una
-nota **RECOVERY** con los comandos exactos para descifrar y extraer en un PC.
+VDBackup se ejecuta como root y maneja los datos de tus apps y, opcionalmente, tus credenciales y frases de contraseña de cifrado; una copia de seguridad puede contener datos sensibles, así que protégela con una frase de contraseña y guárdala en un lugar de confianza. Las credenciales se almacenan cifradas en reposo, nunca en texto claro, y el cifrado nunca está atado al hardware del dispositivo, por lo que la frase de contraseña es lo que protege una copia cifrada. Informa una vulnerabilidad según [SECURITY.md](SECURITY.md).
 
 ## Build
 
@@ -112,15 +119,12 @@ El módulo es shell + WebUI más binarios estáticos por ABI (`tar`, `zstd`, `lz
 `rclone`, `rsync`, ssh, `restic`) compilados para `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. Mira [CONTRIBUTING.md](CONTRIBUTING.md) y los workflows de CI.
 
-## Amigable con la IA
+## Portabilidad
 
-VDBackup está hecho para ser acogedor con asistentes y agentes de IA, no solo con personas.
-El engine habla JSON (cada verbo de `helper.sh` devuelve un único objeto JSON), el
-código, la documentación y la estructura de archivos están dispuestos para la lectura por máquina, y
-las contribuciones asistidas por IA se revisan y aceptan como cualquier otra. Un agente puede administrar
-**cada** acción del módulo sin interfaz a través de la misma API que usa la WebUI -
-mira **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** para la superficie de control completa, y
-[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) para contribuir.
+Tus copias de seguridad **no quedan atrapadas en este módulo**. Todo usa formatos estándar
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) que se abren en Windows, macOS y
+Linux con herramientas comunes o gestores de archivos. Cada copia cifrada incluye una
+nota **RECOVERY** con los comandos exactos para descifrar y extraer en un PC.
 
 ## Actualizaciones incrementales (VDLU)
 
@@ -148,16 +152,15 @@ bloqueadas; el `.zip` completo sigue siendo válido como alternativa.
 
 ## Véase también
 
-Proyectos hermanos del mismo autor:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: un depurador de métodos del dispositivo: lee cada elemento por todos los métodos que pueden leerlo y los compara lado a lado.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: tus servicios de Google (RCS, Wallet, atestaciones de Play Integrity), leídos en tu dispositivo sin internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: un spoofer de dispositivo que convierte un fingerprint nuevo en un perfil coherente y consistente.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: suplantación del fingerprint global del dispositivo / Play Integrity, en todo el dispositivo con alcance por aplicación y una WebUI.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: un demonio SSH independiente con root (Dropbear).
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: un motor de autoactualización incremental y sin flasheo, integrado en módulos KernelSU/APatch/Magisk.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: tus servicios de Google (RCS, Wallet, atestaciones de Play Integrity), leídos en tu dispositivo sin internet.
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: un instalador sideload con root y sin fricción para APK individuales, por lotes y divididos, con un interruptor para el verificador de Play Protect y suplantación del origen de instalación.
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: un depurador de métodos del dispositivo: lee cada elemento por todos los métodos que pueden leerlo y los compara lado a lado.
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: un motor de autoactualización incremental y sin flasheo, integrado en módulos KernelSU/APatch/Magisk.
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: nuestro repositorio de módulos MMRL/WebUI-X (instala todos estos desde tu gestor de root).
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: un conjunto de datos de fingerprints build.prop de Pixel (fork de @T3SL4).
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: usa Telegram como almacén de objetos desde una pequeña CLI de Go.
 
 ## Contactos
 

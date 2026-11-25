@@ -42,7 +42,7 @@
 
 ---
 
-## What it is
+## Why
 
 VDBackup is a root **WebUI module** that backs up and restores your apps and their
 data **without a companion app for the core features**, because the module is
@@ -89,6 +89,16 @@ import existing Neo-Backup and Android-DataBackup backups so you can move over.
 - **Migrate in:** imports existing Neo-Backup and Android-DataBackup backups,
   including password-encrypted ones.
 
+## AI agents
+
+VDBackup is built to be welcoming to AI assistants and agents, not just people.
+The engine speaks JSON (every `helper.sh` verb returns a single JSON object), the
+code, docs and file structure are laid out for machine reading, and AI-assisted
+contributions are reviewed and accepted like any other. An agent can administer
+**every** action of the module headlessly through the same API the WebUI uses -
+see **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** for the full control surface, and
+[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) to contribute.
+
 ## Install
 
 1. Download the latest `VD-Backup-vX.Y.zip` from [Releases](https://github.com/VD171/VD-Backup/releases).
@@ -111,12 +121,14 @@ snapshots -> `universal-lite`; want everything embedded with zero downloads
 
 New here? The [User guide](docs/USER-GUIDE.md) walks you from install to restore.
 
-## Portability
+## Security
 
-Your backups are **not locked into this module**. Everything uses standard formats
-(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) that open on Windows, macOS and
-Linux with common tools or file managers. Every encrypted backup ships with a
-**RECOVERY** note containing the exact commands to decrypt and extract on a PC.
+VDBackup runs as root and handles your app data and, optionally, your credentials
+and encryption passphrases; a backup can hold sensitive data, so protect it with a
+passphrase and keep it somewhere you trust. Credentials are stored encrypted at rest,
+never in clear text, and encryption is never tied to device hardware, so the
+passphrase is what guards an encrypted backup. Report a vulnerability per
+[SECURITY.md](SECURITY.md).
 
 ## Build
 
@@ -124,15 +136,12 @@ The module is shell + WebUI plus per-ABI static binaries (`tar`, `zstd`, `lz4`,
 `rclone`, `rsync`, ssh, `restic`) built for `armeabi-v7a`, `arm64-v8a`, `x86`,
 `x86_64`. See [CONTRIBUTING.md](CONTRIBUTING.md) and the CI workflows.
 
-## AI-friendly
+## Portability
 
-VDBackup is built to be welcoming to AI assistants and agents, not just people.
-The engine speaks JSON (every `helper.sh` verb returns a single JSON object), the
-code, docs and file structure are laid out for machine reading, and AI-assisted
-contributions are reviewed and accepted like any other. An agent can administer
-**every** action of the module headlessly through the same API the WebUI uses -
-see **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** for the full control surface, and
-[CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) to contribute.
+Your backups are **not locked into this module**. Everything uses standard formats
+(`tar`, `gzip`, `zstd`, `age`, `zip`, `restic`) that open on Windows, macOS and
+Linux with common tools or file managers. Every encrypted backup ships with a
+**RECOVERY** note containing the exact commands to decrypt and extract on a PC.
 
 ## Incremental updates (VDLU)
 
@@ -161,16 +170,15 @@ full `.zip` stays valid as a fallback.
 
 ## See also
 
-Sibling projects by the same author:
-
-- **[VDInfos](https://github.com/VD171/VD-Infos)**: a device method debugger that reads each item through every method that can read it and compares them side by side.
-- **[VDGoogle](https://github.com/VD171/VD-Google)**: your Google services (RCS, Wallet, Play Integrity attestations), read on your device with no internet.
-- **[COPG-VD](https://github.com/VD171/COPG-VD)**: a device spoofer that turns a fresh fingerprint into a coherent, consistent profile.
+- **[COPG-VD](https://github.com/VD171/COPG-VD)**: global device fingerprint / Play Integrity spoofing, whole-device with per-app scope and a WebUI.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: a standalone rooted SSH daemon (Dropbear).
-- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: a flashless, incremental self-update engine embedded into KernelSU/APatch/Magisk modules.
+- **[VDGoogle](https://github.com/VD171/VD-Google)**: your Google services (RCS, Wallet, Play Integrity attestations), read on your device with no internet.
 - **[VDInstaller](https://github.com/VD171/VD-Installer)**: a frictionless root sideload installer for single, batch and split APKs, with a Play Protect verifier toggle and install-source spoofing.
-
-Telegram backend: **[@VictorGabriel7Dev/mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**.
+- **[VDInfos](https://github.com/VD171/VD-Infos)**: a device method debugger that reads each item through every method that can read it and compares them side by side.
+- **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: a flashless, incremental self-update engine embedded into KernelSU/APatch/Magisk modules.
+- **[VD-Modules](https://github.com/VD171/VD-Modules)**: our MMRL/WebUI-X module repository (install all of these from your root manager).
+- **[build.prop](https://github.com/VictorGabriel7Dev/build.prop)**: a dataset of Pixel build.prop fingerprints (fork of @T3SL4).
+- **[mtproto-store](https://github.com/VictorGabriel7Dev/mtproto-store)**: use Telegram as an object store from a tiny Go CLI.
 
 ## Contacts
 
