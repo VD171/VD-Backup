@@ -56,6 +56,7 @@
     checkBtn: 'Check for updates', updateNow: 'Update now', automation: 'Automation',
     onOpen: 'On WebUI open', onOpenSub: 'Runs VDLU in the background (applies LIVE, stages the <code>.so</code> for the reboot).',
     onReboot: 'On reboot', onRebootSub: 'In pre-zygote applies everything, including the <code>.so</code>, with no extra reboot.',
+    silentUpdate: 'Silent update', silentUpdateSub: 'Apply updates in the background without showing the reboot bar.',
     bootRetryEvery: 'Boot retry every (s)', bootRetryUpTo: 'Boot retry up to (min)', bootRetryHint: 'If the device boots offline, keep retrying the manifest fetch. 0 min = off.',
     source: 'Source', saveSource: 'Save source', savedDot: 'Saved.',
     netPolicy: 'Network', netAny: 'Wi-Fi + mobile', netWifi: 'Wi-Fi only', netMobile: 'Mobile only',
@@ -63,7 +64,7 @@
     bootstrapping: 'Preparing updater…', bootstrapSub: 'one-time download of the fetcher', bootstrapFail: 'Could not prepare the updater',
     searching: 'Searching…', upToDate: 'Up to date', nothingNew: 'nothing new',
       ahead: 'Newer than the feed', aheadSub: 'your version is ahead of the published update',
-      deferred: 'Download deferred', deferredSub: 'waiting for the allowed network - resumes at the next check',
+      deferred: 'Download deferred', deferredSub: 'waiting for the allowed network, resumes at the next check',
     updateAvail: 'Update available', install: 'install', fileOne: 'file', fileMany: 'files',
     requiresReboot: 'requires reboot', checkFail: 'Check failed', ksuUnavailable: 'KSU API unavailable',
     pendingUpdate: 'Pending update', notNow: 'Not now', srcPlaceholder: 'https://…/&lt;module&gt;'
@@ -173,10 +174,23 @@
     else document.body.appendChild(elBanner);
     return elBanner;
   }
+  // Update-bar (reboot banner) control + persistence. The "x" dismissal must SURVIVE a WebUI restart, so it
+  // is persisted per-module (localStorage) keyed by the dismissed target version - a LATER version re-shows
+  // the bar (its version != the stored one). `silent_update` in the config suppresses the bar entirely; the
+  // update still applies in the background (engine-side behavior is unchanged, this is WebUI-only chrome).
+  function barKey() { return 'vdlu:' + (C.modid || 'vdlu') + ':barDismissed'; }
+  function barDismissedVer() { try { return window.localStorage ? window.localStorage.getItem(barKey()) : null; } catch (e) { return null; } }
+  function setBarDismissed(ver) { try { if (window.localStorage) window.localStorage.setItem(barKey(), String(ver == null ? '' : ver)); } catch (e) {} }
+  function barSilent() { return truthy(((cfgCache || {}).map || {}).silent_update); }
   function showBanner(ver) {
     ensureBanner();
+    if (barSilent()) { hideBanner(); return; }                                              // silent mode: no bar (update still applied)
+    if (ver != null && String(barDismissedVer()) === String(ver)) { hideBanner(); return; } // dismissed earlier, persists across restarts
     elBanner.innerHTML = '<span class="vdlu-banner-ic">⚠️</span><span class="vdlu-banner-tx">' + esc(T('bannerReboot')) + ' <code>.so</code>'
-      + (ver != null ? ' (v' + esc(ver) + ')' : '') + '</span>';
+      + (ver != null ? ' (v' + esc(ver) + ')' : '') + '</span>'
+      + '<button class="vdlu-banner-x" type="button" data-r="bx" title="' + esc(T('close')) + '" aria-label="' + esc(T('close')) + '">&times;</button>';
+    var bx = elBanner.querySelector('[data-r=bx]');
+    if (bx) bx.addEventListener('click', function () { setBarDismissed(ver); hideBanner(); });
     elBanner.hidden = false;
   }
   function hideBanner() { if (elBanner) elBanner.hidden = true; }
@@ -499,6 +513,8 @@
       + '    <span class="vdlu-sw" data-cfg="auto_on_webui_open" role="switch" tabindex="0"></span></div>'
       + '  <div class="vdlu-tg"><div class="vdlu-tg-tx"><b>' + esc(T('onReboot')) + '</b><small>' + T('onRebootSub') + '</small></div>'
       + '    <span class="vdlu-sw" data-cfg="auto_on_reboot" role="switch" tabindex="0"></span></div>'
+      + '  <div class="vdlu-tg"><div class="vdlu-tg-tx"><b>' + esc(T('silentUpdate')) + '</b><small>' + T('silentUpdateSub') + '</small></div>'
+      + '    <span class="vdlu-sw" data-cfg="silent_update" role="switch" tabindex="0"></span></div>'
       + '  <label class="vdlu-fld"><span>' + esc(T('bootRetryEvery')) + '</span><input class="vdlu-num" data-cfg="boot_retry_interval" type="number" min="5" step="5" inputmode="numeric"></label>'
       + '  <label class="vdlu-fld"><span>' + esc(T('bootRetryUpTo')) + '</span><input class="vdlu-num" data-cfg="boot_retry_minutes" type="number" min="0" step="1" inputmode="numeric"></label>'
       + '  <div class="vdlu-hint">' + esc(T('bootRetryHint')) + '</div>'
@@ -521,7 +537,7 @@
       var k = sw.getAttribute('data-cfg'), on = !sw.classList.contains('on');
       sw.classList.toggle('on', on); sw.classList.toggle('off', !on);
       var p = {}; p[k] = on ? '1' : '0';
-      writeConfig(p).then(function () { toastMsg(T('savedToast')); }, function () { sw.classList.toggle('on'); sw.classList.toggle('off'); toastMsg(T('saveFail')); });
+      writeConfig(p).then(function () { toastMsg(T('savedToast')); if (k === 'silent_update') refreshBanner(); }, function () { sw.classList.toggle('on'); sw.classList.toggle('off'); toastMsg(T('saveFail')); });
     };
     [].forEach.call(panelEl.querySelectorAll('.vdlu-sw'), function (sw) {
       sw.addEventListener('click', function () { swToggle(sw); });

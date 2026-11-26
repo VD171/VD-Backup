@@ -9,7 +9,7 @@ gardez les discussions techniques et constructives.
 
 - Soyez bienveillant. Pas de harcèlement, d'attaques personnelles ou de discrimination.
 - Critiquez les idées et le code, pas les personnes.
-- Aidez les nouveaux venus ; tout le monde a été débutant un jour.
+- Aidez les nouveaux venus, tout le monde a été débutant un jour.
 
 Les comportements inacceptables peuvent être signalés en privé au mainteneur (voir
 [SECURITY.md](SECURITY.md) pour le contact). Les mainteneurs peuvent supprimer les commentaires, commits,
@@ -22,4 +22,4 @@ Covenant.
 
 ---
 
-> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues ; voir [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md)._

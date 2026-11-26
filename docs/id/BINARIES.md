@@ -19,7 +19,7 @@ buram yang diselipkan.
   repositori paket Termux resmi (berkas `.deb` bertanda tangan di `packages.termux.dev/apt`),
   tidak pernah disalin dari sebuah Termux yang terpasang di suatu ponsel. Build gagal dengan
   lantang, ia tidak pernah berimprovisasi.
-- **Dapat direproduksi.** Jalankan ulang build dan Anda mendapatkan berkas yang sama; ambil
+- **Dapat direproduksi.** Jalankan ulang build dan Anda mendapatkan berkas yang sama, ambil
    ulang sumber yang disematkan dan nilai SHA-256 cocok.
 - **Jejak audit dikirim bersama modul.** Bukan hanya di situs web, ia ikut bepergian di
   dalam modul yang terpasang, di perangkat Anda, sehingga Anda bisa mengaudit secara luring.
@@ -30,13 +30,13 @@ buram yang diselipkan.
 |---|---|---|
 | `bin/<abi>/` alat native (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + penutupan `lib/` miliknya | Repo apt **Termux** resmi (`packages.termux.dev/apt`), paket `.deb` resmi | `.github/scripts/build_bin.sh` mengunduh berkas `.deb` + dependensi transitifnya, mengekstraknya, dan menyalin biner beserta hanya pustaka bersama yang dibutuhkan masing-masing |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (fallback konverter ABX) | Rilis GitHub **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF statis) | diunduh dari rilis yang disematkan oleh `build_bin.sh` |
-| `companion.apk` (pendamping Google Drive opsional) | **Repositori ini**, `companion/` (Gradle/Kotlin) | dibangun dari sumber oleh CI dan ditandatangani dengan kunci proyek; bukan blob prabangun |
+| `companion.apk` (pendamping Google Drive opsional) | **Repositori ini**, `companion/` (Gradle/Kotlin) | dibangun dari sumber oleh CI dan ditandatangani dengan kunci proyek, bukan blob prabangun |
 | `vdbackup_helper.dex` (helper framework) | **Repositori ini**, `dex/src/` (Java) | dikompilasi dari sumber oleh CI dengan `javac` + `d8` |
 
-Hanya dua baris pertama yang merupakan biner pihak ketiga prabangun; dua terakhir dibangun
+Hanya dua baris pertama yang merupakan biner pihak ketiga prabangun, dua terakhir dibangun
 dari sumber yang berada di repositori ini dan dapat dibaca serta dibangun ulang.
 
-> **Edisi Full vs lite.** Edisi lite hanya menghilangkan `rclone` dan `restic` (dua biner terbesar) agar tetap kecil dan mengambilnya sesuai permintaan (diverifikasi dengan SHA-256) saat pertama kali Anda memakai tujuan cloud atau mode snapshot; `rsync` dan `ssh`/`scp`/`sftp` tetap disertakan, dan setiap biner lain yang tercantum di atas juga hadir. Edisi Full menyertakan `rclone` (penyedia cloud) dan `restic` (snapshot) secara tertanam, sehingga tidak pernah ada yang diunduh.
+> **Edisi Full vs lite.** Edisi lite hanya menghilangkan `rclone` dan `restic` (dua biner terbesar) agar tetap kecil dan mengambilnya sesuai permintaan (diverifikasi dengan SHA-256) saat pertama kali Anda memakai tujuan cloud atau mode snapshot, `rsync` dan `ssh`/`scp`/`sftp` tetap disertakan, dan setiap biner lain yang tercantum di atas juga hadir. Edisi Full menyertakan `rclone` (penyedia cloud) dan `restic` (snapshot) secara tertanam, sehingga tidak pernah ada yang diunduh.
 
 ## Manifes di perangkat: `PROVENANCE.json`
 
@@ -71,7 +71,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 3. **Bangun ulang dari awal.** Jalankan sendiri `.github/scripts/build_bin.sh` (hanya butuh
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`) dan bandingkan keluarannya dengan yang
    dikirim.
-4. **Pendamping dan dex.** Bangun ulang `companion/` dan `dex/` dari sumber; tanda tangan
+4. **Pendamping dan dex.** Bangun ulang `companion/` dan `dex/` dari sumber, tanda tangan
    pendamping adalah kunci proyek (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
@@ -85,4 +85,4 @@ ketidaksesuaian yang karenanya manifes ini ada untuk membuatnya terlihat.
 
 ---
 
-> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

@@ -11,10 +11,10 @@ tùy chọn được mã hóa với một đuôi `.age`.
 
 ## Các công cụ bạn có thể cần
 
-- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`; Linux: `apt install zstd`)
+- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
 - **age** (chỉ cho các tập tin `.age`): https://github.com/FiloSottile/age/releases
 - `tar` được tích hợp sẵn trong macOS, Linux và Windows 10/11 hiện đại.
-- `gzip` được tích hợp sẵn ở mọi nơi; với `.tar.gz` bạn không cần gì thêm.
+- `gzip` được tích hợp sẵn ở mọi nơi, với `.tar.gz` bạn không cần gì thêm.
 
 ## 1. Giải mã (chỉ khi tập tin kết thúc bằng `.age`)
 
@@ -62,7 +62,7 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ## Ghi chú
 
-- Các tập tin được trích xuất giữ các đường dẫn tương đối của chúng; context SELinux, uid/gid và modes
+- Các tập tin được trích xuất giữ các đường dẫn tương đối của chúng, context SELinux, uid/gid và modes
   nằm bên trong tar (và chỉ được áp dụng lại đúng khi bạn restore trên Android).
 - `manifest.json` mô tả chính xác mỗi tập tin là gì, phiên bản ứng dụng và
   chủ sở hữu/context gốc. Nó là nguồn chân lý.
@@ -73,4 +73,4 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ---
 
-> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md)._

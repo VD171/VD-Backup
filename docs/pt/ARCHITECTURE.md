@@ -44,12 +44,12 @@ prompt de permissão nem app companheiro para os recursos centrais.
 - **Já root.** O processo do módulo é root, então o motor é shell puro. ~85% do
   trabalho é shell puro (`tar`/`zstd`/`age`/`pm`/`am`/`chown`/`chcon`/`rclone`/...).
 - **Execução destacada.** Backup/restauração rodam via `setsid nohup`, como processo root
-  independente. Fechar a WebUI não os interrompe; a UI se reata lendo
+  independente. Fechar a WebUI não os interrompe, a UI se reata lendo
   `logs/progress-<opid>.json`.
 - **Helper de framework (~15%).** Permissões granulares, AppOps, SSAID, StorageStats,
   ícones e Wi-Fi privilegiado precisam do framework Android. Uma pequena execução `dex` via
   `app_process` (sem app instalado) cuida disso, com fallback em shell.
-- **Portabilidade.** Só formatos padrão; os backups abrem num PC sem este módulo.
+- **Portabilidade.** Só formatos padrão, os backups abrem num PC sem este módulo.
 - **O estado** vive em `/data/adb/vdbackup/` (config, jobs, destinos, credenciais
   cifradas, logs, staging). **Os backups** são gravados em armazenamento visível ao usuário e com
   credenciais cifradas em `/sdcard/VDBackup/` (`/data/media/<user>/VDBackup`, por usuário),
@@ -61,7 +61,7 @@ Um backup deve permanecer restaurável para sempre. Isto é regra rígida, não 
 
 **Escopo.** A garantia cobre backups gravados pela **v1.01 em diante** (o primeiro release
 publicado oficialmente) e somente por versões publicadas oficialmente e lançadas. A v1.00 foi
-um build só de teste e está explicitamente fora de escopo; builds pré-release e de
+um build só de teste e está explicitamente fora de escopo, builds pré-release e de
 desenvolvimento não são cobertos. A partir do primeiro release público, a promessa abaixo é
 absoluta:
 
@@ -81,14 +81,14 @@ absoluta:
 
 Em resumo: tudo que o VDBackup já escreveu, todo VDBackup futuro (e um PC comum)
 ainda consegue restaurar. Mudar o formato de um jeito que quebre um backup anterior não é
-permitido; novas capacidades são adicionadas atrás de `format_version` e de novos campos aditivos.
+permitido, novas capacidades são adicionadas atrás de `format_version` e de novos campos aditivos.
 
 Para o design técnico completo (formato de archive, schema de metadados, pipelines, cripto,
-destinos, importadores) os mantenedores guardam notas de design detalhadas; este arquivo é a
+destinos, importadores) os mantenedores guardam notas de design detalhadas, este arquivo é a
 visão geral voltada aos colaboradores.
 
 <!-- doc-footer -->
 
 ---
 
-> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas; veja [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md)._

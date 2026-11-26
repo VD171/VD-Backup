@@ -6,7 +6,7 @@
 
 VDBackup está construido para que un asistente o agente de IA pueda administrar **toda**
 acción y contenido del módulo de forma headless, igual que una persona lo hace por la WebUI. La
-WebUI es solo un cliente de una pequeña API JSON; tu agente es otro. Usa la API,
+WebUI es solo un cliente de una pequeña API JSON, tu agente es otro. Usa la API,
 no raspes la WebUI.
 
 ## El contrato
@@ -19,10 +19,10 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 
 - Los argumentos son un único objeto JSON, **codificado en base64**, pasado como un único token argv.
 - El comando imprime **un objeto JSON** en stdout: `{"ok":true,...}` o
-  `{"ok":false,"code":"ERR_...","message":"..."}`. Parsea eso; nunca raspes texto.
+  `{"ok":false,"code":"ERR_...","message":"..."}`. Parsea eso, nunca raspes texto.
 - Las operaciones largas (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) devuelven `{"ok":true,"opid":"..."}`
   inmediatamente y corren **desacopladas** (sobreviven a que el llamador/WebUI desaparezca). Haz poll
-  de su progreso; no están terminadas cuando la llamada retorna.
+  de su progreso, no están terminadas cuando la llamada retorna.
 - `progress` y `cancel` reciben **el base64 de la cadena opid cruda**, no un objeto JSON.
 
 Un pequeño helper para tu shell:
@@ -35,7 +35,7 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 
 Para controlarlo desde una estación de trabajo, ejecuta eso por tu canal root habitual hacia el dispositivo
 (adb shell como root, o un setup de SSH-a-root). El módulo trae binarios empaquetados, así que
-una vez instalado no necesita **nada de internet** para backup/restauración local; solo los destinos
+una vez instalado no necesita **nada de internet** para backup/restauración local, solo los destinos
 de nube (`rclone`/`restic`/ssh) hablan con la red.
 
 ## Verbos
@@ -43,7 +43,7 @@ de nube (`rclone`/`restic`/ssh) hablan con la red.
 | Verbo | Args (JSON) | Devuelve |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` conteos (tamaños en bytes): apps con backups, total de instancias de backup, backups de ruta independientes, trabajos programados, tamaño total de los backups, y el libre/total del sistema de archivos de los backups. No desacoplada, retorna de inmediato; usada por el resumen inicial de la WebUI. |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` conteos (tamaños en bytes): apps con backups, total de instancias de backup, backups de ruta independientes, trabajos programados, tamaño total de los backups, y el libre/total del sistema de archivos de los backups. No desacoplada, retorna de inmediato, usada por el resumen inicial de la WebUI. |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | el objeto de config (o `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | genera el par de claves `age` para cifrado |
@@ -59,7 +59,7 @@ de nube (`rclone`/`restic`/ssh) hablan con la red.
 | `list-ops` | `{}` | `{ok,ops:[...]}` (reacoplar tras reconectar) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | lista de apps / iconos base64 por lote |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
-| `note-set` | `{ref,note?,tags?}` | `{ok}` establece o borra el nombre personalizado de una copia (`note`) y las `tags` libres; se guarda en un archivo adjunto que viaja con la copia, buscable desde `list-backups`. |
+| `note-set` | `{ref,note?,tags?}` | `{ok}` establece o borra el nombre personalizado de una copia (`note`) y las `tags` libres, se guarda en un archivo adjunto que viaja con la copia, buscable desde `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` usuarios de Android del dispositivo (multiusuario). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` subdirectorios de una ruta (selector de carpeta). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` copias de carpeta/archivo independientes. |
@@ -72,48 +72,48 @@ de nube (`rclone`/`restic`/ssh) hablan con la red.
 | `log-export` | `{user?}` | `{ok:true,path}` (ruta absoluta de un `.txt` escrito bajo el directorio de backups) o `{ok:false,code:"ERR_LOG_EXPORT"}`. Escribe el registro de actividad (`audit.jsonl`) más una breve cabecera de compilación/dispositivo en un único archivo de texto visible para el usuario para que pueda adjuntarse a un informe de error. No desacoplada, retorna de inmediato. |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` copia a nivel de todo el sistema (desacoplada) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (requiere reboot; `confirm` la protege) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (requiere reboot, `confirm` la protege) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` respalda cualquier ruta absoluta como `tar.zst`+`manifest.json` bajo `.paths/` (desacoplada) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` restaura un backup de ruta a su ubicación original (`confirm` la protege; desacoplada) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` restaura un backup de ruta a su ubicación original (`confirm` la protege, desacoplada) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` un nivel perezoso del árbol de /data/adb (por defecto `/data/adb`), para el selector. |
 | `adb-du` | `{path}` | `{ok,size}` tamaño recursivo en bytes de un subárbol de /data/adb, a demanda. |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` respalda /data/adb - total (omite `paths`) o las sub-rutas elegidas - con fidelidad SELinux/propietario por archivo, bajo `.adb/` (desacoplada) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` restaura un backup de /data/adb SOBRE el árbol vivo - total o sub-rutas elegidas - conservando el contexto de cada archivo (nunca un chcon general); `confirm` la protege (desacoplada) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` restaura un backup de /data/adb SOBRE el árbol vivo - total o sub-rutas elegidas - conservando el contexto de cada archivo (nunca un chcon general), `confirm` la protege (desacoplada) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` los backups del sistema de archivos /data/adb. |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` el listado de archivos detallado almacenado de un backup, para el selector de árbol de restauración. |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | monta una app instalada como app de sistema (submódulo sin montaje; en vivo vía NoMount, si no al próximo arranque) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | monta una app instalada como app de sistema (submódulo sin montaje, en vivo vía NoMount, si no al próximo arranque) |
 | `companion-status` / `companion-install` | `{}` | estado / instalación bajo demanda del compañero de Google Drive |
 | `telegram-check` | `{}` | estado de la sesión de Telegram (`user` null = sin iniciar sesión) |
-| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | inicio de sesión de Telegram; `sign-in` devuelve `2FA_REQUIRED` si la cuenta tiene 2FA y falta `password` |
+| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | inicio de sesión de Telegram, `sign-in` devuelve `2FA_REQUIRED` si la cuenta tiene 2FA y falta `password` |
 | `telegram-logout` | `{}` | cierra la sesión de Telegram |
 | `telegram-list` | `{}` | copias en el canal de Telegram (nombres `<pkg>__<ts>_<vc>.vdb.tar`) |
-| `telegram-pull` | `{message_id,name}` | `{ok,opid}` descarga una copia de Telegram al almacenamiento local (detached); luego se restaura por el flujo normal de `restore` |
+| `telegram-pull` | `{message_id,name}` | `{ok,opid}` descarga una copia de Telegram al almacenamiento local (detached), luego se restaura por el flujo normal de `restore` |
 | `telegram-delete` | `{message_id}` | `{ok,deleted:[...]}` elimina una copia del canal de Telegram por `message_id` (lote: separado por comas) |
 | `rclone-list` | `{dest}` | `{ok,dest,backups:[{dest,rref,package,tsvc}]}` copias Full almacenadas solo en remoto en un destino rclone (`dest` es el id del destino, `rref` es `<pkg>/<ts_vc>`) |
-| `rclone-pull` | `{dest,rref}` | `{ok,opid}` descarga una copia rclone almacenada solo en remoto al almacenamiento local (detached); luego se restaura por el flujo normal de `restore` |
-| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` elimina una copia de un remoto rclone; `rref` debe ser exactamente `<pkg>/<ts_vc>` |
+| `rclone-pull` | `{dest,rref}` | `{ok,opid}` descarga una copia rclone almacenada solo en remoto al almacenamiento local (detached), luego se restaura por el flujo normal de `restore` |
+| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` elimina una copia de un remoto rclone, `rref` debe ser exactamente `<pkg>/<ts_vc>` |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | gestión de destinos |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | gestión de remotos rclone (crea la entrada `rclone.conf` a la que apunta un dest `type:"rclone"`); `backend` puede ser cualquier backend de rclone, sin lista blanca |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | gestión de remotos rclone (crea la entrada `rclone.conf` a la que apunta un dest `type:"rclone"`), `backend` puede ser cualquier backend de rclone, sin lista blanca |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (el motor ya abrió el navegador del teléfono en esa URL de consentimiento mediante un intent VIEW de Android) o `{ok:false,code:"ERR_AUTHORIZE"}`. Ejecuta `rclone authorize <backend>` en un servidor de callback local (`127.0.0.1:53682`) para OAuth en el dispositivo. |
 | `remote-authorize-poll` | `{}` | `{ok:true,done:false,url}` mientras espera, `{ok:true,done:true,token}` una vez que el usuario consintió (el `token` que se pasa a `remote-add`), o `{ok:false,code:"ERR_AUTHORIZE"}`. |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; detiene una autorización pendiente. |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, detiene una autorización pendiente. |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (si los binarios `rclone`/`restic` están presentes, si esta edición `lite` puede obtenerlos, tamaño de la descarga en bytes) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (desacoplada) descarga+verifica+instala el addon `rclone`/`restic` en una edición `lite` |
-| `schedule-set` / `schedule-list` / `schedule-delete` | ver abajo | trabajos agendados (un backup o una restauración; apuntan a una app, un conjunto o todas las apps) |
+| `schedule-set` / `schedule-list` / `schedule-delete` | ver abajo | trabajos agendados (un backup o una restauración, apuntan a una app, un conjunto o todas las apps) |
 | `scheduler-tick` | `{}` | corre trabajos vencidos + aplica retención + el observador de copia automática (el heartbeat de arranque llama a esto) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (no destacada; retorna de inmediato; `ERR_UPDATE_CHECK` en caso de fallo, ver abajo) |
-| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) respalda varias aplicaciones en una op independiente; el progreso lleva `n`/`of`. Un fallo por app no detiene el lote. |
-| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) restaura varias copias en una op independiente; el progreso lleva `n`/`of`. Un fallo por app no detiene el lote. |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (no destacada, retorna de inmediato, `ERR_UPDATE_CHECK` en caso de fallo, ver abajo) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) respalda varias aplicaciones en una op independiente, el progreso lleva `n`/`of`. Un fallo por app no detiene el lote. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) restaura varias copias en una op independiente, el progreso lleva `n`/`of`. Un fallo por app no detiene el lote. |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` volúmenes de almacenamiento para el selector de carpetas: interno más SD/USB extraíble. |
 | `config-export` | `{password}` | `{ok,opid}` (detached) exporta config, trabajos, destinos, credenciales y claves a un único archivo cifrado con frase de contraseña, bajo la carpeta de copias. |
 | `config-import` | `{ref,password}` | `{ok,opid}` (detached) combina un archivo de config exportado de vuelta en este dispositivo (nunca sobrescribe a ciegas). |
 | `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` enumera los archivos de config cifrados disponibles para importar. |
-| `wipe-credentials` | `{}` | `{ok,wiped}` elimina las contraseñas remotas guardadas y la clave de cifrado del dispositivo; destinos, trabajos y copias permanecen. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` elimina las contraseñas remotas guardadas y la clave de cifrado del dispositivo, destinos, trabajos y copias permanecen. |
 | `log-prune` | `{}` | `{ok}` poda registros de ops hace tiempo terminadas, limita el registro de auditoría y elimina iconos obsoletos (lo llama el servicio de arranque). |
 | `sanitize` | `{}` | `{ok}` reafirma la visibilidad (0755) de las carpetas de backup en cada usuario de Android, para que un gestor de archivos pueda abrir carpetas que una copia root en bruto o un backup anterior a v1.03.2 dejaron accesibles solo para el propietario. |
-| `boot-sweep` | `{}` | `{ok,reaped}` limpia los restos de un backup que fue interrumpido o terminado a la fuerza (lo llama el servicio de arranque); un backup que falla o se cancela ya lo limpia su propio worker. |
+| `boot-sweep` | `{}` | `{ok,reaped}` limpia los restos de un backup que fue interrumpido o terminado a la fuerza (lo llama el servicio de arranque), un backup que falla o se cancela ya lo limpia su propio worker. |
 
 ### Campos de `progress`
 
@@ -140,7 +140,7 @@ restore-test):
 | `of` | int | total de ítems (0 = desconocido) |
 | `cur` | string | nombre del ítem actual (vacío = ninguno) |
 
-Las transferencias de nube llenan `rate`/`eta` (el percent viene de rclone); los backups Full
+Las transferencias de nube llenan `rate`/`eta` (el percent viene de rclone), los backups Full
 locales llenan `n`/`of`/`cur`. Los labels de fase incluyen la fase de sello de checksum
 **`verified`** y, para transferencias de nube, **`transfer`** y **`mirror <item>`**.
 
@@ -166,11 +166,11 @@ locales llenan `n`/`of`/`cur`. Los labels de fase incluyen la fase de sello de c
 ```
 
 `restore`/`import` reciben `{ref}` (un dir de backup / ref de scan). `restore` también acepta:
-`"items"` (un subconjunto de los tipos de ítem del backup a restaurar; omítelo para todos), `"test": true`
+`"items"` (un subconjunto de los tipos de ítem del backup a restaurar, omítelo para todos), `"test": true`
 (extrae a un dir temporal y verifica, sin tocar la app viva), `"mode"` para snapshot/mirror, `"password"`
 para un backup cifrado, `"ssaid"` (opt-in) y las opciones de origen de instalación `"spoof_installer"`
 (por defecto desde la config, fija el instalador como Play Store en el momento de la instalación) y
-`"deep_spoof": true` (opt-in avanzado; además falsifica el paquete iniciador y el origen del paquete
+`"deep_spoof": true` (opt-in avanzado, además falsifica el paquete iniciador y el origen del paquete
 editando la base de datos de paquetes, se aplica tras un reboot). `import` recibe
 `"from": "neo" | "databackup"` y, para un backup Neo cifrado, `"password"`.
 
@@ -229,11 +229,11 @@ Un lote (`backup` con `packages`, `restore` con `refs`) ejecuta cada app en su p
 - **`batch_app_timeout`** (config, segundos, predeterminado `1800`, `0` lo desactiva): si una app tarda más, su árbol de procesos se termina, se registra como `ERR_TIMEOUT` y el lote continúa, de modo que una app atascada nunca congele toda la ejecución.
 - **Resultado parcial**: la escritura final incluye `ok`, `n` de `of`, un recuento `fails` `{code:count}` (p. ej. `{"ERR_NO_SPACE":24}`) y `free` (bytes libres en el sistema de archivos de las copias). Un lote parcial es `ERR_BATCH_PARTIAL`, nunca un error ciego.
 - **Ritmo térmico** (config `thermal_throttle`, activado por defecto): entre apps el worker se pausa para enfriarse cuando el dispositivo está caliente, emitiendo una fase de progreso `cooling`, para que una ejecución larga no sobrecaliente el dispositivo.
-- **Estimación de espacio previa** (config `space_preflight`, activada por defecto): antes de un lote hacia un destino local, se suma el tamaño sin comprimir de las apps seleccionadas; si ya supera el espacio libre del destino, el lote se detiene de antemano con `ERR_NO_SPACE` (más un campo `need`) en lugar de llenar el disco a medias. Se omite en destinos remotos en streaming.
+- **Estimación de espacio previa** (config `space_preflight`, activada por defecto): antes de un lote hacia un destino local, se suma el tamaño sin comprimir de las apps seleccionadas, si ya supera el espacio libre del destino, el lote se detiene de antemano con `ERR_NO_SPACE` (más un campo `need`) en lugar de llenar el disco a medias. Se omite en destinos remotos en streaming.
 
 ### Args de `remote-add`
 
-Un destino de nube es un dest `type:"rclone"` que nombra un remoto `rclone`; crea
+Un destino de nube es un dest `type:"rclone"` que nombra un remoto `rclone`, crea
 ese remoto primero con `remote-add`. El `backend` puede ser **cualquier backend de rclone** -
 no hay lista blanca. `remote-add` acepta cualquier nombre de backend (`dropbox`, `onedrive`,
 `box`, `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` y los ~70 otros
@@ -276,7 +276,7 @@ Los destinos locales nunca se gatean.
 ### Integridad y cuota de nube
 
 - **Sello de checksum (nube).** Tras una copia a nube exitosa, el engine corre una comprobación de
-  checksum remota (`rclone check`); una discrepancia falla la op con `ERR_VERIFY`. Los backends
+  checksum remota (`rclone check`), una discrepancia falla la op con `ERR_VERIFY`. Los backends
   que no comparten ningún hash común con el lado local se omiten (no es un fallo).
 - **Comprobación de cuota (nube, modo Full).** Antes de un upload en modo Full a un remoto
   `rclone`, el engine consulta el espacio libre del remoto (`rclone about --json`) y se niega con
@@ -291,11 +291,11 @@ corres una acción de nube o snapshot. `cloud-status` informa si ya están prese
 edición puede obtenerlos, y el tamaño de la descarga en bytes. `cloud-fetch` corre **desacoplada**
 (haz poll de `progress` con su `opid`): descarga el addon `rclone`+`restic` por arquitectura, lo
 verifica contra el SHA-256 incrustado en el módulo, y lo instala en el caché de runtime. Sus
-fases de progreso son `downloading`, `verifying` e `installing`; el código final es `ERR_NONE` en
+fases de progreso son `downloading`, `verifying` e `installing`, el código final es `ERR_NONE` en
 caso de éxito, o `ERR_FETCH` (descarga fallida) / `ERR_FETCH_VERIFY` (checksum no coincide,
 descartado) en caso de fallo. En una edición `full` es innecesaria. Un `backup`/`restore` a un
 destino de nube o snapshot en una edición `lite`, antes de que los binarios estén presentes,
-falla con `ERR_CLOUD_FETCHABLE`; el cliente debe ofrecer correr `cloud-fetch`, y luego reintentar.
+falla con `ERR_CLOUD_FETCHABLE`, el cliente debe ofrecer correr `cloud-fetch`, y luego reintentar.
 
 ### Categorías de copias especiales
 
@@ -306,11 +306,11 @@ categorías son:
 | Categoría | Qué es | Semántica de restauración |
 |----------|-----------|-------------------|
 | `messages` | SMS/MMS | reemplazo del proveedor (borra + extrae) |
-| `rcs` | chat RCS (Google Messages, `bugle_db`); también exportado de forma portátil a `rcs.json` | reemplazo de datos de la app (borra + extrae), mismo dispositivo |
+| `rcs` | chat RCS (Google Messages, `bugle_db`), también exportado de forma portátil a `rcs.json` | reemplazo de datos de la app (borra + extrae), mismo dispositivo |
 | `contacts` | contactos y registro de llamadas | reemplazo del proveedor (borra + extrae) |
 | `wifi` | redes Wi-Fi guardadas | reemplazo del proveedor (borra + extrae) |
 | `bluetooth` | emparejamientos Bluetooth | reemplazo del proveedor (borra + extrae) |
-| `calendar` | el proveedor de calendario (`com.android.providers.calendar`, app + datos); también exportado de forma portable a `calendar.json` | reemplazo del proveedor (borra + extrae) |
+| `calendar` | el proveedor de calendario (`com.android.providers.calendar`, app + datos), también exportado de forma portable a `calendar.json` | reemplazo del proveedor (borra + extrae) |
 | `wallpaper` | fondo de pantalla de inicio y de bloqueo más `wallpaper_info.xml`, guardado en crudo (binario) | archivos reemplazados |
 | `dns` | el modo y el especificador de DNS privado, leídos de settings | `settings put` idempotente |
 | `system_settings` | el volcado completo de los ajustes system/global/secure | **opt-in**, `settings put` idempotente, sobrescribe los ajustes del dispositivo |
@@ -318,7 +318,7 @@ categorías son:
 **`system_settings` es estrictamente opt-in y destructivo en la restauración.** Como `ssaid`,
 sobrescribe los ajustes de todo el dispositivo cuando se restaura, así que está protegido tras un
 consentimiento explícito del usuario y se escribe en la traza de auditoría. Nunca lo selecciones por
-defecto; solo a petición directa y deliberada del usuario.
+defecto, solo a petición directa y deliberada del usuario.
 
 ### Backup de ruta independiente
 
@@ -336,12 +336,12 @@ con un kit RECOVERY cuando está cifrado) bajo `.paths/` en el directorio de bac
 
 - La ruta de origen debe ser **absoluta** y estar bajo uno de los roots permitidos:
   `/storage/emulated`, `/data/media`, `/sdcard`, `/data`. Una ruta que no existe falla
-  con `ERR_NO_PATH`; una ruta fuera de los roots permitidos, o una que contiene `..`, falla con
+  con `ERR_NO_PATH`, una ruta fuera de los roots permitidos, o una que contiene `..`, falla con
   `ERR_BAD_PATH`.
 - `path-restore` escribe de vuelta en la ubicación original, así que es destructivo y requiere
   `"confirm": true`, una barrera de alta fricción, como `special-restore`. Un `ref` que no es un
   backup de ruta válido falla con `ERR_BAD_REF`.
-- Ambos corren **desacoplados**; haz poll de `progress` con el `opid` devuelto.
+- Ambos corren **desacoplados**, haz poll de `progress` con el `opid` devuelto.
 
 ### Backup del sistema de archivos /data/adb
 
@@ -350,18 +350,18 @@ sus datos y configuraciones), guiados por un selector de árbol perezoso (`adb-l
 vez, `adb-du` para el tamaño de una carpeta a demanda).
 
 - Total o selectivo en ambos extremos: omite `paths` para todo, o pasa las sub-rutas elegidas
-  (relativas a /data/adb); la restauración toma las mismas `paths`.
+  (relativas a /data/adb), la restauración toma las mismas `paths`.
 - **Fidelidad por archivo:** el archive conserva el contexto SELinux, propietario y xattrs de cada
   archivo, y la restauración se apoya en eso - NUNCA aplica un `chcon` general, que aplanaría los
-  contextos heterogéneos de /data/adb y rompería root. `adb-restore` extrae SOBRE el árbol vivo; nunca
+  contextos heterogéneos de /data/adb y rompería root. `adb-restore` extrae SOBRE el árbol vivo, nunca
   lo borra.
 - Autorreferencia: la propia salida del backup y el staging del módulo se excluyen, así que un backup
   nunca se contiene a sí mismo.
 - `adb-index` devuelve el listado de archivos almacenado de un backup para que una restauración pueda
-  mostrar su árbol; la selección de la UI se expresa por completo mediante `paths` (una carpeta
-  totalmente marcada es una ruta; una parcialmente marcada desciende a sus hijos marcados, así que no
+  mostrar su árbol, la selección de la UI se expresa por completo mediante `paths` (una carpeta
+  totalmente marcada es una ruta, una parcialmente marcada desciende a sus hijos marcados, así que no
   hace falta una lista de exclusión).
-- `adb-restore` requiere `"confirm": true` (barrera de alta fricción); ambos corren desacoplados, haz poll de `progress`.
+- `adb-restore` requiere `"confirm": true` (barrera de alta fricción), ambos corren desacoplados, haz poll de `progress`.
 
 ### `update-check`
 
@@ -390,14 +390,14 @@ En caso de éxito retorna:
 Si no hay URL `updateJson`, si la petición de red falla, o si el manifiesto no se puede parsear,
 retorna `{"ok":false,"code":"ERR_UPDATE_CHECK"}`.
 
-`update-check` solo **informa** la disponibilidad y las notas de la versión; la actualización en
+`update-check` solo **informa** la disponibilidad y las notas de la versión, la actualización en
 sí la realiza tu gestor root (KernelSU / APatch / Magisk) a través del `updateJson` del módulo,
 nunca este verbo.
 
 ## Barandillas de seguridad que tu agente debe respetar
 
 - **`ssaid` es estrictamente opt-in (por defecto apagado).** Hace backup / restaura el
-  ANDROID_ID del dispositivo reescribiendo un archivo de sistema; una restauración se aplica solo tras un reboot, y
+  ANDROID_ID del dispositivo reescribiendo un archivo de sistema, una restauración se aplica solo tras un reboot, y
   el archivo anterior siempre se guarda primero para rollback. Solo envía `"ssaid": true`
   a petición directa y deliberada del usuario, nunca por defecto.
 - **Las acciones mutables (restore, delete, import) son destructivas** y se registran en una
@@ -417,7 +417,7 @@ nunca este verbo.
   `--no-absolute-names`). Un archive manipulado nunca puede escapar de su directorio objetivo.
 - **Nunca debilites** la preservación (SELinux/uid/gid/modos/xattr) ni la regla del APK (los APK
   siempre se comprimen, nunca se cifran salvo que `encrypt_apk` esté activado).
-- Trata la salida JSON como la fuente de la verdad; revisa `ok`/`code`, haz poll de `progress`,
+- Trata la salida JSON como la fuente de la verdad, revisa `ok`/`code`, haz poll de `progress`,
   y expón los códigos `ERR_*` en vez de adivinar.
 
 Ve [ARCHITECTURE.md](ARCHITECTURE.md) y
@@ -427,4 +427,4 @@ Ve [ARCHITECTURE.md](ARCHITECTURE.md) y
 
 ---
 
-> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas; consulta [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas, consulta [CONTRIBUTING.md](CONTRIBUTING.md)._

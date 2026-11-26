@@ -44,12 +44,12 @@ prompt de permiso ni app complementaria para las funciones centrales.
 - **Ya root.** El proceso del módulo es root, así que el motor es shell puro. ~85% del
   trabajo es shell puro (`tar`/`zstd`/`age`/`pm`/`am`/`chown`/`chcon`/`rclone`/...).
 - **Ejecución desacoplada.** Backup/restauración corren vía `setsid nohup`, como proceso root
-  independiente. Cerrar la WebUI no los interrumpe; la UI se reconecta leyendo
+  independiente. Cerrar la WebUI no los interrumpe, la UI se reconecta leyendo
   `logs/progress-<opid>.json`.
 - **Helper de framework (~15%).** Permisos granulares, AppOps, SSAID, StorageStats,
   iconos y Wi-Fi privilegiado necesitan el framework de Android. Una pequeña ejecución `dex` vía
   `app_process` (sin app instalada) se ocupa de esto, con fallback en shell.
-- **Portabilidad.** Solo formatos estándar; los backups se abren en un PC sin este módulo.
+- **Portabilidad.** Solo formatos estándar, los backups se abren en un PC sin este módulo.
 - **El estado** vive en `/data/adb/vdbackup/` (config, jobs, destinos, credenciales
   cifradas, logs, staging). **Los backups** se escriben en almacenamiento visible al usuario y con
   credenciales cifradas en `/sdcard/VDBackup/` (`/data/media/<user>/VDBackup`, por usuario),
@@ -61,7 +61,7 @@ Un backup debe seguir siendo restaurable para siempre. Esto es una regla dura, n
 
 **Alcance.** La garantía cubre los backups escritos por **v1.01 en adelante** (la primera versión
 publicada oficialmente) y solo por versiones publicadas oficialmente y liberadas. v1.00 fue una
-compilación solo de prueba y está explícitamente fuera de alcance; las compilaciones prelanzamiento y de
+compilación solo de prueba y está explícitamente fuera de alcance, las compilaciones prelanzamiento y de
 desarrollo no están cubiertas. Desde la primera versión pública en adelante, la promesa de abajo es absoluta:
 
 - **Solo formatos estándar.** Cada archive es un `tar` simple comprimido con `zstd`,
@@ -80,14 +80,14 @@ desarrollo no están cubiertas. Desde la primera versión pública en adelante, 
 
 En resumen: cualquier cosa que VDBackup haya escrito, todo VDBackup futuro (y un PC común)
 todavía puede restaurar. Cambiar el formato de un modo que rompa un backup anterior no está
-permitido; las nuevas capacidades se añaden detrás de `format_version` y de campos nuevos y aditivos.
+permitido, las nuevas capacidades se añaden detrás de `format_version` y de campos nuevos y aditivos.
 
 Para el diseño técnico completo (formato de archive, esquema de metadatos, pipelines, cripto,
-destinos, importadores) los mantenedores guardan notas de diseño detalladas; este archivo es la
+destinos, importadores) los mantenedores guardan notas de diseño detalladas, este archivo es la
 visión general orientada a colaboradores.
 
 <!-- doc-footer -->
 
 ---
 
-> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas; consulta [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas, consulta [CONTRIBUTING.md](CONTRIBUTING.md)._

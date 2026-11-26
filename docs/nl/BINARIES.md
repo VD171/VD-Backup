@@ -18,7 +18,7 @@ vandaan komt en hoe je kunt verifiëren dat er niets ondoorzichtigs is binnenges
   Termux-pakketrepository (de ondertekende `.deb`-bestanden op `packages.termux.dev/apt`), nooit
   gekopieerd uit een Termux die op een of andere telefoon is geïnstalleerd. De build faalt
   luidruchtig, hij improviseert nooit.
-- **Reproduceerbaar.** Voer de build opnieuw uit en je krijgt dezelfde bestanden; haal de
+- **Reproduceerbaar.** Voer de build opnieuw uit en je krijgt dezelfde bestanden, haal de
    vastgezette bronnen opnieuw op en de SHA-256-waarden komen overeen.
 - **Het auditspoor wordt met de module meegeleverd.** Het staat niet alleen op de website, het
   reist mee binnen de geïnstalleerde module, op je apparaat, zodat je offline kunt auditen.
@@ -29,15 +29,15 @@ vandaan komt en hoe je kunt verifiëren dat er niets ondoorzichtigs is binnenges
 |---|---|---|
 | `bin/<abi>/` native tools (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + hun `lib/`-closure | Officiële **Termux** apt-repo (`packages.termux.dev/apt`), officiële `.deb`-pakketten | `.github/scripts/build_bin.sh` downloadt de `.deb`-bestanden + hun transitieve afhankelijkheden, pakt ze uit en kopieert de binaries plus alleen de gedeelde bibliotheken die elk nodig heeft |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX-converter-terugval) | GitHub-release van **rhythmcache/android-xml-converter** (`ABX_RELEASE`, statische ELF) | gedownload van de vastgezette release door `build_bin.sh` |
-| `companion.apk` (optionele Google Drive-metgezel) | **Deze repository**, `companion/` (Gradle/Kotlin) | gebouwd vanuit de bron door de CI en ondertekend met de projectsleutel; geen voorgebouwde blob |
+| `companion.apk` (optionele Google Drive-metgezel) | **Deze repository**, `companion/` (Gradle/Kotlin) | gebouwd vanuit de bron door de CI en ondertekend met de projectsleutel, geen voorgebouwde blob |
 | `vdbackup_helper.dex` (framework-helper) | **Deze repository**, `dex/src/` (Java) | gecompileerd vanuit de bron door de CI met `javac` + `d8` |
 
-Alleen de eerste twee rijen zijn voorgebouwde binaries van derden; de laatste twee worden gebouwd
+Alleen de eerste twee rijen zijn voorgebouwde binaries van derden, de laatste twee worden gebouwd
 vanuit broncode die in deze repository leeft en gelezen en herbouwd kan worden.
 
 > **Full- versus lite-edities.** De lite-edities laten alleen `rclone` en `restic` (de twee
 > grootste binaries) weg om klein te blijven en halen ze op aanvraag op (geverifieerd met
-> SHA-256) de eerste keer dat je een cloud-bestemming of snapshot-modus gebruikt; `rsync` en
+> SHA-256) de eerste keer dat je een cloud-bestemming of snapshot-modus gebruikt, `rsync` en
 > `ssh`/`scp`/`sftp` zijn nog steeds aanwezig, en elke andere hierboven genoemde binary is er
 > ook. De Full-edities leveren `rclone` (cloudproviders) en `restic` (snapshots) ingebouwd, dus
 > er wordt nooit iets gedownload.
@@ -73,7 +73,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
    apt-repository.
 3. **Herbouw vanaf nul.** Voer zelf `.github/scripts/build_bin.sh` uit (heeft alleen `curl`, `ar`,
    `tar`, `xz`, `zstd`, `readelf` nodig) en vergelijk de uitvoer met wat is meegeleverd.
-4. **Metgezel en dex.** Herbouw `companion/` en `dex/` vanuit de bron; de handtekening van de
+4. **Metgezel en dex.** Herbouw `companion/` en `dex/` vanuit de bron, de handtekening van de
    metgezel is de projectsleutel (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
@@ -87,4 +87,4 @@ discrepantie dat dit manifest bestaat om zichtbaar te maken.
 
 ---
 
-> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md)._

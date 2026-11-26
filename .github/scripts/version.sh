@@ -1,13 +1,28 @@
 #!/usr/bin/env bash
 # ======================================================================
-#  version.sh  ::  canonical version bumper for VD root modules (VD-ModuleKit)
-#  Rewrites module/module.prop + module/update.json, preserving the module's own
-#  zipUrl + changelog and substituting only the version token (generic across modules).
+#  VD-ModuleKit  ::  version.sh
+#  Canonical version bumper for VD root modules. Rewrites module/module.prop +
+#  module/update.json, preserving the module's own zipUrl + changelog and
+#  substituting only the version token (generic across modules).
 #
 #  Copyright (C) 2026  VD171
 #  SPDX-License-Identifier: Apache-2.0
-#  Vendored into each module's .github/scripts/; the vendoring module keeps its own
-#  license and product banner.
+#
+#  Licensed under the Apache License, Version 2.0; you may obtain a copy at
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Site           : https://vd171.ru
+#  Site           : https://vd.priv8.ru
+#  Source         : https://github.com/VD171/VD-Backup
+#  GitHub         : @VD171 https://github.com/VD171
+#  XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+#  XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+#  Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+#  Channel        : @Priv8_VD https://t.me/Priv8_VD
+#  Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+#  E-mail         : vd.priv8@pm.me
+#  Vendored from VD-ModuleKit; the host module fills the contact chain and keeps
+#  its own license and product banner.
 # ======================================================================
 #
 #  Version scheme (owner-defined): fleet (default) or per-module via the SCHEME env var.

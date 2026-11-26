@@ -11,10 +11,10 @@ volitelně šifrované s koncovou `.age`.
 
 ## Nástroje, které můžete potřebovat
 
-- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`; Linux: `apt install zstd`)
+- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
 - **age** (jen pro soubory `.age`): https://github.com/FiloSottile/age/releases
 - `tar` je zabudován v macOS, Linuxu a moderních Windows 10/11.
-- `gzip` je zabudován všude; pro `.tar.gz` nepotřebujete nic navíc.
+- `gzip` je zabudován všude, pro `.tar.gz` nepotřebujete nic navíc.
 
 ## 1. Dešifrování (jen pokud soubor končí na `.age`)
 
@@ -62,7 +62,7 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ## Poznámky
 
-- Rozbalené soubory si uchovávají své relativní cesty; SELinux kontext, uid/gid a režimy
+- Rozbalené soubory si uchovávají své relativní cesty, SELinux kontext, uid/gid a režimy
   jsou uvnitř taru (a znovu se správně aplikují jen při obnově na Androidu).
 - `manifest.json` popisuje přesně, co je každý soubor, verzi aplikace a
   původního vlastníka/kontext. Je to zdroj pravdy.
@@ -73,4 +73,4 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ---
 
-> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md)._

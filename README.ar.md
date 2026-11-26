@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · العربية · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/ar/home-dark.png) | ![Apps](docs/screenshots/ar/apps-dark.png) | ![Schedule](docs/screenshots/ar/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/ar/destinations-dark.png) | ![Settings](docs/screenshots/ar/settings-dark.png) | ![Activity log](docs/screenshots/ar/activitylog-dark.png) |
 
 ---
 
@@ -65,7 +84,7 @@ Neo-Backup وAndroid-DataBackup الموجودة كي تنتقل إليها.
   بعتاد الجهاز، لذا تُستعاد النسخة على جهاز آخر أو تُفتح على حاسوب.
 - **الوجهات:** محلي، SFTP، SCP، SMB، WebDAV، FTP، S3 و70+ غيرها (`rclone`)،
   إضافة إلى مستودعات `rsync` و`restic`. Google Drive اختياري عبر مرافق صغير باختيار صريح.
-- **Telegram:** انسخ احتياطيًا إلى قناة تيليجرام خاصة كتخزين سحابي غير محدود عبر MTProto - الاستعادة والحذف أيضًا من واجهة الويب.
+- **Telegram:** انسخ احتياطيًا إلى قناة تيليجرام خاصة كتخزين سحابي غير محدود عبر MTProto، الاستعادة والحذف أيضًا من واجهة الويب.
 - **السلامة:** يُتحقق من كل أرشيف مقابل البيان؛ ويتيح لك التشغيل التجريبي واختبار الاستعادة فحص
   نسخة احتياطية دون المساس بأي شيء.
 - **الاستعادة الانتقائية والدُّفعية:** استعادة أي مجموعة فرعية من عناصر النسخة الاحتياطية، أو
@@ -73,7 +92,7 @@ Neo-Backup وAndroid-DataBackup الموجودة كي تنتقل إليها.
   نشاط/تدقيق لكل إجراء مُتلِف.
 - **النسخ الاحتياطية الخاصة:** الرسائل (SMS/MMS/RCS)، جهات الاتصال وسجل المكالمات، Wi-Fi وBluetooth،
   مع تصدير JSON محمول اختياري يمكنك فتحه على حاسوب.
-- **ملفات النظام (`/data/adb`):** انسخ بيئة الـ root نفسها - الوحدات وبياناتها وإعداداتها - كلها أو
+- **ملفات النظام (`/data/adb`):** انسخ بيئة الـ root نفسها (الوحدات وبياناتها وإعداداتها) كلها أو
   شجرة فرعية تختارها من شجرة ملفات، مع استعادة كل ملف إلى مالكه الأصلي وسياق SELinux الأصلي كي
   يظل الـ root عاملا. متقدم؛ فقط ما تختاره.
 - **الجدولة + الأتمتة:** مهام **نسخ احتياطي أو استعادة** متكررة تستهدف تطبيقا واحدا أو
@@ -181,3 +200,7 @@ VD Backup مشروع مستقل وغير رسمي. وهو غير مرتبط بش
 ## الوسوم
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **انضم إلى القناة للتحديثات:** @Priv8_VD https://t.me/Priv8_VD

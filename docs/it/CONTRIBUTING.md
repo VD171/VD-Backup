@@ -30,7 +30,7 @@ Gli assistenti e gli agenti IA sono qui contributori di prima classe, non un rip
 - Le patch assistite da IA vengono riviste e accettate alle stesse condizioni di qualsiasi altra, per
   correttezza, chiarezza e le convenzioni qui sotto, non per chi (o cosa) le ha scritte.
 - Se guidi VDBackup da un agente, usa l'output JSON di `helper.sh` come
-  contratto; non fare scraping della WebUI.
+  contratto, non fare scraping della WebUI.
 - Stesso standard per tutti: le funzionalità reali non vengono mai indebolite, i segreti e i dati del dispositivo
   non finiscono mai nel repository (vedi il rigoroso [.gitignore](../../.gitignore)), e le azioni che
   modificano lo stato restano confermate e tracciate.
@@ -42,15 +42,15 @@ Gli assistenti e gli agenti IA sono qui contributori di prima classe, non un rip
 - La WebUI è `module/webroot/` (aprila dal gestore root). Il backend è
   `module/helper.sh` (dispatcher) e `module/worker.sh` (motore distaccato).
 - I binari nativi risiedono in `module/bin/<abi>/` e sono prodotti dalla CI
-  (`.github/scripts/build_bin.sh`); normalmente non li ricompili a mano.
+  (`.github/scripts/build_bin.sh`), normalmente non li ricompili a mano.
 
 ## Convenzioni
 
 - **Ogni file sorgente** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) inizia con
   l'intestazione banner del progetto (copiala da qualsiasi file esistente). Nessuna eccezione.
 - **Codice e commenti in inglese.** Mantieni i commenti al minimo e solo dove necessario.
-- **Nessun em-dash o en-dash**; usa sempre un semplice trattino `-`.
-- La WebUI è in **vanilla JS** (un solo `scripts.js`); nessun framework. Comunica con root solo attraverso
+- **Nessun em-dash o en-dash**, usa sempre un semplice trattino `-`.
+- La WebUI è in **vanilla JS** (un solo `scripts.js`), nessun framework. Comunica con root solo attraverso
   il wrapper `helper(verb, args)`, ed effettua l'escape di ogni valore interpolato.
 - **Non indebolire mai** una funzionalità reale (ad es. la preservazione di SELinux/uid/gid/modi).
 - Le azioni che modificano lo stato (ripristino, eliminazione) devono chiedere conferma e scrivere un log di audit.
@@ -58,7 +58,7 @@ Gli assistenti e gli agenti IA sono qui contributori di prima classe, non un rip
 ## Internazionalizzazione (i18n)
 
 - Le stringhe dell'interfaccia risiedono in `module/webroot/lang/`. L'inglese è il fallback canonico
-  (`en.js` + `en.json`); le altre 20 lingue sono `<code>.json`.
+  (`en.js` + `en.json`), le altre 20 lingue sono `<code>.json`.
 - Per aggiungere o modificare una stringa: modifica `en.js` **e** `en.json`, poi aggiorna ogni
   `<code>.json`. Toccare un'etichetta visibile significa aggiornare **tutti** i file di lingua e
   **tutti** i `README.<code>.md`.
@@ -80,4 +80,4 @@ preset di destinazione `rclone` e rifiniture della WebUI sono tutti ottimi punti
 
 ---
 
-> _Questa documentazione è stata generata con Claude (Anthropic) ed è gestita da VD171. Correzioni e miglioramenti sono benvenuti; vedi [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Questa documentazione è stata generata con Claude (Anthropic) ed è gestita da VD171. Correzioni e miglioramenti sono benvenuti, vedi [CONTRIBUTING.md](CONTRIBUTING.md)._

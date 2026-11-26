@@ -44,12 +44,12 @@ lời nhắc cấp quyền và không có ứng dụng đồng hành cho các t�
 - **Đã sẵn root.** Tiến trình mô-đun chạy với quyền root, nên engine chỉ là shell thuần. Khoảng ~85 %
   công việc là shell thuần (`tar`/`zstd`/`age`/`pm`/`am`/`chown`/`chcon`/`rclone`/...).
 - **Thực thi tách rời.** Sao lưu/khôi phục chạy qua `setsid nohup`, như một tiến trình root
-  độc lập. Đóng WebUI không làm gián đoạn chúng; giao diện kết nối lại bằng cách đọc
+  độc lập. Đóng WebUI không làm gián đoạn chúng, giao diện kết nối lại bằng cách đọc
   `logs/progress-<opid>.json`.
 - **Framework helper (~15 %).** Quyền chi tiết, AppOps, SSAID, StorageStats,
   biểu tượng và Wi-Fi đặc quyền cần đến framework Android. Một `dex` nhỏ chạy qua
   `app_process` (không có ứng dụng được cài đặt) xử lý những việc này, với phương án dự phòng bằng shell.
-- **Tính di động.** Chỉ dùng định dạng chuẩn; các bản sao lưu mở được trên PC mà không cần mô-đun này.
+- **Tính di động.** Chỉ dùng định dạng chuẩn, các bản sao lưu mở được trên PC mà không cần mô-đun này.
 - **Trạng thái** nằm trong `/data/adb/vdbackup/` (cấu hình, công việc, đích đến, thông tin đăng nhập
   được mã hóa, nhật ký, staging). **Các bản sao lưu** được ghi vào bộ nhớ mà người dùng nhìn thấy, được mã hóa
   bằng thông tin đăng nhập, tại `/sdcard/VDBackup/` (`/data/media/<user>/VDBackup`, theo từng người dùng),
@@ -61,7 +61,7 @@ Một bản sao lưu phải luôn khôi phục được mãi mãi. Đây là m�
 
 **Phạm vi.** Bảo đảm này bao trùm các bản sao lưu được ghi bởi **v1.01 trở đi** (bản phát hành chính thức
 đầu tiên) và chỉ bởi các phiên bản được phát hành, công bố chính thức. v1.00 là một bản build chỉ để thử
-nghiệm và bị loại khỏi phạm vi một cách rõ ràng; các bản tiền phát hành và phát triển không được bao trùm.
+nghiệm và bị loại khỏi phạm vi một cách rõ ràng, các bản tiền phát hành và phát triển không được bao trùm.
 Kể từ bản phát hành công khai đầu tiên trở đi, lời hứa dưới đây là tuyệt đối:
 
 - **Chỉ định dạng chuẩn.** Mọi kho lưu trữ đều là một `tar` thuần được nén bằng `zstd`,
@@ -80,14 +80,14 @@ Kể từ bản phát hành công khai đầu tiên trở đi, lời hứa dư�
 
 Nói ngắn gọn: bất cứ thứ gì VDBackup từng ghi, mọi VDBackup trong tương lai (và một PC thông thường)
 đều vẫn khôi phục được. Thay đổi định dạng theo cách làm hỏng một bản sao lưu trước đó là không
-được phép; các khả năng mới được thêm phía sau `format_version` và các trường mới, chỉ bổ sung.
+được phép, các khả năng mới được thêm phía sau `format_version` và các trường mới, chỉ bổ sung.
 
 Về thiết kế kỹ thuật đầy đủ (định dạng kho lưu trữ, lược đồ siêu dữ liệu, các pipeline, mã hóa,
-đích đến, trình nhập) những người bảo trì giữ các ghi chú thiết kế chi tiết; tệp này là
+đích đến, trình nhập) những người bảo trì giữ các ghi chú thiết kế chi tiết, tệp này là
 bản tổng quan hướng tới người đóng góp.
 
 <!-- doc-footer -->
 
 ---
 
-> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md)._

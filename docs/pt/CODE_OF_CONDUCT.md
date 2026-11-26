@@ -9,7 +9,7 @@ mantenha as discussões técnicas e construtivas.
 
 - Seja gentil. Sem assédio, ataques pessoais ou discriminação.
 - Critique ideias e código, não pessoas.
-- Ajude os recém-chegados; todos já foram novatos um dia.
+- Ajude os recém-chegados, todos já foram novatos um dia.
 
 Comportamento inaceitável pode ser reportado em privado ao mantenedor (veja
 [SECURITY.md](SECURITY.md) para contato). Mantenedores podem remover comentários, commits,
@@ -22,4 +22,4 @@ Covenant.
 
 ---
 
-> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas; veja [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md)._

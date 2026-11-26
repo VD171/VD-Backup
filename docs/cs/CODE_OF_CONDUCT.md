@@ -9,7 +9,7 @@ udržujte diskuze technické a konstruktivní.
 
 - Buďte laskaví. Žádné obtěžování, osobní útoky ani diskriminace.
 - Kritizujte nápady a kód, ne lidi.
-- Pomáhejte nováčkům; každý byl jednou nový.
+- Pomáhejte nováčkům, každý byl jednou nový.
 
 Nepřijatelné chování lze soukromě nahlásit správci (kontakt viz
 [SECURITY.md](SECURITY.md)). Správci mohou odstranit komentáře, commity,
@@ -21,4 +21,4 @@ Toto je zhuštěná adaptace ducha Contributor Covenant přizpůsobená projektu
 
 ---
 
-> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md)._

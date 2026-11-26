@@ -44,12 +44,12 @@ permission prompt and no companion app for the core features.
 - **Already root.** The module process is root, so the engine is plain shell. ~85% of
   the work is pure shell (`tar`/`zstd`/`age`/`pm`/`am`/`chown`/`chcon`/`rclone`/...).
 - **Detached execution.** Backup/restore run via `setsid nohup`, as an independent root
-  process. Closing the WebUI does not interrupt them; the UI reattaches by reading
+  process. Closing the WebUI does not interrupt them, the UI reattaches by reading
   `logs/progress-<opid>.json`.
 - **Framework helper (~15%).** Fine-grained permissions, AppOps, SSAID, StorageStats,
   icons and privileged Wi-Fi need the Android framework. A small `dex` run via
   `app_process` (no installed app) handles these, with a shell fallback.
-- **Portability.** Only standard formats; backups open on a PC without this module.
+- **Portability.** Only standard formats, backups open on a PC without this module.
 - **State** lives in `/data/adb/vdbackup/` (config, jobs, destinations, encrypted
   credentials, logs, staging). **Backups** are written to user-visible, credential-
   encrypted storage at `/sdcard/VDBackup/` (`/data/media/<user>/VDBackup`, per user),
@@ -61,7 +61,7 @@ A backup must stay restorable forever. This is a hard rule, not a best effort.
 
 **Scope.** The guarantee covers backups written by **v1.01 onward** (the first officially
 published release) and only by officially published, released versions. v1.00 was a
-test-only build and is explicitly out of scope; pre-release and development builds are not
+test-only build and is explicitly out of scope, pre-release and development builds are not
 covered. From the first public release forward, the promise below is absolute:
 
 - **Standard formats only.** Every archive is a plain `tar` compressed with `zstd`,
@@ -80,14 +80,14 @@ covered. From the first public release forward, the promise below is absolute:
 
 In short: anything VDBackup has ever written, every future VDBackup (and a plain PC)
 can still restore. Changing the format in a way that breaks a prior backup is not
-allowed; new capabilities are added behind `format_version` and new, additive fields.
+allowed, new capabilities are added behind `format_version` and new, additive fields.
 
 For the full technical design (archive format, metadata schema, pipelines, crypto,
-destinations, importers) the maintainers keep detailed design notes; this file is the
+destinations, importers) the maintainers keep detailed design notes, this file is the
 contributor-facing overview.
 
 <!-- doc-footer -->
 
 ---
 
-> _This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome; see [CONTRIBUTING.md](../CONTRIBUTING.md)._
+> _This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome, see [CONTRIBUTING.md](../CONTRIBUTING.md)._

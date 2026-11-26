@@ -68,13 +68,13 @@ specifika enhet. Se [avsnitt 11](#11-portabilitet-öppna-säkerhetskopior-på-en
 - **En rootad Android-enhet** hanterad av **KernelSU**, **APatch** eller **Magisk**.
   VDBackup installeras som en modul från den hanteraren.
 - Tillräckligt med fritt lagringsutrymme för dina säkerhetskopior (lokala säkerhetskopior ligger under modulens tillstånds-
-  katalog; se [avsnitt 3](#3-installation-och-första-körning)).
+  katalog, se [avsnitt 3](#3-installation-och-första-körning)).
 - Inget annat. Modulen levereras med alla binärer den behöver (tar, zstd, lz4, rclone,
   rsync, ssh, restic), så **lokal backup och återställning fungerar helt offline**. Endast moln-
   destinationer kommunicerar med nätverket.
 
 Vissa finkorniga tillägg (AppOps, SSAID, några privilegierade systembitar) förlitar sig på
-Android-ramverket; modulen hanterar dessa internt, med en vanlig-skal-reserv, och de degraderar graciöst
+Android-ramverket, modulen hanterar dessa internt, med en vanlig-skal-reserv, och de degraderar graciöst
 när de inte är tillgängliga på din enhet.
 
 ## 3. Installation och första körning
@@ -83,7 +83,7 @@ när de inte är tillgängliga på din enhet.
 2. I din KernelSU / APatch / Magisk-hanterare, flasha modul-zip:en som vilken annan
    modul som helst.
 3. Den är användbar omedelbart, **ingen omstart behövs**. (En omstart är endast någonsin relevant
-   vid återställning av SSAID; se [avsnitt 10](#10-ssaid-enhetens-android_id).)
+   vid återställning av SSAID, se [avsnitt 10](#10-ssaid-enhetens-android_id).)
 4. Öppna modulens **WebUI** från hanteraren. Det är hela gränssnittet.
 
 **Vilken utgåva du laddar ner.** Varje release levereras som flera flashbara zip-utgåvor, så att du
@@ -94,11 +94,11 @@ bara laddar ner det du behöver. Välj en:
   `restic` (deduplicerade ögonblicksbilder). Helt offline, ingenting laddas någonsin ner.
   Fungerar på vilken enhet som helst. Största nedladdningen.
 - **`VD-Backup-<ver>-universal-lite.zip`**: varje arkitektur, men **utan** de två största
-  binärfilerna (`rclone` och `restic`). Minsta nedladdningen; gör fortfarande lokala,
+  binärfilerna (`rclone` och `restic`). Minsta nedladdningen, gör fortfarande lokala,
   SSH/SFTP- och rsync-säkerhetskopior utan nedladdning, med portabel `age`-kryptering. Första
   gången du använder en molndestination (`rclone`) eller ögonblicksbildsläge (`restic`) erbjuder
   WebUI:t sig att ladda ner det lilla arkitekturspecifika tillägget en gång (verifierat med
-  SHA-256) och cachar det; därefter fungerar även de funktionerna.
+  SHA-256) och cachar det, därefter fungerar även de funktionerna.
 - **`VD-Backup-<ver>-<abi>-full.zip`** (en av `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), en
   enda arkitektur med varje binärfil inbäddad (samma funktioner som `universal-full` men endast
   för din enhets arkitektur, alltså mindre än `universal-full`).
@@ -140,7 +140,7 @@ WebUI är organiserat i några flikar:
 - **Home**: en startöversikt som visar antal för dina säkerhetskopior (appar, säkerhetskopior, mappar och schemalagda jobb) och en lagringsstapel för hur mycket plats dina säkerhetskopior använder jämfört med ledigt, med statusmärken, kopiera hashar och sökvägar till urklipp, och en **Check for updates**-åtgärd.
 - **Apps**: listan över installerade appar (användare och system), var och en visad med sitt verkliga
   namn, sitt paketnamn och sin ikon (ikoner laddas lat och cachas, så listan
-  förblir responsiv). Knappen på en rad säkerhetskopierar appen; ett tryck på raden öppnar den
+  förblir responsiv). Knappen på en rad säkerhetskopierar appen, ett tryck på raden öppnar den
   appens backup-historik, där du kan återställa valfri tidigare säkerhetskopia.
 - **Backups**: de säkerhetskopior du redan har, var och en visar appnamnet på en rad och
   paketet på nästa. Tryck på en säkerhetskopia för att se dess fullständiga detaljer (version, datum, storlek,
@@ -161,7 +161,7 @@ WebUI är organiserat i några flikar:
   nyckeln, och schemaläggning. Av/på-inställningar använder växlingsbrytare i Android-stil.
 - **About**: version, länkar, systerprojekten (See also), granskningsmanifestet för de medföljande binärfilerna, och en **Check for updates**-åtgärd som rapporterar om en nyare version har publicerats (med dess versionsanteckningar). Du installerar alla uppdateringar via din root-hanterare, på samma sätt som du flashade modulen.
 
-Appen söker också själv efter en nyare version varje gång du öppnar den (högst en gång i timmen) och visar uppdateringsbannern bara när en finns; tyst när uppdaterad eller offline.
+Appen söker också själv efter en nyare version varje gång du öppnar den (högst en gång i timmen) och visar uppdateringsbannern bara när en finns, tyst när uppdaterad eller offline.
 
 Bekräftelser och meddelanden använder dialoger i appen (inte de gamla systempopuperna), och en
 återställning eller import ber dig bekräfta att den skriver över den aktuella appdatan innan
@@ -174,7 +174,7 @@ pågående jobb visar förloppskortet också den live överföringshastigheten o
 återstående tiden, plus en objekträknare (till exempel "12 av 40") med namnet på det aktuella
 objektet. På
 ROM:ar som ytläger skal-notiser får du också en Android-notis när ett jobb
-startar och slutar; i vilket fall som helst är förloppskortet i appen den tillförlitliga indikatorn.
+startar och slutar, i vilket fall som helst är förloppskortet i appen den tillförlitliga indikatorn.
 
 ## 5. Göra en säkerhetskopia
 
@@ -182,11 +182,11 @@ Det grundläggande flödet: öppna **Apps**, välj en app, välj vad som ska ink
 ställ in komprimering och (valfritt) kryptering, kör sedan. Förloppet visas live och en
 notis talar om när det är klart.
 
-Medan en säkerhetskopiering eller återställning pågår har dess förloppskort en **Cancel**-knapp. Att avbryta en säkerhetskopiering stoppar den och tar bort eventuell delvis kopia som den hade påbörjat, så att inget halvskrivet lämnas kvar. Att avbryta en återställning stoppar den också, men appen kan lämnas delvis återställd, så VDBackup varnar dig först; kör återställningen igen för att slutföra.
+Medan en säkerhetskopiering eller återställning pågår har dess förloppskort en **Cancel**-knapp. Att avbryta en säkerhetskopiering stoppar den och tar bort eventuell delvis kopia som den hade påbörjat, så att inget halvskrivet lämnas kvar. Att avbryta en återställning stoppar den också, men appen kan lämnas delvis återställd, så VDBackup varnar dig först, kör återställningen igen för att slutföra.
 
 I säkerhetskopieringsdialogen kan du även välja **mål** för denna kopia, lokal lagring eller valfritt tillagt moln-/fjärrmål, utan att först ändra standardmålet i Inställningar.
 
-VDBackup kör två automatiska skyddsåtgärder under en säkerhetskopiering, båda på som standard i Inställningar. **"Pausa för att svalna när enheten blir varm"** låter ett långt jobb andas och väntar på att enheten ska svalna om den verkligen är het, så att en stor säkerhetskopiering aldrig överhettar telefonen; bara takten ändras, aldrig troheten. **"Kontrollera ledigt utrymme före en batch-säkerhetskopiering"** uppskattar vad en säkerhetskopiering av flera appar behöver och stoppar vid starten, i stället för halvvägs, om lagringen inte skulle rymma den.
+VDBackup kör två automatiska skyddsåtgärder under en säkerhetskopiering, båda på som standard i Inställningar. **"Pausa för att svalna när enheten blir varm"** låter ett långt jobb andas och väntar på att enheten ska svalna om den verkligen är het, så att en stor säkerhetskopiering aldrig överhettar telefonen, bara takten ändras, aldrig troheten. **"Kontrollera ledigt utrymme före en batch-säkerhetskopiering"** uppskattar vad en säkerhetskopiering av flera appar behöver och stoppar vid starten, i stället för halvvägs, om lagringen inte skulle rymma den.
 
 ### 5.1 Välja vad som ska säkerhetskopieras
 
@@ -280,12 +280,12 @@ kopian mot originalet på fjärren igen, och låter jobbet misslyckas (i ställe
 korrupt kopia i molnet) om de inte matchar. Och före en Full-uppladdning kontrollerar det fjärrens
 **lediga utrymme** och stoppar tidigt med ett tydligt **"not enough space"**-fel om säkerhetskopian
 inte skulle få plats, i stället för att fylla fjärren och misslyckas halvvägs. (Utrymmeskontrollen
-gäller Full-uppladdningar; Mirror är en delta-synk och är undantaget.)
+gäller Full-uppladdningar, Mirror är en delta-synk och är undantaget.)
 
 ### 5.6 Särskilda säkerhetskopior (meddelanden, samtalslogg, Wi-Fi, Bluetooth, kalender, bakgrundsbild, DNS, systeminställningar)
 
 Under applistorna på fliken **Backups** täcker **Särskilda säkerhetskopior** systemomfattande
-data som inte är knutna till en enskild app. Välj kategorierna och säkerhetskopiera dem; de
+data som inte är knutna till en enskild app. Välj kategorierna och säkerhetskopiera dem, de
 arkiveras med samma bevarande av SELinux/xattr och valfria kryptering som app-säkerhetskopior.
 Kategorierna är:
 
@@ -339,7 +339,7 @@ konfiguration, själva root-miljön. VDBackup kan säkerhetskopiera detta, helt 
 du kan ta med din root-uppsättning genom en rensning eller ett ROM-byte.
 
 - **Helt eller selektivt.** Säkerhetskopiera hela `/data/adb`, eller öppna filträdet och välj
-  exakt de mappar och filer du vill ha; en halvmarkerad mapp inkluderar bara de barn du bockade i.
+  exakt de mappar och filer du vill ha, en halvmarkerad mapp inkluderar bara de barn du bockade i.
 - **Allt stannar i dina händer.** Trädet är neutralt - inget är förvalt eller dolt, förutom
   VDBackups egna arbetsfiler, som annars bara skulle säkerhetskopiera sig själv. Komprimering och
   kryptering är samma portabla alternativ som för vilken annan säkerhetskopia som helst.
@@ -381,7 +381,7 @@ Användbara återställningsalternativ:
   app-kontroller förväntar sig. Du kan stänga av detta globalt i Settings eller per återställning,
   och när det är av behålls den ursprungliga installationskällan. En avancerad växling som är tillval,
   **"förfalska den initierande källan"**, går längre och får även appens initierande paket och
-  paketkälla att se Play-installerade ut; den redigerar systemets paketdatabas (säkerhetskopieras
+  paketkälla att se Play-installerade ut, den redigerar systemets paketdatabas (säkerhetskopieras
   först) och träder i kraft efter en omstart.
 
 **Batchåterställning.** Fliken **Backups** har ett **Select**-läge, på samma sätt som Apps-fliken har
@@ -391,14 +391,14 @@ bekräftelsen av överskrivning, återställningstestet och valet av installatio
 säkerhetskopia du valt, och de återställs efter varandra.
 
 **Radera en säkerhetskopia.** Öppna en säkerhetskopias detaljer (eller en apps historik) och använd
-**Delete**; du ombeds bekräfta, och raderingen skrivs till aktivitetsloggen. Du kan också sätta ett
+**Delete**, du ombeds bekräfta, och raderingen skrivs till aktivitetsloggen. Du kan också sätta ett
 tak för hur många säkerhetskopior som ska behållas per app (kvarhållning) så att gamla gallras
 automatiskt.
 
 **Montera en installerad app som en systemapp.** Från en apps säkerhetskopiehistorik förbereder
 **Mount as system** appens APK i en VDBackup-overlay-undermodul så att root-hanteraren serverar den
 från `/system/app` (eller `/system/priv-app`), den riktiga `/system`-partitionen rörs aldrig. Med
-**NoMount** på KernelSU tillämpas det live; annars tillämpas det efter en omstart. Detta beror aldrig
+**NoMount** på KernelSU tillämpas det live, annars tillämpas det efter en omstart. Detta beror aldrig
 på att NoMount är installerat.
 
 ## 7. Destinationer: lokal och fjärr
@@ -465,7 +465,7 @@ Din egen VDBackup-konfiguration, destinationerna, schemana, förinställningarna
 
 - **Exportera inställningar** skriver en krypterad fil till `VDBackup/.export`. Den ber alltid om en lösenordsfras, eftersom filen innehåller dina fjärrlösenord.
 - **Importera inställningar** läser tillbaka en sådan fil och slår samman den med den här enheten, utan att ta bort något som redan finns.
-- **Radera sparade inloggningsuppgifter** tar bort de sparade fjärrlösenorden och enhetens krypteringsnyckel i ett steg; dina destinationer, scheman och säkerhetskopior blir kvar.
+- **Radera sparade inloggningsuppgifter** tar bort de sparade fjärrlösenorden och enhetens krypteringsnyckel i ett steg, dina destinationer, scheman och säkerhetskopior blir kvar.
 
 ## 8. Schemaläggning och kvarhållning
 
@@ -507,7 +507,7 @@ registrerar bara vad som är installerat, så att slå på det säkerhetskopiera
 en gång.
 
 **Uteslutna appar (blocklist).** Även i Settings kan du utesluta appar som du aldrig vill
-säkerhetskopiera automatiskt eller enligt schema; du kan lägga till flera samtidigt (flerval), och
+säkerhetskopiera automatiskt eller enligt schema, du kan lägga till flera samtidigt (flerval), och
 uteslutna appar hoppas över av båda.
 
 **Säkerhetskopieförval.** Även i Inställningar kan du spara namngivna förval, uppsättningar av poster att inkludera, som bara APK eller APK + OBB, och välja ett i säkerhetskopieringsdialogen för att fylla valen på en gång.
@@ -571,8 +571,8 @@ För att öppna en på en PC, i korthet:
 
 - **Dekryptera** (endast om filen slutar på `.age`) med standard-`age`-verktyget och din
   lösenfras eller nyckelfil.
-- **Dekomprimera och extrahera**: `.tar.zst` med `zstd` sedan `tar`; `.tar.gz` med `tar`
-  direkt; `.tar.lz4` via `zstd --format=lz4`. En APK är bara en zstd-komprimerad APK,
+- **Dekomprimera och extrahera**: `.tar.zst` med `zstd` sedan `tar`, `.tar.gz` med `tar`
+  direkt, `.tar.lz4` via `zstd --format=lz4`. En APK är bara en zstd-komprimerad APK,
   så att dekomprimera `base.apk.zst` ger dig en normal installerbar `base.apk`.
 
 Varje krypterad säkerhetskopia levereras med en **RECOVERY**-notis som innehåller de exakta
@@ -586,7 +586,7 @@ bara utan att det Android-specifika ägandet upprätthålls.
 ## 12. Styra VDBackup från en AI-assistent
 
 VDBackup är byggt för att vara vänligt mot AI-assistenter och agenter, inte bara människor. WebUI
-är endast en klient till ett litet JSON-API; en agent kan administrera **varje** åtgärd
+är endast en klient till ett litet JSON-API, en agent kan administrera **varje** åtgärd
 i modulen utan gränssnitt genom samma API (varje kommando returnerar ett enda JSON-
 objekt, långa operationer körs frikopplat och du pollar deras förlopp, och samma säkerhets-
 räcken gäller, SSAID förblir opt-in, muterande åtgärder förblir bekräftade och granskade).
@@ -610,28 +610,28 @@ körande operation och visar aktuellt förlopp.
 **Jag fick ett `ERR_...`-meddelande.** Fel rapporteras med en tydlig kod. Några vanliga:
 - `ERR_VERIFY`, ett skrivet arkiv matchade inte sin manifest-hash (verifieringen
   fångade en dålig säkerhetskopia). Kör säkerhetskopian igen.
-- `ERR_RESTORE_TEST`, ett restore-test misslyckades; säkerhetskopian extraherade/verifierade inte
+- `ERR_RESTORE_TEST`, ett restore-test misslyckades, säkerhetskopian extraherade/verifierade inte
   rent och din aktiva app lämnades orörd.
 - `ERR_UNSAFE_ARCHIVE`, ett arkiv avvisades för att det försökte skriva utanför sin målkatalog
-  (absoluta sökvägar eller `..`). Detta skyddar dig från en manipulerad säkerhetskopia; ingenting
+  (absoluta sökvägar eller `..`). Detta skyddar dig från en manipulerad säkerhetskopia, ingenting
   skrevs.
 - `ERR_QUOTA`, en moln-fjärr hade inte tillräckligt med ledigt utrymme för en Full-uppladdning;
   säkerhetskopian stoppades innan något laddades upp.
 
 **Min fjärrdestination misslyckas.** Använd destinations-**testet** i Destinations-fliken
 för att validera inloggningsuppgifter och anslutning. Kom ihåg att endast molndestinationer behöver
-nätverket; lokal backup/restore är helt offline.
+nätverket, lokal backup/restore är helt offline.
 
 **Ringer något av detta hem eller laddar ner vid körtid?** Nej. Alla binärer är medföljande
-i modulen vid build-tid; inget hämtas till enheten vid körtid. Endast moln-
+i modulen vid build-tid, inget hämtas till enheten vid körtid. Endast moln-
 destinationer (rclone/restic/ssh) kommunicerar med nätverket, och endast när du använder dem.
 
 **Kommer min säkerhetskopia att återställas på en annan telefon?** Ja, säkerhetskopior är portabla och inte
 bundna till enhetshårdvara. (SSAID är det enda enhetsspecifika undantaget, och det är opt-in
-och omstarts-tillämpat; se [avsnitt 10](#10-ssaid-enhetens-android_id).)
+och omstarts-tillämpat, se [avsnitt 10](#10-ssaid-enhetens-android_id).)
 
 **Min krypterade säkerhetskopia öppnas inte, jag tappade lösenfrasen.** Det finns ingen återställnings-
-bakdörr avsiktligt; lösenfrasen är det som skyddar säkerhetskopian. Håll den säker.
+bakdörr avsiktligt, lösenfrasen är det som skyddar säkerhetskopian. Håll den säker.
 
 ## 14. Avinstallera
 
@@ -641,4 +641,4 @@ Avinstallera VDBackup som vilken annan modul som helst från din KernelSU- / APa
 
 ---
 
-> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas, se [CONTRIBUTING.md](CONTRIBUTING.md)._

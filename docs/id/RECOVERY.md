@@ -11,10 +11,10 @@ secara opsional terenkripsi dengan `.age` di akhir.
 
 ## Alat yang mungkin Anda perlukan
 
-- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`; Linux: `apt install zstd`)
+- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
 - **age** (hanya untuk berkas `.age`): https://github.com/FiloSottile/age/releases
 - `tar` sudah terpasang di macOS, Linux dan Windows 10/11 modern.
-- `gzip` sudah terpasang di mana saja; untuk `.tar.gz` Anda tidak butuh tambahan apa pun.
+- `gzip` sudah terpasang di mana saja, untuk `.tar.gz` Anda tidak butuh tambahan apa pun.
 
 ## 1. Dekripsi (hanya jika berkas berakhir dengan `.age`)
 
@@ -62,7 +62,7 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ## Catatan
 
-- Berkas yang diekstrak mempertahankan path relatifnya; konteks SELinux, uid/gid dan modes
+- Berkas yang diekstrak mempertahankan path relatifnya, konteks SELinux, uid/gid dan modes
   ada di dalam tar (dan diterapkan ulang dengan benar hanya ketika Anda memulihkan di Android).
 - `manifest.json` mendeskripsikan persis apa setiap berkas itu, versi aplikasi dan
   pemilik/konteks asli. Ia adalah sumber kebenaran.
@@ -73,4 +73,4 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ---
 
-> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

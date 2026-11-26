@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · हिन्दी · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/hi/home-dark.png) | ![Apps](docs/screenshots/hi/apps-dark.png) | ![Schedule](docs/screenshots/hi/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/hi/destinations-dark.png) | ![Settings](docs/screenshots/hi/settings-dark.png) | ![Activity log](docs/screenshots/hi/activitylog-dark.png) |
 
 ---
 
@@ -66,20 +85,20 @@ WebUI के साथ उपलब्ध हो।
   से बँधा नहीं, इसलिए बैकअप किसी दूसरे डिवाइस पर पुनर्स्थापित होता है या किसी PC पर खुलता है।
 - **गंतव्य:** लोकल, SFTP, SCP, SMB, WebDAV, FTP, S3 और 70+ और (`rclone`),
   साथ ही `rsync` और `restic` रिपॉज़िटरी। एक छोटे, ऑप्ट-इन साथी के ज़रिए वैकल्पिक Google Drive।
-- **Telegram:** MTProto के ज़रिए एक निजी Telegram चैनल में असीमित क्लाउड स्टोरेज के रूप में बैकअप लें - पुनर्स्थापना और हटाना भी WebUI से।
-- **अखंडता:** हर आर्काइव को मैनिफ़ेस्ट के विरुद्ध सत्यापित किया जाता है; dry-run और restore-test आपको
+- **Telegram:** MTProto के ज़रिए एक निजी Telegram चैनल में असीमित क्लाउड स्टोरेज के रूप में बैकअप लें, पुनर्स्थापना और हटाना भी WebUI से।
+- **अखंडता:** हर आर्काइव को मैनिफ़ेस्ट के विरुद्ध सत्यापित किया जाता है, dry-run और restore-test आपको
   किसी बैकअप को बिना कुछ छुए जाँचने देते हैं।
 - **चयनात्मक और बैच पुनर्स्थापना:** किसी बैकअप के आइटम का कोई भी उपसमुच्चय पुनर्स्थापित करें, या कई बैकअप मल्टी-सेलेक्ट
-  करके उन सभी को एक साथ पुनर्स्थापित करें; बैकअप हटाएँ और हर विध्वंसक क्रिया का एक गतिविधि/ऑडिट लॉग रखें।
+  करके उन सभी को एक साथ पुनर्स्थापित करें, बैकअप हटाएँ और हर विध्वंसक क्रिया का एक गतिविधि/ऑडिट लॉग रखें।
 - **विशेष बैकअप:** संदेश (SMS/MMS/RCS), संपर्क और कॉल लॉग, Wi-Fi और Bluetooth, एक वैकल्पिक पोर्टेबल JSON
   निर्यात के साथ जिसे आप किसी PC पर खोल सकते हैं।
-- **सिस्टम फ़ाइलें (`/data/adb`):** स्वयं root परिवेश का बैकअप लें - मॉड्यूल, उनका डेटा और कॉन्फ़िग - यह सब या एक
+- **सिस्टम फ़ाइलें (`/data/adb`):** स्वयं root परिवेश का बैकअप लें (मॉड्यूल, उनका डेटा और कॉन्फ़िग) यह सब या एक
   उपवृक्ष जिसे आप एक फ़ाइल ट्री से चुनते हैं, जिसमें हर फ़ाइल उसके मूल स्वामी और SELinux संदर्भ के साथ पुनर्स्थापित
-  होती है ताकि root काम करता रहे। उन्नत; केवल वही जो आप चुनते हैं।
+  होती है ताकि root काम करता रहे। उन्नत, केवल वही जो आप चुनते हैं।
 - **शेड्यूलिंग + ऑटोमेशन:** एक अकेले ऐप, एक समूह, या सभी ऐप्स को लक्षित करने वाले दोहराए जाने वाले **बैकअप या restore**
   कार्य, keep-N छँटाई के साथ, साथ ही इंस्टॉल/अपडेट पर ऑप्ट-इन स्वचालित बैकअप और एक बहिष्कृत-ऐप्स सूची।
 - **इंस्टॉल स्रोत:** पुनर्स्थापित ऐप्स डिफ़ॉल्ट रूप से अपने इंस्टॉल स्रोत के रूप में Play Store बताते हैं
-  (टॉगल करने योग्य); एक उन्नत ऑप्ट-इन आरंभकर्ता पैकेज और स्रोत को भी गढ़ देता है।
+  (टॉगल करने योग्य), एक उन्नत ऑप्ट-इन आरंभकर्ता पैकेज और स्रोत को भी गढ़ देता है।
 - **सिस्टम-ऐप माउंटिंग:** असली `/system` विभाजन को छुए बिना किसी इंस्टॉल्ड ऐप को सिस्टम ऐप के रूप में
   माउंट करें (systemless ओवरले उप-मॉड्यूल, NoMount-सजग)।
 - **पृष्ठभूमि:** बैकअप/पुनर्स्थापना अलग से चलती है और WebUI बंद करने पर भी चलती रहती है, आरंभ/समाप्ति
@@ -103,13 +122,13 @@ VDBackup को केवल लोगों के लिए ही नही�
 2. इसे KernelSU / APatch / Magisk प्रबंधक में फ़्लैश करें, तुरंत उपयोग योग्य, रीबूट की आवश्यकता नहीं।
 3. बैकअप को कॉन्फ़िगर करने और चलाने के लिए मॉड्यूल की **WebUI** खोलें। बस इतना ही।
 
-**संस्करण।** हर रिलीज़ छह zips के रूप में आती है। `universal-full`, हर आर्किटेक्चर और हर binary एम्बेडेड (cloud प्रदाताओं के लिए `rclone` और snapshots के लिए `restic` सहित), पूरी तरह ऑफ़लाइन, कभी कुछ भी डाउनलोड नहीं होता, कोई भी डिवाइस, सबसे बड़ा। `universal-lite`, हर आर्किटेक्चर, पर दो सबसे बड़ी binaries (`rclone`, `restic`) हटाकर, सबसे छोटा; अब भी बिना कोई डाउनलोड किए local, SSH/SFTP और `rsync` बैकअप करता है, और जब आप पहली बार किसी cloud गंतव्य (`rclone`) या snapshot मोड (`restic`) का उपयोग करते हैं तो वह उस छोटे प्रति-आर्किटेक्चर ऐडऑन को एक बार डाउनलोड करने की पेशकश करता है (SHA-256 से सत्यापित) और उसे कैश कर लेता है, जिससे वे सुविधाएँ भी काम करने लगती हैं। `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), एक ही आर्किटेक्चर, हर binary एम्बेडेड के साथ, `universal-full` से छोटा। अपना आर्किटेक्चर जानते हैं -> `<abi>-full` चुनें; सबसे छोटा चाहिए और cloud या snapshots के लिए एक बार का डाउनलोड मंज़ूर है -> `universal-lite`; सब कुछ एम्बेडेड, बिना किसी डाउनलोड के (ऑफ़लाइन / रिकवरी) चाहिए -> कोई full संस्करण। [रिलीज़](https://github.com/VD171/VD-Backup/releases) देखें।
+**संस्करण।** हर रिलीज़ छह zips के रूप में आती है। `universal-full`, हर आर्किटेक्चर और हर binary एम्बेडेड (cloud प्रदाताओं के लिए `rclone` और snapshots के लिए `restic` सहित), पूरी तरह ऑफ़लाइन, कभी कुछ भी डाउनलोड नहीं होता, कोई भी डिवाइस, सबसे बड़ा। `universal-lite`, हर आर्किटेक्चर, पर दो सबसे बड़ी binaries (`rclone`, `restic`) हटाकर, सबसे छोटा, अब भी बिना कोई डाउनलोड किए local, SSH/SFTP और `rsync` बैकअप करता है, और जब आप पहली बार किसी cloud गंतव्य (`rclone`) या snapshot मोड (`restic`) का उपयोग करते हैं तो वह उस छोटे प्रति-आर्किटेक्चर ऐडऑन को एक बार डाउनलोड करने की पेशकश करता है (SHA-256 से सत्यापित) और उसे कैश कर लेता है, जिससे वे सुविधाएँ भी काम करने लगती हैं। `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), एक ही आर्किटेक्चर, हर binary एम्बेडेड के साथ, `universal-full` से छोटा। अपना आर्किटेक्चर जानते हैं -> `<abi>-full` चुनें, सबसे छोटा चाहिए और cloud या snapshots के लिए एक बार का डाउनलोड मंज़ूर है -> `universal-lite`, सब कुछ एम्बेडेड, बिना किसी डाउनलोड के (ऑफ़लाइन / रिकवरी) चाहिए -> कोई full संस्करण। [रिलीज़](https://github.com/VD171/VD-Backup/releases) देखें।
 
 यहाँ नए हैं? [उपयोक्ता मार्गदर्शिका](docs/USER-GUIDE.md) आपको स्थापना से पुनर्स्थापना तक ले जाती है।
 
 ## सुरक्षा
 
-VDBackup root के रूप में चलता है और आपके ऐप डेटा को और, वैकल्पिक रूप से, आपके क्रेडेंशियल और एन्क्रिप्शन पासफ़्रेज़ को संभालता है; एक बैकअप में संवेदनशील डेटा हो सकता है, इसलिए इसे किसी पासफ़्रेज़ से सुरक्षित रखें और ऐसी जगह रखें जिस पर आप भरोसा करते हैं। क्रेडेंशियल विश्राम अवस्था में एन्क्रिप्टेड रूप में संग्रहीत होते हैं, कभी भी सादे पाठ में नहीं, और एन्क्रिप्शन कभी भी डिवाइस हार्डवेयर से बँधा नहीं होता, इसलिए एन्क्रिप्टेड बैकअप की रक्षा पासफ़्रेज़ ही करता है। किसी भेद्यता की सूचना [SECURITY.md](SECURITY.md) के अनुसार दें।
+VDBackup root के रूप में चलता है और आपके ऐप डेटा को और, वैकल्पिक रूप से, आपके क्रेडेंशियल और एन्क्रिप्शन पासफ़्रेज़ को संभालता है, एक बैकअप में संवेदनशील डेटा हो सकता है, इसलिए इसे किसी पासफ़्रेज़ से सुरक्षित रखें और ऐसी जगह रखें जिस पर आप भरोसा करते हैं। क्रेडेंशियल विश्राम अवस्था में एन्क्रिप्टेड रूप में संग्रहीत होते हैं, कभी भी सादे पाठ में नहीं, और एन्क्रिप्शन कभी भी डिवाइस हार्डवेयर से बँधा नहीं होता, इसलिए एन्क्रिप्टेड बैकअप की रक्षा पासफ़्रेज़ ही करता है। किसी भेद्यता की सूचना [SECURITY.md](SECURITY.md) के अनुसार दें।
 
 ## बिल्ड
 
@@ -126,11 +145,11 @@ VDBackup root के रूप में चलता है और आपके
 
 ## वृद्धिशील अपडेट (VDLU)
 
-VD Backup **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** इंजन के साथ आता है (`vdlu/` में अंतर्निहित): मॉड्यूल पूरे `.zip` को दोबारा डाउनलोड करने के बजाय केवल बदली हुई फ़ाइलों को लाकर खुद को अपडेट करता है (कंटेंट-एड्रेस्ड ब्लॉब्स + एक हस्ताक्षरित `manifest.json`)। **सुदृढ़** प्रोफ़ाइल: ed25519 हस्ताक्षर अनिवार्य है और डाउनग्रेड अवरुद्ध रहते हैं; पूरा `.zip` एक फ़ॉलबैक के रूप में मान्य बना रहता है।
+VD Backup **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** इंजन के साथ आता है (`vdlu/` में अंतर्निहित): मॉड्यूल पूरे `.zip` को दोबारा डाउनलोड करने के बजाय केवल बदली हुई फ़ाइलों को लाकर खुद को अपडेट करता है (कंटेंट-एड्रेस्ड ब्लॉब्स + एक हस्ताक्षरित `manifest.json`)। **सुदृढ़** प्रोफ़ाइल: ed25519 हस्ताक्षर अनिवार्य है और डाउनग्रेड अवरुद्ध रहते हैं, पूरा `.zip` एक फ़ॉलबैक के रूप में मान्य बना रहता है।
 
 - **केवल LIVE** (कोई रीबूट नहीं): अपडेट अगले बूट पर `service.sh` के ज़रिए पृष्ठभूमि में लागू होते हैं, और जब कोई feed पहुँच योग्य नहीं होता तो कुछ नहीं करते।
 - **स्थिति** `/data/adb/vdbackup/vdlu/` में है, मॉड्यूल के बाहर, ताकि यह रीफ़्लैश के बाद भी बनी रहे।
-- **WebUI:** प्रगति टोस्ट और रद्द करने वाला एक **अपडेट** पैनल; स्वतः-अपडेट वैकल्पिक (opt-in) है।
+- **WebUI:** प्रगति टोस्ट और रद्द करने वाला एक **अपडेट** पैनल, स्वतः-अपडेट वैकल्पिक (opt-in) है।
 
 ## दस्तावेज़ीकरण
 
@@ -181,3 +200,7 @@ VD Backup एक स्वतंत्र, अनौपचारिक परि
 ## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **अपडेट के लिए चैनल से जुड़ें:** @Priv8_VD https://t.me/Priv8_VD

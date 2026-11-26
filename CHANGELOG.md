@@ -2,13 +2,26 @@
 
 All notable changes to VDBackup are documented here. English only.
 
+## v1.18
+
+New:
+
+- The device ID (SSAID) can now be applied or restored per app, off by default and chosen from the restore dialog, so you can keep it for the apps that rely on it (such as banking) and leave standard behavior everywhere else. (#35)
+- A new "Off" network option blocks every cloud transfer for a backup or restore. (#35)
+- The flashless updater is now ABI-aware: a per-architecture install keeps only its own ABI's files instead of re-fetching the full universal payload, the update bar's dismissal survives a restart, and a new toggle silences it entirely. (#35)
+- Mirror backups now show up in the Backups tab and restore from there, like Full and Snapshot backups. (#38)
+
+Fixes:
+
+- Disabling the automatic-backup option now clears its baseline, so re-enabling it starts fresh from the current state instead of backing up every app that changed while the option was off. (#37)
+
 ## v1.17
 
 Fixes:
 
 - A Google Drive backup now stages each archive with the ownership and SELinux context the companion app needs to read it, so uploads no longer fail with a "source not found" error. (#24)
 - A batch backup or restore now retries an app once when it fails for a transient reason (a verification miss, a truncated write, a worker stopped under memory pressure), and counts apps it deliberately skipped (the root manager, or an app that is not installed) separately from real failures. (#5)
-- A failed backup now reports a specific reason - the archive could not be written, it came out incomplete, or the app's APK could not be saved - instead of one generic backup error. (#5)
+- A failed backup now reports a specific reason (the archive could not be written, it came out incomplete, or the app's APK could not be saved) instead of one generic backup error. (#5)
 - A restore now waits longer for the system to recreate an app's data directory before it sets ownership, so the restored data is reliably owned by the app and readable, even for a large app on a slow device. (#5)
 - A mirror restore no longer deletes live app data when a backed-up component is empty, guarding against data loss from a partial backup. (#5)
 - The app-install verifier is put back on the next boot if a backup or restore is stopped before it can be re-enabled, so the device's install protection is never left off. (#5)
@@ -22,7 +35,7 @@ Fixes:
 - A Google Drive backup that fails now records the real Drive error (the HTTP code and Drive's message) in the activity log, instead of a generic "try again", so a failed upload can be diagnosed. (#24)
 - The live-progress panel floats in a fixed spot again, the same on every tab, instead of being pinned inline at the bottom of the page. (#24)
 - A partial batch backup now names which apps failed and why, in the activity log and in an on-screen list at the end of the run, not just how many. (#5)
-- A bulk restore can take one optional shared password (with a tick) for backups whose saved password does not open them; it is tried for an app only after its own passphrase fails, so a mixed batch finishes without asking app by app. (#17)
+- A bulk restore can take one optional shared password (with a tick) for backups whose saved password does not open them, it is tried for an app only after its own passphrase fails, so a mixed batch finishes without asking app by app. (#17)
 
 ## v1.15
 
@@ -43,7 +56,7 @@ Fixes:
 - Restoring an encrypted backup now tries your saved passphrase first and only asks if it does not fit (for example an older backup made with a different password), instead of prompting every time. (#17)
 - The out-of-space message now points you to a remote (Telegram, an rclone cloud, or SFTP/SMB) so only one app needs room at a time. (#5)
 - Large storage is measured correctly: free-space and quota checks no longer overflow on volumes or backups larger than 2 GB. (#33)
-- A snapshot (restic) backup that could not read a few files is no longer reported as failed; the snapshot is still saved, with a note, instead of an error. (#32)
+- A snapshot (restic) backup that could not read a few files is no longer reported as failed, the snapshot is still saved, with a note, instead of an error. (#32)
 - Excluding an app now hides it from the list immediately, and clearing the activity log actually empties the on-screen list. (#31)
 - Confirm buttons show a spinner while the action runs instead of a silent pause, and the WebUI boots and scrolls faster with no flash of English before your language loads. (#23)
 - Clearer messages when an operation fails, and more complete translations across all 22 languages. (#22)
@@ -53,7 +66,7 @@ Fixes:
 
 New:
 
-- You can now cancel a running backup or restore from the progress card. The Cancel button stops the operation; a cancelled backup removes its partial copy, and cancelling a restore warns you first that the app may be left partially restored.
+- You can now cancel a running backup or restore from the progress card. The Cancel button stops the operation, a cancelled backup removes its partial copy, and cancelling a restore warns you first that the app may be left partially restored.
 - Filtering apps by label is easier. Your labels now show as tap-to-toggle chips above the app list, instead of a dropdown, and you can combine several at once: an app shows if it carries any of the labels you pick.
 
 Fixes:
@@ -66,13 +79,13 @@ New:
 
 - You can set a default encryption passphrase in Settings, and override it per app, so encrypted backups no longer ask for a password every time. (#17)
 - A backup sent to a remote (Telegram or an rclone cloud remote) can now be remote-only: it uploads and keeps no local copy, which saves space and leaves no local trace, with a Settings switch to keep a local copy instead. You can also browse and restore your backups straight from an rclone remote. (#16)
-- A new Staging folder setting lets you choose where a backup is temporarily assembled when it goes to a remote or to external storage; a root-only folder keeps backup data off shared storage.
+- A new Staging folder setting lets you choose where a backup is temporarily assembled when it goes to a remote or to external storage, a root-only folder keeps backup data off shared storage.
 
 Fixes:
 
 - Checking for and installing updates now works on every device. The bundled downloader could not validate secure (https) connections unless a specific developer app was installed, so the self-update, the Updates panel and the one-tap install from the MMRL app failed on most devices. It now uses the device's own trust store and works everywhere.
 - The size next to each item in the /data/adb file picker now always keeps one decimal (for example 15.6 KB, 184.3 MB), instead of dropping it on larger values.
-- Turning an installed app into a system app now actually takes effect. The app was placed into the system image, but the system refused to read it, so it never became a system app; it is now set up correctly and is picked up on the next boot.
+- Turning an installed app into a system app now actually takes effect. The app was placed into the system image, but the system refused to read it, so it never became a system app, it is now set up correctly and is picked up on the next boot.
 - A backup that fails or is interrupted no longer leaves a partial, unusable copy behind that could slowly use up storage over many retries. Leftovers from an abrupt kill, or from a backup stopped before it even starts, are cleared too, and once more on the next reboot.
 - Importing a Neo-Backup or Android-DataBackup backup now restores each app with the correct security labels, so a restored app no longer crashes or loses access to its own data.
 - Backup and restore notifications now show the app's name instead of its package id.
@@ -96,7 +109,7 @@ Fixes:
 
 New:
 
-- You can now name and tag your backups. Give any backup a custom name and free-form tags - like "v1", "first", or "january" - then search your backups by name, tag or app. The name and tags travel with a backup when you export or import it.
+- You can now name and tag your backups. Give any backup a custom name and free-form tags (like "v1", "first", or "january") then search your backups by name, tag or app. The name and tags travel with a backup when you export or import it.
 
 ## v1.11
 
@@ -105,7 +118,7 @@ Reliability:
 - A long batch no longer stalls on a single app. If one app takes too long to back up or restore, VDBackup records why and moves on, so one stuck app can no longer freeze the whole run.
 - When a batch cannot finish everything, the result now says why: how many apps succeeded, the reason the others failed (for example, the storage filled up), and how much room is left, instead of ending without explanation.
 - An app that is running an active VPN is now backed up while it keeps running, instead of being force-stopped, so your connection is not dropped mid-backup.
-- Long backups no longer overheat the device. Between apps, VDBackup pauses briefly to let it cool when it runs hot, and resumes on its own; a new switch in Settings turns this off. A cool device with a quirky temperature sensor is never paused by mistake.
+- Long backups no longer overheat the device. Between apps, VDBackup pauses briefly to let it cool when it runs hot, and resumes on its own, a new switch in Settings turns this off. A cool device with a quirky temperature sensor is never paused by mistake.
 
 Fixes:
 
@@ -117,12 +130,12 @@ Fixes:
 
 New:
 
-- You can now back up /data/adb itself - the root environment (modules, their data and configs) - all of it or a subtree you pick from a file tree, and restore it the same way. Each file is written back with its original owner and SELinux context, so root keeps working. It is advanced, and only what you choose is ever included.
+- You can now back up /data/adb itself, the root environment (modules, their data and configs), all of it or a subtree you pick from a file tree, and restore it the same way. Each file is written back with its original owner and SELinux context, so root keeps working. It is advanced, and only what you choose is ever included.
 
 Interface:
 
 - Long screens are easier to scan. The heaviest sections across Settings, Destinations, Backups and Schedule are now collapsible groups you open only when you need them, each shown as a clearly tappable card, while your existing backups and jobs stay in view.
-- Settings save the moment you change them; there is no separate Save step to forget.
+- Settings save the moment you change them, there is no separate Save step to forget.
 - "Check for updates" and the update notice moved to the Updates tab, where you would look for them.
 
 ## v1.10
@@ -139,15 +152,15 @@ Reliability:
 - Restoring a per-app network-access policy on custom ROMs now verifies the policy actually applied before reporting success, so a ROM that silently ignores the request is no longer mistaken for a completed restore.
 
 New:
-- Backups can now be sent to Telegram as an unlimited cloud destination. VDBackup signs in to your account and keeps each backup in a private channel over Telegram's own protocol - back up, restore and delete, all from the WebUI. You can name or pin the channel, and the channel is the index, so your backups stay reachable from any device.
+- Backups can now be sent to Telegram as an unlimited cloud destination. VDBackup signs in to your account and keeps each backup in a private channel over Telegram's own protocol, back up, restore and delete, all from the WebUI. You can name or pin the channel, and the channel is the index, so your backups stay reachable from any device.
 
-- RCS chats (Google Messages) can now be backed up as a special backup - a raw copy that restores on the same device, plus a readable export of the conversations that opens on any computer. Migrating RCS between devices is not guaranteed (it re-registers per device), so same-device is the reliable case.
+- RCS chats (Google Messages) can now be backed up as a special backup, a raw copy that restores on the same device, plus a readable export of the conversations that opens on any computer. Migrating RCS between devices is not guaranteed (it re-registers per device), so same-device is the reliable case.
 
 ## v1.09
 
 Reliability:
 
-- Backing up a large app list now finishes reliably. The step that quiesces each app before backing it up used to go through Android's ActivityManager, which past about 120 apps exhausted the system's transaction limit and stalled the rest of the run; it now stops the app's own processes directly, so a backup of any number of apps completes. A finished or interrupted backup also reliably releases its wake lock, so repeated backups no longer keep the device awake.
+- Backing up a large app list now finishes reliably. The step that quiesces each app before backing it up used to go through Android's ActivityManager, which past about 120 apps exhausted the system's transaction limit and stalled the rest of the run, it now stops the app's own processes directly, so a backup of any number of apps completes. A finished or interrupted backup also reliably releases its wake lock, so repeated backups no longer keep the device awake.
 
 ## v1.08
 
@@ -158,7 +171,7 @@ Updates:
 
 Reliability:
 
-- Backing up a large number of apps at once no longer stalls partway through. VDBackup now stops only the apps that are actually running before it backs them up, instead of signalling every app; on long lists that flood of requests could exhaust Android's transaction limit and hang the run. A cancelled or interrupted backup now always releases its wake lock.
+- Backing up a large number of apps at once no longer stalls partway through. VDBackup now stops only the apps that are actually running before it backs them up, instead of signalling every app, on long lists that flood of requests could exhaust Android's transaction limit and hang the run. A cancelled or interrupted backup now always releases its wake lock.
 
 Restore:
 
@@ -212,7 +225,7 @@ Settings:
 Safety:
 
 - Backups can only be stored where they stay encrypted at rest. Destinations under paths that are readable before the first unlock, such as /data/adb or /data/system, are refused.
-- Saved credentials, the rclone config and the age key now live on credential-encrypted storage, locked until the first unlock, instead of a location that was readable before it; a module update moves them there permanently.
+- Saved credentials, the rclone config and the age key now live on credential-encrypted storage, locked until the first unlock, instead of a location that was readable before it, a module update moves them there permanently.
 - Backups now check for free space before they start and stop with a clear message instead of failing midway.
 
 Restore:
@@ -232,7 +245,7 @@ Fixes:
 
 Privacy:
 
-- When you have local backups, the Backups tab now reminds you to hide the backup folder with SUSFS, just like the companion app: its presence can otherwise reveal root or an unlocked bootloader. SUSFS does the hiding; the reminder only points you there.
+- When you have local backups, the Backups tab now reminds you to hide the backup folder with SUSFS, just like the companion app: its presence can otherwise reveal root or an unlocked bootloader. SUSFS does the hiding, the reminder only points you there.
 
 Backups:
 
@@ -242,7 +255,7 @@ Backups:
 - Multi-user: app backups, special backups and restores now all follow the Android user you select.
 - Apps come back warmer and more complete: their ART compilation profiles, and their notification-listener, accessibility and Doze battery-exemption grants, are backed up and restored.
 - More reliable restores: file ownership and SELinux context are re-derived on the target device, so a restore works correctly across devices and users.
-- Safer restores: Play Protect and the install verifier are silenced only during the install and restored exactly; the root manager is never backed up or restored; and the install source is verified and logged.
+- Safer restores: Play Protect and the install verifier are silenced only during the install and restored exactly, the root manager is never backed up or restored, and the install source is verified and logged.
 - App tags: give apps free labels like games or work, filter the app list by a tag, and back up a whole tagged group at once.
 
 ## v1.03.2
@@ -252,7 +265,7 @@ Fixes:
 - The on-device cloud sign-in page always showed "Sign-in failed", even when the sign-in had
   actually succeeded. It now shows the real result.
 - Saved backups can now be opened with a file manager: the per-app backup folders were left
-  owner-only, so even a root file manager could not enter them; they are now accessible like
+  owner-only, so even a root file manager could not enter them, they are now accessible like
   the rest of /sdcard/VDBackup.
 
 Cloud destinations:
@@ -266,7 +279,7 @@ Interface:
 - The backup dialog has a destination picker, so a backup can go to a chosen cloud or remote
   destination without changing the default destination in Settings first.
 - The app checks for a newer version when it opens (at most once an hour) and shows the update
-  banner only when one is available; it stays silent when up to date or offline.
+  banner only when one is available, it stays silent when up to date or offline.
 
 ## v1.03.1
 
@@ -292,7 +305,7 @@ Progress and scheduling:
 - Live progress now shows transfer speed, ETA and an item counter during backups, plus a
   checksum-verified step for cloud uploads and a "not enough space" pre-check.
 - Scheduled jobs can be gated: run only on Wi-Fi, only while charging, only above a
-  battery level, or only on chosen weekdays; a scheduled job is also skipped while the
+  battery level, or only on chosen weekdays, a scheduled job is also skipped while the
   device is critically hot. A skipped job retries on the next tick.
 
 Cloud destinations:
@@ -303,14 +316,14 @@ Cloud destinations:
   backend name and its `key=value` parameters, so all of rclone's backends are reachable.
 - On-device sign-in (no PC): providers that need a browser sign-in (Google Drive, Dropbox,
   OneDrive, Box, pCloud) have an "Authorize in browser" button that opens the phone's own
-  browser to the provider's consent page; after you approve, you return to the app and the
+  browser to the provider's consent page, after you approve, you return to the app and the
   remote is saved automatically, with the token captured on the device. A manual token
   paste stays available as a fallback.
 
 Interface:
 
 - An adjustable interface scale (a draggable slider) rescales the whole interface, so it
-  fits screens of different pixel densities; 100% is the default and is unchanged.
+  fits screens of different pixel densities, 100% is the default and is unchanged.
 - The interface now renders right-to-left for Arabic and Persian.
 - A home overview with backup counts and a storage bar, status badges, copy-to-clipboard
   for hashes and paths, Android-style toggle switches, and a "Check for updates" action.
@@ -320,9 +333,9 @@ Interface:
 Fixes:
 
 - Restore and import no longer fail on devices whose bundled `tar` does not accept the
-  `--no-absolute-names` option; the archive safety check is independent of that option.
+  `--no-absolute-names` option, the archive safety check is independent of that option.
 - "Check for updates" works even where no HTTP client is bundled, by falling back to the
-  bundled rclone; and the activity log no longer takes a long time to open.
+  bundled rclone, and the activity log no longer takes a long time to open.
 
 ## v1.01
 
@@ -337,10 +350,10 @@ Engine and formats:
   and de-duplicated), and Mirror (rclone/rsync 1:1 sync). APKs are always compressed,
   even in a mirror.
 - Items per app: APK (base + splits), `data`, `data_de`, `obb`, external and media.
-  SELinux context, uid/gid, modes and xattr/caps are preserved; restore uses a
+  SELinux context, uid/gid, modes and xattr/caps are preserved, restore uses a
   `pm install` session and remaps ownership/context to the live uid.
 - Per-user (multi-user) aware throughout. Backups are stored under `/sdcard/VDBackup`
-  (per user), out of `/data/adb`, so they are not readable before first unlock; every
+  (per user), out of `/data/adb`, so they are not readable before first unlock, every
   destination is namespaced under `<path>/vdbackup`.
 - Compression: none, lz4, zstd (levels), or gzip ("compatibility mode"). A JSON manifest
   records the device, package (including the app label), items and permissions.
@@ -350,44 +363,44 @@ Engine and formats:
 Destinations and cloud:
 
 - Destinations: add/list/test/delete (local, rclone remote, restic repo, and an opt-in
-  Google Drive companion); credentials are stored obscured, never in the clear.
+  Google Drive companion), credentials are stored obscured, never in the clear.
 - Create rclone remotes from the UI/API (`remote-add`/`remote-list`/`remote-del`), so any
   cloud backend (SFTP, SMB, WebDAV, FTP, S3, Google Drive, and more) is reachable without
   editing `rclone.conf` by hand.
 - Google Drive two ways: via rclone (no Google Cloud account) or the opt-in headless
   companion app (`ru.vd171.vdbackup`), which carries a mandatory [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) hide notice.
 - Network policy: choose whether cloud transfers may use any connection, Wi-Fi only, or
-  mobile data only; enforced for manual and scheduled jobs. Local destinations are exempt.
+  mobile data only, enforced for manual and scheduled jobs. Local destinations are exempt.
 
 Migration in:
 
 - Import from Neo-Backup, including password-encrypted backups (AES-256-GCM decrypted by
-  the dex helper; the WebUI prompts for the password).
+  the dex helper, the WebUI prompts for the password).
 - Import from Android-DataBackup (install APKs, extract user/user_de/data archives, remap).
 - Both validated against real backups across devices.
 
 Integrity and safety:
 
-- Faithful wipe-then-extract restore; per-archive sha256 verify (default on for Full, and
+- Faithful wipe-then-extract restore, per-archive sha256 verify (default on for Full, and
   a repo integrity check for Snapshot), dry-run, and restore-test. Archives are read back
-  for completeness; a corrupt archive or an invalid package name can never trigger a
+  for completeness, a corrupt archive or an invalid package name can never trigger a
   destructive restore, and remote-transfer failures are reported, never silent.
 - Selective restore: restore any subset of the items a backup holds (APK, data, protected
   data, OBB, external, media), all selected by default.
 - Delete backups from the UI/API (`delete-backup`) and keep-last-N retention for manual
-  backups (`prune`); every delete, restore, prune and scheduled run is written to a local
+  backups (`prune`), every delete, restore, prune and scheduled run is written to a local
   JSON audit log you can view in the app.
 - Runtime permissions and AppOps captured into the manifest and reapplied on restore. The
   install source (installerPackageName) and the enabled/disabled state are captured too and
   reapplied on restore.
 - Install-source spoofing: by default a restored app reports the Play Store as its install
   source (set at install time via the install session, since a restored app otherwise looks
-  sideloaded); switchable globally and per restore, and when off the captured source is
+  sideloaded), switchable globally and per restore, and when off the captured source is
   kept. An advanced, opt-in "deep" mode additionally forges the initiating package and
   package source by editing the system package database (byte-exact backup first, applies
   after a reboot) so the app looks fully store-installed.
-- SSAID (device ANDROID_ID): strictly opt-in and prominently flagged; ABX-aware; the live
-  file is always backed up byte-exact before any overwrite for rollback; applies after a
+- SSAID (device ANDROID_ID): strictly opt-in and prominently flagged, ABX-aware, the live
+  file is always backed up byte-exact before any overwrite for rollback, applies after a
   reboot.
 - Restore and import require an explicit "this overwrites the current app data"
   acknowledgment before proceeding.
@@ -416,7 +429,7 @@ System integration:
 
 - Mount an installed app as a system app without touching the real /system partition:
   VDBackup stages the app's APK(s) into its own overlay sub-module, which the root manager
-  mounts. With NoMount on KernelSU it is injected live (no reboot); otherwise it applies at
+  mounts. With NoMount on KernelSU it is injected live (no reboot), otherwise it applies at
   the next boot, so it never depends on NoMount being installed. Choose regular or
   privileged placement.
 
@@ -425,24 +438,24 @@ WebUI:
 - App list shows the real localized app name (resolved from the APK, so it survives an
   uninstall) alongside the package, with lazy-loaded, cached icons rendered as rounded,
   adaptive-aware tiles.
-- Tap an app to open its backup history and restore any previous backup; the Backups tab
+- Tap an app to open its backup history and restore any previous backup, the Backups tab
   shows name and package on separate lines and opens a details sheet per backup (version,
   install source, state, date, size, items, permission counts, device).
-- Filter the app list by user/system/all and sort by name or package; select several apps
-  and back them up in one batch; exclude apps from automatic and scheduled backups.
-- Choose what to include and toggle verify or dry-run per backup; choose a test-only
+- Filter the app list by user/system/all and sort by name or package, select several apps
+  and back them up in one batch, exclude apps from automatic and scheduled backups.
+- Choose what to include and toggle verify or dry-run per backup, choose a test-only
   restore that extracts to staging without touching the live app.
 - Light/dark theme, an accent-colour picker, language selector, an About tab (with the
   sibling projects and the bundled-binary audit manifest), a folder picker for the local
   destination, localized operation progress with instant feedback, and modern in-app
   dialogs (no system alert/confirm pop-ups).
-- Back-button navigation returns to the previous tab and closes dialogs first; dialogs are
+- Back-button navigation returns to the previous tab and closes dialogs first, dialogs are
   floating and the app survives reopening by reattaching to live operations.
 
 AI-friendly and i18n:
 
 - A documented JSON control surface so agents can administer every action headlessly
-  (`docs/AI-AGENTS.md`); the WebUI is just one client of that API.
+  (`docs/AI-AGENTS.md`), the WebUI is just one client of that API.
 - The README and all project documentation are translated into the 21 standard languages
   (`docs/<lang>/`), with docs mirrored to the wiki.
 - Rich app listing and Neo decryption run through a dex helper driven as root
@@ -452,4 +465,4 @@ AI-friendly and i18n:
 
 ---
 
-> _This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md)._

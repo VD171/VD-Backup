@@ -48,11 +48,11 @@ owned by the module WebUI, not by this project).
 ## Shell <-> app command interface
 
 The root engine drives the companion with `am`. Because the engine runs as **uid 0 (root)**, it
-bypasses the export/permission gate; the `signature`-level `ru.vd171.vdbackup.permission.DRIVE_COMMAND`
+bypasses the export/permission gate, the `signature`-level `ru.vd171.vdbackup.permission.DRIVE_COMMAND`
 on the Service blocks any **non-root** app from invoking it.
 
 Every data op is a single `am start-foreground-service` call. The result is **not** on stdout (the
-service returns immediately); it is written to the file path given in `result`. The engine waits for a
+service returns immediately), it is written to the file path given in `result`. The engine waits for a
 sibling marker file `<result>.done` to appear, then reads `<result>` as JSON.
 
 ### Consent check and first-run consent
@@ -126,14 +126,14 @@ Notes on the Drive REST behaviour behind these ops:
 - `list` requests `pageSize=1000` over `spaces=drive` and returns the raw page payload
   `{ files:[...], nextPageToken?, incompleteSearch }`. With the `drive.file` scope only this app's own
   files are ever visible.
-- The access token is fetched fresh before every op; on an HTTP `401` the client invalidates the cached
+- The access token is fetched fresh before every op, on an HTTP `401` the client invalidates the cached
   token, refreshes once, and retries. A `401` that survives the refresh becomes `ERR_CONSENT_REQUIRED`.
 
 | code                 | meaning                                         |
 |----------------------|-------------------------------------------------|
 | `ERR_NONE`           | success                                         |
-| `ERR_NO_CONSENT`     | no linked account; run the consent Activity     |
-| `ERR_CONSENT_REQUIRED` | token revoked/expired; re-run consent         |
+| `ERR_NO_CONSENT`     | no linked account, run the consent Activity     |
+| `ERR_CONSENT_REQUIRED` | token revoked/expired, re-run consent         |
 | `ERR_CONSENT_DENIED` | user cancelled the consent screen               |
 | `ERR_TOKEN`          | token fetch failed                              |
 | `ERR_SRC`            | upload source file missing                      |
@@ -149,7 +149,7 @@ languages) telling the user to re-authorize. Never a silent failure.
 
 1. Create a project at <https://console.cloud.google.com/>.
 2. Enable the **Google Drive API**.
-3. Configure the OAuth consent screen; add the scope `https://www.googleapis.com/auth/drive.file`
+3. Configure the OAuth consent screen, add the scope `https://www.googleapis.com/auth/drive.file`
    (enough for app-created files).
 4. Create an **Android OAuth client** bound to package `ru.vd171.vdbackup` + the release signing
    SHA-1, and a **Web OAuth client** for the id token.

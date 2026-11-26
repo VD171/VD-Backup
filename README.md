@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -17,7 +36,7 @@
 </p>
 
 <p align="center">
-  <b>Full app &amp; data backup and restore as root, driven entirely from a WebUI.</b><br>
+  <b>Full app and data backup and restore as root, driven entirely from a WebUI.</b><br>
   KernelSU / APatch / Magisk module. No "grant su" prompt, no toggling <code>sucompat</code>.
 </p>
 
@@ -32,7 +51,7 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** English · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
@@ -66,22 +85,22 @@ import existing Neo-Backup and Android-DataBackup backups so you can move over.
   tied to device hardware, so a backup restores on another device or opens on a PC.
 - **Destinations:** local, SFTP, SCP, SMB, WebDAV, FTP, S3 and 70+ more (`rclone`),
   plus `rsync` and `restic` repos. Optional Google Drive via a tiny opt-in companion.
-- **Telegram:** back up to a private Telegram channel as unlimited cloud storage over MTProto - restore and delete from the WebUI too.
-- **Integrity:** every archive is verified against the manifest; dry-run and
+- **Telegram:** back up to a private Telegram channel as unlimited cloud storage over MTProto, restore and delete from the WebUI too.
+- **Integrity:** every archive is verified against the manifest, dry-run and
   restore-test let you check a backup without touching anything.
 - **Selective & batch restore:** restore any subset of a backup's items, or multi-select
-  several backups and restore them all at once; delete backups and keep an activity/audit
+  several backups and restore them all at once, delete backups and keep an activity/audit
   log of every destructive action.
 - **Special backups:** messages (SMS/MMS/RCS), contacts and call log, Wi-Fi and Bluetooth,
   with an optional portable JSON export you can open on a PC.
-- **System files (`/data/adb`):** back up the root environment itself - modules, their data
-  and configs - all of it or a subtree you pick from a file tree, with every file restored to
-  its original owner and SELinux context so root keeps working. Advanced; only what you choose.
+- **System files (`/data/adb`):** back up the root environment itself (modules, their data
+  and configs) all of it or a subtree you pick from a file tree, with every file restored to
+  its original owner and SELinux context so root keeps working. Advanced, only what you choose.
 - **Scheduling + automation:** recurring **backup or restore** jobs targeting one app, a
   set, or all apps, with keep-N pruning, plus opt-in auto-backup on install/update and an
   excluded-apps list.
 - **Install source:** restored apps report the Play Store as their install source by
-  default (toggleable); an advanced opt-in also forges the initiating package and source.
+  default (toggleable), an advanced opt-in also forges the initiating package and source.
 - **System-app mounting:** mount an installed app as a system app without touching the
   real `/system` partition (systemless overlay sub-module, NoMount-aware).
 - **Background:** backup/restore run detached and survive closing the WebUI, with
@@ -109,14 +128,14 @@ see **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** for the full control surface, and
 every binary embedded (incl. `rclone` for cloud providers, `restic` for
 snapshots), fully offline, nothing ever downloaded, any device, largest.
 `universal-lite`: every architecture without the two biggest binaries
-(`rclone`, `restic`), smallest; still does local, SSH/SFTP and `rsync` with no
+(`rclone`, `restic`), smallest, still does local, SSH/SFTP and `rsync` with no
 download, and the first time you use a cloud destination (`rclone`) or snapshot
 mode (`restic`) it offers to download that small per-architecture addon once
 (verified by SHA-256) and caches it, so those features work too. `<abi>-full`
 (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`): a single architecture with every
 binary embedded, smaller than `universal-full`. Know your arch -> pick
-`<abi>-full`; want the smallest and do not mind a one-time download for cloud or
-snapshots -> `universal-lite`; want everything embedded with zero downloads
+`<abi>-full`, want the smallest and do not mind a one-time download for cloud or
+snapshots -> `universal-lite`, want everything embedded with zero downloads
 (offline / recovery) -> a full edition. See [Releases](https://github.com/VD171/VD-Backup/releases).
 
 New here? The [User guide](docs/USER-GUIDE.md) walks you from install to restore.
@@ -124,7 +143,7 @@ New here? The [User guide](docs/USER-GUIDE.md) walks you from install to restore
 ## Security
 
 VDBackup runs as root and handles your app data and, optionally, your credentials
-and encryption passphrases; a backup can hold sensitive data, so protect it with a
+and encryption passphrases, a backup can hold sensitive data, so protect it with a
 passphrase and keep it somewhere you trust. Credentials are stored encrypted at rest,
 never in clear text, and encryption is never tied to device hardware, so the
 passphrase is what guards an encrypted backup. Report a vulnerability per
@@ -147,13 +166,13 @@ Linux with common tools or file managers. Every encrypted backup ships with a
 
 VD Backup ships the **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** engine (vendored in `vdlu/`): the module updates itself by fetching only the
 files that changed (content-addressed blobs + a signed `manifest.json`), instead of re-downloading the
-whole `.zip`. **Hardened** profile: the ed25519 signature is mandatory and downgrades are blocked; the
+whole `.zip`. **Hardened** profile: the ed25519 signature is mandatory and downgrades are blocked, the
 full `.zip` stays valid as a fallback.
 
 - **LIVE-only** (no reboot): updates apply on the next boot via `service.sh`, backgrounded, a no-op when
   no feed is reachable.
 - **State** in `/data/adb/vdbackup/vdlu/`, outside the module, so it survives a reflash.
-- **WebUI:** an **Updates** panel with a progress toast and cancel; auto-update is opt-in.
+- **WebUI:** an **Updates** panel with a progress toast and cancel, auto-update is opt-in.
 
 ## Documentation
 
@@ -204,3 +223,7 @@ VD Backup is an independent, unofficial project. It is not affiliated with, endo
 ## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **Join the channel for updates:** @Priv8_VD https://t.me/Priv8_VD

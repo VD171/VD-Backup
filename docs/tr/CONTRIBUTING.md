@@ -30,7 +30,7 @@ Yapay zeka asistanları ve ajanları burada sonradan akla gelen değil, birinci 
 - Yapay zeka destekli yamalar, diğerleriyle aynı koşullarda, kim (ya da ne) yazdığına
   göre değil, doğruluk, netlik ve aşağıdaki kurallara göre incelenip kabul edilir.
 - VDBackup'ı bir ajandan sürüyorsanız sözleşme olarak `helper.sh`'nin JSON çıktısını
-  kullanın; WebUI'yi kazımayın.
+  kullanın, WebUI'yi kazımayın.
 - Herkes için aynı çıta: gerçek özellikler asla zayıflatılmaz, sırlar ve cihaz verileri
   asla depoya girmez (katı [.gitignore](../../.gitignore) dosyasına bakın) ve değiştiren
   eylemler onaylı ve denetlenmiş kalır.
@@ -42,15 +42,15 @@ Yapay zeka asistanları ve ajanları burada sonradan akla gelen değil, birinci 
 - WebUI `module/webroot/` içindedir (root yöneticisinden açın). Arka uç
   `module/helper.sh` (dağıtıcı) ve `module/worker.sh` (ayrık motor) dosyalarıdır.
 - Yerel ikili dosyalar `module/bin/<abi>/` içindedir ve CI tarafından üretilir
-  (`.github/scripts/build_bin.sh`); normalde elle yeniden derlemezsiniz.
+  (`.github/scripts/build_bin.sh`), normalde elle yeniden derlemezsiniz.
 
 ## Kurallar
 
 - **Her kaynak dosya** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) proje
   banner başlığıyla başlar (mevcut herhangi bir dosyadan kopyalayın). İstisnasız.
 - **Kod ve yorumlar İngilizce.** Yorumları minimumda tutun ve yalnızca gerektiğinde kullanın.
-- **Em-dash veya en-dash yok**; her zaman düz tire `-` kullanın.
-- WebUI **vanilla JS**'tir (tek bir `scripts.js`); framework yok. Root ile yalnızca
+- **Em-dash veya en-dash yok**, her zaman düz tire `-` kullanın.
+- WebUI **vanilla JS**'tir (tek bir `scripts.js`), framework yok. Root ile yalnızca
   `helper(verb, args)` sarmalayıcısı üzerinden konuşun ve her interpole edilen değeri kaçırın.
 - Gerçek bir özelliği (örneğin SELinux/uid/gid/modlarının korunması) **asla zayıflatmayın**.
 - Değiştiren eylemler (geri yükleme, silme) onay istemeli ve bir denetim günlüğü yazmalıdır.
@@ -58,7 +58,7 @@ Yapay zeka asistanları ve ajanları burada sonradan akla gelen değil, birinci 
 ## Uluslararasılaştırma (i18n)
 
 - UI dizeleri `module/webroot/lang/` içindedir. İngilizce kanonik yedektir
-  (`en.js` + `en.json`); diğer 20 dil `<code>.json`'dur.
+  (`en.js` + `en.json`), diğer 20 dil `<code>.json`'dur.
 - Bir dizeyi eklemek veya değiştirmek için: `en.js` **ve** `en.json`'u düzenleyin, ardından
   her `<code>.json`'u güncelleyin. Görünür bir etikete dokunmak, **tüm** dil dosyalarını
   ve **tüm** `README.<code>.md` dosyalarını güncellemek demektir.
@@ -80,4 +80,4 @@ Yapay zeka asistanları ve ajanları burada sonradan akla gelen değil, birinci 
 
 ---
 
-> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

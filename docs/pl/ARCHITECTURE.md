@@ -44,12 +44,12 @@ monitu o uprawnienia ani aplikacji towarzyszącej dla funkcji podstawowych.
 - **Już root.** Proces modułu działa jako root, więc silnik to zwykła powłoka. ~85%
   pracy to czysta powłoka (`tar`/`zstd`/`age`/`pm`/`am`/`chown`/`chcon`/`rclone`/...).
 - **Odłączone wykonanie.** Kopia zapasowa/przywracanie działają przez `setsid nohup`, jako niezależny rootowy
-  proces. Zamknięcie WebUI ich nie przerywa; interfejs ponownie się podłącza, odczytując
+  proces. Zamknięcie WebUI ich nie przerywa, interfejs ponownie się podłącza, odczytując
   `logs/progress-<opid>.json`.
 - **Pomocnik frameworka (~15%).** Drobnoziarniste uprawnienia, AppOps, SSAID, StorageStats,
   ikony i uprzywilejowane Wi-Fi wymagają frameworka Androida. Małe uruchomienie `dex` przez
   `app_process` (bez zainstalowanej aplikacji) obsługuje je, z awaryjnym rozwiązaniem w powłoce.
-- **Przenośność.** Tylko standardowe formaty; kopie zapasowe otwierają się na komputerze bez tego modułu.
+- **Przenośność.** Tylko standardowe formaty, kopie zapasowe otwierają się na komputerze bez tego modułu.
 - **Stan** znajduje się w `/data/adb/vdbackup/` (konfiguracja, zadania, cele, zaszyfrowane
   dane uwierzytelniające, logi, staging). **Kopie zapasowe** są zapisywane do widocznego dla użytkownika, szyfrowanego
   danymi uwierzytelniającymi magazynu w `/sdcard/VDBackup/` (`/data/media/<user>/VDBackup`, dla każdego użytkownika),
@@ -61,7 +61,7 @@ Kopia zapasowa musi pozostać możliwa do przywrócenia na zawsze. To twarda zas
 
 **Zakres.** Gwarancja obejmuje kopie zapisane przez **v1.01 i nowsze** (pierwsze oficjalnie
 opublikowane wydanie) i tylko przez oficjalnie opublikowane, wydane wersje. v1.00 była kompilacją
-wyłącznie testową i jest wyraźnie poza zakresem; kompilacje przedpremierowe i deweloperskie nie są
+wyłącznie testową i jest wyraźnie poza zakresem, kompilacje przedpremierowe i deweloperskie nie są
 objęte. Od pierwszego publicznego wydania obietnica poniżej jest absolutna:
 
 - **Tylko standardowe formaty.** Każde archiwum to zwykły `tar` skompresowany za pomocą `zstd`,
@@ -80,14 +80,14 @@ objęte. Od pierwszego publicznego wydania obietnica poniżej jest absolutna:
 
 Krótko mówiąc: wszystko, co VDBackup kiedykolwiek zapisał, każdy przyszły VDBackup (oraz zwykły komputer)
 może nadal przywrócić. Zmiana formatu w sposób, który psuje wcześniejszą kopię zapasową, nie jest
-dozwolona; nowe możliwości są dodawane za `format_version` oraz nowymi, dopisywanymi polami.
+dozwolona, nowe możliwości są dodawane za `format_version` oraz nowymi, dopisywanymi polami.
 
 Pełny projekt techniczny (format archiwum, schemat metadanych, potoki, kryptografia,
-cele, importery) opiekunowie prowadzą w szczegółowych notatkach projektowych; ten plik to przegląd
+cele, importery) opiekunowie prowadzą w szczegółowych notatkach projektowych, ten plik to przegląd
 skierowany do współtwórców.
 
 <!-- doc-footer -->
 
 ---
 
-> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane; zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._

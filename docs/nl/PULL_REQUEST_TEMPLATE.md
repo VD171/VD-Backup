@@ -5,7 +5,7 @@ Beschrijf wat deze PR wijzigt en waarom.
 ## Checklist
 
 - [ ] De project-bannerheader staat op elk nieuw/gewijzigd bronbestand.
-- [ ] Code en commentaar zijn in het Engels; geen em/en-dashes.
+- [ ] Code en commentaar zijn in het Engels, geen em/en-dashes.
 - [ ] Als een UI-label veranderde, zijn alle `lang/<code>.json` en `README.<code>.md` bijgewerkt.
 - [ ] Geen echte functie (behoud van SELinux/uid-gid/modes, enz.) werd verzwakt.
 - [ ] Commits zijn afgetekend (`git commit -s`).
@@ -19,4 +19,4 @@ Alles wat reviewers moeten weten.
 
 ---
 
-> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md)._

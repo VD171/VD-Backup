@@ -11,10 +11,10 @@ backup ของ VDBackup ใช้ **รูปแบบมาตรฐาน** 
 
 ## เครื่องมือที่คุณอาจต้องใช้
 
-- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`; Linux: `apt install zstd`)
+- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
 - **age** (เฉพาะไฟล์ `.age`): https://github.com/FiloSottile/age/releases
 - `tar` มีมาในตัวบน macOS, Linux และ Windows 10/11 รุ่นใหม่
-- `gzip` มีมาในตัวทุกที่; สำหรับ `.tar.gz` คุณไม่ต้องการอะไรเพิ่ม
+- `gzip` มีมาในตัวทุกที่, สำหรับ `.tar.gz` คุณไม่ต้องการอะไรเพิ่ม
 
 ## 1. ถอดรหัส (เฉพาะเมื่อไฟล์ลงท้ายด้วย `.age`)
 
@@ -62,7 +62,7 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ## หมายเหตุ
 
-- ไฟล์ที่แตกออกมายังคง relative path ของมันไว้; SELinux context, uid/gid และ modes
+- ไฟล์ที่แตกออกมายังคง relative path ของมันไว้, SELinux context, uid/gid และ modes
   อยู่ภายใน tar (และจะถูกนำกลับมาใช้อย่างถูกต้องก็ต่อเมื่อคุณ restore บน Android)
 - `manifest.json` อธิบายอย่างแน่นอนว่าแต่ละไฟล์คืออะไร เวอร์ชันแอป และ
   เจ้าของ/context เดิม มันเป็นแหล่งความจริง

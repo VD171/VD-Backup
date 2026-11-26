@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · Tiếng Việt · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/vi/home-dark.png) | ![Apps](docs/screenshots/vi/apps-dark.png) | ![Schedule](docs/screenshots/vi/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/vi/destinations-dark.png) | ![Settings](docs/screenshots/vi/settings-dark.png) | ![Activity log](docs/screenshots/vi/activitylog-dark.png) |
 
 ---
 
@@ -66,23 +85,23 @@ các bản sao lưu Neo-Backup và Android-DataBackup hiện có để bạn chu
   gắn với phần cứng của thiết bị, nên một bản sao lưu có thể khôi phục trên thiết bị khác hoặc mở trên PC.
 - **Đích đến:** cục bộ, SFTP, SCP, SMB, WebDAV, FTP, S3 và hơn 70 loại khác (`rclone`), cùng với
   kho `rsync` và `restic`. Tùy chọn Google Drive qua một ứng dụng đồng hành nhỏ bật theo lựa chọn.
-- **Telegram:** sao lưu vào một kênh Telegram riêng tư như kho lưu trữ đám mây không giới hạn qua MTProto - khôi phục và xóa cũng từ WebUI.
-- **Tính toàn vẹn:** mọi archive đều được kiểm tra đối chiếu với manifest; dry-run và kiểm thử khôi
+- **Telegram:** sao lưu vào một kênh Telegram riêng tư như kho lưu trữ đám mây không giới hạn qua MTProto, khôi phục và xóa cũng từ WebUI.
+- **Tính toàn vẹn:** mọi archive đều được kiểm tra đối chiếu với manifest, dry-run và kiểm thử khôi
   phục cho phép bạn kiểm tra một bản sao lưu mà không đụng chạm đến bất cứ thứ gì.
 - **Khôi phục chọn lọc và hàng loạt:** khôi phục bất kỳ tập con nào các mục của một bản sao lưu,
-  hoặc chọn nhiều bản sao lưu và khôi phục tất cả cùng một lúc; xóa các bản sao lưu và giữ một
+  hoặc chọn nhiều bản sao lưu và khôi phục tất cả cùng một lúc, xóa các bản sao lưu và giữ một
   nhật ký hoạt động/kiểm toán cho mọi hành động phá hủy.
 - **Sao lưu đặc biệt:** tin nhắn (SMS/MMS/RCS), danh bạ và nhật ký cuộc gọi, Wi-Fi và Bluetooth,
   với một bản xuất JSON khả chuyển tùy chọn mà bạn có thể mở trên PC.
-- **Tệp hệ thống (`/data/adb`):** sao lưu chính môi trường root - các mô-đun, dữ liệu và cấu hình
-  của chúng - toàn bộ hoặc một cây con mà bạn chọn từ một cây tệp, với mỗi tệp được khôi phục về
-  chủ sở hữu và ngữ cảnh SELinux ban đầu của nó để root vẫn hoạt động. Nâng cao; chỉ những gì bạn
+- **Tệp hệ thống (`/data/adb`):** sao lưu chính môi trường root (các mô-đun, dữ liệu và cấu hình
+  của chúng) toàn bộ hoặc một cây con mà bạn chọn từ một cây tệp, với mỗi tệp được khôi phục về
+  chủ sở hữu và ngữ cảnh SELinux ban đầu của nó để root vẫn hoạt động. Nâng cao, chỉ những gì bạn
   chọn.
 - **Lập lịch + tự động hóa:** các tác vụ **sao lưu hoặc khôi phục** định kỳ nhắm tới một ứng
   dụng, một tập hợp, hoặc tất cả ứng dụng, với việc tỉa bớt theo kiểu keep-N, cùng với tự động
   sao lưu opt-in khi cài đặt/cập nhật và một danh sách ứng dụng loại trừ.
 - **Nguồn cài đặt:** các ứng dụng đã khôi phục báo cáo Play Store là nguồn cài đặt của chúng
-  theo mặc định (có thể bật/tắt); một tùy chọn opt-in nâng cao còn giả mạo cả gói khởi tạo và nguồn.
+  theo mặc định (có thể bật/tắt), một tùy chọn opt-in nâng cao còn giả mạo cả gói khởi tạo và nguồn.
 - **Gắn ứng dụng hệ thống:** gắn một ứng dụng đã cài làm ứng dụng hệ thống mà không chạm vào
   phân vùng `/system` thật (mô-đun con overlay không-hệ-thống, nhận biết NoMount).
 - **Nền:** sao lưu/khôi phục chạy tách rời và vẫn tiếp tục khi đóng WebUI, kèm thông báo khi bắt đầu
@@ -105,13 +124,13 @@ API mà WebUI dùng, xem toàn bộ bề mặt điều khiển tại **[docs/AI-
 2. Flash nó trong trình quản lý KernelSU / APatch / Magisk, dùng được ngay, không cần khởi động lại.
 3. Mở **WebUI** của mô-đun để cấu hình và chạy sao lưu. Vậy là xong.
 
-**Các phiên bản.** Mỗi bản phát hành gồm sáu zip. `universal-full`, mọi kiến trúc và mọi tệp nhị phân được nhúng sẵn (gồm `rclone` cho nhà cung cấp đám mây và `restic` cho ảnh chụp nhanh), hoàn toàn ngoại tuyến, không bao giờ tải xuống bất cứ thứ gì, mọi thiết bị, lớn nhất. `universal-lite`, mọi kiến trúc nhưng bỏ hai tệp nhị phân lớn nhất (`rclone`, `restic`), nhỏ nhất; vẫn sao lưu được cục bộ, SSH/SFTP và `rsync` mà không cần tải xuống, và lần đầu tiên bạn dùng đích đám mây (`rclone`) hoặc chế độ ảnh chụp nhanh (`restic`), nó sẽ đề nghị tải phần bổ trợ nhỏ theo kiến trúc đó một lần (được xác minh bằng SHA-256) và lưu vào bộ nhớ đệm, sau đó các tính năng ấy cũng hoạt động. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), một kiến trúc duy nhất với mọi tệp nhị phân được nhúng sẵn, nhỏ hơn `universal-full`. Biết kiến trúc của bạn -> chọn `<abi>-full`; muốn nhỏ nhất và không ngại một lần tải xuống cho đám mây hoặc ảnh chụp nhanh -> `universal-lite`; muốn mọi thứ được nhúng sẵn mà không tải xuống gì (ngoại tuyến / khôi phục) -> một phiên bản full. Xem [Bản phát hành](https://github.com/VD171/VD-Backup/releases).
+**Các phiên bản.** Mỗi bản phát hành gồm sáu zip. `universal-full`, mọi kiến trúc và mọi tệp nhị phân được nhúng sẵn (gồm `rclone` cho nhà cung cấp đám mây và `restic` cho ảnh chụp nhanh), hoàn toàn ngoại tuyến, không bao giờ tải xuống bất cứ thứ gì, mọi thiết bị, lớn nhất. `universal-lite`, mọi kiến trúc nhưng bỏ hai tệp nhị phân lớn nhất (`rclone`, `restic`), nhỏ nhất, vẫn sao lưu được cục bộ, SSH/SFTP và `rsync` mà không cần tải xuống, và lần đầu tiên bạn dùng đích đám mây (`rclone`) hoặc chế độ ảnh chụp nhanh (`restic`), nó sẽ đề nghị tải phần bổ trợ nhỏ theo kiến trúc đó một lần (được xác minh bằng SHA-256) và lưu vào bộ nhớ đệm, sau đó các tính năng ấy cũng hoạt động. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), một kiến trúc duy nhất với mọi tệp nhị phân được nhúng sẵn, nhỏ hơn `universal-full`. Biết kiến trúc của bạn -> chọn `<abi>-full`, muốn nhỏ nhất và không ngại một lần tải xuống cho đám mây hoặc ảnh chụp nhanh -> `universal-lite`, muốn mọi thứ được nhúng sẵn mà không tải xuống gì (ngoại tuyến / khôi phục) -> một phiên bản full. Xem [Bản phát hành](https://github.com/VD171/VD-Backup/releases).
 
 Mới làm quen? [Hướng dẫn người dùng](docs/USER-GUIDE.md) sẽ dẫn bạn từ cài đặt đến khôi phục.
 
 ## Bảo mật
 
-VDBackup chạy với quyền root và xử lý dữ liệu ứng dụng của bạn và, tùy chọn, thông tin đăng nhập cùng cụm mật khẩu mã hóa của bạn; một bản sao lưu có thể chứa dữ liệu nhạy cảm, vì vậy hãy bảo vệ nó bằng một cụm mật khẩu và lưu ở nơi bạn tin tưởng. Thông tin đăng nhập được lưu trữ ở dạng mã hóa khi ở trạng thái nghỉ, không bao giờ ở dạng văn bản thuần, và việc mã hóa không bao giờ gắn với phần cứng thiết bị, nên cụm mật khẩu chính là thứ bảo vệ một bản sao lưu đã mã hóa. Hãy báo cáo lỗ hổng theo [SECURITY.md](SECURITY.md).
+VDBackup chạy với quyền root và xử lý dữ liệu ứng dụng của bạn và, tùy chọn, thông tin đăng nhập cùng cụm mật khẩu mã hóa của bạn, một bản sao lưu có thể chứa dữ liệu nhạy cảm, vì vậy hãy bảo vệ nó bằng một cụm mật khẩu và lưu ở nơi bạn tin tưởng. Thông tin đăng nhập được lưu trữ ở dạng mã hóa khi ở trạng thái nghỉ, không bao giờ ở dạng văn bản thuần, và việc mã hóa không bao giờ gắn với phần cứng thiết bị, nên cụm mật khẩu chính là thứ bảo vệ một bản sao lưu đã mã hóa. Hãy báo cáo lỗ hổng theo [SECURITY.md](SECURITY.md).
 
 ## Xây dựng (Build)
 
@@ -130,12 +149,12 @@ chứa các lệnh chính xác để giải mã và giải nén trên PC.
 
 VD Backup đi kèm engine **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** (được nhúng trong `vdlu/`): mô-đun tự cập nhật bằng cách chỉ tải về những
 tệp đã thay đổi (các blob định địa chỉ theo nội dung + một `manifest.json` đã ký), thay vì tải lại toàn bộ
-`.zip`. Hồ sơ **được gia cố**: chữ ký ed25519 là bắt buộc và việc hạ cấp bị chặn; `.zip` đầy đủ vẫn hợp lệ
+`.zip`. Hồ sơ **được gia cố**: chữ ký ed25519 là bắt buộc và việc hạ cấp bị chặn, `.zip` đầy đủ vẫn hợp lệ
 như một phương án dự phòng.
 
 - **Chỉ LIVE** (không khởi động lại): các bản cập nhật được áp dụng ở lần khởi động kế tiếp qua `service.sh`, chạy nền, không làm gì khi không có feed nào truy cập được.
 - **Trạng thái** trong `/data/adb/vdbackup/vdlu/`, bên ngoài mô-đun, nên nó sống sót qua một lần flash lại.
-- **WebUI:** một bảng **Cập nhật** với toast tiến trình và nút hủy; tự động cập nhật là tùy chọn (opt-in).
+- **WebUI:** một bảng **Cập nhật** với toast tiến trình và nút hủy, tự động cập nhật là tùy chọn (opt-in).
 
 ## Tài liệu
 
@@ -186,3 +205,7 @@ VD Backup là một dự án độc lập, không chính thức. Nó không liê
 ## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **Tham gia kênh để nhận cập nhật:** @Priv8_VD https://t.me/Priv8_VD

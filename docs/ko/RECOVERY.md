@@ -11,10 +11,10 @@ VDBackup 백업은 **표준 형식**을 사용하므로, 이 모듈 없이 어�
 
 ## 필요할 수 있는 도구
 
-- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`; Linux: `apt install zstd`)
+- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
 - **age** (`.age` 파일에만 필요): https://github.com/FiloSottile/age/releases
 - `tar`는 macOS, Linux, 최신 Windows 10/11에 내장되어 있습니다.
-- `gzip`은 어디에나 내장되어 있습니다; `.tar.gz`에는 추가로 필요한 것이 없습니다.
+- `gzip`은 어디에나 내장되어 있습니다, `.tar.gz`에는 추가로 필요한 것이 없습니다.
 
 ## 1. 복호화 (파일이 `.age`로 끝나는 경우에만)
 
@@ -62,7 +62,7 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ## 참고
 
-- 추출된 파일은 상대 경로를 유지합니다; SELinux 컨텍스트, uid/gid, modes는
+- 추출된 파일은 상대 경로를 유지합니다, SELinux 컨텍스트, uid/gid, modes는
   tar 안에 있습니다 (그리고 Android에서 복원할 때만 제대로 재적용됩니다).
 - `manifest.json`은 각 파일이 정확히 무엇인지, 앱 버전, 원래 소유자/컨텍스트를
   설명합니다. 그것이 진실의 원천입니다.

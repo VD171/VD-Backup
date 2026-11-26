@@ -5,7 +5,7 @@ Beskriv vad denna PR ändrar och varför.
 ## Checklista
 
 - [ ] Projektets banner-header finns på varje ny/ändrad källfil.
-- [ ] Kod och kommentarer är på engelska; inga em-/en-dashes.
+- [ ] Kod och kommentarer är på engelska, inga em-/en-dashes.
 - [ ] Om en UI-etikett ändrades uppdaterades alla `lang/<code>.json` och `README.<code>.md`.
 - [ ] Ingen riktig funktion (bevarande av SELinux/uid-gid/modes, etc.) försvagades.
 - [ ] Commits är signerade av (`git commit -s`).
@@ -19,4 +19,4 @@ Vad som helst granskare bör veta.
 
 ---
 
-> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas, se [CONTRIBUTING.md](CONTRIBUTING.md)._

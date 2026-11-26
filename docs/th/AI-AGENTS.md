@@ -42,13 +42,13 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | Verb | Args (JSON) | Returns |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` จำนวน (ขนาดเป็น bytes): แอปที่มี backup, จำนวน backup instance ทั้งหมด, path backup แบบเดี่ยว, งานที่ตั้งเวลา, ขนาด backup รวม และพื้นที่ว่าง/ทั้งหมดของระบบไฟล์ backup ไม่ detached, คืนค่าทันที; ใช้โดยภาพรวมหน้าแรกของ WebUI |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` จำนวน (ขนาดเป็น bytes): แอปที่มี backup, จำนวน backup instance ทั้งหมด, path backup แบบเดี่ยว, งานที่ตั้งเวลา, ขนาด backup รวม และพื้นที่ว่าง/ทั้งหมดของระบบไฟล์ backup ไม่ detached, คืนค่าทันที, ใช้โดยภาพรวมหน้าแรกของ WebUI |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | อ็อบเจกต์ config (หรือ `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | สร้างคู่กุญแจ `age` สำหรับการเข้ารหัส |
 | `list-apps` | `{user?}` | `{ok,apps:[{package,label,system,versionCode}]}` (dex, shell fallback) |
 | `label` | `{package,user?}` | `{ok,label}` (ชื่อแอปจริงที่แปลภาษาแล้ว ไม่ขึ้นกับบริบท) |
-| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG; แคชต่อ package+`vc`) |
+| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG, แคชต่อ package+`vc`) |
 | `backup` | ดูด้านล่าง | `{ok,opid}` (detached) |
 | `restore` | ดูด้านล่าง | `{ok,opid}` (detached) |
 | `import` | `{from,ref,password,ssaid,user}` | `{ok,opid}` (detached) |
@@ -71,38 +71,38 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `log-export` | `{user?}` | `{ok:true,path}` (path สัมบูรณ์ของไฟล์ `.txt` ที่เขียนไว้ใต้ไดเรกทอรี backup) หรือ `{ok:false,code:"ERR_LOG_EXPORT"}` เขียน activity log (`audit.jsonl`) พร้อมส่วนหัว build/อุปกรณ์สั้น ๆ ลงในไฟล์ข้อความเดียวที่ผู้ใช้มองเห็นได้ เพื่อให้แนบไปกับรายงานบั๊กได้ ไม่ detached, คืนค่าทันที |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` การสำรองระดับทั้งระบบ (detached) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (ต้องรีบูต; `confirm` เป็นตัวกั้น) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (ต้องรีบูต, `confirm` เป็นตัวกั้น) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` สำรองพาธสัมบูรณ์ใด ๆ เป็น `tar.zst`+`manifest.json` ใต้ `.paths/` (detached) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` กู้คืนการสำรองพาธไปยังตำแหน่งเดิมของมัน (`confirm` เป็นตัวกั้น; detached) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` กู้คืนการสำรองพาธไปยังตำแหน่งเดิมของมัน (`confirm` เป็นตัวกั้น, detached) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` หนึ่งระดับแบบ lazy ของต้นไม้ /data/adb (ค่าเริ่มต้น `/data/adb`) สำหรับตัวเลือก |
 | `adb-du` | `{path}` | `{ok,size}` ขนาดไบต์แบบเวียนเกิดของซับทรี /data/adb หนึ่งอัน ตามคำขอ |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` สำรอง /data/adb - ทั้งหมด (ละ `paths`) หรือซับพาธที่เลือก - ด้วยความเที่ยงตรง SELinux/เจ้าของต่อไฟล์ ใต้ `.adb/` (detached) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` กู้คืนการสำรอง /data/adb ทับต้นไม้ที่ใช้งานอยู่ - ทั้งหมดหรือซับพาธที่เลือก - โดยคงบริบทของแต่ละไฟล์ (ไม่เคยใช้ chcon แบบเหมารวม); `confirm` เป็นตัวกั้น (detached) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` กู้คืนการสำรอง /data/adb ทับต้นไม้ที่ใช้งานอยู่ - ทั้งหมดหรือซับพาธที่เลือก - โดยคงบริบทของแต่ละไฟล์ (ไม่เคยใช้ chcon แบบเหมารวม), `confirm` เป็นตัวกั้น (detached) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` การสำรองระบบไฟล์ /data/adb |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` รายการไฟล์แบบละเอียดที่เก็บไว้ของการสำรอง สำหรับตัวเลือกต้นไม้กู้คืน |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | เมานต์แอปที่ติดตั้งให้เป็นแอประบบ (โมดูลย่อยแบบ systemless; มีผลทันทีผ่าน NoMount มิฉะนั้นเมื่อบูตครั้งถัดไป) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | เมานต์แอปที่ติดตั้งให้เป็นแอประบบ (โมดูลย่อยแบบ systemless, มีผลทันทีผ่าน NoMount มิฉะนั้นเมื่อบูตครั้งถัดไป) |
 | `companion-status` / `companion-install` | `{}` | สถานะ / การติดตั้งตามความต้องการของตัวเสริม Google Drive |
 | `telegram-check` | `{}` | สถานะเซสชัน Telegram (`user` เป็น null = ยังไม่เข้าสู่ระบบ) |
-| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | การเข้าสู่ระบบ Telegram; `sign-in` คืนค่า `2FA_REQUIRED` หากบัญชีมี 2FA และไม่มี `password` |
+| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | การเข้าสู่ระบบ Telegram, `sign-in` คืนค่า `2FA_REQUIRED` หากบัญชีมี 2FA และไม่มี `password` |
 | `telegram-logout` | `{}` | ปิดเซสชัน Telegram |
 | `telegram-list` | `{}` | การสำรองข้อมูลในช่อง Telegram (ชื่อ `<pkg>__<ts>_<vc>.vdb.tar`) |
 | `telegram-pull` | `{message_id,name}` | `{ok,opid}` ดาวน์โหลดการสำรองข้อมูลจาก Telegram ไปยังที่เก็บในเครื่อง (detached) แล้วกู้คืนผ่านโฟลว์ `restore` ปกติ |
 | `telegram-delete` | `{message_id}` | `{ok,deleted:[...]}` ลบการสำรองข้อมูลจากช่อง Telegram ด้วย `message_id` (ชุด: คั่นด้วยจุลภาค) |
 | `rclone-list` | `{dest}` | `{ok,dest,backups:[{dest,rref,package,tsvc}]}` การสำรองข้อมูล Full ที่จัดเก็บแบบ remote เท่านั้นบนปลายทาง rclone (`dest` คือ id ปลายทาง, `rref` คือ `<pkg>/<ts_vc>`) |
 | `rclone-pull` | `{dest,rref}` | `{ok,opid}` ดาวน์โหลดการสำรองข้อมูล rclone ที่จัดเก็บแบบ remote เท่านั้นไปยังที่เก็บในเครื่อง (detached) แล้วกู้คืนผ่านโฟลว์ `restore` ปกติ |
-| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` ลบการสำรองข้อมูลหนึ่งรายการจาก remote ของ rclone; `rref` ต้องเป็น `<pkg>/<ts_vc>` พอดี |
+| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` ลบการสำรองข้อมูลหนึ่งรายการจาก remote ของ rclone, `rref` ต้องเป็น `<pkg>/<ts_vc>` พอดี |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | การจัดการปลายทาง |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | การจัดการ rclone remote (สร้างรายการใน `rclone.conf` ที่ปลายทาง `type:"rclone"` ชี้ไป); `backend` เป็น rclone backend ใดก็ได้ ไม่มี whitelist |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | การจัดการ rclone remote (สร้างรายการใน `rclone.conf` ที่ปลายทาง `type:"rclone"` ชี้ไป), `backend` เป็น rclone backend ใดก็ได้ ไม่มี whitelist |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (เอนจินได้เปิดเบราว์เซอร์ของโทรศัพท์ไปยัง URL ขอความยินยอมนั้นแล้วผ่าน Android VIEW intent) หรือ `{ok:false,code:"ERR_AUTHORIZE"}` รัน `rclone authorize <backend>` บน callback server ในเครื่อง (`127.0.0.1:53682`) เพื่อทำ OAuth บนอุปกรณ์ |
 | `remote-authorize-poll` | `{}` | `{ok:true,done:false,url}` ขณะกำลังรอ, `{ok:true,done:true,token}` เมื่อผู้ใช้ให้ความยินยอมแล้ว (`token` ที่จะส่งให้ `remote-add`), หรือ `{ok:false,code:"ERR_AUTHORIZE"}` |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; หยุดการอนุญาตที่ค้างอยู่ |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, หยุดการอนุญาตที่ค้างอยู่ |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (ไบนารี `rclone`/`restic` มีอยู่หรือไม่, รุ่น `lite` นี้ดึงมาได้หรือไม่, ขนาดดาวน์โหลดเป็นไบต์) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (detached) ดาวน์โหลด+ตรวจสอบ+ติดตั้งส่วนเสริม `rclone`/`restic` บนรุ่น `lite` |
-| `schedule-set` / `schedule-list` / `schedule-delete` | ดูด้านล่าง | งานที่ตั้งเวลาไว้ (การ backup หรือการกู้คืน; กำหนดเป้าหมายเป็นแอปเดียว ชุดของแอป หรือแอปทั้งหมด) |
+| `schedule-set` / `schedule-list` / `schedule-delete` | ดูด้านล่าง | งานที่ตั้งเวลาไว้ (การ backup หรือการกู้คืน, กำหนดเป้าหมายเป็นแอปเดียว ชุดของแอป หรือแอปทั้งหมด) |
 | `scheduler-tick` | `{}` | รันงานที่ถึงกำหนด + ใช้การเก็บรักษา (retention) + ตัวสังเกตการสำรองอัตโนมัติ (heartbeat ตอนบูตเรียกสิ่งนี้) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (ไม่ detached; คืนค่าทันที; `ERR_UPDATE_CHECK` เมื่อล้มเหลว, ดูด้านล่าง) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (ไม่ detached, คืนค่าทันที, `ERR_UPDATE_CHECK` เมื่อล้มเหลว, ดูด้านล่าง) |
 | `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) สำรองข้อมูลหลายแอปในหนึ่งปฏิบัติการแบบแยก ความคืบหน้ามี `n`/`of` ความล้มเหลวรายแอปไม่หยุดชุด |
 | `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) กู้คืนหลายข้อมูลสำรองในหนึ่งปฏิบัติการแบบแยก ความคืบหน้ามี `n`/`of` ความล้มเหลวรายแอปไม่หยุดชุด |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` วอลุ่มที่จัดเก็บสำหรับตัวเลือกโฟลเดอร์: ภายในและการ์ด SD/USB แบบถอดได้ |
@@ -164,11 +164,11 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 ```
 
 `restore`/`import` รับ `{ref}` (ไดเรกทอรี backup / scan ref) `restore` ยังรับ:
-`"items"` (ชุดย่อยของประเภท item ในการสำรองที่จะกู้คืน; ละไว้เพื่อกู้คืนทั้งหมด), `"test": true`
+`"items"` (ชุดย่อยของประเภท item ในการสำรองที่จะกู้คืน, ละไว้เพื่อกู้คืนทั้งหมด), `"test": true`
 (แตกไฟล์ไปยังไดเรกทอรีชั่วคราวและตรวจสอบ โดยไม่แตะแอปที่ใช้งานจริง), `"mode"` สำหรับ snapshot/mirror,
 `"password"` สำหรับ backup ที่เข้ารหัส, `"ssaid"` (opt-in) และตัวเลือกแหล่งติดตั้ง
 `"spoof_installer"` (ค่าเริ่มต้นจาก config, ตั้ง installer เป็น Play Store ตอนติดตั้ง) และ
-`"deep_spoof": true` (ขั้นสูงแบบ opt-in; ยังปลอมแปลง initiating package และ package source ด้วย
+`"deep_spoof": true` (ขั้นสูงแบบ opt-in, ยังปลอมแปลง initiating package และ package source ด้วย
 การแก้ไขฐานข้อมูล package มีผลหลังรีบูต) ส่วน `import` รับ `"from": "neo" | "databackup"` และสำหรับ
 Neo backup ที่เข้ารหัสไว้ จะรับ `"password"`
 
@@ -284,32 +284,32 @@ backup/restore snapshot `restic` ระยะไกล, การ restore แบ
 `cloud-status` รายงานว่ามีอยู่แล้วหรือไม่, รุ่นนี้ดึงมาได้หรือไม่, และขนาดดาวน์โหลดเป็นไบต์ `cloud-fetch`
 ทำงานแบบ **detached** (ให้ poll `progress` ด้วย `opid` ของมัน): มันดาวน์โหลดส่วนเสริม
 `rclone`+`restic` ตามสถาปัตยกรรม, ตรวจสอบกับ SHA-256 ที่ฝังไว้ในโมดูล, และติดตั้งลงในแคชรันไทม์
-เฟสความคืบหน้าคือ `downloading`, `verifying` และ `installing`; รหัสสุดท้ายคือ `ERR_NONE` เมื่อสำเร็จ
+เฟสความคืบหน้าคือ `downloading`, `verifying` และ `installing`, รหัสสุดท้ายคือ `ERR_NONE` เมื่อสำเร็จ
 หรือ `ERR_FETCH` (ดาวน์โหลดล้มเหลว) / `ERR_FETCH_VERIFY` (เช็กซัมไม่ตรง ถูกทิ้ง) เมื่อล้มเหลว
 บนรุ่น `full` ไม่จำเป็นต้องใช้ การทำ `backup`/`restore` ไปยังปลายทางคลาวด์หรือ snapshot บนรุ่น `lite`
-ก่อนที่ไบนารีจะมีอยู่ จะล้มเหลวด้วย `ERR_CLOUD_FETCHABLE`; ไคลเอนต์ควรเสนอให้รัน `cloud-fetch`
+ก่อนที่ไบนารีจะมีอยู่ จะล้มเหลวด้วย `ERR_CLOUD_FETCHABLE`, ไคลเอนต์ควรเสนอให้รัน `cloud-fetch`
 แล้วลองใหม่
 
 ### หมวดหมู่การสำรองพิเศษ
 
-`special-categories` รายงานว่าอุปกรณ์มีหมวดหมู่ระดับทั้งระบบใดบ้าง; `special-backup` จับหมวดที่คุณส่งใน
+`special-categories` รายงานว่าอุปกรณ์มีหมวดหมู่ระดับทั้งระบบใดบ้าง, `special-backup` จับหมวดที่คุณส่งใน
 `categories` และ `special-restore` นำกลับมาใช้ใหม่ หมวดหมู่มีดังนี้:
 
 | หมวดหมู่ | มันคืออะไร | ความหมายของการกู้คืน |
 |----------|-----------|-------------------|
 | `messages` | SMS/MMS | แทนที่ผ่าน provider (ล้าง + แตกไฟล์) |
-| `rcs` | แชท RCS (Google Messages, `bugle_db`); ส่งออกแบบพกพาไปยัง `rcs.json` ด้วย | แทนที่ข้อมูลแอป (ล้าง + แตกไฟล์) อุปกรณ์เดิม |
+| `rcs` | แชท RCS (Google Messages, `bugle_db`), ส่งออกแบบพกพาไปยัง `rcs.json` ด้วย | แทนที่ข้อมูลแอป (ล้าง + แตกไฟล์) อุปกรณ์เดิม |
 | `contacts` | รายชื่อติดต่อและบันทึกการโทร | แทนที่ผ่าน provider (ล้าง + แตกไฟล์) |
 | `wifi` | เครือข่าย Wi-Fi ที่บันทึกไว้ | แทนที่ผ่าน provider (ล้าง + แตกไฟล์) |
 | `bluetooth` | การจับคู่ Bluetooth | แทนที่ผ่าน provider (ล้าง + แตกไฟล์) |
-| `calendar` | provider ปฏิทิน (`com.android.providers.calendar`, แอป + ข้อมูล); ยังส่งออกแบบพกพาไปยัง `calendar.json` ด้วย | แทนที่ผ่าน provider (ล้าง + แตกไฟล์) |
+| `calendar` | provider ปฏิทิน (`com.android.providers.calendar`, แอป + ข้อมูล), ยังส่งออกแบบพกพาไปยัง `calendar.json` ด้วย | แทนที่ผ่าน provider (ล้าง + แตกไฟล์) |
 | `wallpaper` | วอลเปเปอร์หน้าจอหลักและหน้าจอล็อก พร้อม `wallpaper_info.xml` เก็บแบบดิบ (ไบนารี) | แทนที่ไฟล์ |
 | `dns` | โหมดและตัวระบุ DNS ส่วนตัว อ่านจากการตั้งค่า | `settings put` แบบ idempotent |
 | `system_settings` | ดัมป์การตั้งค่า system/global/secure แบบเต็ม | **opt-in**, `settings put` แบบ idempotent, เขียนทับการตั้งค่าของอุปกรณ์ |
 
 **`system_settings` เป็น opt-in อย่างเคร่งครัดและทำลายข้อมูลเมื่อกู้คืน** เช่นเดียวกับ `ssaid` มันเขียนทับ
 การตั้งค่าระดับทั้งอุปกรณ์เมื่อถูกกู้คืน จึงถูกกั้นไว้หลังความยินยอมที่ชัดแจ้งของผู้ใช้และบันทึกลงใน audit trail
-อย่าเลือกมันโดยค่าเริ่มต้นเด็ดขาด; เฉพาะเมื่อผู้ใช้ร้องขอโดยตรงและตั้งใจเท่านั้น
+อย่าเลือกมันโดยค่าเริ่มต้นเด็ดขาด, เฉพาะเมื่อผู้ใช้ร้องขอโดยตรงและตั้งใจเท่านั้น
 
 ### การสำรองพาธแบบ standalone
 
@@ -325,12 +325,12 @@ VDBackup เอง (ผนึกด้วย SHA-256 พร้อมชุด RE
 ```
 
 - พาธต้นทางต้องเป็น **สัมบูรณ์** และอยู่ใต้รากที่อนุญาตอย่างใดอย่างหนึ่ง: `/storage/emulated`,
-  `/data/media`, `/sdcard`, `/data` พาธที่ไม่มีอยู่จะล้มเหลวด้วย `ERR_NO_PATH`; พาธที่อยู่นอกรากที่อนุญาต
+  `/data/media`, `/sdcard`, `/data` พาธที่ไม่มีอยู่จะล้มเหลวด้วย `ERR_NO_PATH`, พาธที่อยู่นอกรากที่อนุญาต
   หรือที่มี `..` จะล้มเหลวด้วย `ERR_BAD_PATH`
 - `path-restore` เขียนกลับไปยังตำแหน่งเดิม จึงเป็นการทำลายข้อมูลและต้องการ `"confirm": true` -
   ตัวกั้นที่มีแรงเสียดทานสูง เช่นเดียวกับ `special-restore` `ref` ที่ไม่ใช่การสำรองพาธที่ถูกต้องจะล้มเหลวด้วย
   `ERR_BAD_REF`
-- ทั้งคู่รันแบบ **detached**; poll `progress` ด้วย `opid` ที่คืนมา
+- ทั้งคู่รันแบบ **detached**, poll `progress` ด้วย `opid` ที่คืนมา
 
 ### การสำรองระบบไฟล์ /data/adb
 
@@ -338,15 +338,15 @@ VDBackup เอง (ผนึกด้วย SHA-256 พร้อมชุด RE
 ขับเคลื่อนด้วยตัวเลือกต้นไม้แบบ lazy (`adb-list` ทีละระดับ, `adb-du` สำหรับขนาดของโฟลเดอร์ตามคำขอ)
 
 - ทั้งหมดหรือเลือกเฉพาะที่ทั้งสองปลาย: ละ `paths` สำหรับทุกอย่าง หรือส่งซับพาธที่เลือก
-  (สัมพัทธ์กับ /data/adb); การกู้คืนรับ `paths` เดียวกัน
+  (สัมพัทธ์กับ /data/adb), การกู้คืนรับ `paths` เดียวกัน
 - **ความเที่ยงตรงต่อไฟล์:** archive เก็บบริบท SELinux เจ้าของ และ xattrs ของแต่ละไฟล์ และการกู้คืน
   พึ่งพาสิ่งนั้น - มันไม่เคยใช้ `chcon` แบบเหมารวม ซึ่งจะทำให้บริบทที่หลากหลายของ /data/adb แบนราบ
   และทำให้ root พัง `adb-restore` แตกไฟล์ทับต้นไม้ที่ใช้งานอยู่ ไม่เคยล้างมันทิ้ง
 - การอ้างอิงตัวเอง: เอาต์พุตของการสำรองเองและ staging ของโมดูลถูกยกเว้น ดังนั้นการสำรองจึงไม่เคยบรรจุตัวมันเอง
-- `adb-index` คืนรายการไฟล์ที่เก็บไว้ของการสำรองเพื่อให้การกู้คืนแสดงต้นไม้ของมันได้; การเลือกใน UI
-  ถูกแสดงออกทั้งหมดผ่าน `paths` (โฟลเดอร์ที่ติ๊กเต็มคือหนึ่งพาธ; ที่ติ๊กบางส่วนจะลงไปยังลูกที่ติ๊กไว้
+- `adb-index` คืนรายการไฟล์ที่เก็บไว้ของการสำรองเพื่อให้การกู้คืนแสดงต้นไม้ของมันได้, การเลือกใน UI
+  ถูกแสดงออกทั้งหมดผ่าน `paths` (โฟลเดอร์ที่ติ๊กเต็มคือหนึ่งพาธ, ที่ติ๊กบางส่วนจะลงไปยังลูกที่ติ๊กไว้
   จึงไม่ต้องใช้รายการ exclude)
-- `adb-restore` ต้องการ `"confirm": true` (ตัวกั้นที่มีแรงเสียดทานสูง); ทั้งคู่รันแบบ detached, poll `progress`
+- `adb-restore` ต้องการ `"confirm": true` (ตัวกั้นที่มีแรงเสียดทานสูง), ทั้งคู่รันแบบ detached, poll `progress`
 
 ### `update-check`
 
@@ -387,7 +387,7 @@ VDBackup เอง (ผนึกด้วย SHA-256 พร้อมชุด RE
   audit trail ในเครื่อง (`logs/audit.jsonl`) การ restore เป็นไปอย่างซื่อตรง (ล้างแล้วจึงแตกไฟล์)
   จึงย้อนแอปกลับไปสู่สถานะที่ตรงเป๊ะของ backup นั้น จงยืนยันเจตนาก่อนเรียกใช้มัน
 - **`system_settings` เป็น opt-in และทำลายข้อมูล เหมือน `ssaid` ทุกประการ** การกู้คืนมันจะเขียนทับ
-  การตั้งค่าระดับทั้งอุปกรณ์ จงส่งมันเฉพาะเมื่อผู้ใช้ร้องขอโดยตรง; มันถูกกั้นด้วยความยินยอมที่ชัดแจ้งและถูกบันทึกใน
+  การตั้งค่าระดับทั้งอุปกรณ์ จงส่งมันเฉพาะเมื่อผู้ใช้ร้องขอโดยตรง, มันถูกกั้นด้วยความยินยอมที่ชัดแจ้งและถูกบันทึกใน
   audit trail
 - **การกู้คืนเป็นแบบ idempotent** การกู้คืน provider แบบดิบ (messages/contacts/wifi/bluetooth/
   calendar) จะ **แทนที่** แทนที่จะผสาน, ข้อมูล provider ถูกล้างและ archive ถูกแตกทับลงไป, ดังนั้น

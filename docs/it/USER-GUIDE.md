@@ -68,13 +68,13 @@ dispositivo specifico. Vedi la [sezione 11](#11-portabilità--aprire-i-backup-su
 - **Un dispositivo Android con root** gestito da **KernelSU**, **APatch** o **Magisk**.
   VDBackup si installa come modulo da quel gestore.
 - Spazio di archiviazione libero sufficiente per i tuoi backup (i backup locali risiedono sotto la directory
-  di stato del modulo ; vedi la [sezione 3](#3-installazione-e-primo-avvio)).
+  di stato del modulo, vedi la [sezione 3](#3-installazione-e-primo-avvio)).
 - Nient'altro. Il modulo include tutti i binari di cui ha bisogno (tar, zstd, lz4, rclone,
   rsync, ssh, restic), quindi **il backup e il ripristino locali funzionano completamente offline**. Solo le
   destinazioni cloud comunicano con la rete.
 
 Alcuni extra a grana fine (AppOps, SSAID, alcuni pezzi di sistema privilegiati) si appoggiano al
-framework Android ; il modulo li gestisce internamente, con un ripiego in shell puro,
+framework Android, il modulo li gestisce internamente, con un ripiego in shell puro,
 e degradano in modo elegante quando non sono disponibili sul tuo dispositivo.
 
 ## 3. Installazione e primo avvio
@@ -83,13 +83,13 @@ e degradano in modo elegante quando non sono disponibili sul tuo dispositivo.
 2. Nel tuo gestore KernelSU / APatch / Magisk, flasha lo zip del modulo come qualsiasi altro
    modulo.
 3. È utilizzabile immediatamente, **nessun riavvio necessario**. (Un riavvio è rilevante solo
-   quando si ripristina il SSAID ; vedi la [sezione 10](#10-ssaid-android_id-del-dispositivo).)
+   quando si ripristina il SSAID, vedi la [sezione 10](#10-ssaid-android_id-del-dispositivo).)
 4. Apri la **WebUI** del modulo dal gestore. Quella è l'intera interfaccia.
 
 **Quale edizione scaricare.** Ogni release è distribuita come diverse edizioni zip flashabili, così scarichi solo ciò che ti serve. Scegline una:
 
 - **`VD-Backup-<ver>-universal-full.zip`**: ogni architettura CPU e ogni binario incorporato, inclusi `rclone` (provider cloud: Google Drive, S3 e oltre 70 altri backend rclone) e `restic` (snapshot deduplicati). Completamente offline, non viene mai scaricato nulla. Funziona su qualsiasi dispositivo. Il download più grande.
-- **`VD-Backup-<ver>-universal-lite.zip`**: ogni architettura, ma **senza** i due binari più grandi (`rclone` e `restic`). Il download più piccolo; fa comunque backup locali, SSH/SFTP e rsync senza alcun download, con cifratura portabile `age`. La prima volta che usi una destinazione cloud (`rclone`) o la modalità snapshot (`restic`), la WebUI propone di scaricare una volta quel piccolo addon per-architettura (verificato con SHA-256) e lo memorizza nella cache; da quel momento anche quelle funzioni funzionano.
+- **`VD-Backup-<ver>-universal-lite.zip`**: ogni architettura, ma **senza** i due binari più grandi (`rclone` e `restic`). Il download più piccolo, fa comunque backup locali, SSH/SFTP e rsync senza alcun download, con cifratura portabile `age`. La prima volta che usi una destinazione cloud (`rclone`) o la modalità snapshot (`restic`), la WebUI propone di scaricare una volta quel piccolo addon per-architettura (verificato con SHA-256) e lo memorizza nella cache, da quel momento anche quelle funzioni funzionano.
 - **`VD-Backup-<ver>-<abi>-full.zip`** (una tra `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), una singola architettura con ogni binario incorporato (le stesse funzioni di `universal-full` ma solo per l'architettura del tuo dispositivo, quindi più piccola di `universal-full`).
 
 Se conosci l'architettura del tuo dispositivo e vuoi tutto incorporato, scegli la **`<abi>-full`** corrispondente (la maggior parte dei telefoni è **`arm64-v8a`**). Se vuoi il download più piccolo e non ti dispiace un download una tantum, verificato con SHA-256, la prima volta che usi i provider cloud (`rclone`) o gli snapshot (`restic`), scegli **`universal-lite`**. Se vuoi tutto incorporato senza alcun download (offline / ripristino) e non sei sicuro dell'architettura, scegli un'edizione **full**. All'installazione il modulo conserva solo l'architettura del tuo dispositivo, indipendentemente dall'edizione che flashi.
@@ -123,7 +123,7 @@ La WebUI è organizzata in alcune schede :
 - **Home**: una panoramica iniziale che mostra i conteggi dei tuoi backup (app, backup, cartelle e lavori pianificati) e una barra di archiviazione di quanto spazio usano i tuoi backup rispetto a quello libero, con badge di stato, copia negli appunti di hash e percorsi, e un'azione **Check for updates**.
 - **Apps**: l'elenco delle app installate (utente e sistema), ognuna mostrata con il suo vero
   nome, il suo nome di package, e la sua icona (le icone si caricano pigramente e sono in cache, così l'elenco
-  resta reattivo). Il pulsante su una riga esegue il backup dell'app ; toccare la riga apre la cronologia di
+  resta reattivo). Il pulsante su una riga esegue il backup dell'app, toccare la riga apre la cronologia di
   backup di quell'app, dove puoi ripristinare qualsiasi backup precedente.
 - **Backups**: i backup che hai già, ognuno che mostra il nome dell'app su una riga e
   il package su quella successiva. Tocca un backup per vedere tutti i suoi dettagli (versione, data, dimensione,
@@ -143,7 +143,7 @@ La WebUI è organizzata in alcune schede :
   e la pianificazione. Le impostazioni on/off usano interruttori in stile Android.
 - **About**: versione, link, i progetti fratelli (Vedi anche), il manifesto di audit dei binari impacchettati, e un'azione **Check for updates** che segnala se è stata pubblicata una versione più recente (con le sue note di rilascio). Installi qualsiasi aggiornamento tramite il tuo gestore root, allo stesso modo in cui hai flashato il modulo.
 
-L'app controlla inoltre da sola se c'è una versione più recente ogni volta che la apri (al massimo una volta all'ora) e mostra il banner di aggiornamento solo quando c'è; resta in silenzio se aggiornata o offline.
+L'app controlla inoltre da sola se c'è una versione più recente ogni volta che la apri (al massimo una volta all'ora) e mostra il banner di aggiornamento solo quando c'è, resta in silenzio se aggiornata o offline.
 
 Le conferme e i messaggi usano finestre di dialogo integrate nell'app (non i vecchi pop-up di sistema), e un
 ripristino o un'importazione ti chiede di riconoscere che sovrascrive i dati attuali dell'app prima
@@ -156,7 +156,7 @@ un lavoro in corso la scheda di avanzamento mostra anche la velocità di trasfer
 reale e il tempo rimanente stimato, più un contatore di item (per esempio "12 di 40") con il nome
 dell'item corrente. Sulle
 ROM che espongono le notifiche shell ricevi anche una notifica Android quando un lavoro
-inizia e finisce ; in ogni caso, la scheda di avanzamento integrata nell'app è l'indicatore affidabile.
+inizia e finisce, in ogni caso, la scheda di avanzamento integrata nell'app è l'indicatore affidabile.
 
 ## 5. Creare un backup
 
@@ -164,11 +164,11 @@ Il flusso di base : apri **Apps**, scegli un'app, seleziona cosa includere, sceg
 imposta la compressione e (opzionalmente) la cifratura, poi esegui. L'avanzamento appare in tempo reale e una
 notifica ti dice quando è finito.
 
-Mentre un backup o un ripristino è in corso, la sua scheda di avanzamento ha un pulsante **Annulla**. Annullare un backup lo ferma e rimuove qualsiasi copia parziale che aveva iniziato, così non resta nulla scritto a metà. Annullare un ripristino lo ferma anch'esso, ma l'app potrebbe restare parzialmente ripristinata, perciò VDBackup ti avvisa prima; esegui di nuovo il ripristino per completarlo.
+Mentre un backup o un ripristino è in corso, la sua scheda di avanzamento ha un pulsante **Annulla**. Annullare un backup lo ferma e rimuove qualsiasi copia parziale che aveva iniziato, così non resta nulla scritto a metà. Annullare un ripristino lo ferma anch'esso, ma l'app potrebbe restare parzialmente ripristinata, perciò VDBackup ti avvisa prima, esegui di nuovo il ripristino per completarlo.
 
 Nella finestra di backup puoi anche scegliere la **destinazione** di questo backup, archiviazione locale o qualsiasi destinazione cloud/remota aggiunta, senza prima cambiare la destinazione predefinita nelle Impostazioni.
 
-VDBackup esegue due salvaguardie automatiche durante un backup, entrambe attive per impostazione predefinita nelle Impostazioni. **"Metti in pausa per raffreddare quando il dispositivo si surriscalda"** lascia respirare un lavoro lungo, e aspetta che il dispositivo si raffreddi se è davvero caldo, così un backup grande non surriscalda mai il telefono; cambia solo il ritmo, mai la fedeltà. **"Controlla lo spazio libero prima di un backup in lotto"** stima ciò di cui avrà bisogno un backup di più app e si ferma all'inizio, invece che a metà, se l'archiviazione non lo conterrebbe.
+VDBackup esegue due salvaguardie automatiche durante un backup, entrambe attive per impostazione predefinita nelle Impostazioni. **"Metti in pausa per raffreddare quando il dispositivo si surriscalda"** lascia respirare un lavoro lungo, e aspetta che il dispositivo si raffreddi se è davvero caldo, così un backup grande non surriscalda mai il telefono, cambia solo il ritmo, mai la fedeltà. **"Controlla lo spazio libero prima di un backup in lotto"** stima ciò di cui avrà bisogno un backup di più app e si ferma all'inizio, invece che a metà, se l'archiviazione non lo conterrebbe.
 
 ### 5.1 Scegliere cosa salvare
 
@@ -266,7 +266,7 @@ il Mirror è un delta sync ed è esente.)
 ### 5.6 Backup speciali (messaggi, registro chiamate, Wi-Fi, Bluetooth, calendario, sfondo, DNS, impostazioni di sistema)
 
 Sotto gli elenchi di app nella scheda **Backups**, i **Backup speciali** coprono dati a livello
-di sistema che non sono legati a una singola app. Scegli le categorie ed eseguine il backup ; vengono
+di sistema che non sono legati a una singola app. Scegli le categorie ed eseguine il backup, vengono
 archiviati con la stessa conservazione SELinux/xattr e la stessa cifratura opzionale dei backup di app.
 Le categorie sono :
 
@@ -321,7 +321,7 @@ configurazione - l'ambiente root stesso. VDBackup può eseguirne il backup, in t
 così da poter portare la tua configurazione root attraverso un wipe o un cambio di ROM.
 
 - **Totale o selettivo.** Esegui il backup di tutto `/data/adb`, oppure apri l'albero dei file e
-  scegli esattamente le cartelle e i file che vuoi; una cartella spuntata a metà include solo i
+  scegli esattamente le cartelle e i file che vuoi, una cartella spuntata a metà include solo i
   figli che hai selezionato.
 - **Tutto resta nelle tue mani.** L'albero è neutro - niente è preselezionato o nascosto, tranne i
   file di lavoro di VDBackup stesso, che altrimenti si limiterebbero a fare il backup di sé stesso.
@@ -331,7 +331,7 @@ così da poter portare la tua configurazione root attraverso un wipe o un cambio
   cancellazione totale), così che i contesti differenti sotto `/data/adb` siano preservati e il tuo
   manager root continui ad avviarsi.
 - **Avanzato.** Questo tocca direttamente l'ambiente root. Il ripristino è distruttivo e ti chiede
-  di confermare; un ripristino selettivo riscrive solo i percorsi che hai scelto.
+  di confermare, un ripristino selettivo riscrive solo i percorsi che hai scelto.
 
 ## 6. Ripristinare un backup
 
@@ -363,7 +363,7 @@ Opzioni di ripristino utili :
   delle app e dei controlli delle app si aspetta. Puoi disattivarlo globalmente in Settings o per singolo
   ripristino, e quando è disattivato viene mantenuta l'origine di installazione originale. Un'opzione avanzata
   opt-in **"forgia l'origine iniziatrice"** va oltre e fa sembrare installati dal Play Store anche il
-  pacchetto e l'origine iniziatori dell'app ; modifica il database dei pacchetti di sistema (prima ne esegue
+  pacchetto e l'origine iniziatori dell'app, modifica il database dei pacchetti di sistema (prima ne esegue
   il backup) e ha effetto dopo un riavvio.
 
 **Ripristino in blocco.** La scheda **Backups** ha una modalità **Select**, nello stesso modo in cui la scheda
@@ -379,7 +379,7 @@ limitare quanti backup mantenere per app (retention) così che quelli vecchi ven
 **Montare un'app installata come app di sistema.** Dalla cronologia di backup di un'app, **Mount as
 system** prepara l'APK dell'app in un sottomodulo overlay di VDBackup così che il gestore root lo
 serva da `/system/app` (o `/system/priv-app`), la partizione `/system` reale non viene mai toccata. Con
-**NoMount** su KernelSU si applica a caldo ; altrimenti si applica dopo un riavvio. Questo non dipende mai
+**NoMount** su KernelSU si applica a caldo, altrimenti si applica dopo un riavvio. Questo non dipende mai
 dall'avere NoMount installato.
 
 ## 7. Destinazioni : locale e remota
@@ -445,7 +445,7 @@ La tua stessa configurazione di VDBackup, le destinazioni, le pianificazioni, le
 
 - **Esporta impostazioni** scrive un file cifrato in `VDBackup/.export`. Chiede sempre una passphrase, perché il file contiene le tue password remote.
 - **Importa impostazioni** rilegge un tale file e lo unisce a questo dispositivo, senza rimuovere nulla di ciò che è già presente.
-- **Cancella credenziali salvate** rimuove le password remote salvate e la chiave di cifratura del dispositivo in un solo passaggio; le tue destinazioni, pianificazioni e backup restano al loro posto.
+- **Cancella credenziali salvate** rimuove le password remote salvate e la chiave di cifratura del dispositivo in un solo passaggio, le tue destinazioni, pianificazioni e backup restano al loro posto.
 
 ## 8. Pianificazione e ritenzione
 
@@ -487,7 +487,7 @@ ne esegue il backup per te (con ritenzione keep-N). La prima esecuzione registra
 installato, così abilitarlo non esegue mai il backup dell'intero dispositivo tutto in una volta.
 
 **App escluse (blocklist).** Sempre in Settings, puoi escludere le app di cui non vuoi mai eseguire
-il backup automaticamente o su pianificazione ; puoi aggiungerne diverse in una volta (selezione multipla), e le app escluse vengono saltate da entrambi.
+il backup automaticamente o su pianificazione, puoi aggiungerne diverse in una volta (selezione multipla), e le app escluse vengono saltate da entrambi.
 
 **Preset di backup.** Anche nelle Impostazioni puoi salvare preset con nome, insiemi di elementi da includere, come solo APK o APK + OBB, e sceglierne uno nel dialogo di backup per riempire le scelte in una volta.
 
@@ -550,7 +550,7 @@ Per aprirne uno su un PC, in breve :
 - **Decifra** (solo se il file termina in `.age`) con lo strumento standard `age` e la tua
   passphrase o il file di chiave.
 - **Decomprimi ed estrai** : `.tar.zst` con `zstd` poi `tar` ; `.tar.gz` con `tar`
-  direttamente ; `.tar.lz4` tramite `zstd --format=lz4`. Un APK è solo un APK compresso con zstd,
+  direttamente, `.tar.lz4` tramite `zstd --format=lz4`. Un APK è solo un APK compresso con zstd,
   quindi decomprimere `base.apk.zst` ti dà un normale `base.apk` installabile.
 
 Ogni backup cifrato viene fornito con una nota **RECOVERY** contenente gli esatti comandi
@@ -564,7 +564,7 @@ solo senza che la proprietà specifica di Android venga imposta.
 ## 12. Pilotare VDBackup da un assistente IA
 
 VDBackup è costruito per essere accogliente verso gli assistenti e gli agenti IA, non solo le persone. La
-WebUI è solo uno dei client di una piccola API JSON ; un agente può amministrare **ogni** azione
+WebUI è solo uno dei client di una piccola API JSON, un agente può amministrare **ogni** azione
 del modulo senza interfaccia tramite quella stessa API (ogni comando restituisce un singolo oggetto JSON,
 le operazioni lunghe vengono eseguite staccate e ne interroghi l'avanzamento, e si applicano le stesse
 protezioni, il SSAID resta opt-in, le azioni mutanti restano confermate e auditate).
@@ -589,28 +589,28 @@ operazione in corso e mostra l'avanzamento attuale.
 comuni :
 - `ERR_VERIFY`, un archivio scritto non corrispondeva all'hash del suo manifesto (la verifica
   ha colto un backup difettoso). Riesegui il backup.
-- `ERR_RESTORE_TEST`, un test di ripristino è fallito ; il backup non si è estratto/verificato
+- `ERR_RESTORE_TEST`, un test di ripristino è fallito, il backup non si è estratto/verificato
   in modo pulito e la tua app in uso è rimasta intatta.
 - `ERR_UNSAFE_ARCHIVE`, un archivio è stato rifiutato perché cercava di scrivere fuori dalla sua
   directory di destinazione (percorsi assoluti o `..`). Questo ti protegge da un backup manomesso ;
   non è stato scritto nulla.
-- `ERR_QUOTA`, un remote cloud non aveva spazio libero sufficiente per un caricamento Full ; il
+- `ERR_QUOTA`, un remote cloud non aveva spazio libero sufficiente per un caricamento Full, il
   backup è stato interrotto prima di caricare qualsiasi cosa.
 
 **La mia destinazione remota fallisce.** Usa il **test** di destinazione nella scheda Destinations
 per validare credenziali e connettività. Ricorda che solo le destinazioni cloud hanno bisogno
-della rete ; il backup/ripristino locale è completamente offline.
+della rete, il backup/ripristino locale è completamente offline.
 
 **Qualcosa di tutto questo telefona a casa o scarica a runtime ?** No. Tutti i binari sono impacchettati
-nel modulo al momento del build ; nulla viene recuperato sul dispositivo a runtime. Solo le destinazioni
+nel modulo al momento del build, nulla viene recuperato sul dispositivo a runtime. Solo le destinazioni
 cloud (rclone/restic/ssh) comunicano con la rete, e solo quando le usi.
 
 **Il mio backup si ripristinerà su un telefono diverso ?** Sì, i backup sono portabili e non
 legati all'hardware del dispositivo. (Il SSAID è l'unica eccezione specifica del dispositivo, ed è opt-in
-e applicato al riavvio ; vedi la [sezione 10](#10-ssaid-android_id-del-dispositivo).)
+e applicato al riavvio, vedi la [sezione 10](#10-ssaid-android_id-del-dispositivo).)
 
 **Il mio backup cifrato non si apre, ho perso la passphrase.** Non c'è backdoor di recupero
-per progettazione ; la passphrase è ciò che protegge il backup. Tienila al sicuro.
+per progettazione, la passphrase è ciò che protegge il backup. Tienila al sicuro.
 
 ## 14. Disinstallazione
 
@@ -620,4 +620,4 @@ Disinstalla VDBackup come qualsiasi altro modulo dal tuo gestore KernelSU / APat
 
 ---
 
-> _Questa documentazione è stata generata con Claude (Anthropic) ed è gestita da VD171. Correzioni e miglioramenti sono benvenuti; vedi [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Questa documentazione è stata generata con Claude (Anthropic) ed è gestita da VD171. Correzioni e miglioramenti sono benvenuti, vedi [CONTRIBUTING.md](CONTRIBUTING.md)._

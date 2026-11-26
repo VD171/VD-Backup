@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · Türkçe · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/tr/home-dark.png) | ![Apps](docs/screenshots/tr/apps-dark.png) | ![Schedule](docs/screenshots/tr/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/tr/destinations-dark.png) | ![Settings](docs/screenshots/tr/settings-dark.png) | ![Activity log](docs/screenshots/tr/activitylog-dark.png) |
 
 ---
 
@@ -50,7 +69,7 @@ bir şey yoktur. Popüler yedekleme uygulamalarının yaptığı her şeyi tek b
 kapsamayı hedefler.
 
 **Swift Backup, Neo-Backup ve Android-DataBackup**'ın açık, root-doğal **ardılı** olarak
-tasarlanmıştır: yaptıklarının birleşimi, AGPLv3 altında; hatta geçiş yapabilmeniz için mevcut
+tasarlanmıştır: yaptıklarının birleşimi, AGPLv3 altında, hatta geçiş yapabilmeniz için mevcut
 Neo-Backup ve Android-DataBackup yedeklerini içe aktarabilir.
 
 ## Özellikler
@@ -66,23 +85,23 @@ Neo-Backup ve Android-DataBackup yedeklerini içe aktarabilir.
   donanımına bağlı değildir, böylece bir yedek başka bir cihazda geri yüklenir veya bir PC'de açılır.
 - **Hedefler:** yerel, SFTP, SCP, SMB, WebDAV, FTP, S3 ve 70'ten fazlası (`rclone`),
   ayrıca `rsync` ve `restic` depoları. Küçük, tercihe bağlı bir yardımcı ile isteğe bağlı Google Drive.
-- **Telegram:** özel bir Telegram kanalına MTProto üzerinden sınırsız bulut depolama olarak yedekle - geri yükleme ve silme de WebUI'den.
-- **Bütünlük:** her arşiv manifest'e karşı doğrulanır; dry-run ve geri yükleme testi, hiçbir şeye
+- **Telegram:** özel bir Telegram kanalına MTProto üzerinden sınırsız bulut depolama olarak yedekle, geri yükleme ve silme de WebUI'den.
+- **Bütünlük:** her arşiv manifest'e karşı doğrulanır, dry-run ve geri yükleme testi, hiçbir şeye
   dokunmadan bir yedeği denetlemenizi sağlar.
 - **Seçmeli ve toplu geri yükleme:** bir yedeğin öğelerinden herhangi bir alt kümeyi geri
-  yükleyin veya birden çok yedeği seçip hepsini tek seferde geri yükleyin; yedekleri silin ve
+  yükleyin veya birden çok yedeği seçip hepsini tek seferde geri yükleyin, yedekleri silin ve
   her yıkıcı eylemin bir etkinlik/denetim günlüğünü tutun.
 - **Özel yedekler:** mesajlar (SMS/MMS/RCS), kişiler ve arama günlüğü, Wi-Fi ve Bluetooth;
   bir PC'de açabileceğiniz isteğe bağlı taşınabilir bir JSON dışa aktarımıyla.
-- **Sistem dosyaları (`/data/adb`):** root ortamının kendisini yedekleyin - modülleri, verilerini
-  ve yapılandırmalarını - hepsini veya bir dosya ağacından seçtiğiniz bir alt ağacı, her dosya
+- **Sistem dosyaları (`/data/adb`):** root ortamının kendisini yedekleyin (modülleri, verilerini
+  ve yapılandırmalarını) hepsini veya bir dosya ağacından seçtiğiniz bir alt ağacı, her dosya
   kendi özgün sahibi ve SELinux bağlamıyla geri yüklenerek, böylece root çalışmaya devam eder.
-  Gelişmiş; yalnızca seçtikleriniz.
+  Gelişmiş, yalnızca seçtikleriniz.
 - **Zamanlama + otomasyon:** tek bir uygulamayı, bir kümeyi veya tüm uygulamaları hedefleyen
   **yedekleme veya geri yükleme** için yinelenen işler, keep-N budamayla, ayrıca
   kurulum/güncellemede katılımlı otomatik yedekleme ve bir hariç tutulan uygulamalar listesi.
 - **Kurulum kaynağı:** geri yüklenen uygulamalar varsayılan olarak kurulum kaynağı olarak
-  Play Store'u bildirir (açılıp kapatılabilir); gelişmiş bir katılımlı seçenek ayrıca başlatan
+  Play Store'u bildirir (açılıp kapatılabilir), gelişmiş bir katılımlı seçenek ayrıca başlatan
   paketi ve kaynağı sahteler.
 - **Sistem uygulaması bağlama:** kurulu bir uygulamayı, gerçek `/system` bölümüne dokunmadan
   bir sistem uygulaması olarak bağlayın (sistemsiz overlay alt-modülü, NoMount farkında).
@@ -107,13 +126,13 @@ diğerleri gibi incelenip kabul edilir. Bir aracı, WebUI'nin kullandığı ayn�
 2. KernelSU / APatch / Magisk yöneticisinde flaşlayın, hemen kullanılabilir, yeniden başlatma gerekmez.
 3. Yedeklemeleri yapılandırmak ve çalıştırmak için modülün **WebUI**'sini açın. Hepsi bu.
 
-**Sürüm çeşitleri.** Her sürüm altı zip halinde gelir. `universal-full`, her mimari ve her ikili gömülü halde (bulut sağlayıcıları için `rclone` ve anlık görüntüler için `restic` dahil), tamamen çevrimdışı, hiçbir şey asla indirilmez, her cihaz, en büyüğü. `universal-lite`, her mimari, ancak en büyük iki ikili (`rclone`, `restic`) çıkarılmış, en küçüğü; yine de yerel, SSH/SFTP ve `rsync` yedeklemelerini indirme olmadan yapar ve bir bulut hedefini (`rclone`) ya da anlık görüntü modunu (`restic`) ilk kez kullandığında o küçük mimariye özel eklentiyi bir kez indirmeyi önerir (SHA-256 ile doğrulanır) ve önbelleğe alır, böylece o özellikler de çalışır. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), her ikili gömülü halde tek bir mimari, `universal-full`'dan küçük. Mimarini biliyor musun -> `<abi>-full` seç; en küçüğünü istiyor ve bulut ya da anlık görüntüler için tek seferlik bir indirmeye aldırmıyorsan -> `universal-lite`; her şeyi gömülü halde ve hiçbir indirme olmadan istiyorsan (çevrimdışı / kurtarma) -> bir full sürüm. Bkz. [Sürümler](https://github.com/VD171/VD-Backup/releases).
+**Sürüm çeşitleri.** Her sürüm altı zip halinde gelir. `universal-full`, her mimari ve her ikili gömülü halde (bulut sağlayıcıları için `rclone` ve anlık görüntüler için `restic` dahil), tamamen çevrimdışı, hiçbir şey asla indirilmez, her cihaz, en büyüğü. `universal-lite`, her mimari, ancak en büyük iki ikili (`rclone`, `restic`) çıkarılmış, en küçüğü, yine de yerel, SSH/SFTP ve `rsync` yedeklemelerini indirme olmadan yapar ve bir bulut hedefini (`rclone`) ya da anlık görüntü modunu (`restic`) ilk kez kullandığında o küçük mimariye özel eklentiyi bir kez indirmeyi önerir (SHA-256 ile doğrulanır) ve önbelleğe alır, böylece o özellikler de çalışır. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), her ikili gömülü halde tek bir mimari, `universal-full`'dan küçük. Mimarini biliyor musun -> `<abi>-full` seç, en küçüğünü istiyor ve bulut ya da anlık görüntüler için tek seferlik bir indirmeye aldırmıyorsan -> `universal-lite`, her şeyi gömülü halde ve hiçbir indirme olmadan istiyorsan (çevrimdışı / kurtarma) -> bir full sürüm. Bkz. [Sürümler](https://github.com/VD171/VD-Backup/releases).
 
 Yeni misiniz? [Kullanıcı kılavuzu](docs/USER-GUIDE.md) sizi kurulumdan geri yüklemeye kadar adım adım götürür.
 
 ## Güvenlik
 
-VDBackup root olarak çalışır ve uygulama verilerinizi ve isteğe bağlı olarak kimlik bilgilerinizi ve şifreleme parolalarınızı işler; bir yedek hassas veriler içerebilir, bu yüzden onu bir parolayla koruyun ve güvendiğiniz bir yerde saklayın. Kimlik bilgileri beklemede şifreli olarak saklanır, asla düz metin olarak değil ve şifreleme hiçbir zaman cihaz donanımına bağlı değildir, dolayısıyla şifreli bir yedeği koruyan şey paroladır. Bir güvenlik açığını [SECURITY.md](SECURITY.md) uyarınca bildirin.
+VDBackup root olarak çalışır ve uygulama verilerinizi ve isteğe bağlı olarak kimlik bilgilerinizi ve şifreleme parolalarınızı işler, bir yedek hassas veriler içerebilir, bu yüzden onu bir parolayla koruyun ve güvendiğiniz bir yerde saklayın. Kimlik bilgileri beklemede şifreli olarak saklanır, asla düz metin olarak değil ve şifreleme hiçbir zaman cihaz donanımına bağlı değildir, dolayısıyla şifreli bir yedeği koruyan şey paroladır. Bir güvenlik açığını [SECURITY.md](SECURITY.md) uyarınca bildirin.
 
 ## Derleme
 
@@ -132,12 +151,12 @@ kullanır. Şifrelenmiş her yedek, bir PC'de şifre çözme ve çıkarmaya yön
 
 VD Backup, **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** motorunu içerir (`vdlu/` içine gömülü): modül, tüm `.zip` dosyasını yeniden indirmek
 yerine yalnızca değişen dosyaları (içerik adresli bloblar + imzalı bir `manifest.json`) alarak kendini
-günceller. **Sağlamlaştırılmış** profil: ed25519 imzası zorunludur ve sürüm düşürmeleri engellenir; tam
+günceller. **Sağlamlaştırılmış** profil: ed25519 imzası zorunludur ve sürüm düşürmeleri engellenir, tam
 `.zip` bir yedek olarak geçerli kalır.
 
 - **Yalnızca LIVE** (yeniden başlatma yok): güncellemeler bir sonraki açılışta `service.sh` ile arka planda uygulanır, erişilebilir bir feed yoksa hiçbir şey yapılmaz.
 - **Durum** `/data/adb/vdbackup/vdlu/` içinde, modülün dışında, böylece yeniden flashlamayı atlatır.
-- **WebUI:** ilerleme bildirimi (toast) ve iptal içeren bir **Güncellemeler** paneli; otomatik güncelleme isteğe bağlıdır.
+- **WebUI:** ilerleme bildirimi (toast) ve iptal içeren bir **Güncellemeler** paneli, otomatik güncelleme isteğe bağlıdır.
 
 ## Belgeler
 
@@ -157,7 +176,7 @@ günceller. **Sağlamlaştırılmış** profil: ed25519 imzası zorunludur ve s�
 - **[COPG-VD](https://github.com/VD171/COPG-VD)**: küresel cihaz parmak izi / Play Integrity sahteciliği, uygulama başına kapsam ve bir WebUI ile cihazın tamamında.
 - **[VD-dropbear](https://github.com/VD171/VD-dropbear)**: bağımsız, root yetkili bir SSH artalan süreci (Dropbear).
 - **[VDGoogle](https://github.com/VD171/VD-Google)**: Google hizmetleriniz (RCS, Wallet, Play Integrity doğrulamaları), internet olmadan cihazınızda okunur.
-- **[VDInstaller](https://github.com/VD171/VD-Installer)**: tekli, toplu ve bölünmüş APK'lar için sürtünmesiz bir root sideload yükleyicisi; Play Protect doğrulayıcı anahtarı ve kurulum kaynağı sahteciliği ile birlikte.
+- **[VDInstaller](https://github.com/VD171/VD-Installer)**: tekli, toplu ve bölünmüş APK'lar için sürtünmesiz bir root sideload yükleyicisi, Play Protect doğrulayıcı anahtarı ve kurulum kaynağı sahteciliği ile birlikte.
 - **[VDInfos](https://github.com/VD171/VD-Infos)**: bir cihaz yöntem hata ayıklayıcısı: her öğeyi, onu okuyabilen her yöntemle okur ve bunları yan yana karşılaştırır.
 - **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate)**: KernelSU/APatch/Magisk modüllerine gömülü, flash'sız, artımlı bir kendini güncelleme motoru.
 - **[VD-Modules](https://github.com/VD171/VD-Modules)**: MMRL/WebUI-X modül depomuz (bunların hepsini root yöneticinizden yükleyin).
@@ -188,3 +207,7 @@ VD Backup bağımsız, resmi olmayan bir projedir. Google LLC veya başka herhan
 ## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **Güncellemeler için kanala katılın:** @Priv8_VD https://t.me/Priv8_VD

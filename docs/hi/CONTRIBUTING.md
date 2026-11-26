@@ -30,7 +30,7 @@ AI assistants और agents यहाँ first-class योगदानकर्
 - AI-assisted patches की समीक्षा और स्वीकृति किसी भी अन्य की तरह उन्हीं शर्तों पर की जाती
   है, correctness, clarity और नीचे दी गई conventions से, न कि किसने (या किसने) इसे लिखा।
 - अगर आप VDBackup को एक agent से चलाते हैं, तो contract के रूप में `helper.sh` के JSON
-  output का उपयोग करें; WebUI को scrape न करें।
+  output का उपयोग करें, WebUI को scrape न करें।
 - सबके लिए समान मानक: real features कभी कमजोर नहीं की जातीं, secrets और device data
   कभी repo में नहीं आते (देखें strict [.gitignore](../../.gitignore)), और mutating
   actions confirmed और audited रहते हैं।
@@ -42,15 +42,15 @@ AI assistants और agents यहाँ first-class योगदानकर्
 - WebUI `module/webroot/` है (इसे root manager से खोलें)। Backend
   `module/helper.sh` (dispatcher) और `module/worker.sh` (detached engine) है।
 - Native binaries `module/bin/<abi>/` में रहते हैं और CI द्वारा produce किए जाते हैं
-  (`.github/scripts/build_bin.sh`); आप आमतौर पर इन्हें हाथ से rebuild नहीं करते।
+  (`.github/scripts/build_bin.sh`), आप आमतौर पर इन्हें हाथ से rebuild नहीं करते।
 
 ## Conventions
 
 - **हर source file** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) project banner
   header से शुरू होती है (इसे किसी भी मौजूदा फाइल से कॉपी करें)। कोई अपवाद नहीं।
 - **Code और comments अंग्रेजी में।** Comments कम से कम रखें और केवल जहाँ जरूरत हो।
-- **कोई em-dash या en-dash नहीं**; हमेशा एक plain hyphen `-` का उपयोग करें।
-- WebUI **vanilla JS** है (एक `scripts.js`); कोई frameworks नहीं। root से केवल
+- **कोई em-dash या en-dash नहीं**, हमेशा एक plain hyphen `-` का उपयोग करें।
+- WebUI **vanilla JS** है (एक `scripts.js`), कोई frameworks नहीं। root से केवल
   `helper(verb, args)` wrapper के माध्यम से बात करें, और हर interpolated value को escape करें।
 - किसी real feature को **कभी कमजोर न करें** (जैसे SELinux/uid/gid/modes का संरक्षण)।
 - Mutating actions (restore, delete) को confirmation मांगनी चाहिए और एक audit log लिखना चाहिए।
@@ -58,7 +58,7 @@ AI assistants और agents यहाँ first-class योगदानकर्
 ## Internationalization (i18n)
 
 - UI strings `module/webroot/lang/` में रहती हैं। अंग्रेजी canonical fallback है
-  (`en.js` + `en.json`); बाकी 20 भाषाएं `<code>.json` हैं।
+  (`en.js` + `en.json`), बाकी 20 भाषाएं `<code>.json` हैं।
 - एक string जोड़ने या बदलने के लिए: `en.js` **और** `en.json` संपादित करें, फिर हर
   `<code>.json` अपडेट करें। एक visible label को छूने का मतलब है **सभी** language files और
   **सभी** `README.<code>.md` अपडेट करना।
@@ -80,4 +80,4 @@ AI assistants और agents यहाँ first-class योगदानकर्
 
 ---
 
-> _यह दस्तावेज़ Claude (Anthropic) से तैयार किया गया है और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और संशोधन का स्वागत है; देखें [CONTRIBUTING.md](CONTRIBUTING.md)।_
+> _यह दस्तावेज़ Claude (Anthropic) से तैयार किया गया है और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और संशोधन का स्वागत है, देखें [CONTRIBUTING.md](CONTRIBUTING.md)।_

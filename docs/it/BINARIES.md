@@ -19,7 +19,7 @@ nulla di opaco.
   repository di pacchetti ufficiale di Termux (i file `.deb` firmati su `packages.termux.dev/apt`),
   mai copiati da un Termux installato su un telefono. La build fallisce rumorosamente, non
   improvvisa mai.
-- **Riproducibile.** Riesegui la build e ottieni gli stessi file; riscarica le sorgenti fissate e
+- **Riproducibile.** Riesegui la build e ottieni gli stessi file, riscarica le sorgenti fissate e
    i valori SHA-256 corrispondono.
 - **La traccia di audit viene inclusa con il modulo.** Non è solo sul sito web, viaggia
   all'interno del modulo installato, sul tuo dispositivo, così puoi fare audit offline.
@@ -30,13 +30,13 @@ nulla di opaco.
 |---|---|---|
 | `bin/<abi>/` strumenti nativi (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + la loro closure `lib/` | Repo apt **Termux** ufficiale (`packages.termux.dev/apt`), pacchetti `.deb` ufficiali | `.github/scripts/build_bin.sh` scarica i file `.deb` + le loro dipendenze transitive, li estrae e copia i binari più solo le librerie condivise di cui ciascuno ha bisogno |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ripiego del convertitore ABX) | Release GitHub di **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF statico) | scaricato dalla release fissata da `build_bin.sh` |
-| `companion.apk` (companion Google Drive opzionale) | **Questo repository**, `companion/` (Gradle/Kotlin) | costruito dai sorgenti dalla CI e firmato con la chiave del progetto; non è un blob precompilato |
+| `companion.apk` (companion Google Drive opzionale) | **Questo repository**, `companion/` (Gradle/Kotlin) | costruito dai sorgenti dalla CI e firmato con la chiave del progetto, non è un blob precompilato |
 | `vdbackup_helper.dex` (helper framework) | **Questo repository**, `dex/src/` (Java) | compilato dai sorgenti dalla CI con `javac` + `d8` |
 
-Solo le prime due righe sono binari di terze parti precompilati; le ultime due sono costruite da
+Solo le prime due righe sono binari di terze parti precompilati, le ultime due sono costruite da
 sorgenti che vivono in questo repository e possono essere lette e ricostruite.
 
-> **Edizioni Full vs lite.** Le edizioni lite omettono solo `rclone` e `restic` (i due binari più grandi) per restare piccole e li scaricano su richiesta (verificati con SHA-256) la prima volta che usi una destinazione cloud o la modalità snapshot; `rsync` e `ssh`/`scp`/`sftp` sono ancora presenti, e ogni altro binario elencato sopra è presente anch'esso. Le edizioni Full includono `rclone` (provider cloud) e `restic` (snapshot) incorporati, così non viene mai scaricato nulla.
+> **Edizioni Full vs lite.** Le edizioni lite omettono solo `rclone` e `restic` (i due binari più grandi) per restare piccole e li scaricano su richiesta (verificati con SHA-256) la prima volta che usi una destinazione cloud o la modalità snapshot, `rsync` e `ssh`/`scp`/`sftp` sono ancora presenti, e ogni altro binario elencato sopra è presente anch'esso. Le edizioni Full includono `rclone` (provider cloud) e `restic` (snapshot) incorporati, così non viene mai scaricato nulla.
 
 ## Il manifest sul dispositivo: `PROVENANCE.json`
 
@@ -68,7 +68,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
    sono a loro volta serviti dal repository apt firmato di Termux.
 3. **Ricostruisci da zero.** Esegui tu stesso `.github/scripts/build_bin.sh` (richiede solo `curl`,
    `ar`, `tar`, `xz`, `zstd`, `readelf`) e confronta l'output con ciò che è stato incluso.
-4. **Companion e dex.** Ricostruisci `companion/` e `dex/` dai sorgenti; la firma del companion è la
+4. **Companion e dex.** Ricostruisci `companion/` e `dex/` dai sorgenti, la firma del companion è la
    chiave del progetto (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
@@ -82,4 +82,4 @@ discrepanza che questo manifest esiste per rendere visibile.
 
 ---
 
-> _Questa documentazione è stata generata con Claude (Anthropic) ed è gestita da VD171. Correzioni e miglioramenti sono benvenuti; vedi [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Questa documentazione è stata generata con Claude (Anthropic) ed è gestita da VD171. Correzioni e miglioramenti sono benvenuti, vedi [CONTRIBUTING.md](CONTRIBUTING.md)._

@@ -318,6 +318,7 @@
             <option value="any" data-i18n="opt_net_any">Wi-Fi and mobile data</option>
             <option value="wifi" data-i18n="opt_net_wifi">Wi-Fi only</option>
             <option value="mobile" data-i18n="opt_net_mobile">Mobile data only</option>
+            <option value="off" data-i18n="opt_net_off">Off (no network)</option>
           </select>
         </div>
         <div class="field">
@@ -676,6 +677,11 @@
           <span data-i18n="ui_ssaid_label">Include the device ID (SSAID)</span>
           <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
         </label>
+        <div class="notice-msg" data-i18n="msg_ssaid_warning">This backs up and, on restore, rewrites the device ID (SSAID / ANDROID_ID). It is optional and off by default. A restored value only takes effect after a reboot, and the previous value is always saved first so it can be rolled back.</div>
+      </div>
+      <div class="notice warn" id="pw-ssaid-apps-row" hidden>
+        <div class="notice-msg" data-i18n="ui_ssaid_apps_head">Apply device ID (SSAID) to:</div>
+        <div class="checks" id="pw-ssaid-apps" style="max-height: 220px; overflow-y: auto;"></div>
         <div class="notice-msg" data-i18n="msg_ssaid_warning">This backs up and, on restore, rewrites the device ID (SSAID / ANDROID_ID). It is optional and off by default. A restored value only takes effect after a reboot, and the previous value is always saved first so it can be rolled back.</div>
       </div>
       <div class="notice warn" id="pw-app-netpolicy-row">

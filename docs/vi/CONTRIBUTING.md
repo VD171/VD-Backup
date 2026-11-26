@@ -30,7 +30,7 @@ Các trợ lý và tác nhân AI là những người đóng góp hạng nhất 
 - Các bản vá có AI hỗ trợ được xét duyệt và chấp nhận theo cùng điều kiện như bất kỳ bản vá nào khác, theo
   tính đúng đắn, sự rõ ràng và các quy ước bên dưới, không phải theo ai (hay cái gì) đã viết chúng.
 - Nếu bạn điều khiển VDBackup từ một tác nhân, hãy dùng đầu ra JSON của `helper.sh` làm
-  hợp đồng; đừng cào dữ liệu từ WebUI.
+  hợp đồng, đừng cào dữ liệu từ WebUI.
 - Cùng một tiêu chuẩn cho tất cả mọi người: các tính năng thực không bao giờ bị làm yếu đi, bí mật và dữ liệu thiết bị
   không bao giờ lọt vào repo (xem [.gitignore](../../.gitignore) nghiêm ngặt), và các hành động
   gây thay đổi vẫn được xác nhận và ghi vào nhật ký kiểm toán.
@@ -42,15 +42,15 @@ Các trợ lý và tác nhân AI là những người đóng góp hạng nhất 
 - WebUI là `module/webroot/` (mở nó từ trình quản lý root). Backend là
   `module/helper.sh` (dispatcher) và `module/worker.sh` (engine tách rời).
 - Các binary native nằm trong `module/bin/<abi>/` và được tạo ra bởi CI
-  (`.github/scripts/build_bin.sh`); thông thường bạn không dựng lại chúng bằng tay.
+  (`.github/scripts/build_bin.sh`), thông thường bạn không dựng lại chúng bằng tay.
 
 ## Quy ước
 
 - **Mỗi tập tin nguồn** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) bắt đầu bằng
   phần tiêu đề banner của dự án (sao chép nó từ bất kỳ tập tin có sẵn nào). Không có ngoại lệ.
 - **Code và chú thích bằng tiếng Anh.** Giữ chú thích ở mức tối thiểu và chỉ ở nơi cần thiết.
-- **Không dùng em-dash hay en-dash**; luôn dùng dấu gạch nối thường `-`.
-- WebUI là **vanilla JS** (một `scripts.js`); không có framework. Chỉ nói chuyện với root thông qua
+- **Không dùng em-dash hay en-dash**, luôn dùng dấu gạch nối thường `-`.
+- WebUI là **vanilla JS** (một `scripts.js`), không có framework. Chỉ nói chuyện với root thông qua
   wrapper `helper(verb, args)`, và escape mọi giá trị được nội suy.
 - **Không bao giờ làm yếu** một tính năng thực (ví dụ việc bảo toàn SELinux/uid/gid/modes).
 - Các hành động gây thay đổi (restore, delete) phải hỏi xác nhận và ghi một nhật ký kiểm toán.
@@ -58,7 +58,7 @@ Các trợ lý và tác nhân AI là những người đóng góp hạng nhất 
 ## Quốc tế hóa (i18n)
 
 - Các chuỗi giao diện nằm trong `module/webroot/lang/`. Tiếng Anh là phương án dự phòng chuẩn
-  (`en.js` + `en.json`); 20 ngôn ngữ còn lại là `<code>.json`.
+  (`en.js` + `en.json`), 20 ngôn ngữ còn lại là `<code>.json`.
 - Để thêm hoặc đổi một chuỗi: sửa `en.js` **và** `en.json`, rồi cập nhật mọi
   `<code>.json`. Đụng đến một nhãn hiển thị nghĩa là cập nhật **tất cả** các tập tin ngôn ngữ và
   **tất cả** các `README.<code>.md`.
@@ -80,4 +80,4 @@ Tìm các nhãn `good first issue` và `help wanted`. Bản dịch, tài liệu,
 
 ---
 
-> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md)._

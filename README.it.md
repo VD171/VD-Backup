@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · Italiano · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/it/home-dark.png) | ![Apps](docs/screenshots/it/apps-dark.png) | ![Schedule](docs/screenshots/it/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/it/destinations-dark.png) | ![Settings](docs/screenshots/it/settings-dark.png) | ![Activity log](docs/screenshots/it/activitylog-dark.png) |
 
 ---
 
@@ -66,22 +85,22 @@ importare i backup esistenti di Neo-Backup e Android-DataBackup così da poter m
   legata all'hardware del dispositivo, così un backup si ripristina su un altro dispositivo o si apre su un PC.
 - **Destinazioni:** locale, SFTP, SCP, SMB, WebDAV, FTP, S3 e oltre 70 (`rclone`),
   oltre ai repository `rsync` e `restic`. Google Drive opzionale tramite un piccolo companion opt-in.
-- **Telegram:** esegui il backup su un canale Telegram privato come archiviazione cloud illimitata tramite MTProto - ripristino ed eliminazione anche dalla WebUI.
-- **Integrità:** ogni archivio è verificato rispetto al manifest; dry-run e
+- **Telegram:** esegui il backup su un canale Telegram privato come archiviazione cloud illimitata tramite MTProto, ripristino ed eliminazione anche dalla WebUI.
+- **Integrità:** ogni archivio è verificato rispetto al manifest, dry-run e
   restore-test ti permettono di controllare un backup senza toccare nulla.
 - **Ripristino selettivo e in blocco:** ripristina qualsiasi sottoinsieme degli elementi di un backup, oppure
-  seleziona più backup e ripristinali tutti in una volta; elimina i backup e mantieni un log di attività/audit di
+  seleziona più backup e ripristinali tutti in una volta, elimina i backup e mantieni un log di attività/audit di
   ogni azione distruttiva.
 - **Backup speciali:** messaggi (SMS/MMS/RCS), contatti e registro chiamate, Wi-Fi e Bluetooth,
   con un'esportazione JSON portatile opzionale che puoi aprire su un PC.
-- **File di sistema (`/data/adb`):** esegui il backup dell'ambiente root stesso - moduli, i loro
-  dati e le loro configurazioni - tutto quanto o un sottoalbero che scegli da un albero dei file, con
-  ogni file ripristinato al suo proprietario e contesto SELinux originali così che root continui a funzionare. Avanzato; solo ciò che scegli.
+- **File di sistema (`/data/adb`):** esegui il backup dell'ambiente root stesso (moduli, i loro
+  dati e le loro configurazioni) tutto quanto o un sottoalbero che scegli da un albero dei file, con
+  ogni file ripristinato al suo proprietario e contesto SELinux originali così che root continui a funzionare. Avanzato, solo ciò che scegli.
 - **Pianificazione + automazione:** job ricorrenti di **backup o ripristino** con bersaglio una singola app, un
   insieme, o tutte le app, con pruning keep-N, più backup automatico opt-in all'installazione/aggiornamento e un
   elenco di app escluse.
 - **Origine di installazione:** le app ripristinate riportano il Play Store come origine di installazione per
-  impostazione predefinita (commutabile); un'opzione avanzata opt-in forgia anche il pacchetto e l'origine iniziatori.
+  impostazione predefinita (commutabile), un'opzione avanzata opt-in forgia anche il pacchetto e l'origine iniziatori.
 - **Montaggio come app di sistema:** monta un'app installata come app di sistema senza toccare la
   partizione `/system` reale (sottomodulo overlay systemless, compatibile con NoMount).
 - **In background:** backup/restore vengono eseguiti in modo scollegato e sopravvivono alla chiusura della WebUI, con
@@ -105,13 +124,13 @@ vedi **[docs/AI-AGENTS.md](docs/AI-AGENTS.md)** per la superficie di controllo c
 2. Installalo nel gestore KernelSU / APatch / Magisk, utilizzabile subito, senza bisogno di riavviare.
 3. Apri la **WebUI** del modulo per configurare ed eseguire i backup. Tutto qui.
 
-**Edizioni.** Ogni release è distribuita come sei zip. `universal-full`, ogni architettura e ogni binario incorporato (incl. `rclone` per i provider cloud e `restic` per gli snapshot), completamente offline, non viene mai scaricato nulla, qualsiasi dispositivo, il più grande. `universal-lite`, ogni architettura senza i due binari più grandi (`rclone`, `restic`), il più piccolo; esegue ancora backup locali, SSH/SFTP e `rsync` senza alcun download, e la prima volta che usi una destinazione cloud (`rclone`) o la modalità snapshot (`restic`) propone di scaricare una volta quel piccolo addon per-architettura (verificato con SHA-256) e lo memorizza nella cache, così anche quelle funzioni funzionano. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), una singola architettura con ogni binario incorporato, più piccolo di `universal-full`. Conosci la tua architettura -> scegli `<abi>-full`; vuoi il più piccolo e non ti dispiace un download una tantum per cloud o snapshot -> `universal-lite`; vuoi tutto incorporato senza alcun download (offline / ripristino) -> un'edizione full. Vedi [Versioni](https://github.com/VD171/VD-Backup/releases).
+**Edizioni.** Ogni release è distribuita come sei zip. `universal-full`, ogni architettura e ogni binario incorporato (incl. `rclone` per i provider cloud e `restic` per gli snapshot), completamente offline, non viene mai scaricato nulla, qualsiasi dispositivo, il più grande. `universal-lite`, ogni architettura senza i due binari più grandi (`rclone`, `restic`), il più piccolo, esegue ancora backup locali, SSH/SFTP e `rsync` senza alcun download, e la prima volta che usi una destinazione cloud (`rclone`) o la modalità snapshot (`restic`) propone di scaricare una volta quel piccolo addon per-architettura (verificato con SHA-256) e lo memorizza nella cache, così anche quelle funzioni funzionano. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), una singola architettura con ogni binario incorporato, più piccolo di `universal-full`. Conosci la tua architettura -> scegli `<abi>-full`, vuoi il più piccolo e non ti dispiace un download una tantum per cloud o snapshot -> `universal-lite`, vuoi tutto incorporato senza alcun download (offline / ripristino) -> un'edizione full. Vedi [Versioni](https://github.com/VD171/VD-Backup/releases).
 
 Sei nuovo? La [Guida utente](docs/USER-GUIDE.md) ti accompagna dall'installazione al ripristino.
 
 ## Sicurezza
 
-VDBackup viene eseguito come root e gestisce i dati delle tue app e, facoltativamente, le tue credenziali e le passphrase di cifratura; un backup può contenere dati sensibili, quindi proteggilo con una passphrase e conservalo in un luogo di cui ti fidi. Le credenziali sono archiviate cifrate a riposo, mai in chiaro, e la cifratura non è mai legata all'hardware del dispositivo, perciò è la passphrase a proteggere un backup cifrato. Segnala una vulnerabilità secondo [SECURITY.md](SECURITY.md).
+VDBackup viene eseguito come root e gestisce i dati delle tue app e, facoltativamente, le tue credenziali e le passphrase di cifratura, un backup può contenere dati sensibili, quindi proteggilo con una passphrase e conservalo in un luogo di cui ti fidi. Le credenziali sono archiviate cifrate a riposo, mai in chiaro, e la cifratura non è mai legata all'hardware del dispositivo, perciò è la passphrase a proteggere un backup cifrato. Segnala una vulnerabilità secondo [SECURITY.md](SECURITY.md).
 
 ## Build
 
@@ -130,12 +149,12 @@ nota **RECOVERY** con i comandi esatti per decifrare ed estrarre su un PC.
 
 VD Backup include l'engine **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** (incorporato in `vdlu/`): il modulo si aggiorna scaricando solo i
 file che sono cambiati (blob indirizzati per contenuto + un `manifest.json` firmato), invece di riscaricare
-l'intero `.zip`. Profilo **irrobustito**: la firma ed25519 è obbligatoria e i downgrade sono bloccati; il
+l'intero `.zip`. Profilo **irrobustito**: la firma ed25519 è obbligatoria e i downgrade sono bloccati, il
 `.zip` completo resta valido come ripiego.
 
 - **Solo LIVE** (senza riavvio): gli aggiornamenti si applicano al boot successivo tramite `service.sh`, in background, senza effetto quando nessun feed è raggiungibile.
 - **Stato** in `/data/adb/vdbackup/vdlu/`, fuori dal modulo, così da sopravvivere a un reflash.
-- **WebUI:** un pannello **Aggiornamenti** con un toast di avanzamento e annullamento; l'aggiornamento automatico è opt-in.
+- **WebUI:** un pannello **Aggiornamenti** con un toast di avanzamento e annullamento, l'aggiornamento automatico è opt-in.
 
 ## Documentazione
 
@@ -186,3 +205,7 @@ VD Backup è un progetto indipendente e non ufficiale. Non è affiliato, approva
 ## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **Unisciti al canale per gli aggiornamenti:** @Priv8_VD https://t.me/Priv8_VD

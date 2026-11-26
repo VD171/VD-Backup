@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -17,7 +36,7 @@
 </p>
 
 <p align="center">
-  <b>Pencadangan dan pemulihan penuh aplikasi &amp; data sebagai root, sepenuhnya dikendalikan dari sebuah WebUI.</b><br>
+  <b>Pencadangan dan pemulihan penuh aplikasi dan data sebagai root, sepenuhnya dikendalikan dari sebuah WebUI.</b><br>
   Modul KernelSU / APatch / Magisk. Tanpa permintaan "grant su", tanpa mengalihkan <code>sucompat</code>.
 </p>
 
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · Bahasa Indonesia · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/id/home-dark.png) | ![Apps](docs/screenshots/id/apps-dark.png) | ![Schedule](docs/screenshots/id/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/id/destinations-dark.png) | ![Settings](docs/screenshots/id/settings-dark.png) | ![Activity log](docs/screenshots/id/activitylog-dark.png) |
 
 ---
 
@@ -66,22 +85,22 @@ mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada agar Anda bi
   terikat ke perangkat keras, sehingga sebuah cadangan dapat dipulihkan di perangkat lain atau dibuka di PC.
 - **Tujuan:** lokal, SFTP, SCP, SMB, WebDAV, FTP, S3 dan 70+ lainnya (`rclone`),
   ditambah repo `rsync` dan `restic`. Google Drive opsional melalui pendamping kecil yang opt-in.
-- **Telegram:** cadangkan ke saluran Telegram pribadi sebagai penyimpanan cloud tanpa batas melalui MTProto - pulihkan dan hapus juga dari WebUI.
-- **Integritas:** setiap arsip diverifikasi terhadap manifes; dry-run dan restore-test memungkinkan
+- **Telegram:** cadangkan ke saluran Telegram pribadi sebagai penyimpanan cloud tanpa batas melalui MTProto, pulihkan dan hapus juga dari WebUI.
+- **Integritas:** setiap arsip diverifikasi terhadap manifes, dry-run dan restore-test memungkinkan
   Anda memeriksa sebuah cadangan tanpa menyentuh apa pun.
 - **Pemulihan selektif & massal:** pulihkan subset mana pun dari item sebuah cadangan, atau pilih beberapa
-  cadangan sekaligus dan pulihkan semuanya dalam satu kali; hapus cadangan dan simpan log aktivitas/audit dari
+  cadangan sekaligus dan pulihkan semuanya dalam satu kali, hapus cadangan dan simpan log aktivitas/audit dari
   setiap tindakan destruktif.
 - **Cadangan khusus:** pesan (SMS/MMS/RCS), kontak dan log panggilan, Wi-Fi dan Bluetooth,
   dengan ekspor JSON portabel opsional yang dapat Anda buka di PC.
-- **File sistem (`/data/adb`):** backup lingkungan root itu sendiri - modul, data dan
-  konfigurasinya - semuanya atau subpohon yang Anda pilih dari pohon file, dengan setiap file
-  direstore ke pemilik dan konteks SELinux aslinya agar root tetap bekerja. Lanjutan; hanya yang Anda pilih.
+- **File sistem (`/data/adb`):** backup lingkungan root itu sendiri (modul, data dan
+  konfigurasinya) semuanya atau subpohon yang Anda pilih dari pohon file, dengan setiap file
+  direstore ke pemilik dan konteks SELinux aslinya agar root tetap bekerja. Lanjutan, hanya yang Anda pilih.
 - **Penjadwalan + otomasi:** tugas **backup atau restore** berulang yang menargetkan satu aplikasi, sekumpulan,
   atau semua aplikasi, dengan pemangkasan keep-N, ditambah pencadangan otomatis opt-in saat pemasangan/pembaruan
   dan daftar aplikasi yang dikecualikan.
 - **Sumber pemasangan:** aplikasi yang dipulihkan melaporkan Play Store sebagai sumber pemasangannya
-  secara default (dapat dialihkan); opt-in tingkat lanjut juga memalsukan paket penginisiasi dan sumbernya.
+  secara default (dapat dialihkan), opt-in tingkat lanjut juga memalsukan paket penginisiasi dan sumbernya.
 - **Pemasangan aplikasi-sistem:** pasang aplikasi terpasang sebagai aplikasi sistem tanpa menyentuh
   partisi `/system` yang asli (sub-modul overlay systemless, sadar-NoMount).
 - **Latar belakang:** pencadangan/pemulihan berjalan terpisah dan tetap hidup setelah WebUI ditutup,
@@ -104,13 +123,13 @@ lengkap, dan [CONTRIBUTING.md](CONTRIBUTING.md#ai-contributors-welcome) untuk be
 2. Flash di manajer KernelSU / APatch / Magisk, langsung bisa dipakai, tanpa perlu reboot.
 3. Buka **WebUI** modul untuk mengonfigurasi dan menjalankan pencadangan. Selesai.
 
-**Edisi.** Setiap rilis hadir sebagai enam zip. `universal-full`, setiap arsitektur dan setiap biner tertanam (termasuk `rclone` untuk penyedia cloud dan `restic` untuk snapshot), sepenuhnya offline, tidak pernah ada yang diunduh, perangkat apa pun, terbesar. `universal-lite`, setiap arsitektur tanpa dua biner terbesar (`rclone`, `restic`), terkecil; tetap bisa backup lokal, SSH/SFTP dan `rsync` tanpa unduhan, dan pertama kali kamu memakai tujuan cloud (`rclone`) atau mode snapshot (`restic`) ia menawarkan untuk mengunduh addon kecil per-arsitektur itu sekali (diverifikasi dengan SHA-256) lalu menyimpannya di cache, sehingga fitur-fitur itu pun berfungsi. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), satu arsitektur dengan setiap biner tertanam, lebih kecil dari `universal-full`. Tahu arsitekturmu -> pilih `<abi>-full`; mau yang terkecil dan tidak keberatan dengan satu kali unduhan untuk cloud atau snapshot -> `universal-lite`; mau semuanya tertanam tanpa unduhan apa pun (offline / pemulihan) -> edisi full. Lihat [Rilis](https://github.com/VD171/VD-Backup/releases).
+**Edisi.** Setiap rilis hadir sebagai enam zip. `universal-full`, setiap arsitektur dan setiap biner tertanam (termasuk `rclone` untuk penyedia cloud dan `restic` untuk snapshot), sepenuhnya offline, tidak pernah ada yang diunduh, perangkat apa pun, terbesar. `universal-lite`, setiap arsitektur tanpa dua biner terbesar (`rclone`, `restic`), terkecil, tetap bisa backup lokal, SSH/SFTP dan `rsync` tanpa unduhan, dan pertama kali kamu memakai tujuan cloud (`rclone`) atau mode snapshot (`restic`) ia menawarkan untuk mengunduh addon kecil per-arsitektur itu sekali (diverifikasi dengan SHA-256) lalu menyimpannya di cache, sehingga fitur-fitur itu pun berfungsi. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), satu arsitektur dengan setiap biner tertanam, lebih kecil dari `universal-full`. Tahu arsitekturmu -> pilih `<abi>-full`, mau yang terkecil dan tidak keberatan dengan satu kali unduhan untuk cloud atau snapshot -> `universal-lite`, mau semuanya tertanam tanpa unduhan apa pun (offline / pemulihan) -> edisi full. Lihat [Rilis](https://github.com/VD171/VD-Backup/releases).
 
 Baru di sini? [Panduan pengguna](docs/USER-GUIDE.md) memandu Anda dari pemasangan hingga pemulihan.
 
 ## Keamanan
 
-VDBackup berjalan sebagai root dan menangani data aplikasi Anda dan, secara opsional, kredensial serta frasa sandi enkripsi Anda; sebuah cadangan dapat memuat data sensitif, jadi lindungi dengan frasa sandi dan simpan di tempat yang Anda percayai. Kredensial disimpan terenkripsi saat tidak digunakan, tidak pernah dalam teks biasa, dan enkripsi tidak pernah terikat pada perangkat keras perangkat, sehingga frasa sandilah yang melindungi cadangan terenkripsi. Laporkan kerentanan sesuai [SECURITY.md](SECURITY.md).
+VDBackup berjalan sebagai root dan menangani data aplikasi Anda dan, secara opsional, kredensial serta frasa sandi enkripsi Anda, sebuah cadangan dapat memuat data sensitif, jadi lindungi dengan frasa sandi dan simpan di tempat yang Anda percayai. Kredensial disimpan terenkripsi saat tidak digunakan, tidak pernah dalam teks biasa, dan enkripsi tidak pernah terikat pada perangkat keras perangkat, sehingga frasa sandilah yang melindungi cadangan terenkripsi. Laporkan kerentanan sesuai [SECURITY.md](SECURITY.md).
 
 ## Pembangunan
 
@@ -130,11 +149,11 @@ perintah persis untuk mendekripsi dan mengekstrak di PC.
 VD Backup menyertakan mesin **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** (tertanam di `vdlu/`): modul memperbarui dirinya sendiri dengan hanya
 mengambil berkas yang berubah (blob yang dialamatkan berdasarkan konten + sebuah `manifest.json` bertanda
 tangan), alih-alih mengunduh ulang seluruh `.zip`. Profil **diperkuat**: tanda tangan ed25519 wajib dan
-penurunan versi diblokir; `.zip` lengkap tetap valid sebagai cadangan.
+penurunan versi diblokir, `.zip` lengkap tetap valid sebagai cadangan.
 
 - **Hanya LIVE** (tanpa boot ulang): pembaruan diterapkan pada boot berikutnya melalui `service.sh`, di latar belakang, tanpa efek apa pun ketika tidak ada feed yang dapat dijangkau.
 - **Status** di `/data/adb/vdbackup/vdlu/`, di luar modul, sehingga bertahan dari flash ulang.
-- **WebUI:** panel **Pembaruan** dengan toast progres dan batal; pembaruan otomatis bersifat opt-in.
+- **WebUI:** panel **Pembaruan** dengan toast progres dan batal, pembaruan otomatis bersifat opt-in.
 
 ## Dokumentasi
 
@@ -185,3 +204,7 @@ VD Backup adalah proyek independen dan tidak resmi. Proyek ini tidak berafiliasi
 ## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **Gabung ke channel untuk pembaruan:** @Priv8_VD https://t.me/Priv8_VD

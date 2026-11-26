@@ -6,7 +6,7 @@
 
 VDBackup इस तरह बनाया गया है कि कोई AI असिस्टेंट या एजेंट मॉड्यूल की **हर** सामग्री और
 क्रिया को headless रूप से प्रशासित कर सके, ठीक उसी तरह जैसे कोई व्यक्ति WebUI के माध्यम से करता है।
-WebUI तो बस एक छोटे JSON API का एक क्लाइंट है; आपका एजेंट दूसरा क्लाइंट है। API का उपयोग करें,
+WebUI तो बस एक छोटे JSON API का एक क्लाइंट है, आपका एजेंट दूसरा क्लाइंट है। API का उपयोग करें,
 WebUI को scrape न करें।
 
 ## अनुबंध
@@ -19,10 +19,10 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 
 - आर्गुमेंट एक ही JSON ऑब्जेक्ट होते हैं, **base64-encoded**, जो एक argv टोकन के रूप में भेजे जाते हैं।
 - कमांड stdout पर **एक JSON ऑब्जेक्ट** प्रिंट करता है: `{"ok":true,...}` या
-  `{"ok":false,"code":"ERR_...","message":"..."}`. उसे parse करें; कभी भी टेक्स्ट scrape न करें।
+  `{"ok":false,"code":"ERR_...","message":"..."}`. उसे parse करें, कभी भी टेक्स्ट scrape न करें।
 - लंबी कार्रवाइयाँ (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) तुरंत `{"ok":true,"opid":"..."}` लौटाती हैं
   और **detached** चलती हैं (कॉल करने वाले/WebUI के चले जाने पर भी वे जीवित रहती हैं)। उनकी
-  प्रगति को poll करें; जब कॉल लौटता है तब वे पूरी नहीं हुई होतीं।
+  प्रगति को poll करें, जब कॉल लौटता है तब वे पूरी नहीं हुई होतीं।
 - `progress` और `cancel` एक JSON ऑब्जेक्ट नहीं, बल्कि **कच्चे opid स्ट्रिंग का base64** लेते हैं।
 
 आपके shell के लिए एक छोटा helper:
@@ -35,7 +35,7 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 
 इसे किसी वर्कस्टेशन से चलाने के लिए, इसे अपने सामान्य root चैनल के माध्यम से डिवाइस तक चलाएँ
 (root के रूप में adb shell, या एक SSH-to-root सेटअप)। मॉड्यूल बंडल किए गए बाइनरी के साथ आता है, इसलिए
-एक बार इंस्टॉल होने के बाद स्थानीय backup/restore के लिए इसे **इंटरनेट की ज़रूरत नहीं**; केवल क्लाउड
+एक बार इंस्टॉल होने के बाद स्थानीय backup/restore के लिए इसे **इंटरनेट की ज़रूरत नहीं**, केवल क्लाउड
 गंतव्य (`rclone`/`restic`/ssh) ही नेटवर्क से बात करते हैं।
 
 ## Verbs
@@ -43,13 +43,13 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | Verb | Args (JSON) | Returns |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` गिनती (आकार bytes में): backups वाले ऐप्स, कुल backup इंस्टेंस, स्वतंत्र path backups, निर्धारित कार्य, कुल backups आकार, और backups फ़ाइल सिस्टम का खाली/कुल। non-detached, तुरंत लौटती है; WebUI होम ओवरव्यू द्वारा उपयोग की जाती है। |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` गिनती (आकार bytes में): backups वाले ऐप्स, कुल backup इंस्टेंस, स्वतंत्र path backups, निर्धारित कार्य, कुल backups आकार, और backups फ़ाइल सिस्टम का खाली/कुल। non-detached, तुरंत लौटती है, WebUI होम ओवरव्यू द्वारा उपयोग की जाती है। |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | config ऑब्जेक्ट (या `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | एन्क्रिप्शन के लिए `age` keypair बनाता है |
 | `list-apps` | `{user?}` | `{ok,apps:[{package,label,system,versionCode}]}` (dex, shell fallback) |
 | `label` | `{package,user?}` | `{ok,label}` (असली स्थानीयकृत ऐप नाम, संदर्भ-मुक्त) |
-| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG; प्रति package+`vc` कैश किया गया) |
+| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG, प्रति package+`vc` कैश किया गया) |
 | `backup` | नीचे देखें | `{ok,opid}` (detached) |
 | `restore` | नीचे देखें | `{ok,opid}` (detached) |
 | `import` | `{from,ref,password,ssaid,user}` | `{ok,opid}` (detached) |
@@ -59,7 +59,7 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `list-ops` | `{}` | `{ok,ops:[...]}` (पुनः कनेक्ट होने के बाद reattach) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | ऐप सूची / बैच base64 आइकन |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
-| `note-set` | `{ref,note?,tags?}` | `{ok}` किसी बैकअप का कस्टम नाम (`note`) और मुक्त `tags` सेट करता या हटाता है; एक सहायक फ़ाइल में संग्रहीत जो बैकअप के साथ चलती है, `list-backups` से खोजी जा सकती है। |
+| `note-set` | `{ref,note?,tags?}` | `{ok}` किसी बैकअप का कस्टम नाम (`note`) और मुक्त `tags` सेट करता या हटाता है, एक सहायक फ़ाइल में संग्रहीत जो बैकअप के साथ चलती है, `list-backups` से खोजी जा सकती है। |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` डिवाइस के Android उपयोगकर्ता (मल्टी-यूज़र). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` किसी पथ की उप-निर्देशिकाएँ (फ़ोल्डर पिकर). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` स्वतंत्र फ़ोल्डर/फ़ाइल बैकअप. |
@@ -72,48 +72,48 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `log-export` | `{user?}` | `{ok:true,path}` (backups डायरेक्टरी के अंदर लिखी गई `.txt` का पूर्ण path) या `{ok:false,code:"ERR_LOG_EXPORT"}`. गतिविधि लॉग (`audit.jsonl`) और एक छोटा build/डिवाइस हेडर एक ही उपयोगकर्ता-दृश्य टेक्स्ट फ़ाइल में लिखती है ताकि इसे bug रिपोर्ट से संलग्न किया जा सके। non-detached, तुरंत लौटती है। |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` सिस्टम-व्यापी backup (detached) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (रिबूट आवश्यक; `confirm` इसे गेट करता है) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (रिबूट आवश्यक, `confirm` इसे गेट करता है) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` किसी भी निरपेक्ष पथ का `tar.zst`+`manifest.json` के रूप में `.paths/` के अंतर्गत backup लेता है (detached) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` किसी पथ backup को उसके मूल स्थान पर restore करता है (`confirm` इसे गेट करता है; detached) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` किसी पथ backup को उसके मूल स्थान पर restore करता है (`confirm` इसे गेट करता है, detached) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` /data/adb ट्री का एक lazy स्तर (डिफ़ॉल्ट `/data/adb`), picker के लिए। |
 | `adb-du` | `{path}` | `{ok,size}` /data/adb के एक सबट्री का पुनरावर्ती बाइट आकार, माँग पर। |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` /data/adb का backup - पूर्ण (`paths` छोड़ें) या चुने गए उप-पथ - प्रति-फ़ाइल SELinux/स्वामी निष्ठा के साथ, `.adb/` के अंतर्गत (detached) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` /data/adb backup को जीवित ट्री के ऊपर restore करता है - पूर्ण या चुने गए उप-पथ - प्रत्येक फ़ाइल का संदर्भ बनाए रखते हुए (कभी भी सर्वव्यापी chcon नहीं); `confirm` इसे गेट करता है (detached) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` /data/adb backup को जीवित ट्री के ऊपर restore करता है - पूर्ण या चुने गए उप-पथ - प्रत्येक फ़ाइल का संदर्भ बनाए रखते हुए (कभी भी सर्वव्यापी chcon नहीं), `confirm` इसे गेट करता है (detached) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` /data/adb फ़ाइल-सिस्टम के backups। |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` किसी backup की संग्रहीत विस्तृत फ़ाइल सूची, restore ट्री picker के लिए। |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | किसी इंस्टॉल्ड ऐप को सिस्टम ऐप के रूप में माउंट करें (systemless उप-मॉड्यूल; NoMount के ज़रिए live अन्यथा अगले बूट पर) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | किसी इंस्टॉल्ड ऐप को सिस्टम ऐप के रूप में माउंट करें (systemless उप-मॉड्यूल, NoMount के ज़रिए live अन्यथा अगले बूट पर) |
 | `companion-status` / `companion-install` | `{}` | Google Drive साथी स्थिति / ऑन-डिमांड इंस्टॉल |
 | `telegram-check` | `{}` | टेलीग्राम सत्र स्थिति (`user` null = लॉग इन नहीं) |
-| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | टेलीग्राम लॉगिन; यदि खाते में 2FA है और `password` नहीं है तो `sign-in` `2FA_REQUIRED` लौटाता है |
+| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | टेलीग्राम लॉगिन, यदि खाते में 2FA है और `password` नहीं है तो `sign-in` `2FA_REQUIRED` लौटाता है |
 | `telegram-logout` | `{}` | टेलीग्राम सत्र समाप्त करता है |
 | `telegram-list` | `{}` | टेलीग्राम चैनल में बैकअप (नाम `<pkg>__<ts>_<vc>.vdb.tar`) |
-| `telegram-pull` | `{message_id,name}` | `{ok,opid}` टेलीग्राम से एक बैकअप स्थानीय संग्रहण में डाउनलोड करता है (detached); फिर सामान्य `restore` प्रवाह से पुनर्स्थापित होता है |
+| `telegram-pull` | `{message_id,name}` | `{ok,opid}` टेलीग्राम से एक बैकअप स्थानीय संग्रहण में डाउनलोड करता है (detached), फिर सामान्य `restore` प्रवाह से पुनर्स्थापित होता है |
 | `telegram-delete` | `{message_id}` | `{ok,deleted:[...]}` `message_id` से टेलीग्राम चैनल से एक बैकअप हटाता है (बैच: अल्पविराम से अलग) |
 | `rclone-list` | `{dest}` | `{ok,dest,backups:[{dest,rref,package,tsvc}]}` किसी rclone गंतव्य पर केवल-remote संग्रहीत Full बैकअप (`dest` गंतव्य id है, `rref` है `<pkg>/<ts_vc>`) |
-| `rclone-pull` | `{dest,rref}` | `{ok,opid}` केवल-remote संग्रहीत एक rclone बैकअप को स्थानीय संग्रहण में डाउनलोड करता है (detached); फिर सामान्य `restore` प्रवाह से पुनर्स्थापित होता है |
-| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` किसी rclone remote से एक बैकअप हटाता है; `rref` बिल्कुल `<pkg>/<ts_vc>` होना चाहिए |
+| `rclone-pull` | `{dest,rref}` | `{ok,opid}` केवल-remote संग्रहीत एक rclone बैकअप को स्थानीय संग्रहण में डाउनलोड करता है (detached), फिर सामान्य `restore` प्रवाह से पुनर्स्थापित होता है |
+| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` किसी rclone remote से एक बैकअप हटाता है, `rref` बिल्कुल `<pkg>/<ts_vc>` होना चाहिए |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | गंतव्य प्रबंधन |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone remote प्रबंधन (वह `rclone.conf` प्रविष्टि बनाता है जिसकी ओर `type:"rclone"` dest इशारा करता है); `backend` कोई भी rclone backend हो सकता है, कोई श्वेतसूची नहीं |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone remote प्रबंधन (वह `rclone.conf` प्रविष्टि बनाता है जिसकी ओर `type:"rclone"` dest इशारा करता है), `backend` कोई भी rclone backend हो सकता है, कोई श्वेतसूची नहीं |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (इंजन पहले ही Android VIEW intent के ज़रिए फ़ोन का ब्राउज़र उस सहमति URL पर खोल चुका है) या `{ok:false,code:"ERR_AUTHORIZE"}`। ऑन-डिवाइस OAuth के लिए एक स्थानीय callback सर्वर (`127.0.0.1:53682`) पर `rclone authorize <backend>` चलाता है। |
 | `remote-authorize-poll` | `{}` | प्रतीक्षा के दौरान `{ok:true,done:false,url}`, उपयोगकर्ता की सहमति मिलने पर `{ok:true,done:true,token}` (वह `token` जो `remote-add` को भेजना है), या `{ok:false,code:"ERR_AUTHORIZE"}`। |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; किसी लंबित प्राधिकरण को रोकता है। |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, किसी लंबित प्राधिकरण को रोकता है। |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (क्या `rclone`/`restic` बाइनरी मौजूद हैं, क्या यह `lite` संस्करण उन्हें ला सकता है, डाउनलोड आकार बाइट में) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (detached) `lite` संस्करण पर `rclone`/`restic` ऐडऑन डाउनलोड+सत्यापन+इंस्टॉल करता है |
-| `schedule-set` / `schedule-list` / `schedule-delete` | नीचे देखें | निर्धारित कार्य (एक बैकअप या एक restore; एक अकेले ऐप, एक समूह, या सभी ऐप्स को लक्षित करते हुए) |
+| `schedule-set` / `schedule-list` / `schedule-delete` | नीचे देखें | निर्धारित कार्य (एक बैकअप या एक restore, एक अकेले ऐप, एक समूह, या सभी ऐप्स को लक्षित करते हुए) |
 | `scheduler-tick` | `{}` | देय कार्य चलाता है + धारण लागू करता है + ऑटो-बैकअप ऑब्ज़र्वर (boot heartbeat इसे कॉल करता है) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached नहीं; तुरंत लौटता है; विफलता पर `ERR_UPDATE_CHECK`, नीचे देखें) |
-| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) कई ऐप्स का एक ही अलग ऑपरेशन में बैकअप लेता है; प्रगति में `n`/`of` रहता है। प्रति-ऐप विफलता बैच को नहीं रोकती। |
-| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) कई बैकअप को एक ही अलग ऑपरेशन में पुनर्स्थापित करता है; प्रगति में `n`/`of` रहता है। प्रति-ऐप विफलता बैच को नहीं रोकती। |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached नहीं, तुरंत लौटता है, विफलता पर `ERR_UPDATE_CHECK`, नीचे देखें) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) कई ऐप्स का एक ही अलग ऑपरेशन में बैकअप लेता है, प्रगति में `n`/`of` रहता है। प्रति-ऐप विफलता बैच को नहीं रोकती। |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) कई बैकअप को एक ही अलग ऑपरेशन में पुनर्स्थापित करता है, प्रगति में `n`/`of` रहता है। प्रति-ऐप विफलता बैच को नहीं रोकती। |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` फ़ोल्डर चयनकर्ता के लिए स्टोरेज वॉल्यूम: आंतरिक और हटाने योग्य SD कार्ड / USB। |
 | `config-export` | `{password}` | `{ok,opid}` (detached) कॉन्फ़िग, जॉब, गंतव्य, क्रेडेंशियल्स और कुंजियों को बैकअप फ़ोल्डर में एक पासफ़्रेज़-एन्क्रिप्टेड फ़ाइल में निर्यात करता है। |
 | `config-import` | `{ref,password}` | `{ok,opid}` (detached) निर्यात की गई कॉन्फ़िग फ़ाइल को इस डिवाइस में वापस मर्ज करता है (कभी भी आँख मूँदकर अधिलेखित नहीं करता)। |
 | `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` आयात के लिए उपलब्ध एन्क्रिप्टेड कॉन्फ़िग फ़ाइलें सूचीबद्ध करता है। |
-| `wipe-credentials` | `{}` | `{ok,wiped}` सहेजे गए रिमोट पासवर्ड और डिवाइस एन्क्रिप्शन कुंजी हटाता है; गंतव्य, जॉब और बैकअप बने रहते हैं। |
+| `wipe-credentials` | `{}` | `{ok,wiped}` सहेजे गए रिमोट पासवर्ड और डिवाइस एन्क्रिप्शन कुंजी हटाता है, गंतव्य, जॉब और बैकअप बने रहते हैं। |
 | `log-prune` | `{}` | `{ok}` बहुत पहले पूर्ण हो चुके ऑप लॉग छाँटता है, ऑडिट ट्रेल सीमित करता है और पुराने आइकन हटाता है (बूट सेवा इसे कॉल करती है)। |
 | `sanitize` | `{}` | `{ok}` हर Android उपयोगकर्ता में बैकअप फ़ोल्डरों की दृश्यता (0755) फिर से लागू करता है, ताकि एक फ़ाइल मैनेजर उन फ़ोल्डरों को खोल सके जिन्हें एक कच्ची root कॉपी या v1.03.2 से पहले के बैकअप ने केवल-स्वामी छोड़ दिया था। |
-| `boot-sweep` | `{}` | `{ok,reaped}` किसी ऐसे बैकअप के अवशेष हटाता है जो बाधित हुआ या जबरन मारा गया (बूट सेवा इसे कॉल करती है); जो बैकअप विफल होता है या रद्द किया जाता है वह पहले ही अपने स्वयं के worker द्वारा साफ़ कर दिया जाता है। |
+| `boot-sweep` | `{}` | `{ok,reaped}` किसी ऐसे बैकअप के अवशेष हटाता है जो बाधित हुआ या जबरन मारा गया (बूट सेवा इसे कॉल करती है), जो बैकअप विफल होता है या रद्द किया जाता है वह पहले ही अपने स्वयं के worker द्वारा साफ़ कर दिया जाता है। |
 
 ### `progress` फ़ील्ड
 
@@ -140,7 +140,7 @@ restore-test):
 | `of` | int | कुल आइटम गणना (0 = अज्ञात) |
 | `cur` | string | वर्तमान आइटम नाम (खाली = कोई नहीं) |
 
-क्लाउड ट्रांसफर `rate`/`eta` भरते हैं (percent rclone से आता है); स्थानीय Full backup
+क्लाउड ट्रांसफर `rate`/`eta` भरते हैं (percent rclone से आता है), स्थानीय Full backup
 `n`/`of`/`cur` भरते हैं। चरण लेबल में चेकसम-सील चरण **`verified`** और, क्लाउड ट्रांसफर के लिए,
 **`transfer`** तथा **`mirror <item>`** शामिल हैं।
 
@@ -166,11 +166,11 @@ restore-test):
 ```
 
 `restore`/`import` `{ref}` लेते हैं (एक backup निर्देशिका / scan ref)। `restore` यह भी स्वीकार करता है:
-`"items"` (बैकअप के आइटम प्रकारों का एक उपसमुच्चय जिसे पुनर्स्थापित करना है; सभी के लिए छोड़ दें), `"test": true`
+`"items"` (बैकअप के आइटम प्रकारों का एक उपसमुच्चय जिसे पुनर्स्थापित करना है, सभी के लिए छोड़ दें), `"test": true`
 (एक temp निर्देशिका में निकालकर सत्यापित करें, बिना live ऐप को छुए), snapshot/mirror के लिए `"mode"`,
 किसी एन्क्रिप्टेड बैकअप के लिए `"password"`, `"ssaid"` (opt-in), और इंस्टॉल-स्रोत विकल्प
 `"spoof_installer"` (config से डिफ़ॉल्ट, इंस्टॉल के समय installer को Play Store पर सेट करता है) तथा
-`"deep_spoof": true` (उन्नत opt-in; पैकेज डेटाबेस संपादित करके आरंभकर्ता पैकेज और पैकेज स्रोत को भी गढ़ता
+`"deep_spoof": true` (उन्नत opt-in, पैकेज डेटाबेस संपादित करके आरंभकर्ता पैकेज और पैकेज स्रोत को भी गढ़ता
 है, एक रिबूट के बाद लागू होता है)। `import` `"from": "neo" | "databackup"` लेता है और, किसी
 एन्क्रिप्टेड Neo backup के लिए, `"password"`।
 
@@ -228,11 +228,11 @@ restore-test):
 - **`batch_app_timeout`** (कॉन्फ़िग, सेकंड, डिफ़ॉल्ट `1800`, `0` बंद करता है): अगर कोई ऐप इससे ज़्यादा समय लेता है, तो उसका प्रोसेस ट्री समाप्त कर दिया जाता है, उसे `ERR_TIMEOUT` के रूप में दर्ज किया जाता है, और बैच जारी रहता है, ताकि एक अटका हुआ ऐप पूरे रन को कभी फ़्रीज़ न करे।
 - **आंशिक परिणाम**: अंतिम लेखन में `ok`, `of` में से `n`, विफलता के कारण बताने वाला `fails` योग `{code:count}` (जैसे `{"ERR_NO_SPACE":24}`), और `free` (बैकअप फ़ाइल सिस्टम में बचे बाइट) शामिल होते हैं। आंशिक बैच `ERR_BATCH_PARTIAL` होता है, कभी अंधी त्रुटि नहीं।
 - **थर्मल पेसिंग** (कॉन्फ़िग `thermal_throttle`, डिफ़ॉल्ट चालू): ऐप्स के बीच जब डिवाइस गर्म होता है तो वर्कर ठंडा होने के लिए रुकता है, `cooling` प्रगति चरण भेजते हुए, ताकि लंबा रन डिवाइस को ज़्यादा गर्म न करे।
-- **रन से पहले जगह का अनुमान** (कॉन्फ़िग `space_preflight`, डिफ़ॉल्ट चालू): स्थानीय गंतव्य की ओर बैच से पहले, चुनी गई ऐप्स का बिना संपीड़ित आकार जोड़ा जाता है; यदि यह पहले से ही गंतव्य की खाली जगह से अधिक है, तो बैच डिस्क को आधा भरने के बजाय पहले ही `ERR_NO_SPACE` (साथ में एक `need` फ़ील्ड) के साथ रुक जाता है। स्ट्रीमिंग रिमोट के लिए छोड़ दिया जाता है।
+- **रन से पहले जगह का अनुमान** (कॉन्फ़िग `space_preflight`, डिफ़ॉल्ट चालू): स्थानीय गंतव्य की ओर बैच से पहले, चुनी गई ऐप्स का बिना संपीड़ित आकार जोड़ा जाता है, यदि यह पहले से ही गंतव्य की खाली जगह से अधिक है, तो बैच डिस्क को आधा भरने के बजाय पहले ही `ERR_NO_SPACE` (साथ में एक `need` फ़ील्ड) के साथ रुक जाता है। स्ट्रीमिंग रिमोट के लिए छोड़ दिया जाता है।
 
 ### `remote-add` के args
 
-एक क्लाउड गंतव्य एक `type:"rclone"` dest है जो किसी `rclone` remote का नाम देता है; उस
+एक क्लाउड गंतव्य एक `type:"rclone"` dest है जो किसी `rclone` remote का नाम देता है, उस
 remote को पहले `remote-add` से बनाएँ। `backend` **कोई भी rclone backend** हो सकता है, कोई
 श्वेतसूची नहीं है। `remote-add` किसी भी backend नाम को स्वीकार करता है (`dropbox`, `onedrive`,
 `box`, `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` और rclone द्वारा
@@ -274,7 +274,7 @@ config फ़ील्ड `network_policy` नियंत्रित करत
 ### क्लाउड अखंडता और कोटा
 
 - **चेकसम सील (क्लाउड)।** किसी सफल क्लाउड कॉपी के बाद engine एक remote चेकसम जाँच
-  (`rclone check`) चलाता है; मेल न खाने पर कार्रवाई `ERR_VERIFY` के साथ विफल होती है। जिन backend
+  (`rclone check`) चलाता है, मेल न खाने पर कार्रवाई `ERR_VERIFY` के साथ विफल होती है। जिन backend
   का स्थानीय पक्ष के साथ कोई साझा hash नहीं होता, उन्हें छोड़ दिया जाता है (यह विफलता नहीं है)।
 - **कोटा जाँच (क्लाउड, Full mode)।** किसी `rclone` remote पर Full-mode अपलोड से पहले engine
   remote का खाली स्थान (`rclone about --json`) पूछता है और यदि backup फ़िट न हो तो `ERR_QUOTA` के
@@ -289,33 +289,33 @@ config फ़ील्ड `network_policy` नियंत्रित करत
 संस्करण उन्हें ला सकता है, और डाउनलोड आकार बाइट में। `cloud-fetch` **detached** चलता है (इसके
 `opid` के साथ `progress` को पोल करें): यह प्रति-आर्किटेक्चर `rclone`+`restic` ऐडऑन डाउनलोड करता है,
 मॉड्यूल में बेक किए गए SHA-256 के विरुद्ध उसे सत्यापित करता है, और उसे रनटाइम कैश में इंस्टॉल करता
-है। इसके प्रगति चरण `downloading`, `verifying`, और `installing` हैं; अंतिम कोड सफलता पर `ERR_NONE`
+है। इसके प्रगति चरण `downloading`, `verifying`, और `installing` हैं, अंतिम कोड सफलता पर `ERR_NONE`
 है, या विफलता पर `ERR_FETCH` (डाउनलोड विफल) / `ERR_FETCH_VERIFY` (चेकसम मेल नहीं खाया, छोड़ दिया
 गया)। `full` संस्करण पर यह अनावश्यक है। `lite` संस्करण पर किसी क्लाउड या snapshot गंतव्य के लिए
-`backup`/`restore`, बाइनरी मौजूद होने से पहले, `ERR_CLOUD_FETCHABLE` के साथ विफल होता है; क्लाइंट
+`backup`/`restore`, बाइनरी मौजूद होने से पहले, `ERR_CLOUD_FETCHABLE` के साथ विफल होता है, क्लाइंट
 को `cloud-fetch` चलाने की पेशकश करनी चाहिए, फिर पुनः प्रयास करना चाहिए।
 
 ### विशेष backup श्रेणियाँ
 
-`special-categories` बताता है कि किसी डिवाइस में कौन-सी सिस्टम-व्यापी श्रेणियाँ हैं; `special-backup`
+`special-categories` बताता है कि किसी डिवाइस में कौन-सी सिस्टम-व्यापी श्रेणियाँ हैं, `special-backup`
 उन श्रेणियों को कैप्चर करता है जो आप `categories` में पास करते हैं और `special-restore` उन्हें फिर से
 लागू करता है। श्रेणियाँ हैं:
 
 | श्रेणी | यह क्या है | restore शब्दार्थ |
 |----------|-----------|-------------------|
 | `messages` | SMS/MMS | provider प्रतिस्थापन (मिटाएँ + निकालें) |
-| `rcs` | RCS चैट (Google Messages, `bugle_db`); `rcs.json` में पोर्टेबल रूप से भी निर्यात | ऐप-डेटा प्रतिस्थापन (मिटाएं + निकालें), वही डिवाइस |
+| `rcs` | RCS चैट (Google Messages, `bugle_db`), `rcs.json` में पोर्टेबल रूप से भी निर्यात | ऐप-डेटा प्रतिस्थापन (मिटाएं + निकालें), वही डिवाइस |
 | `contacts` | संपर्क और कॉल लॉग | provider प्रतिस्थापन (मिटाएँ + निकालें) |
 | `wifi` | सहेजे गए Wi-Fi नेटवर्क | provider प्रतिस्थापन (मिटाएँ + निकालें) |
 | `bluetooth` | Bluetooth जोड़ियाँ | provider प्रतिस्थापन (मिटाएँ + निकालें) |
-| `calendar` | कैलेंडर provider (`com.android.providers.calendar`, app + डेटा); `calendar.json` में पोर्टेबल रूप से भी निर्यात | provider प्रतिस्थापन (मिटाएँ + निकालें) |
+| `calendar` | कैलेंडर provider (`com.android.providers.calendar`, app + डेटा), `calendar.json` में पोर्टेबल रूप से भी निर्यात | provider प्रतिस्थापन (मिटाएँ + निकालें) |
 | `wallpaper` | होम और लॉक वॉलपेपर तथा `wallpaper_info.xml`, कच्चे (बाइनरी) रूप में संग्रहीत | फ़ाइलें प्रतिस्थापित |
 | `dns` | निजी DNS mode और विनिर्देशक, settings से पढ़ा गया | idempotent `settings put` |
 | `system_settings` | system/global/secure settings का पूरा dump | **opt-in**, idempotent `settings put`, डिवाइस settings को अधिलेखित करता है |
 
 **`system_settings` कड़ाई से opt-in है और restore पर विनाशकारी है।** `ssaid` की तरह, यह restore
 किए जाने पर डिवाइस-व्यापी settings को अधिलेखित करता है, इसलिए यह उपयोगकर्ता की स्पष्ट सहमति के पीछे
-गेट किया गया है और audit trail में लिखा जाता है। इसे कभी default रूप से न चुनें; केवल किसी सीधे,
+गेट किया गया है और audit trail में लिखा जाता है। इसे कभी default रूप से न चुनें, केवल किसी सीधे,
 जानबूझकर किए गए उपयोगकर्ता अनुरोध पर।
 
 ### स्वतंत्र पथ backup
@@ -334,11 +334,11 @@ VDBackup के अपने प्रारूप में `tar.zst` तथा
 
 - स्रोत पथ **निरपेक्ष** होना चाहिए और अनुमत रूट्स में से एक के अंतर्गत होना चाहिए:
   `/storage/emulated`, `/data/media`, `/sdcard`, `/data`. जो पथ मौजूद नहीं है वह `ERR_NO_PATH`
-  के साथ विफल होता है; अनुमत रूट्स से बाहर का पथ, या `..` वाला पथ, `ERR_BAD_PATH` के साथ विफल होता है।
+  के साथ विफल होता है, अनुमत रूट्स से बाहर का पथ, या `..` वाला पथ, `ERR_BAD_PATH` के साथ विफल होता है।
 - `path-restore` मूल स्थान पर वापस लिखता है, इसलिए यह विनाशकारी है और `"confirm": true` की माँग
   करता है, `special-restore` की तरह एक भारी-घर्षण वाला गेट। एक `ref` जो वैध पथ backup नहीं है,
   `ERR_BAD_REF` के साथ विफल होता है।
-- दोनों **detached** चलते हैं; लौटाए गए `opid` के साथ `progress` को poll करें।
+- दोनों **detached** चलते हैं, लौटाए गए `opid` के साथ `progress` को poll करें।
 
 ### /data/adb फ़ाइल-सिस्टम backup
 
@@ -347,17 +347,17 @@ backup और restore करते हैं, एक lazy ट्री picker �
 `adb-du` माँग पर किसी फ़ोल्डर के आकार के लिए)।
 
 - दोनों सिरों पर पूर्ण या चयनात्मक: सब कुछ के लिए `paths` छोड़ें, या चुने गए उप-पथ पास करें
-  (/data/adb के सापेक्ष); restore वही `paths` लेता है।
+  (/data/adb के सापेक्ष), restore वही `paths` लेता है।
 - **प्रति-फ़ाइल निष्ठा:** संग्रह प्रत्येक फ़ाइल का SELinux संदर्भ, स्वामी और xattrs रखता है, और
   restore उसी पर निर्भर करता है - यह कभी भी सर्वव्यापी `chcon` लागू नहीं करता, जो /data/adb के
   विषम संदर्भों को समतल कर देगा और root को तोड़ देगा। `adb-restore` जीवित ट्री के ऊपर निकालता है;
   यह उसे कभी नहीं मिटाता।
 - स्व-संदर्भ: backup का अपना आउटपुट और मॉड्यूल का staging बाहर रखे जाते हैं, इसलिए कोई backup
   कभी स्वयं को नहीं रखता।
-- `adb-index` किसी backup की संग्रहीत फ़ाइल सूची लौटाता है ताकि restore अपना ट्री दिखा सके; UI
-  चयन पूरी तरह `paths` के माध्यम से व्यक्त होता है (पूरी तरह चिह्नित फ़ोल्डर एक पथ है; आंशिक रूप से
+- `adb-index` किसी backup की संग्रहीत फ़ाइल सूची लौटाता है ताकि restore अपना ट्री दिखा सके, UI
+  चयन पूरी तरह `paths` के माध्यम से व्यक्त होता है (पूरी तरह चिह्नित फ़ोल्डर एक पथ है, आंशिक रूप से
   चिह्नित अपने चिह्नित बच्चों तक उतरता है, इसलिए किसी exclude सूची की आवश्यकता नहीं)।
-- `adb-restore` के लिए `"confirm": true` आवश्यक है (भारी-घर्षण वाला गेट); दोनों detached चलते हैं, `progress` को poll करें।
+- `adb-restore` के लिए `"confirm": true` आवश्यक है (भारी-घर्षण वाला गेट), दोनों detached चलते हैं, `progress` को poll करें।
 
 ### `update-check`
 
@@ -385,20 +385,20 @@ poll करने के लिए कोई `opid` नहीं होता।
 यदि कोई `updateJson` URL नहीं है, नेटवर्क अनुरोध विफल हो जाता है, या मैनिफ़ेस्ट पार्स नहीं हो पाता,
 तो यह `{"ok":false,"code":"ERR_UPDATE_CHECK"}` लौटाता है।
 
-`update-check` केवल उपलब्धता और रिलीज़ नोट्स की **रिपोर्ट** करता है; अपडेट स्वयं आपका root मैनेजर
+`update-check` केवल उपलब्धता और रिलीज़ नोट्स की **रिपोर्ट** करता है, अपडेट स्वयं आपका root मैनेजर
 (KernelSU / APatch / Magisk) मॉड्यूल के `updateJson` के ज़रिए करता है, कभी भी यह verb नहीं।
 
 ## सुरक्षा रेलिंग जिनका आपके एजेंट को पालन करना चाहिए
 
 - **`ssaid` कड़ाई से opt-in है (default बंद)।** यह एक सिस्टम फ़ाइल को फिर से लिखकर डिवाइस के
-  ANDROID_ID का backup / restore करता है; कोई restore केवल एक reboot के बाद लागू होता है, और
+  ANDROID_ID का backup / restore करता है, कोई restore केवल एक reboot के बाद लागू होता है, और
   पिछली फ़ाइल rollback के लिए हमेशा पहले सहेजी जाती है। `"ssaid": true` केवल किसी सीधे,
   जानबूझकर किए गए उपयोगकर्ता अनुरोध पर भेजें, कभी भी default रूप से नहीं।
 - **परिवर्तनकारी क्रियाएँ (restore, delete, import) विनाशकारी हैं** और एक स्थानीय ऑडिट
   ट्रेल (`logs/audit.jsonl`) में लॉग की जाती हैं। Restore विश्वासयोग्य है (wipe-फिर-निकालें), इसलिए
   यह ऐप को backup की ठीक-ठीक स्थिति में वापस कर देता है। उन्हें कॉल करने से पहले इरादे की पुष्टि करें।
 - **`system_settings` opt-in और विनाशकारी है, ठीक `ssaid` की तरह।** इसे restore करना
-  डिवाइस-व्यापी settings को अधिलेखित करता है, इसलिए इसे केवल किसी सीधे उपयोगकर्ता अनुरोध पर भेजें; यह
+  डिवाइस-व्यापी settings को अधिलेखित करता है, इसलिए इसे केवल किसी सीधे उपयोगकर्ता अनुरोध पर भेजें, यह
   स्पष्ट सहमति द्वारा गेट किया गया है और audit trail में दर्ज होता है।
 - **Restore idempotent है।** कच्चे provider restore (messages/contacts/wifi/bluetooth/calendar)
   विलय करने के बजाय **प्रतिस्थापित** करते हैं, provider डेटा मिटा दिया जाता है और संग्रह उसके ऊपर
@@ -411,7 +411,7 @@ poll करने के लिए कोई `opid` नहीं होता।
   साथ चलता है)। एक छेड़छाड़ किया गया संग्रह कभी अपनी लक्ष्य निर्देशिका से बाहर नहीं निकल सकता।
 - संरक्षण (SELinux/uid/gid/modes/xattr) या APK नियम (APK हमेशा संपीड़ित होते हैं,
   कभी एन्क्रिप्ट नहीं जब तक `encrypt_apk` सेट न हो) को **कभी कमज़ोर न करें**।
-- JSON आउटपुट को सत्य के स्रोत के रूप में लें; `ok`/`code` जाँचें, `progress` poll करें,
+- JSON आउटपुट को सत्य के स्रोत के रूप में लें, `ok`/`code` जाँचें, `progress` poll करें,
   और अनुमान लगाने के बजाय `ERR_*` कोड सामने लाएँ।
 
 आंतरिक विवरण के लिए [ARCHITECTURE.md](ARCHITECTURE.md) और
@@ -421,4 +421,4 @@ poll करने के लिए कोई `opid` नहीं होता।
 
 ---
 
-> _यह दस्तावेज़ Claude (Anthropic) से तैयार किया गया है और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और संशोधन का स्वागत है; देखें [CONTRIBUTING.md](CONTRIBUTING.md)।_
+> _यह दस्तावेज़ Claude (Anthropic) से तैयार किया गया है और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और संशोधन का स्वागत है, देखें [CONTRIBUTING.md](CONTRIBUTING.md)।_

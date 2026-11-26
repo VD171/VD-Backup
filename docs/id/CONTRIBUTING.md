@@ -30,7 +30,7 @@ Asisten dan agen AI adalah kontributor kelas satu di sini, bukan sekadar pelengk
 - Patch dengan bantuan AI ditinjau dan diterima dengan syarat yang sama seperti lainnya, berdasarkan
   kebenaran, kejelasan dan konvensi di bawah ini, bukan berdasarkan siapa (atau apa) yang menulisnya.
 - Jika Anda menjalankan VDBackup dari sebuah agen, gunakan keluaran JSON `helper.sh` sebagai
-  kontrak; jangan scrape WebUI.
+  kontrak, jangan scrape WebUI.
 - Standar yang sama untuk semua: fitur nyata tidak pernah dilemahkan, rahasia dan data perangkat
   tidak pernah masuk ke repo (lihat [.gitignore](../../.gitignore) yang ketat), dan aksi yang
   mengubah tetap dikonfirmasi dan diaudit.
@@ -42,15 +42,15 @@ Asisten dan agen AI adalah kontributor kelas satu di sini, bukan sekadar pelengk
 - WebUI ada di `module/webroot/` (buka dari root manager). Backend ada di
   `module/helper.sh` (dispatcher) dan `module/worker.sh` (mesin terlepas).
 - Biner native berada di `module/bin/<abi>/` dan dihasilkan oleh CI
-  (`.github/scripts/build_bin.sh`); Anda biasanya tidak membangunnya ulang secara manual.
+  (`.github/scripts/build_bin.sh`), Anda biasanya tidak membangunnya ulang secara manual.
 
 ## Konvensi
 
 - **Setiap berkas sumber** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) diawali dengan
   header banner proyek (salin dari berkas mana pun yang sudah ada). Tanpa kecuali.
 - **Kode dan komentar dalam bahasa Inggris.** Jaga komentar tetap minimal dan hanya di tempat yang diperlukan.
-- **Tanpa em-dash atau en-dash**; selalu gunakan tanda hubung biasa `-`.
-- WebUI adalah **vanilla JS** (satu `scripts.js`); tanpa framework. Berbicara ke root hanya melalui
+- **Tanpa em-dash atau en-dash**, selalu gunakan tanda hubung biasa `-`.
+- WebUI adalah **vanilla JS** (satu `scripts.js`), tanpa framework. Berbicara ke root hanya melalui
   pembungkus `helper(verb, args)`, dan escape setiap nilai yang diinterpolasi.
 - **Jangan pernah melemahkan** fitur nyata (mis. pelestarian SELinux/uid/gid/modes).
 - Aksi yang mengubah (restore, delete) harus meminta konfirmasi dan menulis log audit.
@@ -58,7 +58,7 @@ Asisten dan agen AI adalah kontributor kelas satu di sini, bukan sekadar pelengk
 ## Internasionalisasi (i18n)
 
 - String UI berada di `module/webroot/lang/`. Bahasa Inggris adalah fallback kanonis
-  (`en.js` + `en.json`); 20 bahasa lainnya adalah `<code>.json`.
+  (`en.js` + `en.json`), 20 bahasa lainnya adalah `<code>.json`.
 - Untuk menambah atau mengubah string: edit `en.js` **dan** `en.json`, lalu perbarui setiap
   `<code>.json`. Menyentuh label yang terlihat berarti memperbarui **semua** berkas bahasa dan
   **semua** `README.<code>.md`.
@@ -80,4 +80,4 @@ Cari label `good first issue` dan `help wanted`. Terjemahan, dokumentasi, preset
 
 ---
 
-> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

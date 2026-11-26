@@ -14,7 +14,7 @@ WebUI + per-ABI static binaries. No app is required for the core features. See
 [ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/FILE-STRUCTURE.md](docs/FILE-STRUCTURE.md).
 
 It is the open, root-native **successor to Swift Backup, Neo-Backup and
-Android-DataBackup** - the union of their features under AGPLv3, with import of
+Android-DataBackup**, the union of their features under AGPLv3, with import of
 existing Neo-Backup and Android-DataBackup backups so people can migrate.
 
 ## AI contributors welcome
@@ -25,12 +25,12 @@ AI assistants and agents are first-class contributors here, not an afterthought.
   JSON object, the engine is plain POSIX shell, and the file layout is documented in
   [docs/FILE-STRUCTURE.md](docs/FILE-STRUCTURE.md).
 - An agent can administer **every** content and action of the module headlessly through
-  that JSON API - the full control surface, verbs and safety rails are in
+  that JSON API, the full control surface, verbs and safety rails are in
   [docs/AI-AGENTS.md](docs/AI-AGENTS.md).
-- AI-assisted patches are reviewed and accepted on the same terms as any other - by
+- AI-assisted patches are reviewed and accepted on the same terms as any other, by
   correctness, clarity and the conventions below, not by who (or what) wrote them.
 - If you drive VDBackup from an agent, use the JSON output of `helper.sh` as the
-  contract; do not scrape the WebUI.
+  contract, do not scrape the WebUI.
 - Same bar for everyone: real features are never weakened, secrets and device data
   never land in the repo (see the strict [.gitignore](.gitignore)), and mutating
   actions stay confirmed and audited.
@@ -42,15 +42,15 @@ AI assistants and agents are first-class contributors here, not an afterthought.
 - The WebUI is `module/webroot/` (open it from the root manager). The backend is
   `module/helper.sh` (dispatcher) and `module/worker.sh` (detached engine).
 - Native binaries live in `module/bin/<abi>/` and are produced by CI
-  (`.github/scripts/build_bin.sh`); you normally do not rebuild them by hand.
+  (`.github/scripts/build_bin.sh`), you normally do not rebuild them by hand.
 
 ## Conventions
 
 - **Every source file** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) starts with the
   project banner header (copy it from any existing file). No exceptions.
 - **Code and comments in English.** Keep comments minimal and only where needed.
-- **No em-dash or en-dash**; always use a plain hyphen `-`.
-- WebUI is **vanilla JS** (one `scripts.js`); no frameworks. Talk to root only through
+- **No em-dash or en-dash**, always use a plain hyphen `-`.
+- WebUI is **vanilla JS** (one `scripts.js`), no frameworks. Talk to root only through
   the `helper(verb, args)` wrapper, and escape every interpolated value.
 - **Never weaken** a real feature (e.g. preservation of SELinux/uid/gid/modes).
 - Mutating actions (restore, delete) must ask for confirmation and write an audit log.
@@ -58,18 +58,18 @@ AI assistants and agents are first-class contributors here, not an afterthought.
 ## Internationalization (i18n)
 
 - UI strings live in `module/webroot/lang/`. English is the canonical fallback
-  (`en.js` + `en.json`); the other 20 languages are `<code>.json`.
+  (`en.js` + `en.json`), the other 20 languages are `<code>.json`.
 - To add or change a string: edit `en.js` **and** `en.json`, then update every
   `<code>.json`. Touching a visible label means updating **all** language files and
   **all** `README.<code>.md`.
-- Translations are plain JSON - a great first contribution. See the language list in
+- Translations are plain JSON, a great first contribution. See the language list in
   `module/webroot/i18n.js`.
 
 ## Commits & PRs
 
 - Keep PRs focused. Describe what and why.
 - Sign off your commits (DCO): `git commit -s` (adds `Signed-off-by:`).
-- CI must stay green. Be kind in reviews - see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- CI must stay green. Be kind in reviews, see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Good first issues
 
@@ -80,4 +80,4 @@ Look for the `good first issue` and `help wanted` labels. Translations, docs, ne
 
 ---
 
-> _This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md)._

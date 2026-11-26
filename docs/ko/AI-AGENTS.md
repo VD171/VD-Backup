@@ -43,13 +43,13 @@ SSH-to-root 설정)을 통해 그 명령을 실행하세요. 모듈은 바이너
 | Verb | Args (JSON) | Returns |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` 개수(크기는 바이트 단위): 백업이 있는 앱, 전체 백업 인스턴스, 독립 path 백업, 예약 작업, 전체 백업 크기, 그리고 백업 파일 시스템의 여유/전체. 비 detached이며 즉시 반환; WebUI 홈 개요에서 사용. |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` 개수(크기는 바이트 단위): 백업이 있는 앱, 전체 백업 인스턴스, 독립 path 백업, 예약 작업, 전체 백업 크기, 그리고 백업 파일 시스템의 여유/전체. 비 detached이며 즉시 반환, WebUI 홈 개요에서 사용. |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | config 객체 (또는 `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | 암호화용 `age` 키쌍을 생성 |
 | `list-apps` | `{user?}` | `{ok,apps:[{package,label,system,versionCode}]}` (dex, shell 폴백) |
 | `label` | `{package,user?}` | `{ok,label}` (실제 현지화된 앱 이름, 컨텍스트 무관) |
-| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG; package+`vc`별 캐시) |
+| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG, package+`vc`별 캐시) |
 | `backup` | 아래 참고 | `{ok,opid}` (detached) |
 | `restore` | 아래 참고 | `{ok,opid}` (detached) |
 | `import` | `{from,ref,password,ssaid,user}` | `{ok,opid}` (detached) |
@@ -72,38 +72,38 @@ SSH-to-root 설정)을 통해 그 명령을 실행하세요. 모듈은 바이너
 | `log-export` | `{user?}` | `{ok:true,path}` (백업 디렉터리 아래에 기록된 `.txt`의 절대 경로) 또는 `{ok:false,code:"ERR_LOG_EXPORT"}`. 활동 로그(`audit.jsonl`)와 짧은 빌드/기기 헤더를 사용자가 볼 수 있는 단일 텍스트 파일로 기록하여 버그 리포트에 첨부할 수 있게 합니다. 비 detached이며 즉시 반환. |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` 시스템 전역 백업 (detached) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (재부팅 필요; `confirm`이 이를 막음) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (재부팅 필요, `confirm`이 이를 막음) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` 임의의 절대 경로를 `.paths/` 아래에 `tar.zst`+`manifest.json`로 백업 (detached) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` 경로 백업을 원래 위치로 복원 (`confirm`이 이를 막음; detached) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` 경로 백업을 원래 위치로 복원 (`confirm`이 이를 막음, detached) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` /data/adb 트리의 한 지연 레벨 (기본 `/data/adb`), 선택기용. |
 | `adb-du` | `{path}` | `{ok,size}` /data/adb 하위 트리 하나의 재귀적 바이트 크기, 요청 시. |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` /data/adb 백업 - 전체 (`paths` 생략) 또는 선택한 하위 경로 - 파일별 SELinux/소유자 충실도로, `.adb/` 아래 (detached) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` /data/adb 백업을 살아 있는 트리 위에 복원 - 전체 또는 선택한 하위 경로 - 각 파일의 컨텍스트를 유지하며 (전면적 chcon은 절대 아님); `confirm`이 이를 막음 (detached) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` /data/adb 백업을 살아 있는 트리 위에 복원 - 전체 또는 선택한 하위 경로 - 각 파일의 컨텍스트를 유지하며 (전면적 chcon은 절대 아님), `confirm`이 이를 막음 (detached) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` /data/adb 파일 시스템 백업. |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` 백업의 저장된 상세 파일 목록, 복원 트리 선택기용. |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | 설치된 앱을 시스템 앱으로 마운트 (시스템리스 서브모듈; NoMount로 라이브, 아니면 다음 부팅 시) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | 설치된 앱을 시스템 앱으로 마운트 (시스템리스 서브모듈, NoMount로 라이브, 아니면 다음 부팅 시) |
 | `companion-status` / `companion-install` | `{}` | Google Drive 컴패니언 상태 / 온디맨드 설치 |
 | `telegram-check` | `{}` | Telegram 세션 상태 (`user`가 null = 미로그인) |
-| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | Telegram 로그인; 계정에 2FA가 있고 `password`가 없으면 `sign-in`이 `2FA_REQUIRED` 반환 |
+| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | Telegram 로그인, 계정에 2FA가 있고 `password`가 없으면 `sign-in`이 `2FA_REQUIRED` 반환 |
 | `telegram-logout` | `{}` | Telegram 세션 종료 |
 | `telegram-list` | `{}` | Telegram 채널의 백업 (이름 `<pkg>__<ts>_<vc>.vdb.tar`) |
-| `telegram-pull` | `{message_id,name}` | `{ok,opid}` Telegram 백업을 로컬 저장소로 다운로드(detached); 이후 일반 `restore` 흐름으로 복원 |
+| `telegram-pull` | `{message_id,name}` | `{ok,opid}` Telegram 백업을 로컬 저장소로 다운로드(detached), 이후 일반 `restore` 흐름으로 복원 |
 | `telegram-delete` | `{message_id}` | `{ok,deleted:[...]}` `message_id`로 Telegram 채널에서 백업 삭제 (일괄: 쉼표 구분) |
 | `rclone-list` | `{dest}` | `{ok,dest,backups:[{dest,rref,package,tsvc}]}` rclone 대상에 원격 전용으로 저장된 Full 백업 (`dest`는 대상 id, `rref`는 `<pkg>/<ts_vc>`) |
-| `rclone-pull` | `{dest,rref}` | `{ok,opid}` 원격 전용으로 저장된 rclone 백업을 로컬 저장소로 다운로드(detached); 이후 일반 `restore` 흐름으로 복원 |
-| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` rclone 원격에서 백업 하나 삭제; `rref`는 정확히 `<pkg>/<ts_vc>`여야 함 |
+| `rclone-pull` | `{dest,rref}` | `{ok,opid}` 원격 전용으로 저장된 rclone 백업을 로컬 저장소로 다운로드(detached), 이후 일반 `restore` 흐름으로 복원 |
+| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` rclone 원격에서 백업 하나 삭제, `rref`는 정확히 `<pkg>/<ts_vc>`여야 함 |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | 대상 관리 |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone 원격 관리 (`type:"rclone"` 대상이 가리키는 `rclone.conf` 항목을 생성); `backend`는 임의의 rclone backend일 수 있으며 화이트리스트가 없음 |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone 원격 관리 (`type:"rclone"` 대상이 가리키는 `rclone.conf` 항목을 생성), `backend`는 임의의 rclone backend일 수 있으며 화이트리스트가 없음 |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (엔진이 Android VIEW 인텐트를 통해 해당 동의 URL을 이미 휴대폰 브라우저에서 열었음) 또는 `{ok:false,code:"ERR_AUTHORIZE"}`. 기기 내 OAuth를 위해 로컬 콜백 서버(`127.0.0.1:53682`)에서 `rclone authorize <backend>`를 실행. |
 | `remote-authorize-poll` | `{}` | 대기 중에는 `{ok:true,done:false,url}`, 사용자가 동의하면 `{ok:true,done:true,token}`(`remote-add`에 전달할 `token`), 또는 `{ok:false,code:"ERR_AUTHORIZE"}`. |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; 대기 중인 인가를 중지. |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, 대기 중인 인가를 중지. |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (`rclone`/`restic` 바이너리가 있는지, 이 `lite` 에디션이 그것들을 가져올 수 있는지, 다운로드 크기(바이트)) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (detached) `lite` 에디션에서 `rclone`/`restic` 애드온을 다운로드+검증+설치 |
-| `schedule-set` / `schedule-list` / `schedule-delete` | 아래 참고 | 예약 작업 (백업 또는 복원; 단일 앱, 집합, 또는 모든 앱 대상) |
+| `schedule-set` / `schedule-list` / `schedule-delete` | 아래 참고 | 예약 작업 (백업 또는 복원, 단일 앱, 집합, 또는 모든 앱 대상) |
 | `scheduler-tick` | `{}` | 실행 예정인 작업을 수행하고 보존 정책을 적용하며 자동 백업 관찰자를 실행 (부팅 하트비트가 호출) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached 아님; 즉시 반환; 실패 시 `ERR_UPDATE_CHECK`, 아래 참고) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached 아님, 즉시 반환, 실패 시 `ERR_UPDATE_CHECK`, 아래 참고) |
 | `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) 여러 앱을 하나의 분리된 작업으로 백업합니다. 진행 상태에 `n`/`of`가 포함됩니다. 앱별 실패가 배치를 멈추지 않습니다. |
 | `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) 여러 백업을 하나의 분리된 작업으로 복원합니다. 진행 상태에 `n`/`of`가 포함됩니다. 앱별 실패가 배치를 멈추지 않습니다. |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` 폴더 선택기용 저장소 볼륨: 내부 및 이동식 SD 카드/USB. |
@@ -165,10 +165,10 @@ SSH-to-root 설정)을 통해 그 명령을 실행하세요. 모듈은 바이너
 ```
 
 `restore`/`import`은 `{ref}`(백업 디렉터리 / 스캔 ref)를 받습니다. `restore`는 추가로 다음도
-받습니다: `"items"`(복원할 백업 항목 유형의 부분집합; 전부면 생략), `"test": true`(임시
+받습니다: `"items"`(복원할 백업 항목 유형의 부분집합, 전부면 생략), `"test": true`(임시
 디렉터리로 추출해 검증하며, 실제 앱은 건드리지 않음), snapshot/mirror를 위한 `"mode"`, 암호화된
 백업을 위한 `"password"`, `"ssaid"`(옵트인), 그리고 설치 출처 옵션인 `"spoof_installer"`(기본값은
-config에서, 설치 시점에 installer를 Play Store로 설정)와 `"deep_spoof": true`(고급 옵트인; 패키지
+config에서, 설치 시점에 installer를 Play Store로 설정)와 `"deep_spoof": true`(고급 옵트인, 패키지
 데이터베이스를 편집해 초기 패키지와 패키지 출처까지 위조하며, 재부팅 후에 적용). `import`은
 `"from": "neo" | "databackup"`을 받고, 암호화된 Neo 백업의 경우 `"password"`를 받습니다.
 
@@ -299,11 +299,11 @@ Mirror 복원)은 먼저 활성 전송 수단을 확인하고, 일치하지 않�
 | 범주 | 무엇인지 | 복원 동작 |
 |------|-----------|-----------|
 | `messages` | SMS/MMS | provider 교체 (지우기 + 추출) |
-| `rcs` | RCS 채팅 (Google Messages, `bugle_db`); `rcs.json`으로도 이식 가능하게 내보냄 | 앱 데이터 교체 (삭제 + 추출), 같은 기기 |
+| `rcs` | RCS 채팅 (Google Messages, `bugle_db`), `rcs.json`으로도 이식 가능하게 내보냄 | 앱 데이터 교체 (삭제 + 추출), 같은 기기 |
 | `contacts` | 연락처와 통화 기록 | provider 교체 (지우기 + 추출) |
 | `wifi` | 저장된 Wi-Fi 네트워크 | provider 교체 (지우기 + 추출) |
 | `bluetooth` | Bluetooth 페어링 | provider 교체 (지우기 + 추출) |
-| `calendar` | 캘린더 provider (`com.android.providers.calendar`, 앱 + 데이터); `calendar.json`로 이식 가능하게 내보내기도 함 | provider 교체 (지우기 + 추출) |
+| `calendar` | 캘린더 provider (`com.android.providers.calendar`, 앱 + 데이터), `calendar.json`로 이식 가능하게 내보내기도 함 | provider 교체 (지우기 + 추출) |
 | `wallpaper` | 홈 및 잠금 화면 배경화면과 `wallpaper_info.xml`, 원본(바이너리)으로 저장 | 파일 교체 |
 | `dns` | settings에서 읽은 비공개 DNS 모드와 지정자 | 멱등적 `settings put` |
 | `system_settings` | 전체 system/global/secure 설정 덤프 | **옵트인**, 멱등적 `settings put`, 기기 설정을 덮어씀 |
@@ -344,14 +344,14 @@ Mirror 복원)은 먼저 활성 전송 수단을 확인하고, 일치하지 않�
   (/data/adb 기준 상대). 복원은 동일한 `paths`를 취합니다.
 - **파일별 충실도:** 아카이브는 각 파일의 SELinux 컨텍스트, 소유자, xattrs를 보존하며, 복원은
   그것에 의존합니다 - 전면적 `chcon`을 절대 적용하지 않습니다. 그것은 /data/adb의 이질적인
-  컨텍스트를 평탄화하고 root를 망가뜨립니다. `adb-restore`는 살아 있는 트리 위에 추출합니다; 결코
+  컨텍스트를 평탄화하고 root를 망가뜨립니다. `adb-restore`는 살아 있는 트리 위에 추출합니다, 결코
   지우지 않습니다.
 - 자기 참조: 백업 자신의 출력과 모듈의 staging은 제외되므로, 백업이 자기 자신을 포함하는 일은
   결코 없습니다.
-- `adb-index`는 백업의 저장된 파일 목록을 반환하여 복원이 그 트리를 보여줄 수 있게 합니다; UI 선택은
-  전적으로 `paths`로 표현됩니다(완전히 체크된 폴더는 하나의 경로; 부분적으로 체크된 폴더는 체크된
+- `adb-index`는 백업의 저장된 파일 목록을 반환하여 복원이 그 트리를 보여줄 수 있게 합니다, UI 선택은
+  전적으로 `paths`로 표현됩니다(완전히 체크된 폴더는 하나의 경로, 부분적으로 체크된 폴더는 체크된
   자식으로 내려가므로 exclude 목록이 필요 없습니다).
-- `adb-restore`는 `"confirm": true`가 필요합니다(강한 마찰 장치); 둘 다 detached로 실행되며, `progress`를 폴링하세요.
+- `adb-restore`는 `"confirm": true`가 필요합니다(강한 마찰 장치), 둘 다 detached로 실행되며, `progress`를 폴링하세요.
 
 ### `update-check`
 

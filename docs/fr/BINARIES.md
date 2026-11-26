@@ -19,7 +19,7 @@ vérifier que rien d'opaque n'a été glissé dedans.
   dépôt de paquets officiel Termux (les fichiers `.deb` signés sur `packages.termux.dev/apt`),
   jamais copiés depuis un Termux installé sur un téléphone. Le build échoue bruyamment, il
   n'improvise jamais.
-- **Reproductible.** Relancez le build et vous obtenez les mêmes fichiers ; récupérez à nouveau
+- **Reproductible.** Relancez le build et vous obtenez les mêmes fichiers, récupérez à nouveau
    les sources épinglées et les valeurs SHA-256 correspondent.
 - **La piste d'audit est livrée avec le module.** Elle n'est pas seulement sur le site web, elle
   voyage à l'intérieur du module installé, sur votre appareil, pour que vous puissiez auditer
@@ -31,13 +31,13 @@ vérifier que rien d'opaque n'a été glissé dedans.
 |---|---|---|
 | `bin/<abi>/` outils natifs (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + leur closure `lib/` | Dépôt apt **Termux** officiel (`packages.termux.dev/apt`), paquets `.deb` officiels | `.github/scripts/build_bin.sh` télécharge les fichiers `.deb` + leurs dépendances transitives, les extrait, et copie les binaires ainsi que seulement les bibliothèques partagées dont chacun a besoin |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (repli du convertisseur ABX) | Release GitHub de **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF statique) | téléchargé depuis la release épinglée par `build_bin.sh` |
-| `companion.apk` (compagnon Google Drive optionnel) | **Ce dépôt**, `companion/` (Gradle/Kotlin) | construit depuis les sources par la CI et signé avec la clé du projet; pas un blob préconstruit |
+| `companion.apk` (compagnon Google Drive optionnel) | **Ce dépôt**, `companion/` (Gradle/Kotlin) | construit depuis les sources par la CI et signé avec la clé du projet, pas un blob préconstruit |
 | `vdbackup_helper.dex` (assistant framework) | **Ce dépôt**, `dex/src/` (Java) | compilé depuis les sources par la CI avec `javac` + `d8` |
 
-Seules les deux premières lignes sont des binaires tiers préconstruits ; les deux dernières sont
+Seules les deux premières lignes sont des binaires tiers préconstruits, les deux dernières sont
 construites depuis des sources qui vivent dans ce dépôt et peuvent être lues et reconstruites.
 
-> **Éditions Full vs lite.** Les éditions lite n'omettent que `rclone` et `restic` (les deux plus gros binaires) pour rester petites et les récupèrent à la demande (vérifiés par SHA-256) la première fois que vous utilisez une destination cloud ou le mode instantané ; `rsync` et `ssh`/`scp`/`sftp` sont toujours présents, et tous les autres binaires listés ci-dessus sont également présents. Les éditions Full fournissent `rclone` (fournisseurs cloud) et `restic` (instantanés) intégrés, de sorte que rien n'est jamais téléchargé.
+> **Éditions Full vs lite.** Les éditions lite n'omettent que `rclone` et `restic` (les deux plus gros binaires) pour rester petites et les récupèrent à la demande (vérifiés par SHA-256) la première fois que vous utilisez une destination cloud ou le mode instantané, `rsync` et `ssh`/`scp`/`sftp` sont toujours présents, et tous les autres binaires listés ci-dessus sont également présents. Les éditions Full fournissent `rclone` (fournisseurs cloud) et `restic` (instantanés) intégrés, de sorte que rien n'est jamais téléchargé.
 
 ## Le manifeste sur l'appareil : `PROVENANCE.json`
 
@@ -70,7 +70,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
    signé de Termux.
 3. **Reconstruisez depuis zéro.** Lancez vous-même `.github/scripts/build_bin.sh` (ne nécessite que
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`) et comparez la sortie à ce qui a été livré.
-4. **Compagnon et dex.** Reconstruisez `companion/` et `dex/` depuis les sources ; la signature du
+4. **Compagnon et dex.** Reconstruisez `companion/` et `dex/` depuis les sources, la signature du
    compagnon est la clé du projet (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
@@ -84,4 +84,4 @@ ce manifeste existe pour rendre visible.
 
 ---
 
-> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues ; voir [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md)._

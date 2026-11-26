@@ -44,12 +44,12 @@ Berechtigungsabfrage und keine Begleit-App für die Kernfunktionen gibt.
 - **Bereits Root.** Der Modulprozess läuft als Root, daher ist die Engine reine Shell. ~85% der
   Arbeit ist reine Shell (`tar`/`zstd`/`age`/`pm`/`am`/`chown`/`chcon`/`rclone`/...).
 - **Losgelöste Ausführung.** Backup/Restore laufen über `setsid nohup` als eigenständiger Root-
-  Prozess. Das Schließen der WebUI unterbricht sie nicht; die UI klinkt sich wieder ein, indem sie
+  Prozess. Das Schließen der WebUI unterbricht sie nicht, die UI klinkt sich wieder ein, indem sie
   `logs/progress-<opid>.json` liest.
 - **Framework-Helfer (~15%).** Feingranulare Berechtigungen, AppOps, SSAID, StorageStats,
   Icons und privilegiertes Wi-Fi benötigen das Android-Framework. Ein kleiner `dex`-Lauf über
   `app_process` (keine installierte App) erledigt diese, mit einem Shell-Fallback.
-- **Portabilität.** Nur Standardformate; Backups lassen sich auf einem PC ohne dieses Modul öffnen.
+- **Portabilität.** Nur Standardformate, Backups lassen sich auf einem PC ohne dieses Modul öffnen.
 - **Der Zustand** liegt in `/data/adb/vdbackup/` (Konfiguration, Jobs, Ziele, verschlüsselte
   Anmeldedaten, Logs, Staging). **Backups** werden in nutzersichtbaren, zugangsdaten-
   verschlüsselten Speicher unter `/sdcard/VDBackup/` geschrieben (`/data/media/<user>/VDBackup`, pro Nutzer),
@@ -61,7 +61,7 @@ Ein Backup muss für immer wiederherstellbar bleiben. Dies ist eine harte Regel,
 
 **Geltungsbereich.** Die Garantie gilt für Backups, die von **v1.01 an** (die erste offiziell
 veröffentlichte Version) und nur von offiziell veröffentlichten, freigegebenen Versionen
-geschrieben wurden. v1.00 war ein reiner Test-Build und ist ausdrücklich ausgenommen; Vorab- und
+geschrieben wurden. v1.00 war ein reiner Test-Build und ist ausdrücklich ausgenommen, Vorab- und
 Entwicklungs-Builds sind nicht abgedeckt. Ab der ersten öffentlichen Veröffentlichung ist das
 untenstehende Versprechen absolut:
 
@@ -81,14 +81,14 @@ untenstehende Versprechen absolut:
 
 Kurz gesagt: Alles, was VDBackup je geschrieben hat, kann jedes zukünftige VDBackup (und ein einfacher PC)
 weiterhin wiederherstellen. Das Format auf eine Weise zu ändern, die ein früheres Backup unbrauchbar macht, ist nicht
-erlaubt; neue Fähigkeiten werden hinter `format_version` und neuen, hinzufügenden Feldern ergänzt.
+erlaubt, neue Fähigkeiten werden hinter `format_version` und neuen, hinzufügenden Feldern ergänzt.
 
 Für das vollständige technische Design (Archivformat, Metadatenschema, Pipelines, Krypto,
-Ziele, Importeure) führen die Maintainer detaillierte Designnotizen; diese Datei ist der
+Ziele, Importeure) führen die Maintainer detaillierte Designnotizen, diese Datei ist der
 an Mitwirkende gerichtete Überblick.
 
 <!-- doc-footer -->
 
 ---
 
-> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen; siehe [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md)._

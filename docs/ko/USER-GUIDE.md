@@ -517,7 +517,7 @@ Full 백업 폴더에는 `manifest.json`(각 파일, 앱 버전, 원래 소유�
 PC에서 하나를 여는 방법, 요약하면:
 
 - **복호화**(파일이 `.age`로 끝날 때만), 표준 `age` 도구와 당신의 암호문 또는 키 파일로.
-- **압축 해제 및 추출**: `.tar.zst`는 `zstd` 다음에 `tar`로; `.tar.gz`는 `tar`로 바로;
+- **압축 해제 및 추출**: `.tar.zst`는 `zstd` 다음에 `tar`로, `.tar.gz`는 `tar`로 바로;
   `.tar.lz4`는 `zstd --format=lz4`로. APK는 그저 zstd로 압축된 APK이므로, `base.apk.zst`를
   압축 해제하면 평범하게 설치 가능한 `base.apk`를 얻습니다.
 

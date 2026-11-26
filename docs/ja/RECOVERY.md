@@ -11,7 +11,7 @@ VDBackup のバックアップは **標準フォーマット** を使うため�
 
 ## 必要になるかもしれないツール
 
-- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`; Linux: `apt install zstd`)
+- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
 - **age**（`.age` ファイルの場合のみ）: https://github.com/FiloSottile/age/releases
 - `tar` は macOS、Linux、最新の Windows 10/11 に組み込まれています。
 - `gzip` はどこにでも組み込まれています。`.tar.gz` には追加で何も要りません。

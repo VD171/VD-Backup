@@ -6,7 +6,7 @@
 
 VDBackup jest zbudowany tak, aby asystent lub agent AI mógł administrować **każdą** treścią i
 akcją modułu bezgłowo, tak samo jak robi to człowiek przez WebUI. WebUI jest tylko jednym
-klientem małego API JSON; twój agent jest kolejnym. Używaj API,
+klientem małego API JSON, twój agent jest kolejnym. Używaj API,
 nie scrapuj WebUI.
 
 ## Kontrakt
@@ -19,10 +19,10 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 
 - Argumenty to pojedynczy obiekt JSON, **zakodowany w base64**, przekazany jako jeden token argv.
 - Polecenie wypisuje **jeden obiekt JSON** na stdout: `{"ok":true,...}` lub
-  `{"ok":false,"code":"ERR_...","message":"..."}`. Parsuj to; nigdy nie scrapuj tekstu.
+  `{"ok":false,"code":"ERR_...","message":"..."}`. Parsuj to, nigdy nie scrapuj tekstu.
 - Długie operacje (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) zwracają `{"ok":true,"opid":"..."}`
   natychmiast i działają **odłączone** (przeżywają zamknięcie wywołującego/WebUI). Odpytuj
-  ich postęp; nie są zakończone, gdy wywołanie powraca.
+  ich postęp, nie są zakończone, gdy wywołanie powraca.
 - `progress` i `cancel` biorą **base64 surowego łańcucha opid**, nie obiekt JSON.
 
 Mały pomocnik dla twojego shella:
@@ -35,7 +35,7 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 
 Aby sterować tym z komputera roboczego, uruchom to przez swój zwykły kanał root do urządzenia
 (adb shell jako root, lub konfiguracja SSH-to-root). Moduł dostarcza dołączone binaria, więc
-po instalacji nie potrzebuje **żadnego internetu** dla lokalnej kopii/przywracania; tylko cele
+po instalacji nie potrzebuje **żadnego internetu** dla lokalnej kopii/przywracania, tylko cele
 chmurowe (`rclone`/`restic`/ssh) komunikują się z siecią.
 
 ## Czasowniki
@@ -43,13 +43,13 @@ chmurowe (`rclone`/`restic`/ssh) komunikują się z siecią.
 | Czasownik | Args (JSON) | Zwraca |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` liczby (rozmiary w bajtach): aplikacje z kopiami, łączna liczba instancji kopii, samodzielne kopie ścieżek, zaplanowane zadania, łączny rozmiar kopii oraz wolne/całkowite systemu plików kopii. Nieodłączona, zwraca natychmiast; używana przez przegląd startowy WebUI. |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` liczby (rozmiary w bajtach): aplikacje z kopiami, łączna liczba instancji kopii, samodzielne kopie ścieżek, zaplanowane zadania, łączny rozmiar kopii oraz wolne/całkowite systemu plików kopii. Nieodłączona, zwraca natychmiast, używana przez przegląd startowy WebUI. |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | obiekt konfiguracji (lub `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | generuje parę kluczy `age` do szyfrowania |
 | `list-apps` | `{user?}` | `{ok,apps:[{package,label,system,versionCode}]}` (dex, shell fallback) |
 | `label` | `{package,user?}` | `{ok,label}` (prawdziwa zlokalizowana nazwa aplikacji, bez kontekstu) |
-| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG; cachowane per package+`vc`) |
+| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG, cachowane per package+`vc`) |
 | `backup` | zobacz poniżej | `{ok,opid}` (odłączone) |
 | `restore` | zobacz niżej | `{ok,opid}` (odłączone) |
 | `import` | `{from,ref,password,ssaid,user}` | `{ok,opid}` (odłączone) |
@@ -59,7 +59,7 @@ chmurowe (`rclone`/`restic`/ssh) komunikują się z siecią.
 | `list-ops` | `{}` | `{ok,ops:[...]}` (ponowne podłączenie po przywróceniu połączenia) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | lista aplikacji / wsadowe ikony base64 |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
-| `note-set` | `{ref,note?,tags?}` | `{ok}` ustawia lub kasuje własną nazwę kopii zapasowej (`note`) i swobodne `tags`; przechowywane w pliku towarzyszącym, który podróżuje z kopią, przeszukiwalne z `list-backups`. |
+| `note-set` | `{ref,note?,tags?}` | `{ok}` ustawia lub kasuje własną nazwę kopii zapasowej (`note`) i swobodne `tags`, przechowywane w pliku towarzyszącym, który podróżuje z kopią, przeszukiwalne z `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` użytkownicy Androida na urządzeniu (wielu użytkowników). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` podkatalogi ścieżki (wybór folderu). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` samodzielne kopie folderu/pliku. |
@@ -72,48 +72,48 @@ chmurowe (`rclone`/`restic`/ssh) komunikują się z siecią.
 | `log-export` | `{user?}` | `{ok:true,path}` (bezwzględna ścieżka zapisanego pliku `.txt` w katalogu kopii zapasowych) lub `{ok:false,code:"ERR_LOG_EXPORT"}`. Zapisuje dziennik aktywności (`audit.jsonl`) oraz krótki nagłówek kompilacji/urządzenia do pojedynczego widocznego dla użytkownika pliku tekstowego, aby można go było dołączyć do zgłoszenia błędu. Nieodłączona, zwraca natychmiast. |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` kopia ogólnosystemowa (odłączone) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (wymaga restartu; `confirm` to zabezpiecza) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (wymaga restartu, `confirm` to zabezpiecza) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` tworzy kopię dowolnej ścieżki bezwzględnej jako `tar.zst`+`manifest.json` pod `.paths/` (odłączone) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` przywraca kopię ścieżki do jej oryginalnej lokalizacji (`confirm` to zabezpiecza; odłączone) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` przywraca kopię ścieżki do jej oryginalnej lokalizacji (`confirm` to zabezpiecza, odłączone) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` jeden leniwy poziom drzewa /data/adb (domyślnie `/data/adb`), dla selektora. |
 | `adb-du` | `{path}` | `{ok,size}` rekurencyjny rozmiar w bajtach jednego poddrzewa /data/adb, na żądanie. |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` tworzy kopię /data/adb - całość (pomiń `paths`) lub wybrane pod-ścieżki - z wiernością SELinux/właściciela per-plik, pod `.adb/` (odłączone) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` przywraca kopię /data/adb NA żywe drzewo - całość lub wybrane pod-ścieżki - zachowując kontekst każdego pliku (nigdy zbiorczy chcon); `confirm` to zabezpiecza (odłączone) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` przywraca kopię /data/adb NA żywe drzewo - całość lub wybrane pod-ścieżki - zachowując kontekst każdego pliku (nigdy zbiorczy chcon), `confirm` to zabezpiecza (odłączone) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` kopie systemu plików /data/adb. |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` zapisany szczegółowy wykaz plików kopii, dla selektora drzewa przywracania. |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | montuje zainstalowaną aplikację jako systemową (bezsystemowy podmoduł; na żywo przez NoMount, inaczej przy następnym rozruchu) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | montuje zainstalowaną aplikację jako systemową (bezsystemowy podmoduł, na żywo przez NoMount, inaczej przy następnym rozruchu) |
 | `companion-status` / `companion-install` | `{}` | status komponentu Dysku Google / instalacja na żądanie |
 | `telegram-check` | `{}` | stan sesji Telegrama (`user` null = niezalogowany) |
-| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | logowanie do Telegrama; `sign-in` zwraca `2FA_REQUIRED`, gdy konto ma 2FA i brakuje `password` |
+| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | logowanie do Telegrama, `sign-in` zwraca `2FA_REQUIRED`, gdy konto ma 2FA i brakuje `password` |
 | `telegram-logout` | `{}` | kończy sesję Telegrama |
 | `telegram-list` | `{}` | kopie w kanale Telegram (nazwy `<pkg>__<ts>_<vc>.vdb.tar`) |
-| `telegram-pull` | `{message_id,name}` | `{ok,opid}` pobiera kopię z Telegrama do pamięci lokalnej (detached); potem przywraca ją normalnym przepływem `restore` |
+| `telegram-pull` | `{message_id,name}` | `{ok,opid}` pobiera kopię z Telegrama do pamięci lokalnej (detached), potem przywraca ją normalnym przepływem `restore` |
 | `telegram-delete` | `{message_id}` | `{ok,deleted:[...]}` usuwa kopię z kanału Telegram wg `message_id` (wsadowo: po przecinku) |
 | `rclone-list` | `{dest}` | `{ok,dest,backups:[{dest,rref,package,tsvc}]}` kopie Full przechowywane tylko zdalnie w celu rclone (`dest` to id celu, `rref` to `<pkg>/<ts_vc>`) |
-| `rclone-pull` | `{dest,rref}` | `{ok,opid}` pobiera kopię rclone przechowywaną tylko zdalnie do pamięci lokalnej (detached); potem przywraca ją normalnym przepływem `restore` |
-| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` usuwa jedną kopię ze zdalnego rclone; `rref` musi być dokładnie `<pkg>/<ts_vc>` |
+| `rclone-pull` | `{dest,rref}` | `{ok,opid}` pobiera kopię rclone przechowywaną tylko zdalnie do pamięci lokalnej (detached), potem przywraca ją normalnym przepływem `restore` |
+| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` usuwa jedną kopię ze zdalnego rclone, `rref` musi być dokładnie `<pkg>/<ts_vc>` |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | zarządzanie celami |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | zarządzanie zdalnymi rclone (tworzy wpis `rclone.conf`, na który wskazuje cel `type:"rclone"`); `backend` może być dowolnym backendem rclone, bez listy dozwolonych |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | zarządzanie zdalnymi rclone (tworzy wpis `rclone.conf`, na który wskazuje cel `type:"rclone"`), `backend` może być dowolnym backendem rclone, bez listy dozwolonych |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (silnik już otworzył przeglądarkę telefonu na tym URL zgody przez intencję VIEW systemu Android) lub `{ok:false,code:"ERR_AUTHORIZE"}`. Uruchamia `rclone authorize <backend>` na lokalnym serwerze zwrotnym (`127.0.0.1:53682`) dla OAuth na urządzeniu. |
 | `remote-authorize-poll` | `{}` | `{ok:true,done:false,url}` podczas oczekiwania, `{ok:true,done:true,token}` gdy użytkownik wyrazi zgodę (`token` do przekazania do `remote-add`), lub `{ok:false,code:"ERR_AUTHORIZE"}`. |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; zatrzymuje oczekującą autoryzację. |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, zatrzymuje oczekującą autoryzację. |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (czy binaria `rclone`/`restic` są obecne, czy ta edycja `lite` może je pobrać, rozmiar pobierania w bajtach) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (odłączone) pobiera+weryfikuje+instaluje dodatek `rclone`/`restic` w edycji `lite` |
-| `schedule-set` / `schedule-list` / `schedule-delete` | zobacz poniżej | zaplanowane zadania (kopia lub przywracanie; cel to jedna aplikacja, zestaw lub wszystkie aplikacje) |
+| `schedule-set` / `schedule-list` / `schedule-delete` | zobacz poniżej | zaplanowane zadania (kopia lub przywracanie, cel to jedna aplikacja, zestaw lub wszystkie aplikacje) |
 | `scheduler-tick` | `{}` | uruchamia należne zadania + stosuje retencję + obserwator automatycznej kopii (wywołuje to heartbeat rozruchowy) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (nieodłączone; zwraca natychmiast; `ERR_UPDATE_CHECK` przy niepowodzeniu, patrz poniżej) |
-| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) tworzy kopię wielu aplikacji w jednej odłączonej operacji; postęp niesie `n`/`of`. Błąd jednej aplikacji nie zatrzymuje partii. |
-| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) przywraca wiele kopii w jednej odłączonej operacji; postęp niesie `n`/`of`. Błąd jednej aplikacji nie zatrzymuje partii. |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (nieodłączone, zwraca natychmiast, `ERR_UPDATE_CHECK` przy niepowodzeniu, patrz poniżej) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) tworzy kopię wielu aplikacji w jednej odłączonej operacji, postęp niesie `n`/`of`. Błąd jednej aplikacji nie zatrzymuje partii. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) przywraca wiele kopii w jednej odłączonej operacji, postęp niesie `n`/`of`. Błąd jednej aplikacji nie zatrzymuje partii. |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` woluminy pamięci dla selektora folderów: wewnętrzna plus wymienna karta SD / USB. |
 | `config-export` | `{password}` | `{ok,opid}` (detached) eksportuje konfigurację, zadania, miejsca docelowe, dane logowania i klucze do jednego pliku zaszyfrowanego hasłem, w folderze kopii. |
 | `config-import` | `{ref,password}` | `{ok,opid}` (detached) scala wyeksportowany plik konfiguracji z powrotem na to urządzenie (nigdy nie nadpisuje na ślepo). |
 | `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` wypisuje zaszyfrowane pliki konfiguracji dostępne do importu. |
-| `wipe-credentials` | `{}` | `{ok,wiped}` usuwa zapisane hasła zdalne i klucz szyfrowania urządzenia; miejsca docelowe, zadania i kopie pozostają. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` usuwa zapisane hasła zdalne i klucz szyfrowania urządzenia, miejsca docelowe, zadania i kopie pozostają. |
 | `log-prune` | `{}` | `{ok}` przycina dawno zakończone logi operacji, ogranicza dziennik audytu i usuwa nieaktualne ikony (wywołuje to usługa rozruchu). |
 | `sanitize` | `{}` | `{ok}` ponownie wymusza widoczność (0755) folderów kopii zapasowych dla każdego użytkownika Androida, aby menedżer plików mógł otworzyć foldery, które surowa kopia root lub kopia zapasowa sprzed v1.03.2 pozostawiły dostępne tylko dla właściciela. |
-| `boot-sweep` | `{}` | `{ok,reaped}` sprząta pozostałości po kopii zapasowej, która została przerwana lub wymuszenie zakończona (wywołuje to usługa rozruchu); kopia zapasowa, która zawiedzie lub zostanie anulowana, jest już sprzątana przez własny worker. |
+| `boot-sweep` | `{}` | `{ok,reaped}` sprząta pozostałości po kopii zapasowej, która została przerwana lub wymuszenie zakończona (wywołuje to usługa rozruchu), kopia zapasowa, która zawiedzie lub zostanie anulowana, jest już sprzątana przez własny worker. |
 
 ### Pola `progress`
 
@@ -139,7 +139,7 @@ nieznane, i są **pomijane przy zapisach końcowych** (finish / dry-run / restor
 | `of` | int | łączna liczba elementów (0 = nieznana) |
 | `cur` | string | nazwa bieżącego elementu (puste = brak) |
 
-Transfery chmurowe wypełniają `rate`/`eta` (wartość percent pochodzi z rclone); lokalne kopie Full
+Transfery chmurowe wypełniają `rate`/`eta` (wartość percent pochodzi z rclone), lokalne kopie Full
 wypełniają `n`/`of`/`cur`. Etykiety faz obejmują fazę pieczętowania sumą kontrolną **`verified`**
 oraz, dla transferów chmurowych, **`transfer`** i **`mirror <item>`**.
 
@@ -165,11 +165,11 @@ oraz, dla transferów chmurowych, **`transfer`** i **`mirror <item>`**.
 ```
 
 `restore`/`import` biorą `{ref}` (katalog kopii / scan ref). `restore` przyjmuje również:
-`"items"` (podzbiór typów elementów kopii do przywrócenia; pomiń, by przywrócić wszystkie), `"test": true`
+`"items"` (podzbiór typów elementów kopii do przywrócenia, pomiń, by przywrócić wszystkie), `"test": true`
 (rozpakowuje do katalogu tymczasowego i weryfikuje, bez dotykania żywej aplikacji), `"mode"` dla
 snapshot/mirror, `"password"` dla zaszyfrowanej kopii, `"ssaid"` (opt-in) oraz opcje źródła
 instalacji `"spoof_installer"` (domyślnie z config, ustawia instalatora na Sklep Play w czasie
-instalacji) i `"deep_spoof": true` (zaawansowany opt-in; fałszuje też pakiet inicjujący i źródło
+instalacji) i `"deep_spoof": true` (zaawansowany opt-in, fałszuje też pakiet inicjujący i źródło
 pakietu, edytując bazę pakietów, stosuje się po restarcie). `import` bierze `"from": "neo" | "databackup"`
 oraz, dla zaszyfrowanej kopii Neo, `"password"`.
 
@@ -229,11 +229,11 @@ Partia (`backup` z `packages`, `restore` z `refs`) uruchamia każdą aplikację 
 - **`batch_app_timeout`** (konfiguracja, sekundy, domyślnie `1800`, `0` wyłącza): jeśli aplikacja trwa dłużej, jej drzewo procesów zostaje zakończone, jest zapisywana jako `ERR_TIMEOUT`, a partia jest kontynuowana, aby jedna zawieszona aplikacja nigdy nie zamroziła całego przebiegu.
 - **Wynik częściowy**: zapis końcowy zawiera `ok`, `n` z `of`, zestawienie `fails` `{code:count}` (np. `{"ERR_NO_SPACE":24}`) oraz `free` (wolne bajty w systemie plików kopii). Częściowa partia to `ERR_BATCH_PARTIAL`, nigdy ślepy błąd.
 - **Regulacja termiczna** (konfiguracja `thermal_throttle`, domyślnie włączona): między aplikacjami worker wstrzymuje się, aby ostygnąć, gdy urządzenie jest gorące, emitując fazę postępu `cooling`, aby długi przebieg nie przegrzał urządzenia.
-- **Szacowanie miejsca przed uruchomieniem** (konfiguracja `space_preflight`, domyślnie włączona): przed partią do celu lokalnego sumowany jest nieskompresowany rozmiar wybranych aplikacji; jeśli już przekracza wolne miejsce w celu, partia zatrzymuje się z góry z `ERR_NO_SPACE` (oraz polem `need`) zamiast zapełniać dysk do połowy. Pomijane dla strumieniowych celów zdalnych.
+- **Szacowanie miejsca przed uruchomieniem** (konfiguracja `space_preflight`, domyślnie włączona): przed partią do celu lokalnego sumowany jest nieskompresowany rozmiar wybranych aplikacji, jeśli już przekracza wolne miejsce w celu, partia zatrzymuje się z góry z `ERR_NO_SPACE` (oraz polem `need`) zamiast zapełniać dysk do połowy. Pomijane dla strumieniowych celów zdalnych.
 
 ### Argumenty `remote-add`
 
-Cel chmurowy to cel `type:"rclone"`, który nazywa zdalny `rclone`; utwórz
+Cel chmurowy to cel `type:"rclone"`, który nazywa zdalny `rclone`, utwórz
 najpierw ten zdalny za pomocą `remote-add`. `backend` może być **dowolnym backendem rclone** -
 nie ma listy dozwolonych. `remote-add` akceptuje dowolną nazwę backendu (`dropbox`, `onedrive`,
 `box`, `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` i ~70 innych
@@ -277,7 +277,7 @@ Cele lokalne nigdy nie są ograniczane.
 ### Integralność i limit miejsca w chmurze
 
 - **Pieczęć sumy kontrolnej (chmura).** Po udanym skopiowaniu do chmury silnik uruchamia zdalną
-  kontrolę sumy kontrolnej (`rclone check`); niezgodność kończy operację błędem `ERR_VERIFY`.
+  kontrolę sumy kontrolnej (`rclone check`), niezgodność kończy operację błędem `ERR_VERIFY`.
   Backendy, które nie dzielą wspólnego skrótu ze stroną lokalną, są pomijane (nie jest to błąd).
 - **Kontrola limitu (chmura, tryb Full).** Przed wysyłką w trybie Full do zdalnego `rclone` silnik
   odpytuje wolne miejsce zdalnego celu (`rclone about --json`) i odmawia z `ERR_QUOTA`, jeśli kopia
@@ -292,7 +292,7 @@ chmurowej lub snapshot. `cloud-status` zgłasza, czy są już obecne, czy ta edy
 oraz rozmiar pobierania w bajtach. `cloud-fetch` działa **odłączone** (odpytuj `progress` z jego
 `opid`): pobiera dodatek `rclone`+`restic` dla danej architektury, weryfikuje go względem SHA-256
 wypalonego w module, i instaluje go w pamięci podręcznej środowiska uruchomieniowego. Jego fazy
-postępu to `downloading`, `verifying` i `installing`; kod końcowy to `ERR_NONE` przy powodzeniu
+postępu to `downloading`, `verifying` i `installing`, kod końcowy to `ERR_NONE` przy powodzeniu
 lub `ERR_FETCH` (pobieranie nie powiodło się) / `ERR_FETCH_VERIFY` (niezgodność sumy kontrolnej,
 odrzucono) przy niepowodzeniu. W edycji `full` jest zbędne. `backup`/`restore` do celu chmurowego
 lub snapshot w edycji `lite`, zanim binaria będą obecne, kończy się błędem `ERR_CLOUD_FETCHABLE`;
@@ -300,25 +300,25 @@ klient powinien zaproponować uruchomienie `cloud-fetch`, a następnie ponowić 
 
 ### Kategorie kopii specjalnej
 
-`special-categories` zgłasza, które kategorie ogólnosystemowe ma urządzenie; `special-backup`
+`special-categories` zgłasza, które kategorie ogólnosystemowe ma urządzenie, `special-backup`
 przechwytuje te, które przekażesz w `categories`, a `special-restore` je ponownie stosuje.
 Kategorie to:
 
 | Kategoria | Czym jest | Semantyka przywracania |
 |-----------|-----------|------------------------|
 | `messages` | SMS/MMS | zastąpienie w providerze (wyczyszczenie + rozpakowanie) |
-| `rcs` | czat RCS (Google Messages, `bugle_db`); także eksportowany przenośnie do `rcs.json` | zastąpienie danych aplikacji (kasuje + wypakowuje), to samo urządzenie |
+| `rcs` | czat RCS (Google Messages, `bugle_db`), także eksportowany przenośnie do `rcs.json` | zastąpienie danych aplikacji (kasuje + wypakowuje), to samo urządzenie |
 | `contacts` | kontakty i rejestr połączeń | zastąpienie w providerze (wyczyszczenie + rozpakowanie) |
 | `wifi` | zapisane sieci Wi-Fi | zastąpienie w providerze (wyczyszczenie + rozpakowanie) |
 | `bluetooth` | sparowania Bluetooth | zastąpienie w providerze (wyczyszczenie + rozpakowanie) |
-| `calendar` | provider kalendarza (`com.android.providers.calendar`, aplikacja + dane); eksportowany też przenośnie do `calendar.json` | zastąpienie w providerze (wyczyszczenie + rozpakowanie) |
+| `calendar` | provider kalendarza (`com.android.providers.calendar`, aplikacja + dane), eksportowany też przenośnie do `calendar.json` | zastąpienie w providerze (wyczyszczenie + rozpakowanie) |
 | `wallpaper` | tapeta ekranu głównego i blokady oraz `wallpaper_info.xml`, przechowywana surowo (binarnie) | pliki zastąpione |
 | `dns` | tryb i specyfikator prywatnego DNS, odczytane z settings | idempotentne `settings put` |
 | `system_settings` | pełny zrzut ustawień system/global/secure | **opt-in**, idempotentne `settings put`, nadpisuje ustawienia urządzenia |
 
 **`system_settings` jest ściśle opt-in i destrukcyjne przy przywracaniu.** Jak `ssaid`,
 nadpisuje ono ustawienia całego urządzenia, gdy jest przywracane, więc jest zabezpieczone
-jawną zgodą użytkownika i zapisywane w ścieżce audytu. Nigdy nie wybieraj go domyślnie; tylko
+jawną zgodą użytkownika i zapisywane w ścieżce audytu. Nigdy nie wybieraj go domyślnie, tylko
 na bezpośrednie, zamierzone żądanie użytkownika.
 
 ### Samodzielna kopia ścieżki
@@ -337,12 +337,12 @@ Archiwum jest zapisywane jako `tar.zst` plus `manifest.json` we własnym formaci
 
 - Ścieżka źródłowa musi być **bezwzględna** i znajdować się pod jedną z dozwolonych roots:
   `/storage/emulated`, `/data/media`, `/sdcard`, `/data`. Ścieżka, która nie istnieje, kończy
-  się błędem `ERR_NO_PATH`; ścieżka poza dozwolonymi roots lub zawierająca `..` kończy się
+  się błędem `ERR_NO_PATH`, ścieżka poza dozwolonymi roots lub zawierająca `..` kończy się
   błędem `ERR_BAD_PATH`.
 - `path-restore` zapisuje z powrotem do oryginalnej lokalizacji, więc jest destrukcyjne i
   wymaga `"confirm": true`, bramki o dużym tarciu, jak `special-restore`. `ref`, który nie jest
   prawidłową kopią ścieżki, kończy się błędem `ERR_BAD_REF`.
-- Oba działają **odłączone**; odpytuj `progress` zwróconym `opid`.
+- Oba działają **odłączone**, odpytuj `progress` zwróconym `opid`.
 
 ### Kopia systemu plików /data/adb
 
@@ -351,16 +351,16 @@ ich dane i konfiguracje), sterowane leniwym selektorem drzewa (`adb-list` po jed
 dla rozmiaru folderu na żądanie).
 
 - Całość lub wybiórczo na obu końcach: pomiń `paths` dla wszystkiego, albo przekaż wybrane pod-ścieżki
-  (względne do /data/adb); przywracanie bierze te same `paths`.
+  (względne do /data/adb), przywracanie bierze te same `paths`.
 - **Wierność per-plik:** archiwum zachowuje kontekst SELinux, właściciela i xattrs każdego pliku, a
   przywracanie na tym polega - NIGDY nie stosuje zbiorczego `chcon`, który spłaszczyłby heterogeniczne
-  konteksty /data/adb i zepsuł root. `adb-restore` wypakowuje NA żywe drzewo; nigdy go nie kasuje.
+  konteksty /data/adb i zepsuł root. `adb-restore` wypakowuje NA żywe drzewo, nigdy go nie kasuje.
 - Samoodniesienie: własne wyjście kopii i staging modułu są wykluczone, więc kopia nigdy nie zawiera
   samej siebie.
-- `adb-index` zwraca zapisany wykaz plików kopii, aby przywracanie mogło pokazać jej drzewo; wybór w UI
-  jest wyrażony w całości przez `paths` (w pełni zaznaczony folder to jedna ścieżka; częściowo
+- `adb-index` zwraca zapisany wykaz plików kopii, aby przywracanie mogło pokazać jej drzewo, wybór w UI
+  jest wyrażony w całości przez `paths` (w pełni zaznaczony folder to jedna ścieżka, częściowo
   zaznaczony schodzi do swoich zaznaczonych dzieci, więc lista wykluczeń nie jest potrzebna).
-- `adb-restore` wymaga `"confirm": true` (bramka o dużym tarciu); oba działają odłączone, odpytuj `progress`.
+- `adb-restore` wymaga `"confirm": true` (bramka o dużym tarciu), oba działają odłączone, odpytuj `progress`.
 
 ### `update-check`
 
@@ -389,13 +389,13 @@ W razie powodzenia zwraca:
 Jeśli nie ma adresu URL `updateJson`, żądanie sieciowe się nie powiedzie, lub manifestu nie da się
 sparsować, zwraca `{"ok":false,"code":"ERR_UPDATE_CHECK"}`.
 
-`update-check` tylko **zgłasza** dostępność i informacje o wydaniu; samą aktualizację wykonuje twój
+`update-check` tylko **zgłasza** dostępność i informacje o wydaniu, samą aktualizację wykonuje twój
 menedżer roota (KernelSU / APatch / Magisk) poprzez `updateJson` modułu, nigdy ten czasownik.
 
 ## Bariery bezpieczeństwa, których twój agent musi przestrzegać
 
 - **`ssaid` jest ściśle opt-in (domyślnie wyłączone).** Tworzy kopię / przywraca
-  ANDROID_ID urządzenia przez przepisanie pliku systemowego; przywracanie stosuje się dopiero po restarcie, a
+  ANDROID_ID urządzenia przez przepisanie pliku systemowego, przywracanie stosuje się dopiero po restarcie, a
   poprzedni plik jest zawsze najpierw zapisywany dla rollbacku. Wysyłaj `"ssaid": true`
   tylko na bezpośrednie, zamierzone żądanie użytkownika, nigdy domyślnie.
 - **Akcje modyfikujące (restore, delete, import) są destrukcyjne** i są logowane do
@@ -403,7 +403,7 @@ menedżer roota (KernelSU / APatch / Magisk) poprzez `updateJson` modułu, nigdy
   przywraca aplikację do dokładnego stanu kopii. Potwierdź zamiar, zanim je wywołasz.
 - **`system_settings` jest opt-in i destrukcyjne, dokładnie jak `ssaid`.** Jego przywrócenie
   nadpisuje ustawienia całego urządzenia, więc wysyłaj je tylko na bezpośrednie żądanie
-  użytkownika; jest zabezpieczone jawną zgodą i zapisywane w ścieżce audytu.
+  użytkownika, jest zabezpieczone jawną zgodą i zapisywane w ścieżce audytu.
 - **Przywracanie jest idempotentne.** Surowe przywracania providera (messages/contacts/wifi/
   bluetooth/calendar) **zastępują** zamiast scalać, dane providera są czyszczone, a archiwum
   jest rozpakowywane na wierzch, więc ponowne przywrócenie tej samej kopii nie może zduplikować
@@ -416,7 +416,7 @@ menedżer roota (KernelSU / APatch / Magisk) poprzez `updateJson` modułu, nigdy
   wyjść poza swój katalog docelowy.
 - **Nigdy nie osłabiaj** zachowania (SELinux/uid/gid/tryby/xattr) ani reguły APK (APK
   są zawsze skompresowane, nigdy zaszyfrowane, chyba że ustawiono `encrypt_apk`).
-- Traktuj wyjście JSON jako źródło prawdy; sprawdzaj `ok`/`code`, odpytuj `progress`,
+- Traktuj wyjście JSON jako źródło prawdy, sprawdzaj `ok`/`code`, odpytuj `progress`,
   i uwidaczniaj kody `ERR_*` zamiast zgadywać.
 
 Zobacz [ARCHITECTURE.md](ARCHITECTURE.md) i
@@ -426,4 +426,4 @@ Zobacz [ARCHITECTURE.md](ARCHITECTURE.md) i
 
 ---
 
-> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane; zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._

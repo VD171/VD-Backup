@@ -9,7 +9,7 @@ jaga diskusi tetap teknis dan konstruktif.
 
 - Bersikap baik. Tanpa pelecehan, serangan pribadi, atau diskriminasi.
 - Kritiklah ide dan kode, bukan orang.
-- Bantu pendatang baru; semua orang pernah menjadi baru.
+- Bantu pendatang baru, semua orang pernah menjadi baru.
 
 Perilaku yang tidak dapat diterima dapat dilaporkan secara pribadi kepada maintainer (lihat
 [SECURITY.md](SECURITY.md) untuk kontak). Maintainer boleh menghapus komentar, commit,
@@ -22,4 +22,4 @@ Covenant.
 
 ---
 
-> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

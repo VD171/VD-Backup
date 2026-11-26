@@ -6,7 +6,7 @@
 
 VDBackup được xây dựng để một trợ lý hoặc tác nhân AI có thể quản trị **mọi** nội dung và
 hành động của mô-đun theo kiểu headless, giống như cách một người làm qua WebUI. WebUI chỉ
-là một trong các máy khách của một API JSON nhỏ; tác nhân của bạn là một máy khách khác. Hãy
+là một trong các máy khách của một API JSON nhỏ, tác nhân của bạn là một máy khách khác. Hãy
 dùng API, đừng quét (scrape) WebUI.
 
 ## Giao kèo
@@ -19,10 +19,10 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 
 - Các đối số là một đối tượng JSON duy nhất, **được mã hóa base64**, truyền vào như một token argv.
 - Lệnh in ra **một đối tượng JSON** trên stdout: `{"ok":true,...}` hoặc
-  `{"ok":false,"code":"ERR_...","message":"..."}`. Hãy phân tích nó; đừng bao giờ quét văn bản.
+  `{"ok":false,"code":"ERR_...","message":"..."}`. Hãy phân tích nó, đừng bao giờ quét văn bản.
 - Các thao tác dài (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) trả về `{"ok":true,"opid":"..."}` ngay lập tức
   và chạy **tách rời (detached)** (chúng sống sót khi trình gọi/WebUI biến mất). Hãy thăm dò
-  tiến trình của chúng; chúng chưa xong khi lệnh trả về.
+  tiến trình của chúng, chúng chưa xong khi lệnh trả về.
 - `progress` và `cancel` nhận **base64 của chuỗi opid thô**, không phải một đối tượng JSON.
 
 Một trình trợ giúp nhỏ cho shell của bạn:
@@ -35,7 +35,7 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 
 Để điều khiển nó từ một máy trạm, hãy chạy lệnh đó qua kênh root thông thường của bạn tới
 thiết bị (adb shell với quyền root, hoặc một thiết lập SSH-to-root). Mô-đun đi kèm các tệp nhị
-phân đóng gói sẵn, nên sau khi cài đặt nó **không cần internet** cho backup/restore cục bộ; chỉ
+phân đóng gói sẵn, nên sau khi cài đặt nó **không cần internet** cho backup/restore cục bộ, chỉ
 các đích đám mây (`rclone`/`restic`/ssh) mới nói chuyện với mạng.
 
 ## Các động từ
@@ -43,13 +43,13 @@ các đích đám mây (`rclone`/`restic`/ssh) mới nói chuyện với mạng.
 | Động từ | Đối số (JSON) | Trả về |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` số đếm (kích thước theo byte): ứng dụng có bản sao lưu, tổng số thực thể bản sao lưu, bản sao lưu đường dẫn độc lập, công việc đã lập lịch, tổng kích thước bản sao lưu, và dung lượng trống/tổng của hệ thống tệp bản sao lưu. Không tách rời, trả về ngay lập tức; được dùng bởi tổng quan trang chủ của WebUI. |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` số đếm (kích thước theo byte): ứng dụng có bản sao lưu, tổng số thực thể bản sao lưu, bản sao lưu đường dẫn độc lập, công việc đã lập lịch, tổng kích thước bản sao lưu, và dung lượng trống/tổng của hệ thống tệp bản sao lưu. Không tách rời, trả về ngay lập tức, được dùng bởi tổng quan trang chủ của WebUI. |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | đối tượng config (hoặc `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | tạo cặp khóa `age` để mã hóa |
 | `list-apps` | `{user?}` | `{ok,apps:[{package,label,system,versionCode}]}` (dex, dự phòng shell) |
 | `label` | `{package,user?}` | `{ok,label}` (tên ứng dụng bản địa hóa thật, không phụ thuộc ngữ cảnh) |
-| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG; lưu đệm theo package+`vc`) |
+| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG, lưu đệm theo package+`vc`) |
 | `backup` | xem bên dưới | `{ok,opid}` (tách rời) |
 | `restore` | xem bên dưới | `{ok,opid}` (tách rời) |
 | `import` | `{from,ref,password,ssaid,user}` | `{ok,opid}` (tách rời) |
@@ -59,7 +59,7 @@ các đích đám mây (`rclone`/`restic`/ssh) mới nói chuyện với mạng.
 | `list-ops` | `{}` | `{ok,ops:[...]}` (gắn lại sau khi kết nối lại) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | danh sách ứng dụng / lô biểu tượng base64 |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
-| `note-set` | `{ref,note?,tags?}` | `{ok}` đặt hoặc xóa tên tùy chỉnh của một bản sao lưu (`note`) và các `tags` tự do; được lưu trong một tệp đi kèm di chuyển cùng bản sao lưu, có thể tìm kiếm từ `list-backups`. |
+| `note-set` | `{ref,note?,tags?}` | `{ok}` đặt hoặc xóa tên tùy chỉnh của một bản sao lưu (`note`) và các `tags` tự do, được lưu trong một tệp đi kèm di chuyển cùng bản sao lưu, có thể tìm kiếm từ `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` người dùng Android của thiết bị (đa người dùng). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` thư mục con của một đường dẫn (bộ chọn thư mục). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` sao lưu thư mục/tệp độc lập. |
@@ -72,48 +72,48 @@ các đích đám mây (`rclone`/`restic`/ssh) mới nói chuyện với mạng.
 | `log-export` | `{user?}` | `{ok:true,path}` (đường dẫn tuyệt đối của một tệp `.txt` được ghi dưới thư mục bản sao lưu) hoặc `{ok:false,code:"ERR_LOG_EXPORT"}`. Ghi nhật ký hoạt động (`audit.jsonl`) cùng một tiêu đề bản dựng/thiết bị ngắn vào một tệp văn bản duy nhất mà người dùng thấy được để có thể đính kèm vào báo cáo lỗi. Không tách rời, trả về ngay lập tức. |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` sao lưu toàn hệ thống (tách rời) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (cần khởi động lại; `confirm` canh gác nó) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (cần khởi động lại, `confirm` canh gác nó) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` sao lưu bất kỳ đường dẫn tuyệt đối nào thành `tar.zst`+`manifest.json` dưới `.paths/` (tách rời) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` khôi phục một bản sao lưu đường dẫn về vị trí gốc của nó (`confirm` canh gác nó; tách rời) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` khôi phục một bản sao lưu đường dẫn về vị trí gốc của nó (`confirm` canh gác nó, tách rời) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` một cấp lười của cây /data/adb (mặc định `/data/adb`), cho bộ chọn. |
 | `adb-du` | `{path}` | `{ok,size}` kích thước byte đệ quy của một cây con /data/adb, theo yêu cầu. |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` sao lưu /data/adb - toàn bộ (bỏ `paths`) hoặc các sub-path đã chọn - với độ trung thực SELinux/chủ sở hữu theo từng tệp, dưới `.adb/` (tách rời) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` khôi phục một bản sao lưu /data/adb ĐÈ LÊN cây đang hoạt động - toàn bộ hoặc các sub-path đã chọn - giữ nguyên ngữ cảnh của từng tệp (không bao giờ dùng chcon toàn cục); `confirm` canh gác nó (tách rời) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` khôi phục một bản sao lưu /data/adb ĐÈ LÊN cây đang hoạt động - toàn bộ hoặc các sub-path đã chọn - giữ nguyên ngữ cảnh của từng tệp (không bao giờ dùng chcon toàn cục), `confirm` canh gác nó (tách rời) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` các bản sao lưu hệ thống tệp /data/adb. |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` danh sách tệp chi tiết đã lưu của một bản sao lưu, cho bộ chọn cây khôi phục. |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | gắn một ứng dụng đã cài làm ứng dụng hệ thống (mô-đun con không-hệ-thống; trực tiếp qua NoMount, nếu không thì ở lần khởi động kế tiếp) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | gắn một ứng dụng đã cài làm ứng dụng hệ thống (mô-đun con không-hệ-thống, trực tiếp qua NoMount, nếu không thì ở lần khởi động kế tiếp) |
 | `companion-status` / `companion-install` | `{}` | trạng thái / cài đặt theo yêu cầu của ứng dụng đồng hành Google Drive |
 | `telegram-check` | `{}` | trạng thái phiên Telegram (`user` null = chưa đăng nhập) |
-| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | đăng nhập Telegram; `sign-in` trả về `2FA_REQUIRED` nếu tài khoản có 2FA và thiếu `password` |
+| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | đăng nhập Telegram, `sign-in` trả về `2FA_REQUIRED` nếu tài khoản có 2FA và thiếu `password` |
 | `telegram-logout` | `{}` | kết thúc phiên Telegram |
 | `telegram-list` | `{}` | bản sao lưu trong kênh Telegram (tên `<pkg>__<ts>_<vc>.vdb.tar`) |
-| `telegram-pull` | `{message_id,name}` | `{ok,opid}` tải một bản sao lưu từ Telegram về bộ nhớ cục bộ (detached); rồi khôi phục qua luồng `restore` thông thường |
+| `telegram-pull` | `{message_id,name}` | `{ok,opid}` tải một bản sao lưu từ Telegram về bộ nhớ cục bộ (detached), rồi khôi phục qua luồng `restore` thông thường |
 | `telegram-delete` | `{message_id}` | `{ok,deleted:[...]}` xóa một bản sao lưu khỏi kênh Telegram theo `message_id` (hàng loạt: ngăn bằng dấu phẩy) |
 | `rclone-list` | `{dest}` | `{ok,dest,backups:[{dest,rref,package,tsvc}]}` các bản sao lưu Full chỉ lưu trên remote tại một đích rclone (`dest` là id đích, `rref` là `<pkg>/<ts_vc>`) |
-| `rclone-pull` | `{dest,rref}` | `{ok,opid}` tải một bản sao lưu rclone chỉ lưu trên remote về bộ nhớ cục bộ (detached); rồi khôi phục qua luồng `restore` thông thường |
-| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` xóa một bản sao lưu khỏi một remote rclone; `rref` phải chính xác là `<pkg>/<ts_vc>` |
+| `rclone-pull` | `{dest,rref}` | `{ok,opid}` tải một bản sao lưu rclone chỉ lưu trên remote về bộ nhớ cục bộ (detached), rồi khôi phục qua luồng `restore` thông thường |
+| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` xóa một bản sao lưu khỏi một remote rclone, `rref` phải chính xác là `<pkg>/<ts_vc>` |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | quản lý đích |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | quản lý remote rclone (tạo mục `rclone.conf` mà một đích `type:"rclone"` trỏ tới); `backend` có thể là bất kỳ backend rclone nào, không có whitelist |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | quản lý remote rclone (tạo mục `rclone.conf` mà một đích `type:"rclone"` trỏ tới), `backend` có thể là bất kỳ backend rclone nào, không có whitelist |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (engine đã mở trình duyệt của điện thoại đến URL đồng ý đó qua một Android VIEW intent) hoặc `{ok:false,code:"ERR_AUTHORIZE"}`. Chạy `rclone authorize <backend>` trên một callback server cục bộ (`127.0.0.1:53682`) để OAuth ngay trên thiết bị. |
 | `remote-authorize-poll` | `{}` | `{ok:true,done:false,url}` trong khi chờ, `{ok:true,done:true,token}` khi người dùng đã đồng ý (`token` để truyền cho `remote-add`), hoặc `{ok:false,code:"ERR_AUTHORIZE"}`. |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; dừng một ủy quyền đang chờ. |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, dừng một ủy quyền đang chờ. |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (các tệp nhị phân `rclone`/`restic` có hiện diện không, phiên bản `lite` này có thể tải chúng không, kích thước tải xuống tính bằng byte) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (tách rời) tải+xác minh+cài đặt addon `rclone`/`restic` trên phiên bản `lite` |
-| `schedule-set` / `schedule-list` / `schedule-delete` | xem bên dưới | các công việc theo lịch (một bản sao lưu hoặc một bản khôi phục; nhắm tới một ứng dụng, một tập hợp, hoặc tất cả ứng dụng) |
+| `schedule-set` / `schedule-list` / `schedule-delete` | xem bên dưới | các công việc theo lịch (một bản sao lưu hoặc một bản khôi phục, nhắm tới một ứng dụng, một tập hợp, hoặc tất cả ứng dụng) |
 | `scheduler-tick` | `{}` | chạy các công việc đến hạn + áp dụng lưu giữ + bộ quan sát tự động sao lưu (nhịp khởi động gọi cái này) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (không tách rời; trả về ngay; `ERR_UPDATE_CHECK` khi thất bại, xem bên dưới) |
-| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) sao lưu nhiều ứng dụng trong một thao tác tách rời; tiến trình mang `n`/`of`. Một lỗi mỗi ứng dụng không dừng lô. |
-| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) khôi phục nhiều bản sao lưu trong một thao tác tách rời; tiến trình mang `n`/`of`. Một lỗi mỗi ứng dụng không dừng lô. |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (không tách rời, trả về ngay, `ERR_UPDATE_CHECK` khi thất bại, xem bên dưới) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) sao lưu nhiều ứng dụng trong một thao tác tách rời, tiến trình mang `n`/`of`. Một lỗi mỗi ứng dụng không dừng lô. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) khôi phục nhiều bản sao lưu trong một thao tác tách rời, tiến trình mang `n`/`of`. Một lỗi mỗi ứng dụng không dừng lô. |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` các ổ lưu trữ cho bộ chọn thư mục: trong máy cộng thẻ SD/USB rời. |
 | `config-export` | `{password}` | `{ok,opid}` (detached) xuất cấu hình, công việc, đích đến, thông tin xác thực và khóa ra một tệp mã hóa bằng cụm mật khẩu trong thư mục sao lưu. |
 | `config-import` | `{ref,password}` | `{ok,opid}` (detached) hợp nhất một tệp cấu hình đã xuất trở lại thiết bị này (không bao giờ ghi đè mù quáng). |
 | `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` liệt kê các tệp cấu hình mã hóa có sẵn để nhập. |
-| `wipe-credentials` | `{}` | `{ok,wiped}` xóa mật khẩu từ xa đã lưu và khóa mã hóa thiết bị; đích đến, công việc và bản sao lưu vẫn còn. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` xóa mật khẩu từ xa đã lưu và khóa mã hóa thiết bị, đích đến, công việc và bản sao lưu vẫn còn. |
 | `log-prune` | `{}` | `{ok}` cắt tỉa nhật ký thao tác đã hoàn tất từ lâu, giới hạn dấu vết kiểm toán và loại bỏ biểu tượng cũ (dịch vụ khởi động gọi cái này). |
 | `sanitize` | `{}` | `{ok}` tái khẳng định khả năng hiển thị (0755) của các thư mục sao lưu trên mọi người dùng Android, để trình quản lý tệp có thể mở các thư mục mà một bản sao root thô hoặc một bản sao lưu trước v1.03.2 đã để ở chế độ chỉ chủ sở hữu truy cập được. |
-| `boot-sweep` | `{}` | `{ok,reaped}` dọn phần còn sót lại từ một bản sao lưu bị gián đoạn hoặc bị buộc dừng (dịch vụ khởi động gọi cái này); một bản sao lưu bị lỗi hoặc bị hủy thì đã được worker của chính nó dọn dẹp. |
+| `boot-sweep` | `{}` | `{ok,reaped}` dọn phần còn sót lại từ một bản sao lưu bị gián đoạn hoặc bị buộc dừng (dịch vụ khởi động gọi cái này), một bản sao lưu bị lỗi hoặc bị hủy thì đã được worker của chính nó dọn dẹp. |
 
 ### Các trường của `progress`
 
@@ -140,7 +140,7 @@ restore-test):
 | `of` | int | tổng số mục (0 = chưa biết) |
 | `cur` | string | tên mục hiện tại (rỗng = không có) |
 
-Các lần truyền đám mây điền `rate`/`eta` (percent đến từ rclone); các bản sao lưu Full cục bộ
+Các lần truyền đám mây điền `rate`/`eta` (percent đến từ rclone), các bản sao lưu Full cục bộ
 điền `n`/`of`/`cur`. Các nhãn giai đoạn bao gồm giai đoạn niêm phong checksum **`verified`** và,
 đối với các lần truyền đám mây, **`transfer`** và **`mirror <item>`**.
 
@@ -166,11 +166,11 @@ Các lần truyền đám mây điền `rate`/`eta` (percent đến từ rclone)
 ```
 
 `restore`/`import` nhận `{ref}` (một thư mục sao lưu / ref quét). `restore` cũng chấp nhận:
-`"items"` (một tập con các loại mục của bản sao lưu để khôi phục; bỏ qua để lấy tất cả),
+`"items"` (một tập con các loại mục của bản sao lưu để khôi phục, bỏ qua để lấy tất cả),
 `"test": true` (giải nén vào một thư mục tạm và xác minh, không chạm vào ứng dụng đang chạy),
 `"mode"` cho snapshot/mirror, `"password"` cho một bản sao lưu đã mã hóa, `"ssaid"` (opt-in),
 và các tùy chọn nguồn cài đặt `"spoof_installer"` (mặc định lấy từ config, đặt trình cài đặt
-thành Play Store tại thời điểm cài) cùng `"deep_spoof": true` (opt-in nâng cao; còn giả mạo gói
+thành Play Store tại thời điểm cài) cùng `"deep_spoof": true` (opt-in nâng cao, còn giả mạo gói
 khởi tạo và nguồn gói bằng cách chỉnh sửa cơ sở dữ liệu gói, có hiệu lực sau khi khởi động lại).
 `import` nhận `"from": "neo" | "databackup"` và, với một bản sao lưu Neo đã mã hóa, `"password"`.
 
@@ -229,11 +229,11 @@ Một lô (`backup` với `packages`, `restore` với `refs`) chạy mỗi ứng
 - **`batch_app_timeout`** (cấu hình, giây, mặc định `1800`, `0` tắt): nếu một ứng dụng mất nhiều thời gian hơn, cây tiến trình của nó bị kết thúc, nó được ghi là `ERR_TIMEOUT`, và lô tiếp tục, để một ứng dụng bị kẹt không bao giờ làm đóng băng toàn bộ lần chạy.
 - **Kết quả một phần**: lần ghi kết thúc mang theo `ok`, `n` trên `of`, một bảng `fails` `{code:count}` (ví dụ `{"ERR_NO_SPACE":24}`), và `free` (số byte còn lại trên hệ thống tập tin sao lưu). Một lô một phần là `ERR_BATCH_PARTIAL`, không bao giờ là lỗi mù mờ.
 - **Điều tiết nhiệt** (cấu hình `thermal_throttle`, mặc định bật): giữa các ứng dụng, worker tạm dừng để hạ nhiệt khi thiết bị nóng, phát ra một pha tiến trình `cooling`, để một lần chạy dài không làm thiết bị quá nóng.
-- **Ước tính dung lượng trước khi chạy** (cấu hình `space_preflight`, mặc định bật): trước một lô đến đích cục bộ, dung lượng chưa nén của các ứng dụng đã chọn được cộng lại; nếu nó đã vượt quá dung lượng trống của đích, lô sẽ dừng trước với `ERR_NO_SPACE` (cùng một trường `need`) thay vì lấp đầy đĩa nửa chừng. Bỏ qua đối với các đích từ xa truyền phát.
+- **Ước tính dung lượng trước khi chạy** (cấu hình `space_preflight`, mặc định bật): trước một lô đến đích cục bộ, dung lượng chưa nén của các ứng dụng đã chọn được cộng lại, nếu nó đã vượt quá dung lượng trống của đích, lô sẽ dừng trước với `ERR_NO_SPACE` (cùng một trường `need`) thay vì lấp đầy đĩa nửa chừng. Bỏ qua đối với các đích từ xa truyền phát.
 
 ### Đối số của `remote-add`
 
-Một đích đám mây là một đích `type:"rclone"` đặt tên cho một remote `rclone`; hãy tạo remote đó
+Một đích đám mây là một đích `type:"rclone"` đặt tên cho một remote `rclone`, hãy tạo remote đó
 trước bằng `remote-add`. `backend` có thể là **bất kỳ backend rclone nào**: không có whitelist.
 `remote-add` chấp nhận bất kỳ tên backend nào (`dropbox`, `onedrive`, `box`, `pcloud`, `mega`,
 `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` và khoảng ~70 backend khác mà rclone hỗ trợ),
@@ -275,7 +275,7 @@ cục bộ không bao giờ bị chặn.
 ### Toàn vẹn và hạn mức đám mây
 
 - **Niêm phong checksum (đám mây).** Sau một lần sao chép đám mây thành công, engine chạy một
-  kiểm tra checksum từ xa (`rclone check`); một sai khớp khiến thao tác thất bại với `ERR_VERIFY`.
+  kiểm tra checksum từ xa (`rclone check`), một sai khớp khiến thao tác thất bại với `ERR_VERIFY`.
   Các backend không chia sẻ hàm băm chung nào với phía cục bộ sẽ bị bỏ qua (không phải là lỗi).
 - **Kiểm tra hạn mức (đám mây, chế độ Full).** Trước một lần tải lên chế độ Full tới một remote
   `rclone`, engine truy vấn dung lượng trống của remote (`rclone about --json`) và từ chối với
@@ -290,7 +290,7 @@ hành động đám mây hoặc snapshot. `cloud-status` báo cáo chúng đã h
 thể tải chúng không, và kích thước tải xuống tính bằng byte. `cloud-fetch` chạy **tách rời** (hãy
 poll `progress` bằng `opid` của nó): nó tải addon `rclone`+`restic` theo kiến trúc, xác minh với
 SHA-256 được nung vào module, và cài đặt vào bộ nhớ đệm thời gian chạy. Các pha tiến trình là
-`downloading`, `verifying` và `installing`; mã cuối cùng là `ERR_NONE` khi thành công, hoặc
+`downloading`, `verifying` và `installing`, mã cuối cùng là `ERR_NONE` khi thành công, hoặc
 `ERR_FETCH` (tải thất bại) / `ERR_FETCH_VERIFY` (checksum không khớp, đã loại bỏ) khi thất bại.
 Trên phiên bản `full` thì không cần. Một `backup`/`restore` tới đích đám mây hoặc snapshot trên
 phiên bản `lite`, trước khi các tệp nhị phân hiện diện, sẽ thất bại với `ERR_CLOUD_FETCHABLE`;
@@ -298,25 +298,25 @@ client nên đề nghị chạy `cloud-fetch`, rồi thử lại.
 
 ### Các danh mục sao lưu đặc biệt
 
-`special-categories` báo cáo một thiết bị có những danh mục toàn hệ thống nào; `special-backup` nắm
+`special-categories` báo cáo một thiết bị có những danh mục toàn hệ thống nào, `special-backup` nắm
 bắt những danh mục bạn truyền trong `categories` và `special-restore` áp dụng lại chúng. Các danh
 mục là:
 
 | Danh mục | Nó là gì | Ngữ nghĩa khôi phục |
 |----------|-----------|-------------------|
 | `messages` | SMS/MMS | thay thế qua provider (xóa + giải nén) |
-| `rcs` | trò chuyện RCS (Google Messages, `bugle_db`); cũng được xuất di động sang `rcs.json` | thay thế dữ liệu ứng dụng (xóa + giải nén), cùng thiết bị |
+| `rcs` | trò chuyện RCS (Google Messages, `bugle_db`), cũng được xuất di động sang `rcs.json` | thay thế dữ liệu ứng dụng (xóa + giải nén), cùng thiết bị |
 | `contacts` | danh bạ và nhật ký cuộc gọi | thay thế qua provider (xóa + giải nén) |
 | `wifi` | các mạng Wi-Fi đã lưu | thay thế qua provider (xóa + giải nén) |
 | `bluetooth` | các cặp ghép nối Bluetooth | thay thế qua provider (xóa + giải nén) |
-| `calendar` | provider lịch (`com.android.providers.calendar`, ứng dụng + dữ liệu); cũng được xuất khả chuyển sang `calendar.json` | thay thế qua provider (xóa + giải nén) |
+| `calendar` | provider lịch (`com.android.providers.calendar`, ứng dụng + dữ liệu), cũng được xuất khả chuyển sang `calendar.json` | thay thế qua provider (xóa + giải nén) |
 | `wallpaper` | hình nền màn hình chính và màn hình khóa cùng `wallpaper_info.xml`, lưu ở dạng thô (nhị phân) | tệp bị thay thế |
 | `dns` | chế độ và bộ định danh DNS riêng tư, đọc từ cài đặt | `settings put` idempotent |
 | `system_settings` | bản dump đầy đủ các cài đặt system/global/secure | **opt-in**, `settings put` idempotent, ghi đè cài đặt thiết bị |
 
 **`system_settings` là opt-in nghiêm ngặt và có tính phá hủy khi khôi phục.** Giống `ssaid`, nó ghi
 đè các cài đặt trên toàn thiết bị khi được khôi phục, nên nó được canh gác sau sự đồng ý rõ ràng của
-người dùng và được ghi vào dấu vết kiểm toán. Không bao giờ chọn nó theo mặc định; chỉ theo một yêu
+người dùng và được ghi vào dấu vết kiểm toán. Không bao giờ chọn nó theo mặc định, chỉ theo một yêu
 cầu trực tiếp, có chủ ý của người dùng.
 
 ### Sao lưu đường dẫn độc lập
@@ -335,12 +335,12 @@ backups.
 ```
 
 - Đường dẫn nguồn phải là **tuyệt đối** và nằm dưới một trong các gốc được phép: `/storage/emulated`,
-  `/data/media`, `/sdcard`, `/data`. Một đường dẫn không tồn tại sẽ thất bại với `ERR_NO_PATH`; một
+  `/data/media`, `/sdcard`, `/data`. Một đường dẫn không tồn tại sẽ thất bại với `ERR_NO_PATH`, một
   đường dẫn bên ngoài các gốc được phép, hoặc một đường dẫn chứa `..`, sẽ thất bại với `ERR_BAD_PATH`.
 - `path-restore` ghi lại về vị trí gốc, nên nó có tính phá hủy và yêu cầu `"confirm": true`, một
   cổng ma sát cao, giống `special-restore`. Một `ref` không phải là một bản sao lưu đường dẫn hợp lệ
   sẽ thất bại với `ERR_BAD_REF`.
-- Cả hai đều chạy **tách rời**; thăm dò `progress` bằng `opid` được trả về.
+- Cả hai đều chạy **tách rời**, thăm dò `progress` bằng `opid` được trả về.
 
 ### Sao lưu hệ thống tệp /data/adb
 
@@ -349,17 +349,17 @@ dữ liệu và cấu hình của chúng), được điều khiển bởi một 
 cấp, `adb-du` cho kích thước của một thư mục theo yêu cầu).
 
 - Toàn bộ hoặc chọn lọc ở cả hai đầu: bỏ `paths` để lấy mọi thứ, hoặc truyền các sub-path đã chọn
-  (tương đối so với /data/adb); việc khôi phục lấy cùng `paths`.
+  (tương đối so với /data/adb), việc khôi phục lấy cùng `paths`.
 - **Độ trung thực theo từng tệp:** kho lưu trữ giữ ngữ cảnh SELinux, chủ sở hữu và xattrs của từng tệp,
   và việc khôi phục dựa vào đó - nó KHÔNG BAO GIỜ áp dụng một `chcon` toàn cục, điều sẽ làm phẳng các
   ngữ cảnh không đồng nhất của /data/adb và làm hỏng root. `adb-restore` giải nén ĐÈ LÊN cây đang hoạt
-  động; nó không bao giờ xóa cây.
+  động, nó không bao giờ xóa cây.
 - Tự tham chiếu: đầu ra của chính bản sao lưu và staging của module bị loại trừ, nên một bản sao lưu
   không bao giờ chứa chính nó.
 - `adb-index` trả về danh sách tệp đã lưu của một bản sao lưu để việc khôi phục có thể hiển thị cây của
-  nó; lựa chọn UI được biểu đạt hoàn toàn qua `paths` (một thư mục được chọn đầy đủ là một path; một
+  nó, lựa chọn UI được biểu đạt hoàn toàn qua `paths` (một thư mục được chọn đầy đủ là một path, một
   thư mục được chọn một phần sẽ đi xuống các con được chọn của nó, nên không cần danh sách exclude).
-- `adb-restore` yêu cầu `"confirm": true` (cổng ma sát cao); cả hai đều chạy tách rời, thăm dò `progress`.
+- `adb-restore` yêu cầu `"confirm": true` (cổng ma sát cao), cả hai đều chạy tách rời, thăm dò `progress`.
 
 ### `update-check`
 
@@ -388,21 +388,21 @@ Khi thành công nó trả về:
 Nếu không có URL `updateJson`, yêu cầu mạng thất bại, hoặc manifest không thể phân tích, nó trả về
 `{"ok":false,"code":"ERR_UPDATE_CHECK"}`.
 
-`update-check` chỉ **báo cáo** tính khả dụng và ghi chú phát hành; bản cập nhật thực sự được thực
+`update-check` chỉ **báo cáo** tính khả dụng và ghi chú phát hành, bản cập nhật thực sự được thực
 hiện bởi trình quản lý root của bạn (KernelSU / APatch / Magisk) thông qua `updateJson` của mô-đun,
 không bao giờ bởi động từ này.
 
 ## Các lan can an toàn mà tác nhân của bạn phải tôn trọng
 
 - **`ssaid` là opt-in nghiêm ngặt (mặc định tắt).** Nó sao lưu / khôi phục ANDROID_ID của thiết
-  bị bằng cách ghi lại một tệp hệ thống; một lần khôi phục chỉ áp dụng sau khi khởi động lại, và
+  bị bằng cách ghi lại một tệp hệ thống, một lần khôi phục chỉ áp dụng sau khi khởi động lại, và
   tệp trước đó luôn được lưu trước để hoàn tác. Chỉ gửi `"ssaid": true` theo một yêu cầu trực
   tiếp, có chủ ý của người dùng, không bao giờ theo mặc định.
 - **Các hành động làm thay đổi (restore, delete, import) có tính phá hủy** và được ghi vào một
   dấu vết kiểm toán cục bộ (`logs/audit.jsonl`). Khôi phục là trung thực (xóa-rồi-giải-nén), nên
   nó đưa ứng dụng về đúng trạng thái của bản sao lưu. Hãy xác nhận ý định trước khi gọi chúng.
 - **`system_settings` là opt-in và có tính phá hủy, y hệt `ssaid`.** Khôi phục nó sẽ ghi đè các cài
-  đặt trên toàn thiết bị, nên chỉ gửi nó theo một yêu cầu trực tiếp của người dùng; nó được canh gác
+  đặt trên toàn thiết bị, nên chỉ gửi nó theo một yêu cầu trực tiếp của người dùng, nó được canh gác
   bằng sự đồng ý rõ ràng và được ghi vào dấu vết kiểm toán.
 - **Khôi phục là idempotent.** Các khôi phục provider thô (messages/contacts/wifi/bluetooth/calendar)
   **thay thế** thay vì hợp nhất, dữ liệu provider bị xóa và kho lưu trữ được giải nén đè lên, nên
@@ -416,7 +416,7 @@ không bao giờ bởi động từ này.
   thư mục đích của nó.
 - **Không bao giờ làm suy yếu** việc bảo tồn (SELinux/uid/gid/chế độ/xattr) hay quy tắc APK (APK
   luôn được nén, không bao giờ mã hóa trừ khi `encrypt_apk` được đặt).
-- Hãy coi đầu ra JSON là nguồn sự thật; kiểm tra `ok`/`code`, thăm dò `progress`, và đưa ra các
+- Hãy coi đầu ra JSON là nguồn sự thật, kiểm tra `ok`/`code`, thăm dò `progress`, và đưa ra các
   mã `ERR_*` thay vì đoán.
 
 Xem [ARCHITECTURE.md](ARCHITECTURE.md) và
@@ -426,4 +426,4 @@ Xem [ARCHITECTURE.md](ARCHITECTURE.md) và
 
 ---
 
-> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md)._

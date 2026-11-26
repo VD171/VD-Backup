@@ -11,10 +11,10 @@ valfritt krypterade med ett avslutande `.age`.
 
 ## Verktyg du kan behöva
 
-- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`; Linux: `apt install zstd`)
+- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
 - **age** (endast för `.age`-filer): https://github.com/FiloSottile/age/releases
 - `tar` är inbyggt i macOS, Linux och moderna Windows 10/11.
-- `gzip` är inbyggt överallt; för `.tar.gz` behöver du inget extra.
+- `gzip` är inbyggt överallt, för `.tar.gz` behöver du inget extra.
 
 ## 1. Dekryptera (endast om filen slutar med `.age`)
 
@@ -62,7 +62,7 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ## Noteringar
 
-- Extraherade filer behåller sina relativa sökvägar; SELinux-kontexten, uid/gid och modes
+- Extraherade filer behåller sina relativa sökvägar, SELinux-kontexten, uid/gid och modes
   finns inuti tar-filen (och återtillämpas ordentligt endast när du återställer på Android).
 - `manifest.json` beskriver exakt vad varje fil är, app-versionen och den
   ursprungliga ägaren/kontexten. Det är sanningskällan.
@@ -73,4 +73,4 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ---
 
-> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas, se [CONTRIBUTING.md](CONTRIBUTING.md)._

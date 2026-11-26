@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · 中文
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/zh/home-dark.png) | ![Apps](docs/screenshots/zh/apps-dark.png) | ![Schedule](docs/screenshots/zh/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/zh/destinations-dark.png) | ![Settings](docs/screenshots/zh/settings-dark.png) | ![Activity log](docs/screenshots/zh/activitylog-dark.png) |
 
 ---
 
@@ -64,11 +83,11 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
   另一台设备上还原或在 PC 上打开。
 - **目标位置:** 本地、SFTP、SCP、SMB、WebDAV、FTP、S3 以及 70 多种 (`rclone`)，外加 `rsync`
   和 `restic` 仓库。还可通过一个小型的选择加入配套应用选用 Google Drive。
-- **Telegram:** 通过 MTProto 备份到私有 Telegram 频道作为无限云存储 - 恢复和删除也可在 WebUI 中完成。
+- **Telegram:** 通过 MTProto 备份到私有 Telegram 频道作为无限云存储，恢复和删除也可在 WebUI 中完成。
 - **完整性:** 每个归档都会对照清单进行校验；试运行和还原测试让你无需改动任何东西即可检查备份。
 - **选择性与批量还原:** 还原备份项目的任意子集，或多选多个备份并一次性全部还原；删除备份，并为每一次破坏性操作保留活动/审计日志。
 - **特殊备份:** 短信 (SMS/MMS/RCS)、联系人和通话记录、Wi-Fi 和蓝牙，还可选地导出一份可在 PC 上打开的可移植 JSON。
-- **系统文件 (`/data/adb`):** 备份 root 环境本身 - 模块、它们的数据和配置 - 全部，或你从文件树中挑选的一个子树，每个文件都以其原始所有者和 SELinux 上下文还原，让 root 继续工作。高级；仅限你所选择的内容。
+- **系统文件 (`/data/adb`):** 备份 root 环境本身（模块、它们的数据和配置）全部，或你从文件树中挑选的一个子树，每个文件都以其原始所有者和 SELinux 上下文还原，让 root 继续工作。高级；仅限你所选择的内容。
 - **调度 + 自动化:** 针对单个应用、一组应用或所有应用的周期性**备份或恢复**任务，以 keep-N 修剪，外加选择加入的安装/更新时自动备份和一份排除应用列表。
 - **安装来源:** 还原的应用默认把 Play Store 报告为其安装来源 (可切换)；一个高级的选择加入项还会伪造发起方软件包和来源。
 - **系统应用挂载:** 无需触碰真实的 `/system` 分区即可把已安装的应用挂载为系统应用 (无系统修改的叠加子模块，支持 NoMount)。
@@ -166,3 +185,7 @@ VD Backup 是一个独立的非官方项目。它与 Google LLC 或任何其他�
 ## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **加入频道以获取更新：** @Priv8_VD https://t.me/Priv8_VD

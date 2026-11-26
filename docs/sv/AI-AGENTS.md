@@ -6,7 +6,7 @@
 
 VDBackup är byggt så att en AI-assistent eller agent kan administrera **varje** innehåll och
 åtgärd i modulen utan gränssnitt, på samma sätt som en person gör via WebUI. WebUI
-är bara en klient till ett litet JSON-API; din agent är en annan. Använd API:et,
+är bara en klient till ett litet JSON-API, din agent är en annan. Använd API:et,
 skrapa inte WebUI.
 
 ## Kontraktet
@@ -19,10 +19,10 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 
 - Argumenten är ett enda JSON-objekt, **base64-kodat**, skickat som en argv-token.
 - Kommandot skriver **ett JSON-objekt** till stdout: `{"ok":true,...}` eller
-  `{"ok":false,"code":"ERR_...","message":"..."}`. Tolka det; skrapa aldrig text.
+  `{"ok":false,"code":"ERR_...","message":"..."}`. Tolka det, skrapa aldrig text.
 - Långa operationer (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) returnerar `{"ok":true,"opid":"..."}`
   omedelbart och körs **frikopplat** (de överlever att anroparen/WebUI försvinner). Polla
-  deras förlopp; de är inte klara när anropet returnerar.
+  deras förlopp, de är inte klara när anropet returnerar.
 - `progress` och `cancel` tar **base64 av den råa opid-strängen**, inte ett JSON-objekt.
 
 En liten hjälpfunktion för ditt skal:
@@ -35,7 +35,7 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 
 För att styra det från en arbetsstation, kör det över din vanliga root-kanal till enheten
 (adb shell som root, eller en SSH-till-root-uppsättning). Modulen levereras med medföljande binärer, så
-när den väl är installerad behöver den **inget internet** för lokal backup/återställning; endast moln-
+när den väl är installerad behöver den **inget internet** för lokal backup/återställning, endast moln-
 destinationer (`rclone`/`restic`/ssh) kommunicerar med nätverket.
 
 ## Verb
@@ -43,13 +43,13 @@ destinationer (`rclone`/`restic`/ssh) kommunicerar med nätverket.
 | Verb | Args (JSON) | Returnerar |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` antal (storlekar i byte): appar med säkerhetskopior, totalt antal säkerhetskopieinstanser, fristående sökvägssäkerhetskopior, schemalagda jobb, total säkerhetskopiestorlek, och ledigt/totalt för säkerhetskopiornas filsystem. Inte frikopplad, returnerar omedelbart; används av WebUI:s startöversikt. |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` antal (storlekar i byte): appar med säkerhetskopior, totalt antal säkerhetskopieinstanser, fristående sökvägssäkerhetskopior, schemalagda jobb, total säkerhetskopiestorlek, och ledigt/totalt för säkerhetskopiornas filsystem. Inte frikopplad, returnerar omedelbart, används av WebUI:s startöversikt. |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | konfigurationsobjektet (eller `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | genererar `age`-nyckelparet för kryptering |
 | `list-apps` | `{user?}` | `{ok,apps:[{package,label,system,versionCode}]}` (dex, shell-reserv) |
 | `label` | `{package,user?}` | `{ok,label}` (verkligt lokaliserat appnamn, kontextfritt) |
-| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG; cachad per paket+`vc`) |
+| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG, cachad per paket+`vc`) |
 | `backup` | se nedan | `{ok,opid}` (frikopplat) |
 | `restore` | se nedan | `{ok,opid}` (frikopplat) |
 | `import` | `{from,ref,password,ssaid,user}` | `{ok,opid}` (frikopplat) |
@@ -59,7 +59,7 @@ destinationer (`rclone`/`restic`/ssh) kommunicerar med nätverket.
 | `list-ops` | `{}` | `{ok,ops:[...]}` (återanslut efter återanslutning) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | applista / base64-ikoner i batch |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
-| `note-set` | `{ref,note?,tags?}` | `{ok}` anger eller rensar en säkerhetskopias egna namn (`note`) och fria `tags`; lagras i en följefil som följer med säkerhetskopian, sökbar från `list-backups`. |
+| `note-set` | `{ref,note?,tags?}` | `{ok}` anger eller rensar en säkerhetskopias egna namn (`note`) och fria `tags`, lagras i en följefil som följer med säkerhetskopian, sökbar från `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` enhetens Android-användare (fleranvändare). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` underkataloger för en sökväg (mappväljare). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` fristående mapp-/filsäkerhetskopior. |
@@ -72,48 +72,48 @@ destinationer (`rclone`/`restic`/ssh) kommunicerar med nätverket.
 | `log-export` | `{user?}` | `{ok:true,path}` (absolut sökväg till en skriven `.txt` under säkerhetskopiekatalogen) eller `{ok:false,code:"ERR_LOG_EXPORT"}`. Skriver aktivitetsloggen (`audit.jsonl`) plus ett kort bygg-/enhetshuvud till en enda användarsynlig textfil så att den kan bifogas en felrapport. Inte frikopplad, returnerar omedelbart. |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` systemomfattande säkerhetskopia (frikopplat) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (kräver omstart; `confirm` skyddar den) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (kräver omstart, `confirm` skyddar den) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` säkerhetskopiera valfri absolut sökväg som `tar.zst`+`manifest.json` under `.paths/` (frikopplat) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` återställ en sökvägs-säkerhetskopia till dess ursprungliga plats (`confirm` skyddar den; frikopplat) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` återställ en sökvägs-säkerhetskopia till dess ursprungliga plats (`confirm` skyddar den, frikopplat) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` en lat nivå av /data/adb-trädet (standard `/data/adb`), för väljaren. |
 | `adb-du` | `{path}` | `{ok,size}` rekursiv byte-storlek för ett /data/adb-delträd, vid behov. |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` säkerhetskopierar /data/adb - helt (utelämna `paths`) eller de valda delsökvägarna - med per-fil SELinux-/ägar-trohet, under `.adb/` (frikopplat) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` återställer en /data/adb-säkerhetskopia ÖVER det levande trädet - helt eller valda delsökvägar - med varje fils kontext bevarad (aldrig ett svepande chcon); `confirm` skyddar den (frikopplat) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` återställer en /data/adb-säkerhetskopia ÖVER det levande trädet - helt eller valda delsökvägar - med varje fils kontext bevarad (aldrig ett svepande chcon), `confirm` skyddar den (frikopplat) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` säkerhetskopiorna av /data/adb-filsystemet. |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` en säkerhetskopias lagrade utförliga fillista, för återställningsträdets väljare. |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | montera en installerad app som en systemapp (systemlös undermodul; live via NoMount annars nästa uppstart) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | montera en installerad app som en systemapp (systemlös undermodul, live via NoMount annars nästa uppstart) |
 | `companion-status` / `companion-install` | `{}` | status för Google Drive-companion / installation på begäran |
 | `telegram-check` | `{}` | status för Telegram-sessionen (`user` null = inte inloggad) |
-| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | Telegram-inloggning; `sign-in` returnerar `2FA_REQUIRED` om kontot har 2FA och `password` saknas |
+| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | Telegram-inloggning, `sign-in` returnerar `2FA_REQUIRED` om kontot har 2FA och `password` saknas |
 | `telegram-logout` | `{}` | avslutar Telegram-sessionen |
 | `telegram-list` | `{}` | säkerhetskopior i Telegram-kanalen (namn `<pkg>__<ts>_<vc>.vdb.tar`) |
-| `telegram-pull` | `{message_id,name}` | `{ok,opid}` hämtar en Telegram-kopia till lokal lagring (detached); den återställs sedan via det vanliga `restore`-flödet |
+| `telegram-pull` | `{message_id,name}` | `{ok,opid}` hämtar en Telegram-kopia till lokal lagring (detached), den återställs sedan via det vanliga `restore`-flödet |
 | `telegram-delete` | `{message_id}` | `{ok,deleted:[...]}` tar bort en säkerhetskopia från Telegram-kanalen via `message_id` (batch: kommaseparerat) |
 | `rclone-list` | `{dest}` | `{ok,dest,backups:[{dest,rref,package,tsvc}]}` Full-säkerhetskopior som lagras enbart på fjärrplats på en rclone-destination (`dest` är destinations-id, `rref` är `<pkg>/<ts_vc>`) |
-| `rclone-pull` | `{dest,rref}` | `{ok,opid}` hämtar en rclone-säkerhetskopia som lagras enbart på fjärrplats till lokal lagring (detached); den återställs sedan via det vanliga `restore`-flödet |
-| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` tar bort en säkerhetskopia från en rclone-fjärrplats; `rref` måste vara exakt `<pkg>/<ts_vc>` |
+| `rclone-pull` | `{dest,rref}` | `{ok,opid}` hämtar en rclone-säkerhetskopia som lagras enbart på fjärrplats till lokal lagring (detached), den återställs sedan via det vanliga `restore`-flödet |
+| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` tar bort en säkerhetskopia från en rclone-fjärrplats, `rref` måste vara exakt `<pkg>/<ts_vc>` |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | destinationshantering |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | hantering av rclone-fjärrplatser (skapar `rclone.conf`-posten som en `type:"rclone"`-destination pekar på); `backend` kan vara vilken rclone-backend som helst, ingen vitlista |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | hantering av rclone-fjärrplatser (skapar `rclone.conf`-posten som en `type:"rclone"`-destination pekar på), `backend` kan vara vilken rclone-backend som helst, ingen vitlista |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (motorn har redan öppnat telefonens webbläsare på den samtyckes-URL:en via en Android VIEW-intent) eller `{ok:false,code:"ERR_AUTHORIZE"}`. Kör `rclone authorize <backend>` på en lokal callback-server (`127.0.0.1:53682`) för OAuth på enheten. |
 | `remote-authorize-poll` | `{}` | `{ok:true,done:false,url}` medan den väntar, `{ok:true,done:true,token}` när användaren har samtyckt (`token` att skicka till `remote-add`), eller `{ok:false,code:"ERR_AUTHORIZE"}`. |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; stoppar en väntande auktorisering. |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, stoppar en väntande auktorisering. |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (om binärerna `rclone`/`restic` finns, om denna `lite`-utgåva kan hämta dem, nedladdningsstorlek i byte) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (frikopplat) hämtar+verifierar+installerar `rclone`/`restic`-tillägget i en `lite`-utgåva |
-| `schedule-set` / `schedule-list` / `schedule-delete` | se nedan | schemalagda jobb (en säkerhetskopiering eller en återställning; mot en app, en uppsättning, eller alla appar) |
+| `schedule-set` / `schedule-list` / `schedule-delete` | se nedan | schemalagda jobb (en säkerhetskopiering eller en återställning, mot en app, en uppsättning, eller alla appar) |
 | `scheduler-tick` | `{}` | kör förfallna jobb + tillämpar kvarhållning + auto-backup-observatören (boot-hjärtslaget anropar detta) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (inte frikopplat; returnerar direkt; `ERR_UPDATE_CHECK` vid fel, se nedan) |
-| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) säkerhetskopierar många appar i en frånkopplad op; förloppet bär `n`/`of`. Ett fel per app stoppar inte satsen. |
-| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) återställer många säkerhetskopior i en frånkopplad op; förloppet bär `n`/`of`. Ett fel per app stoppar inte satsen. |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (inte frikopplat, returnerar direkt, `ERR_UPDATE_CHECK` vid fel, se nedan) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) säkerhetskopierar många appar i en frånkopplad op, förloppet bär `n`/`of`. Ett fel per app stoppar inte satsen. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) återställer många säkerhetskopior i en frånkopplad op, förloppet bär `n`/`of`. Ett fel per app stoppar inte satsen. |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` lagringsvolymer för mappväljaren: internt plus flyttbart SD-kort / USB. |
 | `config-export` | `{password}` | `{ok,opid}` (detached) exporterar konfig, jobb, destinationer, inloggningsuppgifter och nycklar till en enda lösenordsfrasskrypterad fil i säkerhetskopiemappen. |
 | `config-import` | `{ref,password}` | `{ok,opid}` (detached) slår samman en exporterad konfigfil tillbaka till den här enheten (skriver aldrig över blint). |
 | `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` listar de krypterade konfigfiler som är tillgängliga att importera. |
-| `wipe-credentials` | `{}` | `{ok,wiped}` tar bort sparade fjärrlösenord och enhetens krypteringsnyckel; destinationer, jobb och säkerhetskopior blir kvar. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` tar bort sparade fjärrlösenord och enhetens krypteringsnyckel, destinationer, jobb och säkerhetskopior blir kvar. |
 | `log-prune` | `{}` | `{ok}` beskär sedan länge avslutade op-loggar, begränsar granskningsspåret och rensar inaktuella ikoner (startservicen anropar detta). |
 | `sanitize` | `{}` | `{ok}` återställer synligheten (0755) för backup-mappar för varje Android-användare, så att en filhanterare kan öppna mappar som en rå root-kopia eller en backup före v1.03.2 lämnade åtkomliga endast för ägaren. |
-| `boot-sweep` | `{}` | `{ok,reaped}` rensar rester från en backup som avbröts eller tvångsavslutades (startservicen anropar detta); en backup som misslyckas eller avbryts rensas redan av sin egen worker. |
+| `boot-sweep` | `{}` | `{ok,reaped}` rensar rester från en backup som avbröts eller tvångsavslutades (startservicen anropar detta), en backup som misslyckas eller avbryts rensas redan av sin egen worker. |
 
 ### `progress`-fält
 
@@ -139,7 +139,7 @@ En pågående operation kan också bära dessa **valfria** live-fält. De saknas
 | `of` | int | totalt antal objekt (0 = okänt) |
 | `cur` | string | namn på aktuellt objekt (tom = inget) |
 
-Molnöverföringar fyller `rate`/`eta` (percent-värdet kommer från rclone); lokala Full-säkerhetskopior
+Molnöverföringar fyller `rate`/`eta` (percent-värdet kommer från rclone), lokala Full-säkerhetskopior
 fyller `n`/`of`/`cur`. Fasetiketter inkluderar kontrollsummeförseglingsfasen **`verified`** och, för
 molnöverföringar, **`transfer`** och **`mirror <item>`**.
 
@@ -165,11 +165,11 @@ molnöverföringar, **`transfer`** och **`mirror <item>`**.
 ```
 
 `restore`/`import` tar `{ref}` (en backup-katalog / skanningsreferens). `restore` accepterar också:
-`"items"` (en delmängd av säkerhetskopians objekttyper att återställa; utelämna för alla), `"test": true`
+`"items"` (en delmängd av säkerhetskopians objekttyper att återställa, utelämna för alla), `"test": true`
 (extrahera till en tillfällig katalog och verifiera, utan att röra den aktiva appen), `"mode"` för
 snapshot/mirror, `"password"` för en krypterad säkerhetskopia, `"ssaid"` (tillval), och
 installationskälle-alternativen `"spoof_installer"` (standard från config, sätter installeraren till
-Play Store vid installationstillfället) och `"deep_spoof": true` (avancerat tillval; förfalskar även det
+Play Store vid installationstillfället) och `"deep_spoof": true` (avancerat tillval, förfalskar även det
 initierande paketet och paketkällan genom att redigera paketdatabasen, tillämpas efter en omstart).
 `import` tar `"from": "neo" | "databackup"` och, för en krypterad Neo-backup, `"password"`.
 
@@ -228,11 +228,11 @@ En batch (`backup` med `packages`, `restore` med `refs`) kör varje app i sitt e
 - **`batch_app_timeout`** (konfig, sekunder, standard `1800`, `0` inaktiverar): om en app tar längre tid avslutas dess processträd, den registreras som `ERR_TIMEOUT` och batchen fortsätter, så att en fastnad app aldrig fryser hela körningen.
 - **Delresultat**: den avslutande skrivningen innehåller `ok`, `n` av `of`, en `fails`-räkning `{code:count}` (t.ex. `{"ERR_NO_SPACE":24}`) och `free` (lediga byte i säkerhetskopiornas filsystem). En delvis batch är `ERR_BATCH_PARTIAL`, aldrig ett blint fel.
 - **Termisk takt** (konfig `thermal_throttle`, på som standard): mellan appar pausar worker för att svalna när enheten är varm och sänder en `cooling`-förloppsfas, så att en lång körning inte överhettar enheten.
-- **Utrymmesuppskattning före körning** (konfig `space_preflight`, på som standard): före en batch till ett lokalt mål summeras den okomprimerade storleken för de valda apparna; om den redan överstiger målets lediga utrymme stannar batchen i förväg med `ERR_NO_SPACE` (plus ett `need`-fält) i stället för att fylla disken halvvägs. Hoppas över för strömmande fjärrmål.
+- **Utrymmesuppskattning före körning** (konfig `space_preflight`, på som standard): före en batch till ett lokalt mål summeras den okomprimerade storleken för de valda apparna, om den redan överstiger målets lediga utrymme stannar batchen i förväg med `ERR_NO_SPACE` (plus ett `need`-fält) i stället för att fylla disken halvvägs. Hoppas över för strömmande fjärrmål.
 
 ### `remote-add`-args
 
-En molndestination är en `type:"rclone"`-destination som namnger en `rclone`-fjärrplats; skapa
+En molndestination är en `type:"rclone"`-destination som namnger en `rclone`-fjärrplats, skapa
 den fjärrplatsen först med `remote-add`. `backend` kan vara **vilken rclone-backend som helst** -
 det finns ingen vitlista. `remote-add` accepterar vilket backend-namn som helst (`dropbox`,
 `onedrive`, `box`, `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` och de
@@ -275,7 +275,7 @@ Lokala destinationer är aldrig begränsade.
 ### Molnintegritet och kvot
 
 - **Kontrollsummeförsegling (moln).** Efter en lyckad molnkopiering kör motorn en
-  fjärrkontrollsummekontroll (`rclone check`); en avvikelse får operationen att misslyckas med
+  fjärrkontrollsummekontroll (`rclone check`), en avvikelse får operationen att misslyckas med
   `ERR_VERIFY`. Backends som inte delar någon gemensam hash med den lokala sidan hoppas över
   (inte ett misslyckande).
 - **Kvotkontroll (moln, Full-läge).** Före en uppladdning i Full-läge till en `rclone`-fjärr
@@ -291,32 +291,32 @@ snapshot-åtgärd. `cloud-status` rapporterar om de redan finns, om denna utgåv
 nedladdningsstorleken i byte. `cloud-fetch` körs **frikopplat** (polla `progress` med dess
 `opid`): den laddar ner `rclone`+`restic`-tillägget per arkitektur, verifierar det mot den SHA-256
 som är inbränd i modulen, och installerar det i runtime-cachen. Dess förloppsfaser är
-`downloading`, `verifying` och `installing`; slutkoden är `ERR_NONE` vid framgång, eller
+`downloading`, `verifying` och `installing`, slutkoden är `ERR_NONE` vid framgång, eller
 `ERR_FETCH` (nedladdningen misslyckades) / `ERR_FETCH_VERIFY` (checksumman stämmer inte, förkastad)
 vid fel. På en `full`-utgåva är den onödig. En `backup`/`restore` till en moln- eller
 snapshot-destination i `lite`-utgåvan misslyckas, innan binärerna finns, med
-`ERR_CLOUD_FETCHABLE`; klienten bör erbjuda att köra `cloud-fetch` och sedan försöka igen.
+`ERR_CLOUD_FETCHABLE`, klienten bör erbjuda att köra `cloud-fetch` och sedan försöka igen.
 
 ### Särskilda backup-kategorier
 
-`special-categories` rapporterar vilka systemomfattande kategorier en enhet har; `special-backup`
+`special-categories` rapporterar vilka systemomfattande kategorier en enhet har, `special-backup`
 fångar dem du skickar i `categories` och `special-restore` återapplicerar dem. Kategorierna är:
 
 | Kategori | Vad det är | Återställningssemantik |
 |----------|-----------|-------------------|
 | `messages` | SMS/MMS | ersättning via provider (radera + extrahera) |
-| `rcs` | RCS-chatt (Google Messages, `bugle_db`); exporteras även portabelt till `rcs.json` | ersätt appdata (rensa + extrahera), samma enhet |
+| `rcs` | RCS-chatt (Google Messages, `bugle_db`), exporteras även portabelt till `rcs.json` | ersätt appdata (rensa + extrahera), samma enhet |
 | `contacts` | kontakter och samtalslogg | ersättning via provider (radera + extrahera) |
 | `wifi` | sparade Wi-Fi-nätverk | ersättning via provider (radera + extrahera) |
 | `bluetooth` | Bluetooth-parkopplingar | ersättning via provider (radera + extrahera) |
-| `calendar` | kalender-providern (`com.android.providers.calendar`, app + data); exporteras även portabelt till `calendar.json` | ersättning via provider (radera + extrahera) |
+| `calendar` | kalender-providern (`com.android.providers.calendar`, app + data), exporteras även portabelt till `calendar.json` | ersättning via provider (radera + extrahera) |
 | `wallpaper` | hem- och låsskärmsbakgrund plus `wallpaper_info.xml`, lagrad rå (binär) | filer ersätts |
 | `dns` | privat DNS-läge och specificerare, läst från inställningarna | idempotent `settings put` |
 | `system_settings` | den fullständiga dumpen av system/global/secure-inställningar | **opt-in**, idempotent `settings put`, skriver över enhetens inställningar |
 
 **`system_settings` är strikt opt-in och destruktiv vid återställning.** Liksom `ssaid` skriver den
 över enhetsomfattande inställningar när den återställs, så den skyddas bakom uttryckligt
-användarsamtycke och skrivs till granskningsspåret. Välj den aldrig som standard; endast på en
+användarsamtycke och skrivs till granskningsspåret. Välj den aldrig som standard, endast på en
 direkt, avsiktlig användarbegäran.
 
 ### Fristående sökvägs-säkerhetskopia
@@ -334,12 +334,12 @@ RECOVERY-kit när det är krypterat) under `.paths/` i backup-katalogen.
 ```
 
 - Källsökvägen måste vara **absolut** och under en av de tillåtna rötterna: `/storage/emulated`,
-  `/data/media`, `/sdcard`, `/data`. En sökväg som inte finns misslyckas med `ERR_NO_PATH`; en sökväg
+  `/data/media`, `/sdcard`, `/data`. En sökväg som inte finns misslyckas med `ERR_NO_PATH`, en sökväg
   utanför de tillåtna rötterna, eller en som innehåller `..`, misslyckas med `ERR_BAD_PATH`.
 - `path-restore` skriver tillbaka till den ursprungliga platsen, så den är destruktiv och kräver
   `"confirm": true`, en spärr med hög friktion, likt `special-restore`. En `ref` som inte är en
   giltig sökvägs-säkerhetskopia misslyckas med `ERR_BAD_REF`.
-- Båda körs **frikopplat**; polla `progress` med det returnerade `opid`.
+- Båda körs **frikopplat**, polla `progress` med det returnerade `opid`.
 
 ### Säkerhetskopia av /data/adb-filsystemet
 
@@ -348,17 +348,17 @@ deras data och konfigurationer), styrda av en lat trädväljare (`adb-list` en n
 för storleken på en mapp vid behov).
 
 - Helt eller selektivt i båda ändar: utelämna `paths` för allt, eller skicka de valda delsökvägarna
-  (relativa till /data/adb); återställningen tar samma `paths`.
+  (relativa till /data/adb), återställningen tar samma `paths`.
 - **Per-fil-trohet:** arkivet behåller varje fils SELinux-kontext, ägare och xattrs, och återställningen
   förlitar sig på det - den tillämpar ALDRIG ett svepande `chcon`, vilket skulle platta till /data/adb:s
-  heterogena kontexter och bryta root. `adb-restore` extraherar ÖVER det levande trädet; den raderar det
+  heterogena kontexter och bryta root. `adb-restore` extraherar ÖVER det levande trädet, den raderar det
   aldrig.
 - Självreferens: säkerhetskopians egen utdata och modulens staging exkluderas, så en säkerhetskopia
   innehåller aldrig sig själv.
 - `adb-index` returnerar en säkerhetskopias lagrade fillista så att en återställning kan visa sitt träd;
-  UI-valet uttrycks helt genom `paths` (en helt ikryssad mapp är en sökväg; en delvis ikryssad stiger
+  UI-valet uttrycks helt genom `paths` (en helt ikryssad mapp är en sökväg, en delvis ikryssad stiger
   ner till sina ikryssade barn, så ingen exkluderingslista behövs).
-- `adb-restore` kräver `"confirm": true` (spärr med hög friktion); båda körs frikopplat, polla `progress`.
+- `adb-restore` kräver `"confirm": true` (spärr med hög friktion), båda körs frikopplat, polla `progress`.
 
 ### `update-check`
 
@@ -387,21 +387,21 @@ Vid framgång returnerar det:
 Om det inte finns någon `updateJson`-URL, om nätverksbegäran misslyckas, eller om manifestet inte
 kan parsas, returnerar det `{"ok":false,"code":"ERR_UPDATE_CHECK"}`.
 
-`update-check` **rapporterar** bara tillgänglighet och versionsanteckningar; själva uppdateringen
+`update-check` **rapporterar** bara tillgänglighet och versionsanteckningar, själva uppdateringen
 utförs av din root-hanterare (KernelSU / APatch / Magisk) via modulens `updateJson`, aldrig av
 detta verb.
 
 ## Säkerhetsräcken som din agent måste respektera
 
 - **`ssaid` är strikt opt-in (standard av).** Det säkerhetskopierar / återställer enhetens
-  ANDROID_ID genom att skriva om en systemfil; en återställning tillämpas först efter en omstart, och
+  ANDROID_ID genom att skriva om en systemfil, en återställning tillämpas först efter en omstart, och
   den tidigare filen sparas alltid först för återställning. Skicka endast `"ssaid": true`
   på en direkt, avsiktlig användarbegäran, aldrig som standard.
 - **Muterande åtgärder (restore, delete, import) är destruktiva** och loggas till ett
   lokalt granskningsspår (`logs/audit.jsonl`). Återställning är trogen (radera-sedan-extrahera), så
   den återför appen till säkerhetskopians exakta tillstånd. Bekräfta avsikten innan du anropar dem.
 - **`system_settings` är opt-in och destruktiv, precis som `ssaid`.** Att återställa den skriver över
-  enhetsomfattande inställningar, så skicka den endast på en direkt användarbegäran; den skyddas av
+  enhetsomfattande inställningar, så skicka den endast på en direkt användarbegäran, den skyddas av
   uttryckligt samtycke och registreras i granskningsspåret.
 - **Återställning är idempotent.** Råa provider-återställningar (messages/contacts/wifi/bluetooth/
   calendar) **ersätter** i stället för att slå samman, provider-datan raderas och arkivet extraheras
@@ -414,7 +414,7 @@ detta verb.
   manipulerat arkiv kan aldrig ta sig ut ur sin målkatalog.
 - **Försvaga aldrig** bevarandet (SELinux/uid/gid/lägen/xattr) eller APK-regeln (APK:er
   komprimeras alltid, krypteras aldrig om inte `encrypt_apk` är satt).
-- Behandla JSON-utdata som sanningskällan; kontrollera `ok`/`code`, polla `progress`,
+- Behandla JSON-utdata som sanningskällan, kontrollera `ok`/`code`, polla `progress`,
   och lyft fram `ERR_*`-koder i stället för att gissa.
 
 Se [ARCHITECTURE.md](ARCHITECTURE.md) och
@@ -424,4 +424,4 @@ Se [ARCHITECTURE.md](ARCHITECTURE.md) och
 
 ---
 
-> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas, se [CONTRIBUTING.md](CONTRIBUTING.md)._

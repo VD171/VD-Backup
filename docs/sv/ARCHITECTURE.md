@@ -44,12 +44,12 @@ behörighetsfråga och ingen följeslagarapp för kärnfunktionerna.
 - **Redan root.** Modulprocessen är root, så motorn är rent shell. ~85 % av
   arbetet är rent shell (`tar`/`zstd`/`age`/`pm`/`am`/`chown`/`chcon`/`rclone`/...).
 - **Frånkopplad exekvering.** Backup/återställning körs via `setsid nohup`, som en fristående
-  root-process. Att stänga WebUI avbryter dem inte; gränssnittet återansluter genom att läsa
+  root-process. Att stänga WebUI avbryter dem inte, gränssnittet återansluter genom att läsa
   `logs/progress-<opid>.json`.
 - **Framework-hjälpare (~15 %).** Finkorniga behörigheter, AppOps, SSAID, StorageStats,
   ikoner och privilegierat Wi-Fi behöver Android-ramverket. En liten `dex` körd via
   `app_process` (ingen installerad app) hanterar dessa, med en shell-reserv.
-- **Portabilitet.** Endast standardformat; säkerhetskopior öppnas på en PC utan denna modul.
+- **Portabilitet.** Endast standardformat, säkerhetskopior öppnas på en PC utan denna modul.
 - **Tillstånd** ligger i `/data/adb/vdbackup/` (konfiguration, jobb, destinationer, krypterade
   autentiseringsuppgifter, loggar, staging). **Säkerhetskopior** skrivs till användarsynlig,
   autentiseringskrypterad lagring på `/sdcard/VDBackup/` (`/data/media/<user>/VDBackup`, per användare),
@@ -61,7 +61,7 @@ En säkerhetskopia måste förbli återställbar för alltid. Detta är en hård
 
 **Omfattning.** Garantin täcker säkerhetskopior skrivna av **v1.01 och framåt** (den första
 officiellt publicerade utgåvan) och endast av officiellt publicerade, släppta versioner. v1.00 var en
-build endast för test och är uttryckligen utanför omfattningen; förhandsutgåvor och
+build endast för test och är uttryckligen utanför omfattningen, förhandsutgåvor och
 utvecklingsbyggen täcks inte. Från den första offentliga utgåvan och framåt är löftet nedan absolut:
 
 - **Endast standardformat.** Varje arkiv är en vanlig `tar` komprimerad med `zstd`,
@@ -80,14 +80,14 @@ utvecklingsbyggen täcks inte. Från den första offentliga utgåvan och framåt
 
 Kort sagt: allt VDBackup någonsin har skrivit kan varje framtida VDBackup (och en vanlig PC)
 fortfarande återställa. Att ändra formatet på ett sätt som bryter en tidigare säkerhetskopia är inte
-tillåtet; nya funktioner läggs till bakom `format_version` och nya, tillkommande fält.
+tillåtet, nya funktioner läggs till bakom `format_version` och nya, tillkommande fält.
 
 För den fullständiga tekniska designen (arkivformat, metadataschema, pipelines, krypto,
-destinationer, importerare) håller underhållarna detaljerade designanteckningar; denna fil är den
+destinationer, importerare) håller underhållarna detaljerade designanteckningar, denna fil är den
 bidragsgivarvända översikten.
 
 <!-- doc-footer -->
 
 ---
 
-> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas, se [CONTRIBUTING.md](CONTRIBUTING.md)._

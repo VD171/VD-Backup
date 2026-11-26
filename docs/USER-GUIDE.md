@@ -68,13 +68,13 @@ specific device. See [section 11](#11-portability-opening-backups-on-a-pc).
 - **A rooted Android device** managed by **KernelSU**, **APatch** or **Magisk**.
   VDBackup is installed as a module from that manager.
 - Enough free storage for your backups (local backups live under the module's state
-  directory; see [section 3](#3-install-and-first-run)).
+  directory, see [section 3](#3-install-and-first-run)).
 - Nothing else. The module bundles all the binaries it needs (tar, zstd, lz4, rclone,
   rsync, ssh, restic), so **local backup and restore work fully offline**. Only cloud
   destinations talk to the network.
 
 Some fine-grained extras (AppOps, SSAID, a few privileged system bits) rely on the
-Android framework; the module handles these internally, with a plain-shell fallback,
+Android framework, the module handles these internally, with a plain-shell fallback,
 and they degrade gracefully when they are not available on your device.
 
 ## 3. Install and first run
@@ -83,7 +83,7 @@ and they degrade gracefully when they are not available on your device.
 2. In your KernelSU / APatch / Magisk manager, flash the module zip like any other
    module.
 3. It is usable immediately, **no reboot needed**. (A reboot is only ever relevant
-   when restoring SSAID; see [section 10](#10-ssaid-device-android_id).)
+   when restoring SSAID, see [section 10](#10-ssaid-device-android_id).)
 4. Open the module's **WebUI** from the manager. That is the entire interface.
 
 **Which edition to download.** Each release ships as several flashable zip editions, so
@@ -94,7 +94,7 @@ you download only what you need. Pick one:
   backends) and `restic` (deduplicated snapshots). Fully offline, nothing is ever
   downloaded. Works on any device. Largest download.
 - **`VD-Backup-<ver>-universal-lite.zip`**: every architecture, but **without** the two
-  largest binaries (`rclone` and `restic`). Smallest download; still does local, SSH/SFTP
+  largest binaries (`rclone` and `restic`). Smallest download, still does local, SSH/SFTP
   and rsync backups with no download, with portable `age` encryption. The first time you
   use a cloud destination (`rclone`) or snapshot mode (`restic`), the WebUI offers to
   download that small per-architecture addon once (verified by SHA-256) and caches it;
@@ -140,7 +140,7 @@ The WebUI is organized into a few tabs:
 - **Home**: a home overview showing counts of your backups (apps, backups, folders and scheduled jobs) and a storage bar for how much space your backups use versus free, with status badges, copy-to-clipboard for hashes and paths, and a **Check for updates** action.
 - **Apps**: the list of installed apps (user and system), each shown with its real
   name, its package name, and its icon (icons load lazily and are cached, so the list
-  stays responsive). The button on a row backs the app up; tapping the row opens that
+  stays responsive). The button on a row backs the app up, tapping the row opens that
   app's backup history, where you can restore any previous backup.
 - **Backups**: the backups you already have, each showing the app name on one line and
   the package on the next. Tap a backup to see its full details (version, date, size,
@@ -164,7 +164,7 @@ The WebUI is organized into a few tabs:
   been published (with its release notes). You install any update through your root manager,
   the same way you flashed the module.
 
-The app also checks for a newer version on its own each time you open it (at most once an hour) and shows the update banner only when one exists; it stays silent when you are up to date or offline.
+The app also checks for a newer version on its own each time you open it (at most once an hour) and shows the update banner only when one exists, it stays silent when you are up to date or offline.
 
 Confirmations and messages use in-app dialogs (not the old system pop-ups), and a
 restore or import asks you to acknowledge that it overwrites the current app data before
@@ -177,7 +177,7 @@ running job the progress card also shows the live transfer speed and the estimat
 remaining, plus an item counter (for example "12 of 40") with the name of the current
 item. On
 ROMs that surface shell notifications you also get an Android notification when a job
-starts and finishes; either way the in-app progress card is the reliable indicator.
+starts and finishes, either way the in-app progress card is the reliable indicator.
 
 ## 5. Making a backup
 
@@ -185,11 +185,11 @@ The basic flow: open **Apps**, choose an app, select what to include, pick a mod
 set compression and (optionally) encryption, then run. Progress appears live and a
 notification tells you when it is done.
 
-While a backup or restore is running, its progress card has a **Cancel** button. Cancelling a backup stops it and removes any partial copy it had started, so nothing half-written is left behind. Cancelling a restore also stops it, but the app may be left partially restored, so VDBackup warns you first; run the restore again to finish.
+While a backup or restore is running, its progress card has a **Cancel** button. Cancelling a backup stops it and removes any partial copy it had started, so nothing half-written is left behind. Cancelling a restore also stops it, but the app may be left partially restored, so VDBackup warns you first, run the restore again to finish.
 
 In the backup dialog you can also choose the **destination** for this backup, local storage or any cloud/remote destination you have added, without changing the default destination in Settings first.
 
-VDBackup runs two automatic safeguards during a backup, both on by default in Settings. **"Pause to cool down when the device gets hot"** lets a long job breathe, and waits for the device to cool if it is truly hot, so a big backup never overheats the phone; only the pace changes, never the fidelity. **"Check free space before a batch backup"** estimates what a multi-app backup will need and stops at the start, instead of part-way, if the storage would not hold it.
+VDBackup runs two automatic safeguards during a backup, both on by default in Settings. **"Pause to cool down when the device gets hot"** lets a long job breathe, and waits for the device to cool if it is truly hot, so a big backup never overheats the phone, only the pace changes, never the fidelity. **"Check free space before a batch backup"** estimates what a multi-app backup will need and stops at the start, instead of part-way, if the storage would not hold it.
 
 ### 5.1 Choosing what to back up
 
@@ -282,13 +282,13 @@ final **checksum-verified** step that re-checks the uploaded copy against the or
 remote, and fails the job (rather than leaving a corrupt copy in the cloud) if they do not
 match. And before a Full upload it checks the remote's **free space** and stops early with a
 clear **"not enough space"** error if the backup would not fit, instead of filling the remote
-and failing partway. (The space check is for Full uploads; Mirror is a delta sync and is
+and failing partway. (The space check is for Full uploads, Mirror is a delta sync and is
 exempt.)
 
 ### 5.6 Special backups (messages, call log, Wi-Fi, Bluetooth, calendar, wallpaper, DNS, system settings)
 
 Below the app lists on the **Backups** tab, **Special backups** cover system-wide data
-that is not tied to a single app. Pick the categories and back them up; they are archived
+that is not tied to a single app. Pick the categories and back them up, they are archived
 with the same SELinux/xattr preservation and optional encryption as app backups. The
 categories are:
 
@@ -339,19 +339,19 @@ your backups directory.
 ### 5.8 System files (`/data/adb`)
 
 `/data/adb` is where your root manager keeps installed modules, their data and their
-configuration - the root environment itself. VDBackup can back this up, whole or in part,
+configuration, the root environment itself. VDBackup can back this up, whole or in part,
 so you can carry your root setup across a wipe or a ROM change.
 
 - **Total or selective.** Back up all of `/data/adb`, or open the file tree and pick exactly
-  the folders and files you want; a half-checked folder includes only the children you ticked.
-- **Everything stays in your hands.** The tree is neutral - nothing is pre-selected or hidden,
+  the folders and files you want, a half-checked folder includes only the children you ticked.
+- **Everything stays in your hands.** The tree is neutral, nothing is pre-selected or hidden,
   except VDBackup's own working files, which would otherwise just back up itself. Compression
   and encryption are the same portable options as any other backup.
 - **Restore keeps root working.** Each file is written back with its original owner, group,
   mode and SELinux context, one file at a time, over the live tree (never a blanket wipe), so
   the differing contexts under `/data/adb` are preserved and your root manager still boots.
 - **Advanced.** This touches the root environment directly. Restoring is destructive and asks
-  you to confirm; a selective restore writes back only the paths you chose.
+  you to confirm, a selective restore writes back only the paths you chose.
 
 ## 6. Restoring a backup
 
@@ -384,7 +384,7 @@ Useful restore options:
   expect. You can turn this off globally in Settings or per restore, and when off the
   original install source is kept. An advanced, opt-in **"forge the initiating source"**
   toggle goes further and also makes the app's initiating package and package source look
-  Play-installed; it edits the system package database (backed up first) and takes effect
+  Play-installed, it edits the system package database (backed up first) and takes effect
   after a reboot.
 
 **Batch restore.** The **Backups** tab has a **Select** mode, the same way the Apps tab
@@ -400,7 +400,7 @@ cap how many backups to keep per app (retention) so old ones are pruned automati
 **Mount an installed app as a system app.** From an app's backup history, **Mount as
 system** stages the app's APK into a VDBackup overlay sub-module so the root manager
 serves it from `/system/app` (or `/system/priv-app`), the real `/system` partition is
-never touched. With **NoMount** on KernelSU it applies live; otherwise it applies after a
+never touched. With **NoMount** on KernelSU it applies live, otherwise it applies after a
 reboot. This never depends on NoMount being installed.
 
 ## 7. Destinations: local and remote
@@ -409,7 +409,7 @@ By default, backups are written to **local** storage under the module's state
 directory. You can also add remote destinations in the **Destinations** tab. For a local
 destination, **Browse** opens a folder picker so you can pick a sub-folder instead of
 typing the path. The picker shows a shortcut to each storage volume, so you can back up to
-internal storage or to a removable **SD card or USB drive**; destinations that would not
+internal storage or to a removable **SD card or USB drive**, destinations that would not
 stay encrypted at rest (system paths such as `/data/adb`) are refused.
 
 Remote transport is handled by the bundled tools:
@@ -484,7 +484,7 @@ install. In **Settings**, under **Settings backup**:
 - **Import settings** reads such a file back and merges it into this device, without
   removing anything already there.
 - **Wipe stored credentials** removes the saved remote passwords and the device encryption
-  key in one step; your destinations, schedules and backups stay in place.
+  key in one step, your destinations, schedules and backups stay in place.
 
 ## 8. Scheduling and retention
 
@@ -525,7 +525,7 @@ up for you (with keep-N retention). The first run only records what is installed
 enabling it never backs up your whole device at once.
 
 **Excluded apps (blocklist).** Also in Settings, you can exclude apps you never want
-backed up automatically or on a schedule; you can add several at once (multi-select), and
+backed up automatically or on a schedule, you can add several at once (multi-select), and
 excluded apps are skipped by both.
 
 **Backup presets.** Also in Settings, you can save named presets, sets of items to include, like APK only or APK + OBB, and pick one in the backup dialog to fill the item choices at once.
@@ -589,8 +589,8 @@ To open one on a PC, in short:
 
 - **Decrypt** (only if the file ends in `.age`) with the standard `age` tool and your
   passphrase or keyfile.
-- **Decompress and extract**: `.tar.zst` with `zstd` then `tar`; `.tar.gz` with `tar`
-  directly; `.tar.lz4` via `zstd --format=lz4`. An APK is just a zstd-compressed APK,
+- **Decompress and extract**: `.tar.zst` with `zstd` then `tar`, `.tar.gz` with `tar`
+  directly, `.tar.lz4` via `zstd --format=lz4`. An APK is just a zstd-compressed APK,
   so decompressing `base.apk.zst` gives you a normal installable `base.apk`.
 
 Every encrypted backup ships with a **RECOVERY** note containing the exact
@@ -604,7 +604,7 @@ just without the Android-specific ownership being enforced.
 ## 12. Driving VDBackup from an AI assistant
 
 VDBackup is built to be friendly to AI assistants and agents, not just people. The
-WebUI is only one client of a small JSON API; an agent can administer **every** action
+WebUI is only one client of a small JSON API, an agent can administer **every** action
 of the module headlessly through that same API (every command returns a single JSON
 object, long operations run detached and you poll their progress, and the same safety
 rails apply, SSAID stays opt-in, mutating actions stay confirmed and audited).
@@ -629,28 +629,28 @@ running operation and shows current progress.
 ones:
 - `ERR_VERIFY`, a written archive did not match its manifest hash (verification
   caught a bad backup). Re-run the backup.
-- `ERR_RESTORE_TEST`, a restore-test failed; the backup did not extract/verify
+- `ERR_RESTORE_TEST`, a restore-test failed, the backup did not extract/verify
   cleanly and your live app was left untouched.
 - `ERR_UNSAFE_ARCHIVE`, an archive was refused because it tried to write outside its
   target directory (absolute or `..` paths). This protects you from a tampered backup;
   nothing was written.
-- `ERR_QUOTA`, a cloud remote did not have enough free space for a Full upload; the backup
+- `ERR_QUOTA`, a cloud remote did not have enough free space for a Full upload, the backup
   was stopped before uploading anything.
 
 **My remote destination fails.** Use the destination **test** in the Destinations tab
 to validate credentials and connectivity. Remember that only cloud destinations need
-the network; local backup/restore is fully offline.
+the network, local backup/restore is fully offline.
 
 **Does any of this phone home or download at runtime?** No. All binaries are bundled
-in the module at build time; nothing is fetched to the device at runtime. Only cloud
+in the module at build time, nothing is fetched to the device at runtime. Only cloud
 destinations (rclone/restic/ssh) talk to the network, and only when you use them.
 
 **Will my backup restore on a different phone?** Yes, backups are portable and not
 tied to device hardware. (SSAID is the one device-specific exception, and it is opt-in
-and reboot-applied; see [section 10](#10-ssaid-device-android_id).)
+and reboot-applied, see [section 10](#10-ssaid-device-android_id).)
 
 **My encrypted backup will not open, I lost the passphrase.** There is no recovery
-backdoor by design; the passphrase is what protects the backup. Keep it safe.
+backdoor by design, the passphrase is what protects the backup. Keep it safe.
 
 ## 14. Uninstalling
 
@@ -660,4 +660,4 @@ Uninstall VDBackup like any other module from your KernelSU / APatch / Magisk ma
 
 ---
 
-> _This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome; see [CONTRIBUTING.md](../CONTRIBUTING.md)._
+> _This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome, see [CONTRIBUTING.md](../CONTRIBUTING.md)._

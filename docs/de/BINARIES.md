@@ -19,7 +19,7 @@ eingeschleust wurde.
   Termux-Paket-Repository (die signierten `.deb`-Dateien unter `packages.termux.dev/apt`), nie
   aus einem auf irgendeinem Telefon installierten Termux kopiert. Der Build schlägt laut fehl,
   er improvisiert nie.
-- **Reproduzierbar.** Führen Sie den Build erneut aus und Sie erhalten dieselben Dateien; holen
+- **Reproduzierbar.** Führen Sie den Build erneut aus und Sie erhalten dieselben Dateien, holen
    Sie die fixierten Quellen erneut und die SHA-256-Werte stimmen überein.
 - **Der Prüfpfad wird mit dem Modul mitgeliefert.** Er steht nicht nur auf der Website, er
   reist im installierten Modul mit, auf Ihrem Gerät, sodass Sie offline prüfen können.
@@ -30,14 +30,14 @@ eingeschleust wurde.
 |---|---|---|
 | `bin/<abi>/` native Werkzeuge (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + ihre `lib/`-Closure | Offizielles **Termux**-apt-Repo (`packages.termux.dev/apt`), offizielle `.deb`-Pakete | `.github/scripts/build_bin.sh` lädt die `.deb`-Dateien + ihre transitiven Abhängigkeiten herunter, extrahiert sie und kopiert die Binärdateien sowie nur die gemeinsam genutzten Bibliotheken, die jede benötigt |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (ABX-Konverter-Fallback) | **rhythmcache/android-xml-converter** GitHub-Release (`ABX_RELEASE`, statisches ELF) | von `build_bin.sh` aus dem fixierten Release heruntergeladen |
-| `companion.apk` (optionaler Google-Drive-Begleiter) | **Dieses Repository**, `companion/` (Gradle/Kotlin) | von der CI aus dem Quellcode gebaut und mit dem Projektschlüssel signiert; kein vorgebauter Blob |
+| `companion.apk` (optionaler Google-Drive-Begleiter) | **Dieses Repository**, `companion/` (Gradle/Kotlin) | von der CI aus dem Quellcode gebaut und mit dem Projektschlüssel signiert, kein vorgebauter Blob |
 | `vdbackup_helper.dex` (Framework-Helfer) | **Dieses Repository**, `dex/src/` (Java) | von der CI aus dem Quellcode mit `javac` + `d8` kompiliert |
 
-Nur die ersten beiden Zeilen sind vorgebaute Drittanbieter-Binärdateien; die letzten beiden
+Nur die ersten beiden Zeilen sind vorgebaute Drittanbieter-Binärdateien, die letzten beiden
 werden aus Quellcode gebaut, der in diesem Repository liegt und gelesen und neu gebaut werden
 kann.
 
-> **Full- vs. lite-Editionen.** Die lite-Editionen lassen nur `rclone` und `restic` (die zwei größten Binärdateien) weg, um klein zu bleiben, und laden sie bei Bedarf (per SHA-256 verifiziert) beim ersten Nutzen eines Cloud-Ziels oder des Snapshot-Modus nach; `rsync` und `ssh`/`scp`/`sftp` sind weiterhin vorhanden, und jede andere oben aufgeführte Binärdatei ist ebenfalls vorhanden. Die Full-Editionen liefern `rclone` (Cloud-Anbieter) und `restic` (Snapshots) eingebettet, sodass nie etwas heruntergeladen wird.
+> **Full- vs. lite-Editionen.** Die lite-Editionen lassen nur `rclone` und `restic` (die zwei größten Binärdateien) weg, um klein zu bleiben, und laden sie bei Bedarf (per SHA-256 verifiziert) beim ersten Nutzen eines Cloud-Ziels oder des Snapshot-Modus nach, `rsync` und `ssh`/`scp`/`sftp` sind weiterhin vorhanden, und jede andere oben aufgeführte Binärdatei ist ebenfalls vorhanden. Die Full-Editionen liefern `rclone` (Cloud-Anbieter) und `restic` (Snapshots) eingebettet, sodass nie etwas heruntergeladen wird.
 
 ## Das Manifest auf dem Gerät: `PROVENANCE.json`
 
@@ -71,7 +71,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
 3. **Von Grund auf neu bauen.** Führen Sie `.github/scripts/build_bin.sh` selbst aus (benötigt nur
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`) und vergleichen Sie die Ausgabe mit dem, was
    mitgeliefert wurde.
-4. **Begleiter und dex.** Bauen Sie `companion/` und `dex/` aus dem Quellcode neu; die Signatur des
+4. **Begleiter und dex.** Bauen Sie `companion/` und `dex/` aus dem Quellcode neu, die Signatur des
    Begleiters ist der Projektschlüssel (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
@@ -85,4 +85,4 @@ Abweichung soll dieses Manifest sichtbar machen.
 
 ---
 
-> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen; siehe [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md)._

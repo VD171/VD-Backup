@@ -6,7 +6,7 @@
 
 VDBackup dibangun agar asisten atau agen AI dapat mengelola **setiap** konten dan
 tindakan modul secara headless, dengan cara yang sama seperti orang melakukannya melalui WebUI.
-WebUI hanyalah salah satu klien dari sebuah JSON API kecil; agen Anda adalah klien lainnya. Gunakan API,
+WebUI hanyalah salah satu klien dari sebuah JSON API kecil, agen Anda adalah klien lainnya. Gunakan API,
 jangan scrape WebUI.
 
 ## Kontrak
@@ -19,10 +19,10 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 
 - Argumen berupa satu objek JSON, **base64-encoded**, diteruskan sebagai satu token argv.
 - Perintah mencetak **satu objek JSON** di stdout: `{"ok":true,...}` atau
-  `{"ok":false,"code":"ERR_...","message":"..."}`. Parse itu; jangan pernah scrape teks.
+  `{"ok":false,"code":"ERR_...","message":"..."}`. Parse itu, jangan pernah scrape teks.
 - Operasi panjang (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) mengembalikan `{"ok":true,"opid":"..."}`
   seketika dan berjalan **terlepas** (tetap bertahan meski pemanggil/WebUI menghilang). Poll
-  kemajuannya; mereka belum selesai saat panggilan kembali.
+  kemajuannya, mereka belum selesai saat panggilan kembali.
 - `progress` dan `cancel` menerima **base64 dari string opid mentah**, bukan objek JSON.
 
 Sebuah helper kecil untuk shell Anda:
@@ -35,7 +35,7 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 
 Untuk mengendalikannya dari workstation, jalankan itu melalui saluran root biasa Anda ke perangkat
 (adb shell sebagai root, atau setup SSH-ke-root). Modul ini menyertakan biner yang dibundel, jadi
-setelah terpasang ia **tidak butuh internet** untuk backup/restore lokal; hanya tujuan
+setelah terpasang ia **tidak butuh internet** untuk backup/restore lokal, hanya tujuan
 cloud (`rclone`/`restic`/ssh) yang berkomunikasi dengan jaringan.
 
 ## Verb
@@ -43,7 +43,7 @@ cloud (`rclone`/`restic`/ssh) yang berkomunikasi dengan jaringan.
 | Verb | Args (JSON) | Returns |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` jumlah (ukuran dalam byte): aplikasi yang punya backup, total instansi backup, backup path mandiri, pekerjaan terjadwal, total ukuran backup, dan ruang bebas/total dari sistem berkas backup. Tidak terlepas, langsung kembali; dipakai oleh ringkasan beranda WebUI. |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` jumlah (ukuran dalam byte): aplikasi yang punya backup, total instansi backup, backup path mandiri, pekerjaan terjadwal, total ukuran backup, dan ruang bebas/total dari sistem berkas backup. Tidak terlepas, langsung kembali, dipakai oleh ringkasan beranda WebUI. |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | objek config (atau `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | membuat keypair `age` untuk enkripsi |
@@ -59,7 +59,7 @@ cloud (`rclone`/`restic`/ssh) yang berkomunikasi dengan jaringan.
 | `list-ops` | `{}` | `{ok,ops:[...]}` (reattach setelah tersambung kembali) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | daftar aplikasi / ikon base64 batch |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
-| `note-set` | `{ref,note?,tags?}` | `{ok}` menetapkan atau menghapus nama khusus cadangan (`note`) dan `tags` bebas; disimpan dalam berkas pendamping yang ikut bersama cadangan, dapat dicari dari `list-backups`. |
+| `note-set` | `{ref,note?,tags?}` | `{ok}` menetapkan atau menghapus nama khusus cadangan (`note`) dan `tags` bebas, disimpan dalam berkas pendamping yang ikut bersama cadangan, dapat dicari dari `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` pengguna Android perangkat (multi-pengguna). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` subdirektori dari sebuah path (pemilih folder). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` cadangan folder/berkas mandiri. |
@@ -72,48 +72,48 @@ cloud (`rclone`/`restic`/ssh) yang berkomunikasi dengan jaringan.
 | `log-export` | `{user?}` | `{ok:true,path}` (path absolut dari `.txt` yang ditulis di bawah direktori backup) atau `{ok:false,code:"ERR_LOG_EXPORT"}`. Menulis log aktivitas (`audit.jsonl`) ditambah header build/perangkat singkat ke satu berkas teks yang terlihat pengguna sehingga bisa dilampirkan ke laporan bug. Tidak terlepas, langsung kembali. |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` backup sistem-wide (terlepas) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (butuh-reboot; `confirm` membatasinya) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (butuh-reboot, `confirm` membatasinya) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` membackup sembarang path absolut sebagai `tar.zst`+`manifest.json` di bawah `.paths/` (terlepas) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` merestore sebuah backup path ke lokasi aslinya (`confirm` membatasinya; terlepas) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` merestore sebuah backup path ke lokasi aslinya (`confirm` membatasinya, terlepas) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` satu level lazy dari pohon /data/adb (default `/data/adb`), untuk pemilih. |
 | `adb-du` | `{path}` | `{ok,size}` ukuran byte rekursif satu subpohon /data/adb, sesuai permintaan. |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` membackup /data/adb - total (hilangkan `paths`) atau sub-path yang dipilih - dengan fidelitas SELinux/pemilik per-file, di bawah `.adb/` (terlepas) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` merestore sebuah backup /data/adb DI ATAS pohon hidup - total atau sub-path yang dipilih - mempertahankan konteks tiap file (tidak pernah chcon menyeluruh); `confirm` membatasinya (terlepas) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` merestore sebuah backup /data/adb DI ATAS pohon hidup - total atau sub-path yang dipilih - mempertahankan konteks tiap file (tidak pernah chcon menyeluruh), `confirm` membatasinya (terlepas) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` backup sistem file /data/adb. |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` daftar file verbose tersimpan sebuah backup, untuk pemilih pohon restore. |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | pasang aplikasi terpasang sebagai aplikasi sistem (sub-modul systemless; live via NoMount jika tidak maka boot berikutnya) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | pasang aplikasi terpasang sebagai aplikasi sistem (sub-modul systemless, live via NoMount jika tidak maka boot berikutnya) |
 | `companion-status` / `companion-install` | `{}` | status pendamping Google Drive / pemasangan sesuai permintaan |
 | `telegram-check` | `{}` | status sesi Telegram (`user` null = belum masuk) |
-| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | login Telegram; `sign-in` mengembalikan `2FA_REQUIRED` jika akun punya 2FA dan `password` tidak ada |
+| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | login Telegram, `sign-in` mengembalikan `2FA_REQUIRED` jika akun punya 2FA dan `password` tidak ada |
 | `telegram-logout` | `{}` | mengakhiri sesi Telegram |
 | `telegram-list` | `{}` | cadangan di kanal Telegram (nama `<pkg>__<ts>_<vc>.vdb.tar`) |
-| `telegram-pull` | `{message_id,name}` | `{ok,opid}` mengunduh cadangan dari Telegram ke penyimpanan lokal (detached); lalu dipulihkan lewat alur `restore` normal |
+| `telegram-pull` | `{message_id,name}` | `{ok,opid}` mengunduh cadangan dari Telegram ke penyimpanan lokal (detached), lalu dipulihkan lewat alur `restore` normal |
 | `telegram-delete` | `{message_id}` | `{ok,deleted:[...]}` menghapus cadangan dari kanal Telegram berdasarkan `message_id` (batch: dipisah koma) |
 | `rclone-list` | `{dest}` | `{ok,dest,backups:[{dest,rref,package,tsvc}]}` cadangan Full yang disimpan hanya-remote pada tujuan rclone (`dest` adalah id tujuan, `rref` adalah `<pkg>/<ts_vc>`) |
-| `rclone-pull` | `{dest,rref}` | `{ok,opid}` mengunduh cadangan rclone yang disimpan hanya-remote ke penyimpanan lokal (detached); lalu dipulihkan lewat alur `restore` normal |
-| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` menghapus satu cadangan dari remote rclone; `rref` harus tepat `<pkg>/<ts_vc>` |
+| `rclone-pull` | `{dest,rref}` | `{ok,opid}` mengunduh cadangan rclone yang disimpan hanya-remote ke penyimpanan lokal (detached), lalu dipulihkan lewat alur `restore` normal |
+| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` menghapus satu cadangan dari remote rclone, `rref` harus tepat `<pkg>/<ts_vc>` |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | pengelolaan tujuan |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | pengelolaan remote rclone (membuat entri `rclone.conf` yang ditunjuk oleh dest `type:"rclone"`); `backend` bisa berupa backend rclone apa pun, tanpa daftar putih |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | pengelolaan remote rclone (membuat entri `rclone.conf` yang ditunjuk oleh dest `type:"rclone"`), `backend` bisa berupa backend rclone apa pun, tanpa daftar putih |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (mesin sudah membuka browser ponsel ke URL persetujuan itu lewat Android VIEW intent) atau `{ok:false,code:"ERR_AUTHORIZE"}`. Menjalankan `rclone authorize <backend>` pada server callback lokal (`127.0.0.1:53682`) untuk OAuth di perangkat. |
 | `remote-authorize-poll` | `{}` | `{ok:true,done:false,url}` selama menunggu, `{ok:true,done:true,token}` setelah pengguna menyetujui (`token` yang diteruskan ke `remote-add`), atau `{ok:false,code:"ERR_AUTHORIZE"}`. |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; menghentikan otorisasi yang tertunda. |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, menghentikan otorisasi yang tertunda. |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (apakah biner `rclone`/`restic` tersedia, apakah edisi `lite` ini bisa mengambilnya, ukuran unduhan dalam byte) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (terlepas) mengunduh+memverifikasi+memasang addon `rclone`/`restic` pada edisi `lite` |
-| `schedule-set` / `schedule-list` / `schedule-delete` | lihat di bawah | pekerjaan terjadwal (sebuah backup atau sebuah restore; menargetkan satu aplikasi, sekumpulan, atau semua aplikasi) |
+| `schedule-set` / `schedule-list` / `schedule-delete` | lihat di bawah | pekerjaan terjadwal (sebuah backup atau sebuah restore, menargetkan satu aplikasi, sekumpulan, atau semua aplikasi) |
 | `scheduler-tick` | `{}` | menjalankan pekerjaan yang jatuh tempo + menerapkan retensi + observer pencadangan otomatis (heartbeat boot memanggil ini) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (tidak terlepas; langsung kembali; `ERR_UPDATE_CHECK` saat gagal, lihat di bawah) |
-| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) mencadangkan banyak aplikasi dalam satu op terpisah; progres membawa `n`/`of`. Kegagalan per aplikasi tidak menghentikan batch. |
-| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) memulihkan banyak cadangan dalam satu op terpisah; progres membawa `n`/`of`. Kegagalan per aplikasi tidak menghentikan batch. |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (tidak terlepas, langsung kembali, `ERR_UPDATE_CHECK` saat gagal, lihat di bawah) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) mencadangkan banyak aplikasi dalam satu op terpisah, progres membawa `n`/`of`. Kegagalan per aplikasi tidak menghentikan batch. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) memulihkan banyak cadangan dalam satu op terpisah, progres membawa `n`/`of`. Kegagalan per aplikasi tidak menghentikan batch. |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` volume penyimpanan untuk pemilih folder: internal plus SD/USB lepasan. |
 | `config-export` | `{password}` | `{ok,opid}` (detached) mengekspor konfig, tugas, tujuan, kredensial, dan kunci ke satu berkas terenkripsi frasa sandi di folder cadangan. |
 | `config-import` | `{ref,password}` | `{ok,opid}` (detached) menggabungkan berkas konfig yang diekspor kembali ke perangkat ini (tidak pernah menimpa secara buta). |
 | `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` mencantumkan berkas konfig terenkripsi yang tersedia untuk diimpor. |
-| `wipe-credentials` | `{}` | `{ok,wiped}` menghapus kata sandi jarak jauh tersimpan dan kunci enkripsi perangkat; tujuan, tugas, dan cadangan tetap ada. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` menghapus kata sandi jarak jauh tersimpan dan kunci enkripsi perangkat, tujuan, tugas, dan cadangan tetap ada. |
 | `log-prune` | `{}` | `{ok}` memangkas log op yang sudah lama selesai, membatasi jejak audit, dan membuang ikon usang (layanan boot memanggilnya). |
 | `sanitize` | `{}` | `{ok}` menegaskan kembali visibilitas (0755) folder backup di setiap pengguna Android, sehingga pengelola berkas dapat membuka folder yang ditinggalkan hanya-pemilik oleh salinan root mentah atau backup sebelum v1.03.2. |
-| `boot-sweep` | `{}` | `{ok,reaped}` membersihkan sisa-sisa dari backup yang terputus atau dihentikan paksa (layanan boot memanggilnya); backup yang gagal atau dibatalkan sudah dibersihkan oleh worker-nya sendiri. |
+| `boot-sweep` | `{}` | `{ok,reaped}` membersihkan sisa-sisa dari backup yang terputus atau dihentikan paksa (layanan boot memanggilnya), backup yang gagal atau dibatalkan sudah dibersihkan oleh worker-nya sendiri. |
 
 ### Field `progress`
 
@@ -140,7 +140,7 @@ dry-run / restore-test):
 | `of` | int | jumlah total item (0 = tidak diketahui) |
 | `cur` | string | nama item saat ini (kosong = tidak ada) |
 
-Transfer cloud mengisi `rate`/`eta` (percent berasal dari rclone); backup Full lokal mengisi
+Transfer cloud mengisi `rate`/`eta` (percent berasal dari rclone), backup Full lokal mengisi
 `n`/`of`/`cur`. Label fase mencakup fase segel checksum **`verified`** dan, untuk transfer cloud,
 **`transfer`** serta **`mirror <item>`**.
 
@@ -166,11 +166,11 @@ Transfer cloud mengisi `rate`/`eta` (percent berasal dari rclone); backup Full l
 ```
 
 `restore`/`import` menerima `{ref}` (direktori backup / ref scan). `restore` juga menerima:
-`"items"` (subset dari tipe item backup yang akan direstore; hilangkan untuk semua), `"test": true`
+`"items"` (subset dari tipe item backup yang akan direstore, hilangkan untuk semua), `"test": true`
 (ekstrak ke direktori temp dan verifikasi, tanpa menyentuh aplikasi yang live), `"mode"` untuk
 snapshot/mirror, `"password"` untuk backup terenkripsi, `"ssaid"` (opt-in), dan opsi sumber-pemasangan
 `"spoof_installer"` (default dari config, menyetel installer ke Play Store saat pemasangan) serta
-`"deep_spoof": true` (opt-in tingkat lanjut; juga memalsukan paket penginisiasi dan sumber paket dengan
+`"deep_spoof": true` (opt-in tingkat lanjut, juga memalsukan paket penginisiasi dan sumber paket dengan
 mengedit basis data paket, berlaku setelah reboot). `import` menerima `"from": "neo" | "databackup"` dan,
 untuk backup Neo terenkripsi, `"password"`.
 
@@ -230,11 +230,11 @@ Sebuah batch (`backup` dengan `packages`, `restore` dengan `refs`) menjalankan s
 - **`batch_app_timeout`** (konfigurasi, detik, bawaan `1800`, `0` menonaktifkan): jika sebuah aplikasi memakan waktu lebih lama, pohon prosesnya dihentikan, dicatat sebagai `ERR_TIMEOUT`, dan batch berlanjut, sehingga satu aplikasi yang macet tidak pernah membekukan seluruh proses.
 - **Hasil sebagian**: penulisan akhir membawa `ok`, `n` dari `of`, hitungan `fails` `{code:count}` (mis. `{"ERR_NO_SPACE":24}`), dan `free` (byte tersisa di sistem berkas cadangan). Batch sebagian adalah `ERR_BATCH_PARTIAL`, tidak pernah kesalahan buta.
 - **Pengaturan laju termal** (konfigurasi `thermal_throttle`, bawaan aktif): di antara aplikasi, worker berhenti sejenak untuk mendingin saat perangkat panas, memancarkan fase kemajuan `cooling`, sehingga proses yang panjang tidak membuat perangkat terlalu panas.
-- **Perkiraan ruang pra-jalan** (konfigurasi `space_preflight`, bawaan aktif): sebelum batch ke tujuan lokal, jejak tak terkompresi dari aplikasi terpilih dijumlahkan; jika sudah melebihi ruang kosong tujuan, batch berhenti di awal dengan `ERR_NO_SPACE` (plus bidang `need`) alih-alih mengisi disk setengah jalan. Dilewati untuk tujuan jarak jauh streaming.
+- **Perkiraan ruang pra-jalan** (konfigurasi `space_preflight`, bawaan aktif): sebelum batch ke tujuan lokal, jejak tak terkompresi dari aplikasi terpilih dijumlahkan, jika sudah melebihi ruang kosong tujuan, batch berhenti di awal dengan `ERR_NO_SPACE` (plus bidang `need`) alih-alih mengisi disk setengah jalan. Dilewati untuk tujuan jarak jauh streaming.
 
 ### Args `remote-add`
 
-Tujuan cloud adalah dest `type:"rclone"` yang menamai sebuah remote `rclone`; buat
+Tujuan cloud adalah dest `type:"rclone"` yang menamai sebuah remote `rclone`, buat
 remote itu terlebih dahulu dengan `remote-add`. `backend` bisa berupa **backend rclone apa pun** -
 tidak ada daftar putih. `remote-add` menerima nama backend apa pun (`dropbox`, `onedrive`, `box`,
 `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` dan ~70 lainnya yang didukung
@@ -276,7 +276,7 @@ Tujuan lokal tidak pernah dibatasi.
 ### Integritas dan kuota cloud
 
 - **Segel checksum (cloud).** Setelah penyalinan cloud berhasil, engine menjalankan pemeriksaan
-  checksum remote (`rclone check`); ketidakcocokan menggagalkan operasi dengan `ERR_VERIFY`. Backend
+  checksum remote (`rclone check`), ketidakcocokan menggagalkan operasi dengan `ERR_VERIFY`. Backend
   yang tidak berbagi hash umum dengan sisi lokal dilewati (bukan kegagalan).
 - **Pemeriksaan kuota (cloud, mode Full).** Sebelum unggahan mode Full ke remote `rclone`, engine
   menanyakan ruang bebas remote (`rclone about --json`) dan menolak dengan `ERR_QUOTA` jika backup
@@ -291,11 +291,11 @@ pertama kali Anda menjalankan aksi cloud atau snapshot. `cloud-status` melaporka
 sudah tersedia, apakah edisi ini bisa mengambilnya, dan ukuran unduhan dalam byte. `cloud-fetch`
 berjalan **terlepas** (poll `progress` dengan `opid`-nya): ia mengunduh addon `rclone`+`restic`
 per-arsitektur, memverifikasinya terhadap SHA-256 yang dipanggang ke dalam modul, dan memasangnya
-ke cache runtime. Fase progresnya adalah `downloading`, `verifying`, dan `installing`; kode
+ke cache runtime. Fase progresnya adalah `downloading`, `verifying`, dan `installing`, kode
 akhirnya adalah `ERR_NONE` jika berhasil, atau `ERR_FETCH` (unduhan gagal) / `ERR_FETCH_VERIFY`
 (checksum tidak cocok, dibuang) jika gagal. Pada edisi `full` ia tidak diperlukan. Sebuah
 `backup`/`restore` ke tujuan cloud atau snapshot pada edisi `lite`, sebelum biner tersedia, gagal
-dengan `ERR_CLOUD_FETCHABLE`; klien sebaiknya menawarkan untuk menjalankan `cloud-fetch`, lalu
+dengan `ERR_CLOUD_FETCHABLE`, klien sebaiknya menawarkan untuk menjalankan `cloud-fetch`, lalu
 mencoba lagi.
 
 ### Kategori backup khusus
@@ -307,18 +307,18 @@ menerapkannya kembali. Kategorinya adalah:
 | Kategori | Apa itu | Semantik restore |
 |----------|-----------|-------------------|
 | `messages` | SMS/MMS | penggantian provider (hapus + ekstrak) |
-| `rcs` | obrolan RCS (Google Messages, `bugle_db`); juga diekspor secara portabel ke `rcs.json` | ganti data aplikasi (hapus + ekstrak), perangkat yang sama |
+| `rcs` | obrolan RCS (Google Messages, `bugle_db`), juga diekspor secara portabel ke `rcs.json` | ganti data aplikasi (hapus + ekstrak), perangkat yang sama |
 | `contacts` | kontak dan log panggilan | penggantian provider (hapus + ekstrak) |
 | `wifi` | jaringan Wi-Fi tersimpan | penggantian provider (hapus + ekstrak) |
 | `bluetooth` | pemasangan Bluetooth | penggantian provider (hapus + ekstrak) |
-| `calendar` | provider kalender (`com.android.providers.calendar`, app + data); juga diekspor secara portabel ke `calendar.json` | penggantian provider (hapus + ekstrak) |
+| `calendar` | provider kalender (`com.android.providers.calendar`, app + data), juga diekspor secara portabel ke `calendar.json` | penggantian provider (hapus + ekstrak) |
 | `wallpaper` | wallpaper beranda dan kunci plus `wallpaper_info.xml`, disimpan mentah (biner) | file diganti |
 | `dns` | mode DNS privat dan penentunya, dibaca dari settings | `settings put` idempoten |
 | `system_settings` | dump lengkap settings system/global/secure | **opt-in**, `settings put` idempoten, menimpa settings perangkat |
 
 **`system_settings` ketat bersifat opt-in dan merusak saat restore.** Seperti `ssaid`, ia
 menimpa settings di seluruh perangkat saat direstore, jadi ia dibatasi di balik persetujuan
-eksplisit pengguna dan ditulis ke jejak audit. Jangan pernah memilihnya secara default; hanya atas
+eksplisit pengguna dan ditulis ke jejak audit. Jangan pernah memilihnya secara default, hanya atas
 permintaan pengguna yang langsung dan disengaja.
 
 ### Backup path mandiri
@@ -337,12 +337,12 @@ dengan kit RECOVERY saat terenkripsi) di bawah `.paths/` di direktori backups.
 
 - Path sumber harus **absolut** dan di bawah salah satu root yang diizinkan:
   `/storage/emulated`, `/data/media`, `/sdcard`, `/data`. Path yang tidak ada gagal dengan
-  `ERR_NO_PATH`; path di luar root yang diizinkan, atau yang mengandung `..`, gagal dengan
+  `ERR_NO_PATH`, path di luar root yang diizinkan, atau yang mengandung `..`, gagal dengan
   `ERR_BAD_PATH`.
 - `path-restore` menulis kembali ke lokasi asli, jadi ia merusak dan membutuhkan
   `"confirm": true`, sebuah gate berfriksi tinggi, seperti `special-restore`. Sebuah `ref` yang
   bukan backup path yang valid gagal dengan `ERR_BAD_REF`.
-- Keduanya berjalan **terlepas**; poll `progress` dengan `opid` yang dikembalikan.
+- Keduanya berjalan **terlepas**, poll `progress` dengan `opid` yang dikembalikan.
 
 ### Backup sistem file /data/adb
 
@@ -351,17 +351,17 @@ data dan konfigurasinya), digerakkan oleh pemilih pohon lazy (`adb-list` satu le
 `adb-du` untuk ukuran sebuah folder sesuai permintaan).
 
 - Total atau selektif di kedua ujung: hilangkan `paths` untuk semuanya, atau berikan sub-path yang
-  dipilih (relatif terhadap /data/adb); restore mengambil `paths` yang sama.
+  dipilih (relatif terhadap /data/adb), restore mengambil `paths` yang sama.
 - **Fidelitas per-file:** arsip menyimpan konteks SELinux, pemilik dan xattrs tiap file, dan restore
   bergantung pada itu - ia TIDAK PERNAH menerapkan `chcon` menyeluruh, yang akan meratakan konteks
-  heterogen /data/adb dan merusak root. `adb-restore` mengekstrak DI ATAS pohon hidup; ia tidak pernah
+  heterogen /data/adb dan merusak root. `adb-restore` mengekstrak DI ATAS pohon hidup, ia tidak pernah
   menghapusnya.
 - Referensi-diri: keluaran backup itu sendiri dan staging modul dikecualikan, sehingga sebuah backup
   tidak pernah memuat dirinya sendiri.
 - `adb-index` mengembalikan daftar file tersimpan sebuah backup agar restore dapat menampilkan pohonnya;
   pilihan UI diekspresikan sepenuhnya melalui `paths` (folder yang tercentang penuh adalah satu path;
   yang tercentang sebagian turun ke anak-anaknya yang tercentang, jadi tidak perlu daftar exclude).
-- `adb-restore` membutuhkan `"confirm": true` (gate berfriksi tinggi); keduanya berjalan terlepas, poll `progress`.
+- `adb-restore` membutuhkan `"confirm": true` (gate berfriksi tinggi), keduanya berjalan terlepas, poll `progress`.
 
 ### `update-check`
 
@@ -390,21 +390,21 @@ Saat berhasil ia mengembalikan:
 Jika tidak ada URL `updateJson`, permintaan jaringan gagal, atau manifest tidak dapat diparse, ia
 mengembalikan `{"ok":false,"code":"ERR_UPDATE_CHECK"}`.
 
-`update-check` hanya **melaporkan** ketersediaan dan catatan rilis; pembaruan itu sendiri dilakukan
+`update-check` hanya **melaporkan** ketersediaan dan catatan rilis, pembaruan itu sendiri dilakukan
 oleh manajer root Anda (KernelSU / APatch / Magisk) melalui `updateJson` modul, tidak pernah oleh
 verba ini.
 
 ## Pengaman yang harus dipatuhi agen Anda
 
 - **`ssaid` ketat bersifat opt-in (default mati).** Ia membackup / merestore ANDROID_ID
-  perangkat dengan menulis ulang file sistem; sebuah restore berlaku hanya setelah reboot, dan
+  perangkat dengan menulis ulang file sistem, sebuah restore berlaku hanya setelah reboot, dan
   file sebelumnya selalu disimpan lebih dulu untuk rollback. Kirim `"ssaid": true`
   hanya atas permintaan pengguna yang langsung dan disengaja, jangan pernah secara default.
 - **Tindakan yang mengubah (restore, delete, import) bersifat merusak** dan dicatat ke
   jejak audit lokal (`logs/audit.jsonl`). Restore bersifat setia (wipe-lalu-ekstrak), jadi
   ia mengembalikan aplikasi ke keadaan persis dari backup. Konfirmasi niat sebelum memanggilnya.
 - **`system_settings` bersifat opt-in dan merusak, persis seperti `ssaid`.** Merestorenya
-  menimpa settings di seluruh perangkat, jadi kirim hanya atas permintaan langsung pengguna; ia
+  menimpa settings di seluruh perangkat, jadi kirim hanya atas permintaan langsung pengguna, ia
   dibatasi oleh persetujuan eksplisit dan dicatat di jejak audit.
 - **Restore bersifat idempoten.** Restore provider mentah (messages/contacts/wifi/bluetooth/
   calendar) **mengganti** alih-alih menggabungkan, data provider dihapus dan arsip diekstrak di
@@ -417,7 +417,7 @@ verba ini.
   `--no-absolute-names`). Arsip yang dirusak tidak akan pernah bisa lolos dari direktori targetnya.
 - **Jangan pernah melemahkan** pelestarian (SELinux/uid/gid/mode/xattr) atau aturan APK (APK
   selalu dikompresi, tidak pernah dienkripsi kecuali `encrypt_apk` disetel).
-- Perlakukan output JSON sebagai sumber kebenaran; periksa `ok`/`code`, poll `progress`,
+- Perlakukan output JSON sebagai sumber kebenaran, periksa `ok`/`code`, poll `progress`,
   dan tampilkan kode `ERR_*` alih-alih menebak.
 
 Lihat [ARCHITECTURE.md](ARCHITECTURE.md) dan
@@ -427,4 +427,4 @@ Lihat [ARCHITECTURE.md](ARCHITECTURE.md) dan
 
 ---
 
-> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

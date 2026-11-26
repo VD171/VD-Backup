@@ -42,15 +42,15 @@ AI asistenti a agenti jsou zde plnohodnotnými přispěvateli, nikoli dodatečno
 - WebUI je `module/webroot/` (otevřete ho ze správce rootu). Backend je
   `module/helper.sh` (dispatcher) a `module/worker.sh` (odpojený engine).
 - Nativní binárky žijí v `module/bin/<abi>/` a vytváří je CI
-  (`.github/scripts/build_bin.sh`); běžně je ručně nepřekompilováváte.
+  (`.github/scripts/build_bin.sh`), běžně je ručně nepřekompilováváte.
 
 ## Konvence
 
 - **Každý zdrojový soubor** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) začíná
   banner hlavičkou projektu (zkopírujte ji z libovolného existujícího souboru). Bez výjimek.
 - **Kód a komentáře v angličtině.** Udržujte komentáře minimální a jen tam, kde jsou potřeba.
-- **Žádná em-dash ani en-dash**; vždy používejte obyčejný spojovník `-`.
-- WebUI je **vanilla JS** (jeden `scripts.js`); žádné frameworky. S rootem komunikujte jen přes
+- **Žádná em-dash ani en-dash**, vždy používejte obyčejný spojovník `-`.
+- WebUI je **vanilla JS** (jeden `scripts.js`), žádné frameworky. S rootem komunikujte jen přes
   wrapper `helper(verb, args)` a escapujte každou interpolovanou hodnotu.
 - **Nikdy neoslabujte** skutečnou funkci (např. zachování SELinux/uid/gid/režimů).
 - Měnící akce (obnova, mazání) musí vyžádat potvrzení a zapsat auditní log.
@@ -58,7 +58,7 @@ AI asistenti a agenti jsou zde plnohodnotnými přispěvateli, nikoli dodatečno
 ## Internacionalizace (i18n)
 
 - Řetězce UI žijí v `module/webroot/lang/`. Angličtina je kanonický fallback
-  (`en.js` + `en.json`); ostatních 20 jazyků jsou `<code>.json`.
+  (`en.js` + `en.json`), ostatních 20 jazyků jsou `<code>.json`.
 - Pro přidání nebo změnu řetězce: upravte `en.js` **a** `en.json`, poté aktualizujte každý
   `<code>.json`. Dotknout se viditelného popisku znamená aktualizovat **všechny** jazykové soubory a
   **všechny** `README.<code>.md`.
@@ -80,4 +80,4 @@ předvolby destinací `rclone` a vylepšování WebUI jsou skvělé výchozí bo
 
 ---
 
-> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md)._

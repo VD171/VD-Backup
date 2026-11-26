@@ -401,7 +401,14 @@ net_transport() {
 # net_guard: enforce the user's network_policy before a cloud transfer. On a
 # violation it finishes the op with ERR_NET_POLICY and returns 1 (caller: || return).
 net_guard() {
-  _pol="$(cfg .network_policy)"; case "$_pol" in wifi|mobile) ;; *) return 0 ;; esac
+  _pol="$(cfg .network_policy)"
+  # "off": the user disabled network transfers entirely - block every cloud op regardless of
+  # the active transport (issue #35). wifi/mobile gate by transport; anything else = unrestricted.
+  case "$_pol" in
+    off) audit "network policy OFF: cloud transfer blocked $PKG"; finish false ERR_NET_POLICY; return 1 ;;
+    wifi|mobile) ;;
+    *) return 0 ;;
+  esac
   _tr="$(net_transport)"
   [ "$_tr" = "$_pol" ] && return 0
   audit "network policy block need=$_pol have=$_tr $PKG"
@@ -1878,7 +1885,12 @@ restore() {
   # after the next reboot (the settings provider caches it). Edit is validated by a
   # decode round-trip before the live file is overwritten; any failure leaves it untouched.
   SS="$("$JQ" -r '.permissions.ssaid // empty' "$M" 2>/dev/null)"
-  if [ "$(jget "$ARGS" '.ssaid')" = true ]; then
+  # A single restore passes .ssaid=true (whole op); a batch restore passes .ssaid_pkgs - the apps
+  # the user ticked for SSAID - so the device ID is applied per-app, not broadly (issue #35).
+  _want_ssaid=false
+  [ "$(jget "$ARGS" '.ssaid')" = true ] && _want_ssaid=true
+  [ "$_want_ssaid" = true ] || { jget "$ARGS" '.ssaid_pkgs[]?' 2>/dev/null | grep -qxF "$PKG" && _want_ssaid=true; }
+  if [ "$_want_ssaid" = true ]; then
     case "$SS" in ''|null|*[!0-9a-fA-F]*) : ;; *) ssaid_restore "$PKG" "$U" "$SS" ;; esac
   elif [ -n "$SS" ] && [ "$SS" != null ]; then
     audit "ssaid present in backup but not opted in $PKG"

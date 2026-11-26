@@ -18,7 +18,7 @@ mang theo, mỗi tệp đến từ đâu, và cách kiểm chứng rằng không
   chính thức (các tệp `.deb` đã ký tại `packages.termux.dev/apt`), không bao giờ sao chép ra từ một
   Termux đã cài trên điện thoại nào đó. Quá trình dựng sẽ thất bại rõ ràng, nó không bao giờ ứng
   biến tạm bợ.
-- **Tái lập được.** Chạy lại quá trình dựng và bạn sẽ có cùng những tệp đó; lấy lại các nguồn được
+- **Tái lập được.** Chạy lại quá trình dựng và bạn sẽ có cùng những tệp đó, lấy lại các nguồn được
    ghim và các giá trị SHA-256 khớp nhau.
 - **Dấu vết kiểm toán đi kèm với mô-đun.** Nó không chỉ nằm trên trang web, nó còn đi cùng bên
   trong mô-đun đã cài, trên thiết bị của bạn, nên bạn có thể kiểm toán ngoại tuyến.
@@ -29,15 +29,15 @@ mang theo, mỗi tệp đến từ đâu, và cách kiểm chứng rằng không
 |---|---|---|
 | Các công cụ gốc `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) cùng bao đóng `lib/` của chúng | Kho apt **Termux** chính thức (`packages.termux.dev/apt`), các gói `.deb` chính thức | `.github/scripts/build_bin.sh` tải xuống các tệp `.deb` cùng các phụ thuộc bắc cầu của chúng, giải nén chúng, và chỉ sao chép các tệp nhị phân cùng những thư viện dùng chung mà mỗi tệp cần |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (bộ chuyển đổi ABX dự phòng) | GitHub release của **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF tĩnh) | tải xuống từ release được ghim bởi `build_bin.sh` |
-| `companion.apk` (companion Google Drive tùy chọn) | **Kho này**, `companion/` (Gradle/Kotlin) | được CI dựng từ mã nguồn và ký bằng khóa dự án; không phải khối blob dựng sẵn |
+| `companion.apk` (companion Google Drive tùy chọn) | **Kho này**, `companion/` (Gradle/Kotlin) | được CI dựng từ mã nguồn và ký bằng khóa dự án, không phải khối blob dựng sẵn |
 | `vdbackup_helper.dex` (trình trợ giúp framework) | **Kho này**, `dex/src/` (Java) | được CI biên dịch từ mã nguồn bằng `javac` + `d8` |
 
-Chỉ hai hàng đầu là tệp nhị phân bên thứ ba dựng sẵn; hai hàng cuối được dựng từ mã nguồn nằm
+Chỉ hai hàng đầu là tệp nhị phân bên thứ ba dựng sẵn, hai hàng cuối được dựng từ mã nguồn nằm
 trong kho này và có thể đọc và dựng lại.
 
 > **Phiên bản Full so với lite.** Các phiên bản lite chỉ bỏ qua `rclone` và `restic` (hai tệp nhị
 > phân lớn nhất) để giữ kích thước nhỏ và tải chúng theo nhu cầu (được xác minh bằng SHA-256) trong
-> lần đầu bạn dùng đích đám mây hoặc chế độ ảnh chụp nhanh; `rsync` và `ssh`/`scp`/`sftp` vẫn có mặt,
+> lần đầu bạn dùng đích đám mây hoặc chế độ ảnh chụp nhanh, `rsync` và `ssh`/`scp`/`sftp` vẫn có mặt,
 > và mọi tệp nhị phân khác được liệt kê ở trên cũng có mặt. Các phiên bản Full cung cấp `rclone`
 > (nhà cung cấp đám mây) và `restic` (ảnh chụp nhanh) được nhúng sẵn, nên không bao giờ tải xuống gì.
 
@@ -71,7 +71,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
    kho Termux được phục vụ từ kho apt đã ký của Termux.
 3. **Dựng lại từ đầu.** Tự chạy `.github/scripts/build_bin.sh` (chỉ cần `curl`, `ar`, `tar`, `xz`,
    `zstd`, `readelf`) và so sánh kết quả với những gì được đi kèm.
-4. **Companion và dex.** Dựng lại `companion/` và `dex/` từ mã nguồn; chữ ký của companion là khóa
+4. **Companion và dex.** Dựng lại `companion/` và `dex/` từ mã nguồn, chữ ký của companion là khóa
    dự án (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
@@ -85,4 +85,4 @@ làm cho nó hiển thị rõ.
 
 ---
 
-> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md)._

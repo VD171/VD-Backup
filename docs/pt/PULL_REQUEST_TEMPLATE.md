@@ -5,7 +5,7 @@ Descreva o que este PR muda e por quê.
 ## Checklist
 
 - [ ] O cabeçalho banner do projeto está presente em todo arquivo-fonte novo/alterado.
-- [ ] Código e comentários estão em inglês; sem em/en-dashes.
+- [ ] Código e comentários estão em inglês, sem em/en-dashes.
 - [ ] Se um label de UI mudou, todos os `lang/<code>.json` e `README.<code>.md` foram atualizados.
 - [ ] Nenhum recurso real (preservação de SELinux/uid-gid/modes, etc.) foi enfraquecido.
 - [ ] Commits estão assinados (`git commit -s`).
@@ -19,4 +19,4 @@ Qualquer coisa que os revisores devam saber.
 
 ---
 
-> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas; veja [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md)._

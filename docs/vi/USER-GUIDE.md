@@ -67,13 +67,13 @@ gắn với thiết bị cụ thể của bạn. Xem [phần 11](#11-tính-di-đ
 - **Một thiết bị Android đã root** được quản lý bởi **KernelSU**, **APatch** hoặc
   **Magisk**. VDBackup được cài như một mô-đun từ trình quản lý đó.
 - Đủ bộ nhớ trống cho các bản sao lưu của bạn (các bản sao lưu cục bộ nằm dưới thư mục
-  trạng thái của mô-đun; xem [phần 3](#3-cài-đặt-và-chạy-lần-đầu)).
+  trạng thái của mô-đun, xem [phần 3](#3-cài-đặt-và-chạy-lần-đầu)).
 - Không gì khác. Mô-đun đóng gói tất cả các tệp nhị phân nó cần (tar, zstd, lz4, rclone,
   rsync, ssh, restic), nên **sao lưu và khôi phục cục bộ hoạt động hoàn toàn ngoại tuyến**.
   Chỉ các đích đám mây mới nói chuyện với mạng.
 
 Một vài phần bổ sung chi tiết (AppOps, SSAID, một vài bit hệ thống đặc quyền) dựa vào
-khung Android; mô-đun xử lý chúng nội bộ, với một dự phòng shell thuần, và chúng suy giảm
+khung Android, mô-đun xử lý chúng nội bộ, với một dự phòng shell thuần, và chúng suy giảm
 một cách nhẹ nhàng khi chúng không khả dụng trên thiết bị của bạn.
 
 ## 3. Cài đặt và chạy lần đầu
@@ -82,7 +82,7 @@ một cách nhẹ nhàng khi chúng không khả dụng trên thiết bị của
 2. Trong trình quản lý KernelSU / APatch / Magisk của bạn, flash zip mô-đun như bất kỳ mô-đun
    nào khác.
 3. Nó dùng được ngay lập tức, **không cần khởi động lại**. (Khởi động lại chỉ liên quan khi
-   khôi phục SSAID; xem [phần 10](#10-ssaid-android_id-của-thiết-bị).)
+   khôi phục SSAID, xem [phần 10](#10-ssaid-android_id-của-thiết-bị).)
 4. Mở **WebUI** của mô-đun từ trình quản lý. Đó là toàn bộ giao diện.
 
 **Nên tải phiên bản nào.** Mỗi bản phát hành đi kèm nhiều phiên bản zip có thể flash, nên bạn chỉ tải
@@ -93,10 +93,10 @@ cái mình cần. Hãy chọn một:
   (snapshot khử trùng lặp). Hoàn toàn ngoại tuyến, không bao giờ tải xuống gì. Hoạt động trên mọi
   thiết bị. Bản tải lớn nhất.
 - **`VD-Backup-<ver>-universal-lite.zip`**: mọi kiến trúc, nhưng **không có** hai tệp nhị phân
-  lớn nhất (`rclone` và `restic`). Bản tải nhỏ nhất; vẫn làm được sao lưu cục bộ, SSH/SFTP và
+  lớn nhất (`rclone` và `restic`). Bản tải nhỏ nhất, vẫn làm được sao lưu cục bộ, SSH/SFTP và
   rsync mà không cần tải xuống, với mã hóa `age` khả chuyển. Lần đầu tiên bạn dùng đích đám mây
   (`rclone`) hoặc chế độ snapshot (`restic`), WebUI sẽ đề nghị tải phần bổ trợ nhỏ theo kiến trúc
-  đó một lần (được xác minh bằng SHA-256) và lưu vào bộ nhớ đệm; sau đó các tính năng ấy cũng
+  đó một lần (được xác minh bằng SHA-256) và lưu vào bộ nhớ đệm, sau đó các tính năng ấy cũng
   hoạt động.
 - **`VD-Backup-<ver>-<abi>-full.zip`** (một trong `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) -
   một kiến trúc duy nhất với mọi tệp nhị phân được nhúng sẵn (cùng tính năng như `universal-full`
@@ -139,7 +139,7 @@ WebUI được tổ chức thành một vài tab:
 - **Home**: một tổng quan trang chủ hiển thị số lượng các bản sao lưu của bạn (ứng dụng, bản sao lưu, thư mục và công việc đã lập lịch) và một thanh lưu trữ cho biết các bản sao lưu của bạn dùng bao nhiêu dung lượng so với dung lượng trống, kèm huy hiệu trạng thái, sao chép hash và đường dẫn vào bảng tạm, và một hành động **Check for updates**.
 - **Apps**: danh sách các ứng dụng đã cài (người dùng và hệ thống), mỗi cái hiển thị với
   tên thật, tên gói, và biểu tượng của nó (biểu tượng tải lười và được lưu đệm, nên danh
-  sách vẫn phản hồi nhanh). Nút trên một hàng sao lưu ứng dụng; chạm vào hàng sẽ mở lịch sử
+  sách vẫn phản hồi nhanh). Nút trên một hàng sao lưu ứng dụng, chạm vào hàng sẽ mở lịch sử
   sao lưu của ứng dụng đó, nơi bạn có thể khôi phục bất kỳ bản sao lưu trước nào.
 - **Backups**: các bản sao lưu bạn đã có, mỗi cái hiển thị tên ứng dụng trên một dòng và
   tên gói trên dòng kế tiếp. Chạm vào một bản sao lưu để xem toàn bộ chi tiết của nó (phiên
@@ -157,7 +157,7 @@ WebUI được tổ chức thành một vài tab:
   và danh sách ứng dụng loại trừ, tùy chọn nguồn cài đặt, khóa mã hóa, và lập lịch. Các thiết lập bật/tắt dùng công tắc gạt kiểu Android.
 - **About**: phiên bản, liên kết, các dự án anh em (See also), tệp kê khai kiểm toán nhị phân đi kèm, và một hành động **Check for updates** báo cáo liệu một phiên bản mới hơn đã được phát hành hay chưa (cùng với ghi chú phát hành của nó). Bạn cài đặt mọi bản cập nhật thông qua trình quản lý root của mình, giống như cách bạn đã flash mô-đun.
 
-Ứng dụng cũng tự kiểm tra phiên bản mới hơn mỗi khi bạn mở (nhiều nhất một lần mỗi giờ) và chỉ hiển thị biểu ngữ cập nhật khi có; im lặng khi đã mới nhất hoặc ngoại tuyến.
+Ứng dụng cũng tự kiểm tra phiên bản mới hơn mỗi khi bạn mở (nhiều nhất một lần mỗi giờ) và chỉ hiển thị biểu ngữ cập nhật khi có, im lặng khi đã mới nhất hoặc ngoại tuyến.
 
 Các xác nhận và thông báo dùng hộp thoại trong ứng dụng (không phải các cửa sổ bật lên của
 hệ thống kiểu cũ), và một lần khôi phục hoặc nhập sẽ yêu cầu bạn thừa nhận rằng nó ghi đè
@@ -169,7 +169,7 @@ WebUI gắn lại và hiển thị tiến trình trực tiếp với nhãn pha �
 việc đang chạy, thẻ tiến trình cũng hiển thị tốc độ truyền trực tiếp và thời gian còn lại ước
 tính, cùng một bộ đếm mục (ví dụ "12 of 40") với tên của mục hiện tại. Trên các ROM
 hiển thị thông báo shell, bạn cũng nhận được một thông báo Android khi một công việc bắt
-đầu và kết thúc; dù sao đi nữa, thẻ tiến trình trong ứng dụng là chỉ báo đáng tin cậy.
+đầu và kết thúc, dù sao đi nữa, thẻ tiến trình trong ứng dụng là chỉ báo đáng tin cậy.
 
 ## 5. Tạo một bản sao lưu
 
@@ -177,11 +177,11 @@ Luồng cơ bản: mở **Apps**, chọn một ứng dụng, chọn những gì 
 đặt nén và (tùy chọn) mã hóa, rồi chạy. Tiến trình xuất hiện trực tiếp và một thông báo cho
 bạn biết khi nó xong.
 
-Trong khi một lần sao lưu hoặc khôi phục đang chạy, thẻ tiến trình của nó có một nút **Cancel**. Hủy một lần sao lưu sẽ dừng nó và xóa bất kỳ bản sao một phần nào mà nó đã bắt đầu, nên không có gì viết dở còn sót lại. Hủy một lần khôi phục cũng dừng nó, nhưng ứng dụng có thể bị khôi phục một phần, nên VDBackup cảnh báo bạn trước; chạy lại lần khôi phục để hoàn tất.
+Trong khi một lần sao lưu hoặc khôi phục đang chạy, thẻ tiến trình của nó có một nút **Cancel**. Hủy một lần sao lưu sẽ dừng nó và xóa bất kỳ bản sao một phần nào mà nó đã bắt đầu, nên không có gì viết dở còn sót lại. Hủy một lần khôi phục cũng dừng nó, nhưng ứng dụng có thể bị khôi phục một phần, nên VDBackup cảnh báo bạn trước, chạy lại lần khôi phục để hoàn tất.
 
 Trong hộp thoại sao lưu, bạn cũng có thể chọn **đích** cho bản sao lưu này, bộ nhớ cục bộ hoặc bất kỳ đích đám mây/từ xa nào bạn đã thêm, mà không cần đổi đích mặc định trong Cài đặt trước.
 
-VDBackup chạy hai biện pháp bảo vệ tự động trong một lần sao lưu, cả hai bật theo mặc định trong Cài đặt. **"Tạm dừng để hạ nhiệt khi thiết bị nóng lên"** cho một tác vụ dài được nghỉ, và chờ thiết bị nguội nếu nó thực sự nóng, nên một bản sao lưu lớn không bao giờ làm điện thoại quá nhiệt; chỉ nhịp độ thay đổi, không bao giờ là độ trung thực. **"Kiểm tra dung lượng trống trước khi sao lưu theo lô"** ước tính một lần sao lưu nhiều ứng dụng sẽ cần bao nhiêu và dừng ngay từ đầu, thay vì giữa chừng, nếu bộ nhớ không đủ chứa.
+VDBackup chạy hai biện pháp bảo vệ tự động trong một lần sao lưu, cả hai bật theo mặc định trong Cài đặt. **"Tạm dừng để hạ nhiệt khi thiết bị nóng lên"** cho một tác vụ dài được nghỉ, và chờ thiết bị nguội nếu nó thực sự nóng, nên một bản sao lưu lớn không bao giờ làm điện thoại quá nhiệt, chỉ nhịp độ thay đổi, không bao giờ là độ trung thực. **"Kiểm tra dung lượng trống trước khi sao lưu theo lô"** ước tính một lần sao lưu nhiều ứng dụng sẽ cần bao nhiêu và dừng ngay từ đầu, thay vì giữa chừng, nếu bộ nhớ không đủ chứa.
 
 ### 5.1 Chọn những gì để sao lưu
 
@@ -276,13 +276,13 @@ bước **checksum-verified** cuối cùng để kiểm tra lại bản sao đã
 remote, và khiến công việc thất bại (thay vì để lại một bản sao hỏng trên đám mây) nếu chúng
 không khớp. Và trước một lần tải lên Full, nó kiểm tra **dung lượng trống** của remote và dừng
 sớm với một lỗi rõ ràng **"not enough space"** nếu bản sao lưu sẽ không vừa, thay vì lấp đầy
-remote rồi thất bại giữa chừng. (Kiểm tra dung lượng là cho các lần tải lên Full; Mirror là một
+remote rồi thất bại giữa chừng. (Kiểm tra dung lượng là cho các lần tải lên Full, Mirror là một
 đồng bộ delta và được miễn trừ.)
 
 ### 5.6 Sao lưu đặc biệt (tin nhắn, nhật ký cuộc gọi, Wi-Fi, Bluetooth, lịch, hình nền, DNS, cài đặt hệ thống)
 
 Bên dưới các danh sách ứng dụng trong tab **Backups**, **Sao lưu đặc biệt** bao gồm dữ liệu
-toàn hệ thống không gắn với một ứng dụng đơn lẻ. Chọn các hạng mục và sao lưu chúng; chúng được
+toàn hệ thống không gắn với một ứng dụng đơn lẻ. Chọn các hạng mục và sao lưu chúng, chúng được
 lưu trữ với cùng việc bảo toàn SELinux/xattr và mã hóa tùy chọn như các bản sao lưu ứng dụng. Các
 hạng mục là:
 
@@ -336,7 +336,7 @@ chúng, tức là chính môi trường root. VDBackup có thể sao lưu nó, t
 thể mang theo thiết lập root của mình qua một lần xóa sạch hoặc một lần đổi ROM.
 
 - **Toàn bộ hoặc chọn lọc.** Sao lưu toàn bộ `/data/adb`, hoặc mở cây tệp và chọn chính xác các
-  thư mục và tệp bạn muốn; một thư mục được tích một nửa chỉ bao gồm các mục con mà bạn đã tích.
+  thư mục và tệp bạn muốn, một thư mục được tích một nửa chỉ bao gồm các mục con mà bạn đã tích.
 - **Mọi thứ nằm trong tay bạn.** Cây là trung lập - không có gì được chọn trước hoặc bị ẩn, ngoại
   trừ các tệp làm việc của chính VDBackup, mà nếu không thì nó sẽ chỉ sao lưu chính mình. Nén và
   mã hóa là cùng các tùy chọn khả chuyển như bất kỳ bản sao lưu nào khác.
@@ -345,7 +345,7 @@ thể mang theo thiết lập root của mình qua một lần xóa sạch hoặ
   lần xóa toàn bộ), nên các ngữ cảnh khác nhau dưới `/data/adb` được bảo tồn và trình quản lý root
   của bạn vẫn khởi động.
 - **Nâng cao.** Điều này chạm trực tiếp vào môi trường root. Khôi phục có tính phá hủy và yêu cầu
-  bạn xác nhận; một lần khôi phục chọn lọc chỉ ghi lại các đường dẫn bạn đã chọn.
+  bạn xác nhận, một lần khôi phục chọn lọc chỉ ghi lại các đường dẫn bạn đã chọn.
 
 ## 6. Khôi phục một bản sao lưu
 
@@ -377,7 +377,7 @@ Các tùy chọn khôi phục hữu ích:
   và các bài kiểm tra ứng dụng mong đợi. Bạn có thể tắt điều này trên toàn cục trong Settings
   hoặc theo từng lần khôi phục, và khi tắt thì nguồn cài đặt gốc được giữ lại. Một công tắc
   opt-in nâng cao **"giả mạo nguồn khởi tạo"** còn đi xa hơn và cũng làm cho gói khởi tạo và
-  nguồn gói của ứng dụng trông như được cài từ Play; nó chỉnh sửa cơ sở dữ liệu gói của hệ
+  nguồn gói của ứng dụng trông như được cài từ Play, nó chỉnh sửa cơ sở dữ liệu gói của hệ
   thống (được sao lưu trước tiên) và có hiệu lực sau khi khởi động lại.
 
 **Khôi phục hàng loạt.** Tab **Backups** có chế độ **Select**, giống như cách tab Apps có nó
@@ -387,14 +387,14 @@ lựa chọn, việc xác nhận ghi đè, kiểm tra khôi phục và tùy ch�
 bản sao lưu bạn đã chọn, và chúng được khôi phục lần lượt nối tiếp nhau.
 
 **Xóa một bản sao lưu.** Mở chi tiết của một bản sao lưu (hoặc lịch sử của một ứng dụng) và
-dùng **Delete**; bạn được yêu cầu xác nhận, và việc xóa được ghi vào nhật ký hoạt động. Bạn
+dùng **Delete**, bạn được yêu cầu xác nhận, và việc xóa được ghi vào nhật ký hoạt động. Bạn
 cũng có thể giới hạn số bản sao lưu giữ lại cho mỗi ứng dụng (lưu giữ) để các bản cũ được tỉa
 tự động.
 
 **Gắn một ứng dụng đã cài làm ứng dụng hệ thống.** Từ lịch sử sao lưu của một ứng dụng,
 **Mount as system** dàn dựng APK của ứng dụng vào một mô-đun con overlay của VDBackup để trình
 quản lý root phục vụ nó từ `/system/app` (hoặc `/system/priv-app`), phân vùng `/system` thật không bao
-giờ bị chạm tới. Với **NoMount** trên KernelSU nó áp dụng trực tiếp; nếu không thì nó áp dụng
+giờ bị chạm tới. Với **NoMount** trên KernelSU nó áp dụng trực tiếp, nếu không thì nó áp dụng
 sau khi khởi động lại. Điều này không bao giờ phụ thuộc vào việc NoMount phải được cài.
 
 ## 7. Đích: cục bộ và từ xa
@@ -459,7 +459,7 @@ Bản thiết lập VDBackup của bạn, tức là các đích đến, lịch t
 
 - **Xuất cài đặt** ghi một tệp mã hóa vào `VDBackup/.export`. Nó luôn yêu cầu một cụm mật khẩu, vì tệp chứa mật khẩu từ xa của bạn.
 - **Nhập cài đặt** đọc lại tệp đó và hợp nhất vào thiết bị này, mà không xóa bất cứ thứ gì đã có.
-- **Xóa thông tin xác thực đã lưu** xóa mật khẩu từ xa đã lưu và khóa mã hóa thiết bị trong một bước; các đích đến, lịch trình và bản sao lưu của bạn vẫn ở nguyên.
+- **Xóa thông tin xác thực đã lưu** xóa mật khẩu từ xa đã lưu và khóa mã hóa thiết bị trong một bước, các đích đến, lịch trình và bản sao lưu của bạn vẫn ở nguyên.
 
 ## 8. Lập lịch và lưu giữ
 
@@ -502,7 +502,7 @@ cho bạn (với lưu giữ keep-N). Lần chạy đầu tiên chỉ ghi lại n
 nó không bao giờ sao lưu toàn bộ thiết bị của bạn cùng một lúc.
 
 **Ứng dụng loại trừ (danh sách chặn).** Cũng trong Settings, bạn có thể loại trừ các ứng dụng
-mà bạn không bao giờ muốn được sao lưu tự động hoặc theo lịch; bạn có thể thêm nhiều ứng dụng cùng
+mà bạn không bao giờ muốn được sao lưu tự động hoặc theo lịch, bạn có thể thêm nhiều ứng dụng cùng
 lúc (chọn nhiều), và các ứng dụng bị loại trừ được cả hai bỏ qua.
 
 **Cấu hình sao lưu sẵn.** Cũng trong Cài đặt, bạn có thể lưu các cấu hình có tên, bộ mục cần sao lưu, như chỉ APK hoặc APK + OBB, và chọn một trong hộp thoại sao lưu để điền lựa chọn mục cùng lúc.
@@ -568,8 +568,8 @@ dưới dạng `<item>.tar.zst` (hoặc `.tar.gz` / `.tar.lz4`), tùy chọn có
 
 - **Giải mã** (chỉ nếu tệp kết thúc bằng `.age`) với công cụ `age` chuẩn và cụm mật khẩu
   hoặc tệp khóa của bạn.
-- **Giải nén và trích xuất**: `.tar.zst` với `zstd` rồi `tar`; `.tar.gz` với `tar` trực
-  tiếp; `.tar.lz4` qua `zstd --format=lz4`. Một APK chỉ là một APK được nén zstd, nên giải
+- **Giải nén và trích xuất**: `.tar.zst` với `zstd` rồi `tar`, `.tar.gz` với `tar` trực
+  tiếp, `.tar.lz4` qua `zstd --format=lz4`. Một APK chỉ là một APK được nén zstd, nên giải
   nén `base.apk.zst` cho bạn một `base.apk` bình thường có thể cài được.
 
 Mỗi bản sao lưu đã mã hóa đi kèm một ghi chú **RECOVERY** chứa các lệnh sao chép-dán chính
@@ -583,7 +583,7 @@ tệp của mình, chỉ là không có sự sở hữu đặc thù Android đư
 ## 12. Điều khiển VDBackup từ một trợ lý AI
 
 VDBackup được xây dựng để thân thiện với các trợ lý và tác nhân AI, không chỉ với con người.
-WebUI chỉ là một trong các máy khách của một API JSON nhỏ; một tác nhân có thể quản trị
+WebUI chỉ là một trong các máy khách của một API JSON nhỏ, một tác nhân có thể quản trị
 **mọi** hành động của mô-đun theo kiểu headless qua cùng API đó (mỗi lệnh trả về một đối
 tượng JSON duy nhất, các thao tác dài chạy tách rời và bạn thăm dò tiến trình của chúng, và
 cùng các lan can an toàn áp dụng, SSAID vẫn opt-in, các hành động làm thay đổi vẫn được xác
@@ -609,30 +609,30 @@ chạy nào và hiển thị tiến trình hiện tại.
 mã phổ biến:
 - `ERR_VERIFY`, một kho lưu trữ đã ghi không khớp hash manifest của nó (xác minh đã bắt
   được một bản sao lưu xấu). Chạy lại bản sao lưu.
-- `ERR_RESTORE_TEST`, một bài kiểm tra khôi phục thất bại; bản sao lưu không giải nén/xác
+- `ERR_RESTORE_TEST`, một bài kiểm tra khôi phục thất bại, bản sao lưu không giải nén/xác
   minh sạch sẽ và ứng dụng đang chạy của bạn được để nguyên không bị chạm.
 - `ERR_UNSAFE_ARCHIVE`, một kho lưu trữ bị từ chối vì nó cố ghi ra ngoài thư mục đích của mình
-  (đường dẫn tuyệt đối hoặc `..`). Điều này bảo vệ bạn khỏi một bản sao lưu bị giả mạo; không có gì
+  (đường dẫn tuyệt đối hoặc `..`). Điều này bảo vệ bạn khỏi một bản sao lưu bị giả mạo, không có gì
   được ghi.
-- `ERR_QUOTA`, một remote đám mây không có đủ dung lượng trống cho một lần tải lên Full; bản sao
+- `ERR_QUOTA`, một remote đám mây không có đủ dung lượng trống cho một lần tải lên Full, bản sao
   lưu đã bị dừng trước khi tải lên bất cứ thứ gì.
 
 **Đích từ xa của tôi thất bại.** Dùng **bài kiểm tra** đích trong tab Destinations để xác
-thực thông tin đăng nhập và kết nối. Nhớ rằng chỉ các đích đám mây mới cần mạng; sao
+thực thông tin đăng nhập và kết nối. Nhớ rằng chỉ các đích đám mây mới cần mạng, sao
 lưu/khôi phục cục bộ hoàn toàn ngoại tuyến.
 
 **Có bất kỳ phần nào trong số này gọi về nhà hay tải xuống lúc chạy không?** Không. Tất cả
-các tệp nhị phân được đóng gói trong mô-đun lúc build; không có gì được lấy về thiết bị lúc
+các tệp nhị phân được đóng gói trong mô-đun lúc build, không có gì được lấy về thiết bị lúc
 chạy. Chỉ các đích đám mây (rclone/restic/ssh) mới nói chuyện với mạng, và chỉ khi bạn dùng
 chúng.
 
 **Bản sao lưu của tôi có khôi phục được trên một điện thoại khác không?** Có, các bản sao
 lưu di động và không gắn với phần cứng thiết bị. (SSAID là ngoại lệ đặc thù thiết bị duy
-nhất, và nó là opt-in và áp dụng khi khởi động lại; xem
+nhất, và nó là opt-in và áp dụng khi khởi động lại, xem
 [phần 10](#10-ssaid-android_id-của-thiết-bị).)
 
 **Bản sao lưu đã mã hóa của tôi không mở được, tôi đã mất cụm mật khẩu.** Không có cửa hậu
-khôi phục theo thiết kế; cụm mật khẩu là thứ bảo vệ bản sao lưu. Hãy giữ nó an toàn.
+khôi phục theo thiết kế, cụm mật khẩu là thứ bảo vệ bản sao lưu. Hãy giữ nó an toàn.
 
 ## 14. Gỡ cài đặt
 
@@ -642,4 +642,4 @@ Gỡ VDBackup như bất kỳ mô-đun nào khác từ trình quản lý KernelS
 
 ---
 
-> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md)._

@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · ไทย · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/th/home-dark.png) | ![Apps](docs/screenshots/th/apps-dark.png) | ![Schedule](docs/screenshots/th/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/th/destinations-dark.png) | ![Settings](docs/screenshots/th/settings-dark.png) | ![Activity log](docs/screenshots/th/activitylog-dark.png) |
 
 ---
 
@@ -65,17 +84,17 @@ Android-DataBackup**: การรวมสิ่งที่ทั้งสา�
   ฮาร์ดแวร์ของอุปกรณ์ จึงกู้คืนการสำรองข้อมูลบนอุปกรณ์อื่นหรือเปิดบน PC ได้.
 - **ปลายทาง:** ในเครื่อง, SFTP, SCP, SMB, WebDAV, FTP, S3 และอีกกว่า 70 แบบ (`rclone`),
   รวมถึงที่เก็บ `rsync` และ `restic` ด้วย. เลือกใช้ Google Drive ได้ผ่านแอปคู่เล็ก ๆ แบบเลือกเปิดใช้.
-- **Telegram:** สำรองข้อมูลไปยังช่อง Telegram ส่วนตัวเป็นที่เก็บบนคลาวด์แบบไม่จำกัดผ่าน MTProto - กู้คืนและลบได้จาก WebUI เช่นกัน
-- **ความสมบูรณ์:** ทุกไฟล์ archive จะถูกตรวจสอบเทียบกับ manifest; dry-run และการทดสอบกู้คืนให้คุณ
+- **Telegram:** สำรองข้อมูลไปยังช่อง Telegram ส่วนตัวเป็นที่เก็บบนคลาวด์แบบไม่จำกัดผ่าน MTProto, กู้คืนและลบได้จาก WebUI เช่นกัน
+- **ความสมบูรณ์:** ทุกไฟล์ archive จะถูกตรวจสอบเทียบกับ manifest, dry-run และการทดสอบกู้คืนให้คุณ
   ตรวจสอบการสำรองข้อมูลได้โดยไม่แตะต้องสิ่งใด.
 - **การกู้คืนแบบเลือกได้และแบบกลุ่ม:** กู้คืนชุดย่อยใด ๆ ของ items ในการสำรองข้อมูล หรือเลือกหลายการสำรอง
-  ข้อมูลพร้อมกันแล้วกู้คืนทั้งหมดในครั้งเดียว; ลบการสำรองข้อมูลและเก็บบันทึกกิจกรรม/การตรวจสอบของทุกการกระทำ
+  ข้อมูลพร้อมกันแล้วกู้คืนทั้งหมดในครั้งเดียว, ลบการสำรองข้อมูลและเก็บบันทึกกิจกรรม/การตรวจสอบของทุกการกระทำ
   ที่ทำลายข้อมูล.
 - **การสำรองข้อมูลพิเศษ:** ข้อความ (SMS/MMS/RCS), รายชื่อติดต่อและบันทึกการโทร, Wi-Fi และ Bluetooth
   พร้อมการส่งออก JSON แบบพกพาที่เป็นตัวเลือกซึ่งคุณเปิดบน PC ได้.
-- **ไฟล์ระบบ (`/data/adb`):** สำรองตัวสภาพแวดล้อม root เอง - โมดูล, ข้อมูลและการตั้งค่าของมัน -
+- **ไฟล์ระบบ (`/data/adb`):** สำรองตัวสภาพแวดล้อม root เอง (โมดูล, ข้อมูลและการตั้งค่าของมัน)
   ทั้งหมดหรือเฉพาะบางส่วนที่คุณเลือกจากแผนผังไฟล์ โดยแต่ละไฟล์ถูกกู้คืนด้วยเจ้าของเดิมและ SELinux
-  context เดิม เพื่อให้ root ยังทำงานต่อได้ ขั้นสูง; เฉพาะสิ่งที่คุณเลือกเท่านั้น
+  context เดิม เพื่อให้ root ยังทำงานต่อได้ ขั้นสูง, เฉพาะสิ่งที่คุณเลือกเท่านั้น
 - **การตั้งเวลา + การทำงานอัตโนมัติ:** งานที่ทำซ้ำสำหรับ **การสำรองข้อมูลหรือการกู้คืน** โดยกำหนดเป้าหมาย
   เป็นแอปเดียว ชุดของแอป หรือแอปทั้งหมด พร้อมการตัดแต่งแบบ keep-N บวกกับการสำรองข้อมูลอัตโนมัติแบบเลือก
   เปิดใช้เมื่อติดตั้ง/อัปเดต และรายการแอปที่ยกเว้น.
@@ -135,11 +154,11 @@ VDBackup ทำงานในฐานะ root และจัดการข�
 
 ## การอัปเดตแบบเพิ่มทีละส่วน (VDLU)
 
-VD Backup มาพร้อมเอนจิน **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** (ฝังอยู่ใน `vdlu/`): โมดูลอัปเดตตัวเองโดยดึงเฉพาะไฟล์ที่เปลี่ยนแปลง (บล็อบแบบระบุที่อยู่ด้วยเนื้อหา + `manifest.json` ที่ลงนามแล้ว) แทนที่จะดาวน์โหลด `.zip` ทั้งก้อนใหม่. โปรไฟล์ **เสริมความแข็งแกร่ง**: ลายเซ็น ed25519 เป็นสิ่งบังคับและการดาวน์เกรดถูกบล็อก; `.zip` แบบเต็มยังคงใช้ได้ในฐานะทางเลือกสำรอง.
+VD Backup มาพร้อมเอนจิน **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** (ฝังอยู่ใน `vdlu/`): โมดูลอัปเดตตัวเองโดยดึงเฉพาะไฟล์ที่เปลี่ยนแปลง (บล็อบแบบระบุที่อยู่ด้วยเนื้อหา + `manifest.json` ที่ลงนามแล้ว) แทนที่จะดาวน์โหลด `.zip` ทั้งก้อนใหม่. โปรไฟล์ **เสริมความแข็งแกร่ง**: ลายเซ็น ed25519 เป็นสิ่งบังคับและการดาวน์เกรดถูกบล็อก, `.zip` แบบเต็มยังคงใช้ได้ในฐานะทางเลือกสำรอง.
 
 - **LIVE เท่านั้น** (ไม่ต้องรีบูต): การอัปเดตจะถูกนำไปใช้ในการบูตครั้งถัดไปผ่าน `service.sh` แบบเบื้องหลัง, ไม่ทำอะไรเลยเมื่อไม่มี feed ที่เข้าถึงได้.
 - **สถานะ** อยู่ใน `/data/adb/vdbackup/vdlu/`, ภายนอกโมดูล จึงอยู่รอดหลังการแฟลชใหม่.
-- **WebUI:** แผง **อัปเดต** พร้อม toast แสดงความคืบหน้าและปุ่มยกเลิก; การอัปเดตอัตโนมัติเป็นแบบเลือกเปิดใช้ (opt-in).
+- **WebUI:** แผง **อัปเดต** พร้อม toast แสดงความคืบหน้าและปุ่มยกเลิก, การอัปเดตอัตโนมัติเป็นแบบเลือกเปิดใช้ (opt-in).
 
 ## เอกสาร
 
@@ -190,3 +209,7 @@ VD Backup เป็นโปรเจกต์อิสระที่ไม่�
 ## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **เข้าร่วมช่องเพื่อรับการอัปเดต:** @Priv8_VD https://t.me/Priv8_VD

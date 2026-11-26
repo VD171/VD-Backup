@@ -7,7 +7,7 @@
 VDBackup, bir YZ asistanının veya ajanının modülün **her** içeriğini ve
 eylemini, tıpkı bir kişinin WebUI üzerinden yaptığı gibi başsız (headless) olarak
 yönetebilmesi için tasarlanmıştır. WebUI, küçük bir JSON API'nin yalnızca bir
-istemcisidir; ajanınız da bir diğeridir. API'yi kullanın, WebUI'yi kazımayın.
+istemcisidir, ajanınız da bir diğeridir. API'yi kullanın, WebUI'yi kazımayın.
 
 ## Sözleşme
 
@@ -19,10 +19,10 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 
 - Argümanlar tek bir JSON nesnesidir, **base64 ile kodlanır** ve tek bir argv token'ı olarak geçirilir.
 - Komut, stdout üzerine **tek bir JSON nesnesi** yazdırır: `{"ok":true,...}` veya
-  `{"ok":false,"code":"ERR_...","message":"..."}`. Bunu ayrıştırın; asla metni kazımayın.
+  `{"ok":false,"code":"ERR_...","message":"..."}`. Bunu ayrıştırın, asla metni kazımayın.
 - Uzun işlemler (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) hemen `{"ok":true,"opid":"..."}` döndürür
   ve **ayrık (detached)** çalışır (çağıran/WebUI kapansa bile hayatta kalırlar). İlerlemelerini
-  yoklayın; çağrı döndüğünde henüz bitmemişlerdir.
+  yoklayın, çağrı döndüğünde henüz bitmemişlerdir.
 - `progress` ve `cancel`, bir JSON nesnesi değil, **ham opid dizesinin base64'ünü** alır.
 
 Kabuğunuz için küçük bir yardımcı:
@@ -36,20 +36,20 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 Bunu bir iş istasyonundan yönetmek için, cihaza giden olağan root kanalınız üzerinden
 çalıştırın (root olarak adb shell veya SSH-to-root kurulumu). Modül, paketlenmiş ikili
 dosyalarla gelir, bu yüzden kurulduktan sonra yerel yedekleme/geri yükleme için
-**internet gerektirmez**; yalnızca bulut hedefleri (`rclone`/`restic`/ssh) ağla konuşur.
+**internet gerektirmez**, yalnızca bulut hedefleri (`rclone`/`restic`/ssh) ağla konuşur.
 
 ## Fiiller
 
 | Fiil | Argümanlar (JSON) | Döndürür |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` sayılar (boyutlar bayt cinsinden): yedeği olan uygulamalar, toplam yedek örneği, bağımsız yol yedekleri, zamanlanmış işler, toplam yedek boyutu ve yedek dosya sisteminin boş/toplam alanı. Ayrık değildir, hemen döner; WebUI başlangıç genel görünümü tarafından kullanılır. |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` sayılar (boyutlar bayt cinsinden): yedeği olan uygulamalar, toplam yedek örneği, bağımsız yol yedekleri, zamanlanmış işler, toplam yedek boyutu ve yedek dosya sisteminin boş/toplam alanı. Ayrık değildir, hemen döner, WebUI başlangıç genel görünümü tarafından kullanılır. |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | config nesnesi (veya `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | şifreleme için `age` anahtar çiftini üretir |
 | `list-apps` | `{user?}` | `{ok,apps:[{package,label,system,versionCode}]}` (dex, shell yedeği) |
 | `label` | `{package,user?}` | `{ok,label}` (gerçek yerelleştirilmiş uygulama adı, bağlamsız) |
-| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG; paket+`vc` başına önbelleklenir) |
+| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG, paket+`vc` başına önbelleklenir) |
 | `backup` | aşağıya bakın | `{ok,opid}` (ayrık) |
 | `restore` | aşağıya bakın | `{ok,opid}` (ayrık) |
 | `import` | `{from,ref,password,ssaid,user}` | `{ok,opid}` (ayrık) |
@@ -59,7 +59,7 @@ dosyalarla gelir, bu yüzden kurulduktan sonra yerel yedekleme/geri yükleme iç
 | `list-ops` | `{}` | `{ok,ops:[...]}` (yeniden bağlandıktan sonra yeniden eklenir) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | uygulama listesi / toplu base64 simgeler |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
-| `note-set` | `{ref,note?,tags?}` | `{ok}` bir yedeğin özel adını (`note`) ve serbest `tags` değerini ayarlar veya temizler; yedekle birlikte taşınan bir yardımcı dosyada saklanır, `list-backups` üzerinden aranabilir. |
+| `note-set` | `{ref,note?,tags?}` | `{ok}` bir yedeğin özel adını (`note`) ve serbest `tags` değerini ayarlar veya temizler, yedekle birlikte taşınan bir yardımcı dosyada saklanır, `list-backups` üzerinden aranabilir. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` cihazın Android kullanıcıları (çoklu kullanıcı). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` bir yolun alt dizinleri (klasör seçici). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` bağımsız klasör/dosya yedekleri. |
@@ -72,48 +72,48 @@ dosyalarla gelir, bu yüzden kurulduktan sonra yerel yedekleme/geri yükleme iç
 | `log-export` | `{user?}` | `{ok:true,path}` (yedek dizini altında yazılmış bir `.txt` dosyasının mutlak yolu) veya `{ok:false,code:"ERR_LOG_EXPORT"}`. Etkinlik günlüğünü (`audit.jsonl`) artı kısa bir yapı/cihaz başlığını, bir hata raporuna eklenebilmesi için kullanıcıya görünür tek bir metin dosyasına yazar. Ayrık değildir, hemen döner. |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` sistem genelinde yedek (ayrık) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (yeniden başlatma gerekir; `confirm` buna kapı tutar) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (yeniden başlatma gerekir, `confirm` buna kapı tutar) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` herhangi bir mutlak yolu `tar.zst`+`manifest.json` olarak `.paths/` altında yedekler (ayrık) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` bir yol yedeğini orijinal konumuna geri yükler (`confirm` buna kapı tutar; ayrık) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` bir yol yedeğini orijinal konumuna geri yükler (`confirm` buna kapı tutar, ayrık) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` /data/adb ağacının bir tembel seviyesi (varsayılan `/data/adb`), seçici için. |
 | `adb-du` | `{path}` | `{ok,size}` bir /data/adb alt ağacının özyinelemeli bayt boyutu, istek üzerine. |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` /data/adb'yi yedekler - tamamını (`paths`'i atla) veya seçilen alt yolları - dosya başına SELinux/sahip sadakatiyle, `.adb/` altında (ayrık) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` bir /data/adb yedeğini canlı ağacın ÜZERİNE geri yükler - tamamı veya seçilen alt yollar - her dosyanın bağlamını koruyarak (asla toptan chcon); `confirm` buna kapı tutar (ayrık) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` bir /data/adb yedeğini canlı ağacın ÜZERİNE geri yükler - tamamı veya seçilen alt yollar - her dosyanın bağlamını koruyarak (asla toptan chcon), `confirm` buna kapı tutar (ayrık) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` /data/adb dosya sistemi yedekleri. |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` bir yedeğin depolanmış ayrıntılı dosya listesi, geri yükleme ağacı seçicisi için. |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | kurulu bir uygulamayı sistem uygulaması olarak bağlar (sistemsiz alt-modül; NoMount ile canlı, yoksa sonraki açılışta) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | kurulu bir uygulamayı sistem uygulaması olarak bağlar (sistemsiz alt-modül, NoMount ile canlı, yoksa sonraki açılışta) |
 | `companion-status` / `companion-install` | `{}` | Google Drive eşlikçi durumu / istek üzerine kurulum |
 | `telegram-check` | `{}` | Telegram oturum durumu (`user` null = oturum açılmamış) |
-| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | Telegram girişi; hesapta 2FA varsa ve `password` yoksa `sign-in` `2FA_REQUIRED` döndürür |
+| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | Telegram girişi, hesapta 2FA varsa ve `password` yoksa `sign-in` `2FA_REQUIRED` döndürür |
 | `telegram-logout` | `{}` | Telegram oturumunu kapatır |
 | `telegram-list` | `{}` | Telegram kanalındaki yedekler (adlar `<pkg>__<ts>_<vc>.vdb.tar`) |
-| `telegram-pull` | `{message_id,name}` | `{ok,opid}` bir Telegram yedeğini yerel depolamaya indirir (detached); sonra normal `restore` akışıyla geri yüklenir |
+| `telegram-pull` | `{message_id,name}` | `{ok,opid}` bir Telegram yedeğini yerel depolamaya indirir (detached), sonra normal `restore` akışıyla geri yüklenir |
 | `telegram-delete` | `{message_id}` | `{ok,deleted:[...]}` Telegram kanalından `message_id` ile bir yedeği siler (toplu: virgülle ayrılmış) |
 | `rclone-list` | `{dest}` | `{ok,dest,backups:[{dest,rref,package,tsvc}]}` bir rclone hedefinde yalnızca-uzakta saklanan Full yedekler (`dest` hedef id'sidir, `rref` ise `<pkg>/<ts_vc>`) |
-| `rclone-pull` | `{dest,rref}` | `{ok,opid}` yalnızca-uzakta saklanan bir rclone yedeğini yerel depolamaya indirir (detached); sonra normal `restore` akışıyla geri yüklenir |
-| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` bir rclone uzak biriminden bir yedeği siler; `rref` tam olarak `<pkg>/<ts_vc>` olmalıdır |
+| `rclone-pull` | `{dest,rref}` | `{ok,opid}` yalnızca-uzakta saklanan bir rclone yedeğini yerel depolamaya indirir (detached), sonra normal `restore` akışıyla geri yüklenir |
+| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` bir rclone uzak biriminden bir yedeği siler, `rref` tam olarak `<pkg>/<ts_vc>` olmalıdır |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | hedef yönetimi |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone uzak yönetimi (bir `type:"rclone"` hedefinin işaret ettiği `rclone.conf` girdisini oluşturur); `backend` herhangi bir rclone backend'i olabilir, whitelist yok |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone uzak yönetimi (bir `type:"rclone"` hedefinin işaret ettiği `rclone.conf` girdisini oluşturur), `backend` herhangi bir rclone backend'i olabilir, whitelist yok |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (motor, telefon tarayıcısını o onay URL'sine bir Android VIEW intent ile zaten açtı) veya `{ok:false,code:"ERR_AUTHORIZE"}`. Cihaz üzerinde OAuth için yerel bir geri çağırma sunucusunda (`127.0.0.1:53682`) `rclone authorize <backend>` çalıştırır. |
 | `remote-authorize-poll` | `{}` | beklerken `{ok:true,done:false,url}`, kullanıcı onay verdiğinde `{ok:true,done:true,token}` (`remote-add`'e geçirilecek `token`), veya `{ok:false,code:"ERR_AUTHORIZE"}`. |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; bekleyen bir yetkilendirmeyi durdurur. |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, bekleyen bir yetkilendirmeyi durdurur. |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (`rclone`/`restic` ikili dosyaları mevcut mu, bu `lite` sürümü onları getirebilir mi, bayt cinsinden indirme boyutu) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (ayrık) bir `lite` sürümünde `rclone`/`restic` eklentisini indirir+doğrular+kurar |
-| `schedule-set` / `schedule-list` / `schedule-delete` | aşağıya bakın | zamanlanmış işler (bir yedekleme veya bir geri yükleme; tek bir uygulamayı, bir kümeyi veya tüm uygulamaları hedefler) |
+| `schedule-set` / `schedule-list` / `schedule-delete` | aşağıya bakın | zamanlanmış işler (bir yedekleme veya bir geri yükleme, tek bir uygulamayı, bir kümeyi veya tüm uygulamaları hedefler) |
 | `scheduler-tick` | `{}` | vadesi gelen işleri çalıştırır + saklama uygular + otomatik yedekleme gözlemcisi (açılış sinyali bunu çağırır) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (ayrık değil; hemen döner; başarısızlıkta `ERR_UPDATE_CHECK`, aşağıya bakın) |
-| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) birçok uygulamayı tek bir ayrık işlemde yedekler; ilerleme `n`/`of` taşır. Uygulama başına bir hata partiyi durdurmaz. |
-| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) birçok yedeği tek bir ayrık işlemde geri yükler; ilerleme `n`/`of` taşır. Uygulama başına bir hata partiyi durdurmaz. |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (ayrık değil, hemen döner, başarısızlıkta `ERR_UPDATE_CHECK`, aşağıya bakın) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) birçok uygulamayı tek bir ayrık işlemde yedekler, ilerleme `n`/`of` taşır. Uygulama başına bir hata partiyi durdurmaz. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) birçok yedeği tek bir ayrık işlemde geri yükler, ilerleme `n`/`of` taşır. Uygulama başına bir hata partiyi durdurmaz. |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` klasör seçici için depolama birimleri: dahili artı çıkarılabilir SD kart / USB. |
 | `config-export` | `{password}` | `{ok,opid}` (detached) yapılandırmayı, işleri, hedefleri, kimlik bilgilerini ve anahtarları yedek klasöründe parola ifadesiyle şifreli tek bir dosyaya aktarır. |
 | `config-import` | `{ref,password}` | `{ok,opid}` (detached) dışa aktarılmış bir yapılandırma dosyasını bu cihaza geri birleştirir (asla körlemesine üzerine yazmaz). |
 | `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` içe aktarmak için mevcut şifreli yapılandırma dosyalarını listeler. |
-| `wipe-credentials` | `{}` | `{ok,wiped}` kayıtlı uzak parolaları ve cihaz şifreleme anahtarını kaldırır; hedefler, işler ve yedekler kalır. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` kayıtlı uzak parolaları ve cihaz şifreleme anahtarını kaldırır, hedefler, işler ve yedekler kalır. |
 | `log-prune` | `{}` | `{ok}` çoktan bitmiş işlem günlüklerini budar, denetim izini sınırlar ve eski simgeleri temizler (önyükleme hizmeti bunu çağırır). |
 | `sanitize` | `{}` | `{ok}` yedek klasörlerinin görünürlüğünü (0755) her Android kullanıcısında yeniden uygular, böylece bir dosya yöneticisi, ham bir root kopyasının veya v1.03.2 öncesi bir yedeğin yalnızca sahibine erişilebilir bıraktığı klasörleri açabilir. |
-| `boot-sweep` | `{}` | `{ok,reaped}` kesintiye uğramış veya zorla sonlandırılmış bir yedekten kalanları toplar (önyükleme hizmeti bunu çağırır); başarısız olan veya iptal edilen bir yedek zaten kendi worker'ı tarafından temizlenir. |
+| `boot-sweep` | `{}` | `{ok,reaped}` kesintiye uğramış veya zorla sonlandırılmış bir yedekten kalanları toplar (önyükleme hizmeti bunu çağırır), başarısız olan veya iptal edilen bir yedek zaten kendi worker'ı tarafından temizlenir. |
 
 ### `progress` alanları
 
@@ -139,7 +139,7 @@ boştur ve **sonlandırıcı yazımlarda atlanır** (finish / dry-run / restore-
 | `of` | int | toplam öğe sayısı (0 = bilinmiyor) |
 | `cur` | string | mevcut öğe adı (boş = yok) |
 
-Bulut aktarımları `rate`/`eta` alanlarını doldurur (percent rclone'dan gelir); yerel Full
+Bulut aktarımları `rate`/`eta` alanlarını doldurur (percent rclone'dan gelir), yerel Full
 yedekleri `n`/`of`/`cur` alanlarını doldurur. Aşama etiketleri sağlama toplamı mühürleme aşaması
 **`verified`** ile, bulut aktarımları için, **`transfer`** ve **`mirror <item>`** aşamalarını
 içerir.
@@ -166,7 +166,7 @@ içerir.
 ```
 
 `restore`/`import`, `{ref}` alır (bir yedek dizini / tarama ref'i). `restore` ayrıca şunları
-kabul eder: `"items"` (geri yüklenecek, yedeğin öğe türlerinin bir alt kümesi; hepsi için
+kabul eder: `"items"` (geri yüklenecek, yedeğin öğe türlerinin bir alt kümesi, hepsi için
 atlayın), `"test": true` (geçici bir dizine çıkarır ve canlı uygulamaya dokunmadan doğrular),
 snapshot/mirror için `"mode"`, şifrelenmiş bir yedek için `"password"`, `"ssaid"` (katılımlı)
 ve kurulum kaynağı seçenekleri `"spoof_installer"` (yapılandırmadan varsayılan, kurulum
@@ -230,7 +230,7 @@ Bir toplu işlem (`packages` ile `backup`, `refs` ile `restore`) her uygulamayı
 - **`batch_app_timeout`** (yapılandırma, saniye, varsayılan `1800`, `0` devre dışı bırakır): bir uygulama daha uzun sürerse işlem ağacı sonlandırılır, `ERR_TIMEOUT` olarak kaydedilir ve toplu işlem devam eder, böylece takılan bir uygulama tüm çalışmayı asla dondurmaz.
 - **Kısmi sonuç**: bitiş yazması `ok`, `of` içinden `n`, bir `fails` dökümü `{code:count}` (örn. `{"ERR_NO_SPACE":24}`) ve `free` (yedeklerin dosya sistemindeki boş bayt) içerir. Kısmi bir toplu işlem `ERR_BATCH_PARTIAL` değeridir, asla kör bir hata değil.
 - **Termal hız ayarı** (yapılandırma `thermal_throttle`, varsayılan açık): uygulamalar arasında cihaz sıcakken worker soğumak için duraklar ve bir `cooling` ilerleme aşaması yayar, böylece uzun bir çalışma cihazı aşırı ısıtmaz.
-- **Çalıştırma öncesi alan tahmini** (yapılandırma `space_preflight`, varsayılan açık): yerel bir hedefe toplu işlemden önce, seçilen uygulamaların sıkıştırılmamış boyutu toplanır; bu zaten hedefin boş alanını aşıyorsa, toplu işlem diski yarıya kadar doldurmak yerine önceden `ERR_NO_SPACE` (ve bir `need` alanı) ile durur. Akışlı uzak hedefler için atlanır.
+- **Çalıştırma öncesi alan tahmini** (yapılandırma `space_preflight`, varsayılan açık): yerel bir hedefe toplu işlemden önce, seçilen uygulamaların sıkıştırılmamış boyutu toplanır, bu zaten hedefin boş alanını aşıyorsa, toplu işlem diski yarıya kadar doldurmak yerine önceden `ERR_NO_SPACE` (ve bir `need` alanı) ile durur. Akışlı uzak hedefler için atlanır.
 
 ### `remote-add` argümanları
 
@@ -278,7 +278,7 @@ işler için. Yerel hedefler asla kapılanmaz.
 ### Bulut bütünlüğü ve kota
 
 - **Sağlama toplamı mührü (bulut).** Başarılı bir bulut kopyasından sonra motor uzak bir sağlama
-  toplamı kontrolü (`rclone check`) çalıştırır; bir uyuşmazlık işlemi `ERR_VERIFY` ile başarısız
+  toplamı kontrolü (`rclone check`) çalıştırır, bir uyuşmazlık işlemi `ERR_VERIFY` ile başarısız
   kılar. Yerel tarafla ortak bir karma paylaşmayan arka uçlar atlanır (bir başarısızlık değildir).
 - **Kota kontrolü (bulut, Full modu).** Bir `rclone` uzak hedefine Full modunda yüklemeden önce
   motor uzak hedefin boş alanını sorgular (`rclone about --json`) ve yedek sığmayacaksa `ERR_QUOTA`
@@ -293,10 +293,10 @@ Bir `full` sürüm tüm ikilileri paketler ve asla ağa ihtiyaç duymaz. `lite` 
 getiremeyeceğini ve bayt cinsinden indirme boyutunu bildirir. `cloud-fetch` **ayrık** çalışır
 (kendi `opid`'si ile `progress`'i yoklayın): mimariye özgü `rclone`+`restic` eklentisini indirir,
 onu modüle gömülü SHA-256 ile doğrular ve çalışma zamanı önbelleğine kurar. İlerleme aşamaları
-`downloading`, `verifying` ve `installing`'dir; son kod başarıda `ERR_NONE`, başarısızlıkta
+`downloading`, `verifying` ve `installing`'dir, son kod başarıda `ERR_NONE`, başarısızlıkta
 `ERR_FETCH` (indirme başarısız) / `ERR_FETCH_VERIFY` (sağlama toplamı uyuşmuyor, atıldı) olur. Bir
 `full` sürümde gereksizdir. `lite` sürümde ikililer mevcut olmadan önce bir bulut veya snapshot
-hedefine yapılan `backup`/`restore`, `ERR_CLOUD_FETCHABLE` ile başarısız olur; istemci
+hedefine yapılan `backup`/`restore`, `ERR_CLOUD_FETCHABLE` ile başarısız olur, istemci
 `cloud-fetch` çalıştırmayı önermeli, ardından yeniden denemelidir.
 
 ### Özel yedek kategorileri
@@ -308,18 +308,18 @@ uygular. Kategoriler şunlardır:
 | Kategori | Ne olduğu | Geri yükleme semantiği |
 |----------|-----------|-------------------|
 | `messages` | SMS/MMS | provider değiştirme (sil + çıkar) |
-| `rcs` | RCS sohbet (Google Messages, `bugle_db`); ayrıca taşınabilir şekilde `rcs.json`'a aktarılır | uygulama verisi değiştirme (siler + çıkarır), aynı cihaz |
+| `rcs` | RCS sohbet (Google Messages, `bugle_db`), ayrıca taşınabilir şekilde `rcs.json`'a aktarılır | uygulama verisi değiştirme (siler + çıkarır), aynı cihaz |
 | `contacts` | kişiler ve arama günlüğü | provider değiştirme (sil + çıkar) |
 | `wifi` | kaydedilmiş Wi-Fi ağları | provider değiştirme (sil + çıkar) |
 | `bluetooth` | Bluetooth eşleştirmeleri | provider değiştirme (sil + çıkar) |
-| `calendar` | takvim provider'ı (`com.android.providers.calendar`, uygulama + veri); ayrıca `calendar.json`'a taşınabilir olarak dışa aktarılır | provider değiştirme (sil + çıkar) |
+| `calendar` | takvim provider'ı (`com.android.providers.calendar`, uygulama + veri), ayrıca `calendar.json`'a taşınabilir olarak dışa aktarılır | provider değiştirme (sil + çıkar) |
 | `wallpaper` | ana ekran ve kilit ekranı duvar kağıdı artı `wallpaper_info.xml`, ham (ikili) olarak saklanır | dosyalar değiştirilir |
 | `dns` | ayarlardan okunan özel DNS modu ve belirteci | idempotent `settings put` |
 | `system_settings` | sistem/global/secure ayarlarının tam dökümü | **katılımlı**, idempotent `settings put`, cihaz ayarlarının üzerine yazar |
 
 **`system_settings` kesinlikle katılımlıdır ve geri yüklemede yıkıcıdır.** `ssaid` gibi, geri
 yüklendiğinde cihaz genelindeki ayarların üzerine yazar, bu yüzden açık kullanıcı rızasının arkasında
-kapı tutulur ve denetim izine yazılır. Onu asla varsayılan olarak seçmeyin; yalnızca doğrudan,
+kapı tutulur ve denetim izine yazılır. Onu asla varsayılan olarak seçmeyin, yalnızca doğrudan,
 kasıtlı bir kullanıcı isteğinde.
 
 ### Bağımsız yol yedeği
@@ -338,30 +338,30 @@ Arşiv, backups dizini altındaki `.paths/` içinde VDBackup'ın kendi formatın
 
 - Kaynak yol **mutlak** olmalı ve izin verilen köklerden birinin altında olmalıdır:
   `/storage/emulated`, `/data/media`, `/sdcard`, `/data`. Var olmayan bir yol `ERR_NO_PATH` ile
-  başarısız olur; izin verilen köklerin dışındaki veya `..` içeren bir yol `ERR_BAD_PATH` ile
+  başarısız olur, izin verilen köklerin dışındaki veya `..` içeren bir yol `ERR_BAD_PATH` ile
   başarısız olur.
 - `path-restore`, orijinal konuma geri yazar, bu yüzden yıkıcıdır ve `"confirm": true` gerektirir -
   `special-restore` gibi yüksek sürtünmeli bir kapı. Geçerli bir yol yedeği olmayan bir `ref`,
   `ERR_BAD_REF` ile başarısız olur.
-- İkisi de **ayrık** çalışır; döndürülen `opid` ile `progress`'i yoklayın.
+- İkisi de **ayrık** çalışır, döndürülen `opid` ile `progress`'i yoklayın.
 
 ### /data/adb dosya sistemi yedeği
 
 `adb-backup` / `adb-restore`, /data/adb altındaki root ortamını (modüller, verileri ve yapılandırmaları)
-yedekler ve geri yükler; tembel bir ağaç seçicisiyle sürülür (`adb-list` bir seferde bir seviye, `adb-du`
+yedekler ve geri yükler, tembel bir ağaç seçicisiyle sürülür (`adb-list` bir seferde bir seviye, `adb-du`
 istek üzerine bir klasörün boyutu için).
 
 - Her iki uçta da tam veya seçmeli: her şey için `paths`'i atla, ya da seçilen alt yolları geç
-  (/data/adb'ye göreli); geri yükleme aynı `paths`'i alır.
+  (/data/adb'ye göreli), geri yükleme aynı `paths`'i alır.
 - **Dosya başına sadakat:** arşiv her dosyanın SELinux bağlamını, sahibini ve xattrs'ını saklar ve geri
-  yükleme buna dayanır - ASLA toptan bir `chcon` uygulamaz; bu, /data/adb'nin heterojen bağlamlarını
-  düzleştirip root'u bozardı. `adb-restore` canlı ağacın ÜZERİNE çıkarır; onu asla silmez.
+  yükleme buna dayanır - ASLA toptan bir `chcon` uygulamaz, bu, /data/adb'nin heterojen bağlamlarını
+  düzleştirip root'u bozardı. `adb-restore` canlı ağacın ÜZERİNE çıkarır, onu asla silmez.
 - Öz-referans: yedeğin kendi çıktısı ve modülün staging'i dışlanır, böylece bir yedek asla kendini
   içermez.
 - `adb-index` bir yedeğin depolanmış dosya listesini döndürür, böylece bir geri yükleme kendi ağacını
-  gösterebilir; UI seçimi tamamen `paths` ile ifade edilir (tamamen işaretli bir klasör tek bir yoldur;
+  gösterebilir, UI seçimi tamamen `paths` ile ifade edilir (tamamen işaretli bir klasör tek bir yoldur;
   kısmen işaretli olan, işaretli çocuklarına iner, bu yüzden bir exclude listesine gerek yoktur).
-- `adb-restore`, `"confirm": true` gerektirir (yüksek sürtünmeli kapı); ikisi de ayrık çalışır, `progress`'i yoklayın.
+- `adb-restore`, `"confirm": true` gerektirir (yüksek sürtünmeli kapı), ikisi de ayrık çalışır, `progress`'i yoklayın.
 
 ### `update-check`
 
@@ -390,14 +390,14 @@ Başarılı olduğunda şunu döner:
 `updateJson` URL'si yoksa, ağ isteği başarısız olursa veya manifest ayrıştırılamıyorsa
 `{"ok":false,"code":"ERR_UPDATE_CHECK"}` döner.
 
-`update-check` yalnızca kullanılabilirliği ve sürüm notlarını **bildirir**; güncellemenin kendisini
+`update-check` yalnızca kullanılabilirliği ve sürüm notlarını **bildirir**, güncellemenin kendisini
 root yöneticiniz (KernelSU / APatch / Magisk) modülün `updateJson`'ı aracılığıyla yapar, asla bu
 fiil yapmaz.
 
 ## Ajanınızın uyması gereken güvenlik korkulukları
 
 - **`ssaid` kesinlikle katılımlıdır (varsayılan kapalı).** Cihaz ANDROID_ID'sini bir sistem
-  dosyasını yeniden yazarak yedekler / geri yükler; bir geri yükleme yalnızca yeniden başlatmadan
+  dosyasını yeniden yazarak yedekler / geri yükler, bir geri yükleme yalnızca yeniden başlatmadan
   sonra uygulanır ve önceki dosya geri alma için her zaman önce kaydedilir. `"ssaid": true`'yu
   yalnızca doğrudan, kasıtlı bir kullanıcı isteğinde gönderin, asla varsayılan olarak.
 - **Değiştiren eylemler (restore, delete, import) yıkıcıdır** ve yerel bir denetim izine
@@ -405,7 +405,7 @@ fiil yapmaz.
   uygulamayı yedeğin tam durumuna döndürür. Çağırmadan önce niyeti onaylayın.
 - **`system_settings`, tıpkı `ssaid` gibi katılımlı ve yıkıcıdır.** Onu geri yüklemek cihaz
   genelindeki ayarların üzerine yazar, bu yüzden onu yalnızca doğrudan bir kullanıcı isteğinde
-  gönderin; açık rızayla kapı tutulur ve denetim izine kaydedilir.
+  gönderin, açık rızayla kapı tutulur ve denetim izine kaydedilir.
 - **Geri yükleme idempotenttir.** Ham provider geri yüklemeleri (messages/contacts/wifi/bluetooth/
   calendar) birleştirmek yerine **değiştirir**: provider verisi silinir ve arşiv onun üzerine
   çıkarılır, bu yüzden aynı yedeği yeniden geri yüklemek satırları çoğaltamaz. `dns` ve
@@ -417,7 +417,7 @@ fiil yapmaz.
   ile çalışır). Kurcalanmış bir arşiv, hedef dizininden asla kaçamaz.
 - Korumayı (SELinux/uid/gid/modlar/xattr) veya APK kuralını (APK'lar her zaman sıkıştırılır,
   `encrypt_apk` ayarlanmadıkça asla şifrelenmez) **asla zayıflatmayın**.
-- JSON çıktısını gerçeğin kaynağı olarak ele alın; `ok`/`code`'u kontrol edin, `progress`'i
+- JSON çıktısını gerçeğin kaynağı olarak ele alın, `ok`/`code`'u kontrol edin, `progress`'i
   yoklayın ve tahmin etmek yerine `ERR_*` kodlarını yüzeye çıkarın.
 
 Dahili yapı için [ARCHITECTURE.md](ARCHITECTURE.md) ve
@@ -427,4 +427,4 @@ Dahili yapı için [ARCHITECTURE.md](ARCHITECTURE.md) ve
 
 ---
 
-> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

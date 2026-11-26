@@ -38,7 +38,7 @@ python3 tools/screenshots/shoot.py pt en ar   # only the given language codes
 ```
 
 Requirements: `python3-playwright` (the Python package) and a system Google Chrome or
-Chromium. No network is used; a throwaway loopback HTTP server serves the webroot so
+Chromium. No network is used, a throwaway loopback HTTP server serves the webroot so
 the UI's `fetch` of `lang/<code>.json` works.
 
 The release ritual runs this automatically: the **Release** workflow regenerates all
@@ -56,10 +56,10 @@ step with the UI:
   run with no edit to the harness;
 - the shown version is read from `module/module.prop`, so a release bump needs no change
   here either;
-- the mock data is declared once in `build_fixtures()` in `shoot.py`; when the UI starts
+- the mock data is declared once in `build_fixtures()` in `shoot.py`, when the UI starts
   calling a new `helper.sh` verb, add it there.
 
-`tools/` is outside `module/`, so it is never copied into the flashed module zip; it
+`tools/` is outside `module/`, so it is never copied into the flashed module zip, it
 ships only to the dev remote, never to end users.
 
 ## Rules (match the project)
@@ -82,4 +82,4 @@ ships only to the dev remote, never to end users.
 | `settings-dark` | Settings | theme, interface scale, language, accent, backup defaults |
 | `activitylog-dark` | Activity log | the audit log screen |
 
-*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome; see [CONTRIBUTING.md](../../CONTRIBUTING.md).*
+*This documentation was generated with Claude (Anthropic) and is maintained by VD171. Corrections and improvements are welcome, see [CONTRIBUTING.md](../../CONTRIBUTING.md).*

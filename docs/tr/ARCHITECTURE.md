@@ -44,12 +44,12 @@ izin istemi yoktur ve çekirdek özellikler için bir yardımcı uygulama yoktur
 - **Zaten root.** Modül süreci root'tur, bu yüzden motor sade shell'dir. İşin ~%85'i
   saf shell'dir (`tar`/`zstd`/`age`/`pm`/`am`/`chown`/`chcon`/`rclone`/...).
 - **Ayrık yürütme.** Yedekleme/geri yükleme, bağımsız bir root süreci olarak `setsid nohup` ile
-  çalışır. WebUI'yi kapatmak onları kesmez; arayüz,
+  çalışır. WebUI'yi kapatmak onları kesmez, arayüz,
   `logs/progress-<opid>.json` dosyasını okuyarak yeniden bağlanır.
 - **Framework yardımcısı (~%15).** İnce ayarlı izinler, AppOps, SSAID, StorageStats,
   simgeler ve ayrıcalıklı Wi-Fi, Android framework'üne ihtiyaç duyar. `app_process` üzerinden çalıştırılan
   küçük bir `dex` (yüklü uygulama yok) bunları bir shell yedeğiyle birlikte halleder.
-- **Taşınabilirlik.** Yalnızca standart biçimler; yedekler bu modül olmadan bir PC'de açılır.
+- **Taşınabilirlik.** Yalnızca standart biçimler, yedekler bu modül olmadan bir PC'de açılır.
 - **Durum**, `/data/adb/vdbackup/` içinde bulunur (yapılandırma, işler, hedefler, şifrelenmiş
   kimlik bilgileri, günlükler, staging). **Yedekler**, kullanıcıya görünür, kimlik bilgisiyle
   şifrelenmiş depolamaya `/sdcard/VDBackup/` (`/data/media/<user>/VDBackup`, kullanıcı başına) yazılır,
@@ -61,7 +61,7 @@ Bir yedek sonsuza dek geri yüklenebilir kalmalıdır. Bu bir elden geldiğince 
 
 **Kapsam.** Garanti, **v1.01'den itibaren** (resmi olarak yayımlanan ilk sürüm) yazılan
 yedekleri ve yalnızca resmi olarak yayımlanmış, sürümü çıkmış sürümleri kapsar. v1.00
-yalnızca test amaçlı bir derlemeydi ve açıkça kapsam dışıdır; ön sürüm ve geliştirme
+yalnızca test amaçlı bir derlemeydi ve açıkça kapsam dışıdır, ön sürüm ve geliştirme
 derlemeleri kapsanmaz. İlk genel sürümden itibaren, aşağıdaki söz mutlaktır:
 
 - **Yalnızca standart biçimler.** Her arşiv, `zstd`, `gzip` veya `lz4` ile sıkıştırılmış,
@@ -80,14 +80,14 @@ derlemeleri kapsanmaz. İlk genel sürümden itibaren, aşağıdaki söz mutlakt
 
 Kısacası: VDBackup'ın şimdiye dek yazdığı her şey, gelecekteki her VDBackup (ve sade bir PC)
 hâlâ geri yükleyebilir. Biçimi, önceki bir yedeği bozacak şekilde değiştirmek
-yasaktır; yeni yetenekler `format_version` ve yeni, eklenen alanların arkasına eklenir.
+yasaktır, yeni yetenekler `format_version` ve yeni, eklenen alanların arkasına eklenir.
 
 Tam teknik tasarım için (arşiv biçimi, üst veri şeması, pipeline'lar, kripto,
-hedefler, içe aktarıcılar) bakımcılar ayrıntılı tasarım notları tutar; bu dosya,
+hedefler, içe aktarıcılar) bakımcılar ayrıntılı tasarım notları tutar, bu dosya,
 katkıda bulunanlara yönelik genel bakıştır.
 
 <!-- doc-footer -->
 
 ---
 
-> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

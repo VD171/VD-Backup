@@ -44,12 +44,12 @@ prompt de permission ni d'application compagnon pour les fonctions centrales.
 - **Déjà root.** Le processus du module est root, donc le moteur est du shell pur. ~85% du
   travail est du shell pur (`tar`/`zstd`/`age`/`pm`/`am`/`chown`/`chcon`/`rclone`/...).
 - **Exécution détachée.** Les sauvegardes/restaurations s'exécutent via `setsid nohup`, en tant que processus root
-  indépendant. Fermer la WebUI ne les interrompt pas ; l'UI se rattache en lisant
+  indépendant. Fermer la WebUI ne les interrompt pas, l'UI se rattache en lisant
   `logs/progress-<opid>.json`.
 - **Helper de framework (~15%).** Les permissions fines, AppOps, SSAID, StorageStats,
   les icônes et le Wi-Fi privilégié nécessitent le framework Android. Une petite exécution `dex` via
   `app_process` (sans application installée) s'en charge, avec un fallback en shell.
-- **Portabilité.** Uniquement des formats standard ; les sauvegardes s'ouvrent sur un PC sans ce module.
+- **Portabilité.** Uniquement des formats standard, les sauvegardes s'ouvrent sur un PC sans ce module.
 - **L'état** réside dans `/data/adb/vdbackup/` (config, jobs, destinations, identifiants
   chiffrés, logs, staging). **Les sauvegardes** sont écrites dans un stockage visible par l'utilisateur et chiffré
   par identifiants dans `/sdcard/VDBackup/` (`/data/media/<user>/VDBackup`, par utilisateur),
@@ -61,7 +61,7 @@ Une sauvegarde doit rester restaurable pour toujours. Ceci est une règle strict
 
 **Portée.** La garantie couvre les sauvegardes écrites par **v1.01 et au-delà** (la première version
 publiée officiellement) et uniquement par des versions officiellement publiées et releasées. v1.00 était une
-build de test uniquement et est explicitement hors de portée ; les builds pré-release et de développement ne
+build de test uniquement et est explicitement hors de portée, les builds pré-release et de développement ne
 sont pas couvertes. À partir de la première version publique, la promesse ci-dessous est absolue :
 
 - **Formats standard uniquement.** Chaque archive est un simple `tar` compressé avec `zstd`,
@@ -80,14 +80,14 @@ sont pas couvertes. À partir de la première version publique, la promesse ci-d
 
 En bref : tout ce que VDBackup a jamais écrit, tout VDBackup futur (et un PC ordinaire)
 peut encore le restaurer. Changer le format d'une manière qui casse une sauvegarde antérieure n'est pas
-autorisé ; les nouvelles capacités sont ajoutées derrière `format_version` et de nouveaux champs additifs.
+autorisé, les nouvelles capacités sont ajoutées derrière `format_version` et de nouveaux champs additifs.
 
 Pour la conception technique complète (format d'archive, schéma de métadonnées, pipelines, crypto,
-destinations, importateurs) les mainteneurs tiennent des notes de conception détaillées ; ce fichier est la
+destinations, importateurs) les mainteneurs tiennent des notes de conception détaillées, ce fichier est la
 vue d'ensemble destinée aux contributeurs.
 
 <!-- doc-footer -->
 
 ---
 
-> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues ; voir [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md)._

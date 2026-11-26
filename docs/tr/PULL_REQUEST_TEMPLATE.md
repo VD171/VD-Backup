@@ -5,7 +5,7 @@ Bu PR'nin neyi ve neden değiştirdiğini açıklayın.
 ## Kontrol listesi
 
 - [ ] Proje banner başlığı her yeni/değiştirilen kaynak dosyada mevcut.
-- [ ] Kod ve yorumlar İngilizce; em/en-dash yok.
+- [ ] Kod ve yorumlar İngilizce, em/en-dash yok.
 - [ ] Bir UI etiketi değiştiyse, tüm `lang/<code>.json` ve `README.<code>.md` güncellendi.
 - [ ] Hiçbir gerçek özellik (SELinux/uid-gid/modlar koruması vb.) zayıflatılmadı.
 - [ ] Commit'ler imzalandı (`git commit -s`).
@@ -19,4 +19,4 @@ Bu PR'nin neyi ve neden değiştirdiğini açıklayın.
 
 ---
 
-> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

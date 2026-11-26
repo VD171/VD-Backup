@@ -29,7 +29,7 @@ Açık bir açıklama ve mümkünse yeniden üretme adımlarını ekleyin. Elimi
   olarak yazılmaz. Yedekler asla cihaza bağlı donanım anahtarlarına bağlanmaz (böylece
   taşınabilir kalırlar), bu da şifreli bir yedeği parolanın koruduğu anlamına gelir -
   güçlü bir parola seçin.
-- Bu kimlik bilgileri, yeniden başlatmadan sonraki ilk kilit açmaya kadar kilitli kalan kimlik bilgisiyle şifreli depolamada (`/data/misc_ce`) bulunur; bu nedenle `/data/adb`'nin aksine o açılmadan önce asla okunamaz. Bir modül güncellemesi eski kopyaları oraya kalıcı olarak taşır (orijinali silmeden önce her birini doğrular) ve yeniden kurulumlar arasında kalıcıdır.
+- Bu kimlik bilgileri, yeniden başlatmadan sonraki ilk kilit açmaya kadar kilitli kalan kimlik bilgisiyle şifreli depolamada (`/data/misc_ce`) bulunur, bu nedenle `/data/adb`'nin aksine o açılmadan önce asla okunamaz. Bir modül güncellemesi eski kopyaları oraya kalıcı olarak taşır (orijinali silmeden önce her birini doğrular) ve yeniden kurulumlar arasında kalıcıdır.
 - Yerel bir yedek hedefi de beklemede şifreli kalmalıdır: yalnızca dahili ve çıkarılabilir kullanıcı depolaması izinlidir, asla `/data/adb`, `/data/system` ya da ilk kilit açmadan önce okunabilen başka yollar ve asla bir `..` geçişi. Çıkarılabilir SD/USB beklemede hiç şifreli değildir, bu yüzden bunun için yedek şifrelemesini açmanız konusunda uyarılırsınız (engellenmezsiniz).
 - İsteğe bağlı Google Drive yardımcı uygulaması, root'u veya kilidi açılmış bir
   önyükleyiciyi ifşa etmemesi için her zaman [HMA-OSS](https://github.com/frknkrc44/HMA-OSS) ile gizlenmelidir.
@@ -44,4 +44,4 @@ Açık bir açıklama ve mümkünse yeniden üretme adımlarını ekleyin. Elimi
 
 ---
 
-> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

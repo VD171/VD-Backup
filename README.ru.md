@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · Русский · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/ru/home-dark.png) | ![Apps](docs/screenshots/ru/apps-dark.png) | ![Schedule](docs/screenshots/ru/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/ru/destinations-dark.png) | ![Settings](docs/screenshots/ru/settings-dark.png) | ![Activity log](docs/screenshots/ru/activitylog-dark.png) |
 
 ---
 
@@ -67,23 +86,23 @@ Android-DataBackup**: объединение того, что они делаю�
   не привязано к оборудованию устройства, поэтому резервная копия восстанавливается на другом устройстве или открывается на ПК.
 - **Назначения:** локально, SFTP, SCP, SMB, WebDAV, FTP, S3 и ещё 70+ (`rclone`),
   а также репозитории `rsync` и `restic`. Google Drive необязательно через крошечный опциональный компаньон.
-- **Telegram:** создавайте копии в приватном канале Telegram как безлимитное облако по MTProto - восстановление и удаление тоже из WebUI.
-- **Целостность:** каждый архив проверяется по манифесту; пробный прогон (dry-run) и
+- **Telegram:** создавайте копии в приватном канале Telegram как безлимитное облако по MTProto, восстановление и удаление тоже из WebUI.
+- **Целостность:** каждый архив проверяется по манифесту, пробный прогон (dry-run) и
   тест восстановления позволяют проверить резервную копию, ничего не затрагивая.
 - **Выборочное и пакетное восстановление:** восстанавливайте любое подмножество элементов резервной
-  копии или выберите несколько резервных копий и восстановите их все сразу; удаляйте резервные копии
+  копии или выберите несколько резервных копий и восстановите их все сразу, удаляйте резервные копии
   и ведите журнал активности/аудита каждого разрушающего действия.
 - **Особые резервные копии:** сообщения (SMS/MMS/RCS), контакты и журнал вызовов, Wi-Fi и Bluetooth,
   с необязательным переносимым экспортом в JSON, который можно открыть на ПК.
-- **Системные файлы (`/data/adb`):** резервное копирование самого окружения root - модулей, их
-  данных и конфигураций - всего целиком или поддерева, которое вы выбираете в дереве файлов, при
+- **Системные файлы (`/data/adb`):** резервное копирование самого окружения root (модулей, их
+  данных и конфигураций) всего целиком или поддерева, которое вы выбираете в дереве файлов, при
   этом каждый файл восстанавливается с исходным владельцем и контекстом SELinux, чтобы root
-  продолжал работать. Для продвинутых; только то, что вы выберете.
+  продолжал работать. Для продвинутых, только то, что вы выберете.
 - **Расписание + автоматизация:** повторяющиеся задания **резервного копирования или восстановления**
   с целью на одно приложение, набор или все приложения, с очисткой по правилу keep-N, плюс
   опциональное авторезервирование при установке/обновлении и список исключённых приложений.
 - **Источник установки:** восстановленные приложения по умолчанию сообщают, что источник их установки -
-  Play Store (переключаемо); расширенная опция также подделывает инициирующий пакет и источник.
+  Play Store (переключаемо), расширенная опция также подделывает инициирующий пакет и источник.
 - **Монтирование как системное приложение:** смонтируйте установленное приложение как системное, не трогая
   реальный раздел `/system` (безсистемный overlay-подмодуль, с учётом NoMount).
 - **Фоновый режим:** резервное копирование/восстановление выполняются отсоединённо и
@@ -111,13 +130,13 @@ VDBackup создан, чтобы быть дружелюбным к ИИ-асс
 бинарники встроены (включая `rclone` для облачных провайдеров и `restic` для снапшотов),
 полностью офлайн, ничего никогда не скачивается, любое устройство, самый большой.
 `universal-lite`, все архитектуры без двух самых больших бинарников (`rclone`, `restic`),
-самый маленький; всё ещё делает локальные бэкапы, SSH/SFTP и `rsync` без скачивания, а при
+самый маленький, всё ещё делает локальные бэкапы, SSH/SFTP и `rsync` без скачивания, а при
 первом использовании облачного назначения (`rclone`) или режима снапшотов (`restic`)
 предлагает один раз скачать небольшое дополнение под вашу архитектуру (проверенное по
 SHA-256) и кэширует его, так что эти функции тоже работают. `<abi>-full` (`arm64-v8a`,
 `armeabi-v7a`, `x86`, `x86_64`), одна архитектура со всеми встроенными бинарниками, меньше,
-чем `universal-full`. Знаете свою архитектуру -> берите `<abi>-full`; нужен самый маленький и
-не смущает однократная загрузка для облака или снапшотов -> `universal-lite`; хотите всё
+чем `universal-full`. Знаете свою архитектуру -> берите `<abi>-full`, нужен самый маленький и
+не смущает однократная загрузка для облака или снапшотов -> `universal-lite`, хотите всё
 встроенное без загрузок (офлайн / восстановление) -> редакция full. См.
 [Релизы](https://github.com/VD171/VD-Backup/releases).
 
@@ -125,7 +144,7 @@ SHA-256) и кэширует его, так что эти функции тож�
 
 ## Безопасность
 
-VDBackup работает с правами root и обрабатывает данные ваших приложений и, по желанию, ваши учётные данные и парольные фразы шифрования; резервная копия может содержать конфиденциальные данные, поэтому защитите её парольной фразой и храните в надёжном месте. Учётные данные хранятся зашифрованными в состоянии покоя, никогда в открытом виде, а шифрование никогда не привязано к аппаратному обеспечению устройства, поэтому именно парольная фраза защищает зашифрованную копию. Сообщайте об уязвимости согласно [SECURITY.md](SECURITY.md).
+VDBackup работает с правами root и обрабатывает данные ваших приложений и, по желанию, ваши учётные данные и парольные фразы шифрования, резервная копия может содержать конфиденциальные данные, поэтому защитите её парольной фразой и храните в надёжном месте. Учётные данные хранятся зашифрованными в состоянии покоя, никогда в открытом виде, а шифрование никогда не привязано к аппаратному обеспечению устройства, поэтому именно парольная фраза защищает зашифрованную копию. Сообщайте об уязвимости согласно [SECURITY.md](SECURITY.md).
 
 ## Сборка
 
@@ -149,7 +168,7 @@ VD Backup поставляется с движком **[VDLiveUpdate](https://gi
 
 - **Только LIVE** (без перезагрузки): обновления применяются при следующей загрузке через `service.sh`, в фоне, и ничего не делают, когда ни один feed недоступен.
 - **Состояние** в `/data/adb/vdbackup/vdlu/`, вне модуля, поэтому оно переживает перепрошивку.
-- **WebUI:** панель **Обновления** с всплывающим уведомлением о ходе выполнения и отменой; автоматическое обновление включается по желанию.
+- **WebUI:** панель **Обновления** с всплывающим уведомлением о ходе выполнения и отменой, автоматическое обновление включается по желанию.
 
 ## Документация
 
@@ -200,3 +219,7 @@ VD Backup, это независимый, неофициальный проек�
 ## Теги
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **Подпишитесь на канал для обновлений:** @Priv8_VD https://t.me/Priv8_VD

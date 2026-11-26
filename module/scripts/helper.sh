@@ -482,7 +482,7 @@ case "$verb" in
        '(($cur[0] // {}) * .) | .format_version = (.format_version // $cur[0].format_version // 1)' 2>/dev/null)"
     if [ -n "$_cfgmerged" ]; then
       printf '%s\n' "$_cfgmerged" > "$STATE/config.json" && chmod 600 "$STATE/config.json" \
-        && { [ "$("$JQ" -r '.auto_backup // false' "$STATE/config.json")" = true ] && seed_autobackup "$JQ" "$("$JQ" -r '.user // 0' "$STATE/config.json")"; ok '"saved":true'; } \
+        && { if [ "$("$JQ" -r '.auto_backup // false' "$STATE/config.json")" = true ]; then seed_autobackup "$JQ" "$("$JQ" -r '.user // 0' "$STATE/config.json")"; else rm -f "$STATE/autobackup_seen.json"; fi; ok '"saved":true'; } \
         || err ERR_CONFIG_WRITE "could not write config"
     else
       err ERR_CONFIG_WRITE "config merge failed (invalid JSON?)"
@@ -965,6 +965,26 @@ case "$verb" in
     done <<EOF
 $(backup_roots "$_u")
 EOF
+    # Mirror backups (issue #38): a Mirror keeps ONE live copy per app under
+    # <backups_dir>/.mirror/vdbackup/<pkg>/{component,meta.json} - no <TS_VC> level and no
+    # manifest.json, so the loop above (keyed on manifest.json) never lists them. Surface each as
+    # a single mode:"mirror" entry. Restore resolves a mirror by dest+package (do_restore_mirror),
+    # not by ref, so dest is the default local store. A mirror's meta.json is framework state,
+    # not a manifest, so there is no versionCode/label - the UI falls back to the package name;
+    # created_at is the dir mtime (ms, so the frontend's shortDate parses it like a full backup).
+    _mroot="$(bdir "$_u")/.mirror/vdbackup"
+    for _md in "$_mroot"/${pkg:-*}/.; do
+      _mp="${_md%/.}"; [ -d "$_mp" ] || continue
+      _mpkg="${_mp##*/}"; case "$_mpkg" in ''|'*') continue ;; esac
+      _mit=""; for _c in data data_de external obb media apk; do [ -d "$_mp/$_c" ] && _mit="$_mit\"$_c\","; done
+      [ -n "$_mit" ] || continue   # a dir with no restorable component is not a backup
+      _mts="$(stat -c %Y "$_mp" 2>/dev/null || echo 0)"; case "$_mts" in ''|*[!0-9]*) _mts=0 ;; esac
+      _mnt="$("$JQ" -c '{note:(.note//""),tags:((.tags//[])|map(select(type=="string")))}' "$_mp/note.json" 2>/dev/null)"; case "$_mnt" in '') _mnt='{"note":"","tags":[]}' ;; esac
+      [ "$first" = 1 ] || printf ','; first=0
+      printf '{"ref":"%s","package":"%s","label":"%s","mode":"mirror","dest":"local","versionName":"","versionCode":0,"created_at":%s000,"note":%s,"tags":%s,"items":[%s]}' \
+        "$(jstr "$_mp")" "$(jstr "$_mpkg")" "$(jstr "$_mpkg")" "$_mts" \
+        "$(printf '%s' "$_mnt" | "$JQ" -c '.note')" "$(printf '%s' "$_mnt" | "$JQ" -c '.tags')" "${_mit%,}"
+    done
     printf ']}\n' ;;
 
   note-set)

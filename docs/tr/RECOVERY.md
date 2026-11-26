@@ -11,10 +11,10 @@ sonunda bir `.age` ile şifrelenmiş.
 
 ## İhtiyaç duyabileceğiniz araçlar
 
-- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`; Linux: `apt install zstd`)
+- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
 - **age** (yalnızca `.age` dosyaları için): https://github.com/FiloSottile/age/releases
 - `tar`, macOS, Linux ve modern Windows 10/11'de yerleşiktir.
-- `gzip` her yerde yerleşiktir; `.tar.gz` için fazladan hiçbir şeye ihtiyacınız yoktur.
+- `gzip` her yerde yerleşiktir, `.tar.gz` için fazladan hiçbir şeye ihtiyacınız yoktur.
 
 ## 1. Şifre çözme (yalnızca dosya `.age` ile bitiyorsa)
 
@@ -62,7 +62,7 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ## Notlar
 
-- Çıkarılan dosyalar göreli yollarını korur; SELinux bağlamı, uid/gid ve modlar tar'ın
+- Çıkarılan dosyalar göreli yollarını korur, SELinux bağlamı, uid/gid ve modlar tar'ın
   içindedir (ve yalnızca Android'de geri yüklediğinizde düzgün bir şekilde yeniden uygulanır).
 - `manifest.json`, her dosyanın tam olarak ne olduğunu, uygulama sürümünü ve orijinal
   sahibi/bağlamı açıklar. Doğruluk kaynağıdır.
@@ -73,4 +73,4 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ---
 
-> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

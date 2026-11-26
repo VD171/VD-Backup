@@ -68,13 +68,13 @@ bağlı değildir. Bkz. [bölüm 11](#11-taşınabilirlik-yedekleri-bir-pcde-aç
 - **KernelSU**, **APatch** veya **Magisk** tarafından yönetilen **root'lanmış bir
   Android cihaz**. VDBackup, o yöneticiden bir modül olarak kurulur.
 - Yedekleriniz için yeterli boş depolama (yerel yedekler modülün durum dizini altında
-  yaşar; bkz. [bölüm 3](#3-kurulum-ve-ilk-çalıştırma)).
+  yaşar, bkz. [bölüm 3](#3-kurulum-ve-ilk-çalıştırma)).
 - Başka hiçbir şey. Modül, ihtiyaç duyduğu tüm ikili dosyaları paketler (tar, zstd, lz4,
   rclone, rsync, ssh, restic), bu nedenle **yerel yedekleme ve geri yükleme tamamen
   çevrimdışı çalışır**. Yalnızca bulut hedefleri ağla konuşur.
 
 Bazı ince taneli ekstralar (AppOps, SSAID, birkaç ayrıcalıklı sistem biti) Android
-çerçevesine dayanır; modül bunları dahili olarak, düz kabuk yedeğiyle ele alır ve
+çerçevesine dayanır, modül bunları dahili olarak, düz kabuk yedeğiyle ele alır ve
 cihazınızda kullanılamadıklarında zarif bir şekilde devre dışı kalırlar.
 
 ## 3. Kurulum ve ilk çalıştırma
@@ -83,7 +83,7 @@ cihazınızda kullanılamadıklarında zarif bir şekilde devre dışı kalırla
 2. KernelSU / APatch / Magisk yöneticinizde, modül zip'ini başka herhangi bir modül
    gibi flaşlayın.
 3. Hemen kullanılabilir, **yeniden başlatma gerekmez**. (Yeniden başlatma yalnızca
-   SSAID geri yüklenirken geçerlidir; bkz. [bölüm 10](#10-ssaid-cihaz-android_id).)
+   SSAID geri yüklenirken geçerlidir, bkz. [bölüm 10](#10-ssaid-cihaz-android_id).)
 4. Yöneticiden modülün **WebUI**'sini açın. Bu, tüm arayüzdür.
 
 **Hangi sürümü indirmeli.** Her sürüm, yalnızca ihtiyacınız olanı indirmeniz için birkaç
@@ -94,7 +94,7 @@ flaşlanabilir zip sürümü halinde gelir. Birini seçin:
   (tekilleştirilmiş anlık görüntüler) dahil. Tamamen çevrimdışı, hiçbir şey asla indirilmez. Her
   cihazda çalışır. En büyük indirme.
 - **`VD-Backup-<ver>-universal-lite.zip`**: her mimari, ancak en büyük iki ikili dosya
-  (`rclone` ve `restic`) **olmadan**. En küçük indirme; yine de taşınabilir `age`
+  (`rclone` ve `restic`) **olmadan**. En küçük indirme, yine de taşınabilir `age`
   şifrelemesiyle yerel, SSH/SFTP ve rsync yedeklerini indirme olmadan yapar. Bir bulut hedefini
   (`rclone`) ya da anlık görüntü modunu (`restic`) ilk kez kullandığınızda, WebUI o küçük
   mimariye özel eklentiyi bir kez indirmeyi önerir (SHA-256 ile doğrulanır) ve önbelleğe alır;
@@ -139,10 +139,10 @@ Bunu iki nedenle aklınızda tutun: yedekler `/sdcard/VDBackup` altında yer kap
 
 WebUI birkaç sekmeye düzenlenmiştir:
 
-- **Home**: yedeklerinizin sayılarını (uygulamalar, yedekler, klasörler ve zamanlanmış işler) ve yedeklerinizin boşa kıyasla ne kadar yer kapladığını gösteren bir depolama çubuğunu gösteren bir başlangıç genel görünümü; durum rozetleri, karma ve yolları panoya kopyalama ve bir **Check for updates** eylemi ile birlikte.
+- **Home**: yedeklerinizin sayılarını (uygulamalar, yedekler, klasörler ve zamanlanmış işler) ve yedeklerinizin boşa kıyasla ne kadar yer kapladığını gösteren bir depolama çubuğunu gösteren bir başlangıç genel görünümü, durum rozetleri, karma ve yolları panoya kopyalama ve bir **Check for updates** eylemi ile birlikte.
 - **Apps**: kurulu uygulamaların listesi (kullanıcı ve sistem), her biri gerçek adı,
   paket adı ve simgesiyle gösterilir (simgeler tembel yüklenir ve önbelleklenir, böylece
-  liste duyarlı kalır). Bir satırdaki düğme uygulamayı yedekler; satıra dokunmak o
+  liste duyarlı kalır). Bir satırdaki düğme uygulamayı yedekler, satıra dokunmak o
   uygulamanın yedek geçmişini açar, burada herhangi bir önceki yedeği geri
   yükleyebilirsiniz.
 - **Backups**: zaten sahip olduğunuz yedekler, her biri uygulama adını bir satırda ve
@@ -166,7 +166,7 @@ WebUI birkaç sekmeye düzenlenmiştir:
   birlikte) bildiren bir **Check for updates** eylemi. Her güncellemeyi, modülü flaşladığınız gibi
   root yöneticiniz üzerinden kurarsınız.
 
-Uygulama ayrıca her açılışında kendisi daha yeni bir sürüm olup olmadığını denetler (saatte en fazla bir kez) ve güncelleme afişini yalnızca varsa gösterir; güncel veya çevrimdışıysa sessiz kalır.
+Uygulama ayrıca her açılışında kendisi daha yeni bir sürüm olup olmadığını denetler (saatte en fazla bir kez) ve güncelleme afişini yalnızca varsa gösterir, güncel veya çevrimdışıysa sessiz kalır.
 
 Onaylar ve mesajlar, uygulama içi diyalogları kullanır (eski sistem açılır pencereleri
 değil) ve bir geri yükleme veya içe aktarma, ilerlemeden önce mevcut uygulama verilerinin
@@ -178,7 +178,7 @@ WebUI yeniden eklenir ve yerelleştirilmiş bir aşama etiketiyle canlı ilerlem
 Çalışan bir iş için ilerleme kartı ayrıca canlı aktarım hızını ve tahmini kalan süreyi, artı
 mevcut öğenin adıyla birlikte bir öğe sayacını (örneğin "12 of 40") gösterir.
 Kabuk bildirimlerini yüzeye çıkaran ROM'larda, bir iş başladığında ve bittiğinde ayrıca
-bir Android bildirimi alırsınız; her durumda, uygulama içi ilerleme kartı güvenilir
+bir Android bildirimi alırsınız, her durumda, uygulama içi ilerleme kartı güvenilir
 göstergedir.
 
 ## 5. Yedek alma
@@ -187,11 +187,11 @@ Temel akış: **Apps**'i açın, bir uygulama seçin, neyi dahil edeceğinizi se
 seçin, sıkıştırmayı ve (isteğe bağlı olarak) şifrelemeyi ayarlayın, sonra çalıştırın.
 İlerleme canlı olarak görünür ve bir bildirim bittiğinde size haber verir.
 
-Bir yedekleme ya da geri yükleme sürerken, ilerleme kartında bir **Cancel** düğmesi bulunur. Bir yedeklemeyi iptal etmek onu durdurur ve başlatmış olduğu kısmi kopyayı kaldırır, böylece yarım yazılmış hiçbir şey geride kalmaz. Bir geri yüklemeyi iptal etmek de onu durdurur, ancak uygulama kısmen geri yüklenmiş kalabilir, bu yüzden VDBackup önce sizi uyarır; bitirmek için geri yüklemeyi yeniden çalıştırın.
+Bir yedekleme ya da geri yükleme sürerken, ilerleme kartında bir **Cancel** düğmesi bulunur. Bir yedeklemeyi iptal etmek onu durdurur ve başlatmış olduğu kısmi kopyayı kaldırır, böylece yarım yazılmış hiçbir şey geride kalmaz. Bir geri yüklemeyi iptal etmek de onu durdurur, ancak uygulama kısmen geri yüklenmiş kalabilir, bu yüzden VDBackup önce sizi uyarır, bitirmek için geri yüklemeyi yeniden çalıştırın.
 
 Yedekleme iletişim kutusunda bu yedeğin **hedefini** de seçebilirsin, yerel depolama ya da eklediğin herhangi bir bulut/uzak hedef, önce Ayarlar'daki varsayılan hedefi değiştirmeden.
 
-VDBackup bir yedekleme sırasında, ikisi de Ayarlar'da varsayılan olarak açık olan iki otomatik güvenlik önlemi çalıştırır. **"Cihaz ısındığında soğuması için duraklat"** uzun bir işe nefes aldırır ve cihaz gerçekten sıcaksa soğumasını bekler, böylece büyük bir yedekleme telefonu asla aşırı ısıtmaz; yalnızca tempo değişir, sadakat asla. **"Toplu yedeklemeden önce boş alanı denetle"**, çok uygulamalı bir yedeklemenin neye ihtiyaç duyacağını tahmin eder ve depolama yetmeyecekse yarı yolda değil, en başta durur.
+VDBackup bir yedekleme sırasında, ikisi de Ayarlar'da varsayılan olarak açık olan iki otomatik güvenlik önlemi çalıştırır. **"Cihaz ısındığında soğuması için duraklat"** uzun bir işe nefes aldırır ve cihaz gerçekten sıcaksa soğumasını bekler, böylece büyük bir yedekleme telefonu asla aşırı ısıtmaz, yalnızca tempo değişir, sadakat asla. **"Toplu yedeklemeden önce boş alanı denetle"**, çok uygulamalı bir yedeklemenin neye ihtiyaç duyacağını tahmin eder ve depolama yetmeyecekse yarı yolda değil, en başta durur.
 
 ### 5.1 Neyi yedekleyeceğinizi seçme
 
@@ -287,13 +287,13 @@ hedefteki orijinaline karşı yeniden kontrol eden son bir **checksum-verified**
 ve eşleşmezlerse (buluta bozuk bir kopya bırakmak yerine) işi başarısız kılar. Ve bir Full
 yüklemeden önce uzak hedefin **boş alanını** kontrol eder ve yedek sığmayacaksa, uzak hedefi
 doldurup yarı yolda başarısız olmak yerine, açık bir **"not enough space"** hatasıyla erkenden
-durur. (Alan kontrolü Full yüklemeler içindir; Mirror bir delta eşitlemesidir ve muaftır.)
+durur. (Alan kontrolü Full yüklemeler içindir, Mirror bir delta eşitlemesidir ve muaftır.)
 
 ### 5.6 Özel yedekler (mesajlar, arama günlüğü, Wi-Fi, Bluetooth, takvim, duvar kağıdı, DNS, sistem ayarları)
 
 **Backups** sekmesindeki uygulama listelerinin altında, **Özel yedekler** tek bir
 uygulamaya bağlı olmayan sistem genelindeki verileri kapsar. Kategorileri seçin ve
-yedekleyin; uygulama yedekleriyle aynı SELinux/xattr koruması ve isteğe bağlı şifrelemeyle
+yedekleyin, uygulama yedekleriyle aynı SELinux/xattr koruması ve isteğe bağlı şifrelemeyle
 arşivlenirler. Kategoriler şunlardır:
 
 | Kategori | Ne olduğu |
@@ -345,10 +345,10 @@ ortamının kendisini sakladığı yerdir. VDBackup bunu tamamen veya kısmen ye
 root kurulumunuzu bir silme işlemi veya bir ROM değişikliği boyunca taşıyabilirsiniz.
 
 - **Tümü veya seçmeli.** `/data/adb`'nin tamamını yedekleyin ya da dosya ağacını açıp tam olarak
-  istediğiniz klasörleri ve dosyaları seçin; yarısı işaretli bir klasör yalnızca işaretlediğiniz
+  istediğiniz klasörleri ve dosyaları seçin, yarısı işaretli bir klasör yalnızca işaretlediğiniz
   alt öğeleri içerir.
 - **Her şey sizin elinizde kalır.** Ağaç tarafsızdır - VDBackup'ın kendi çalışma dosyaları dışında
-  hiçbir şey önceden seçili veya gizli değildir; o dosyalar aksi halde yalnızca kendisini
+  hiçbir şey önceden seçili veya gizli değildir, o dosyalar aksi halde yalnızca kendisini
   yedeklerdi. Sıkıştırma ve şifreleme, diğer herhangi bir yedekle aynı taşınabilir seçeneklerdir.
 - **Geri yükleme root'u çalışır tutar.** Her dosya kendi özgün sahibi, grubu, modu ve SELinux
   bağlamıyla, teker teker, canlı ağacın üzerine geri yazılır (asla toptan bir silme değil), böylece
@@ -387,7 +387,7 @@ Yararlı geri yükleme seçenekleri:
   uygulama denetimi bunu bekler. Bunu Settings'te genel olarak veya geri yükleme başına
   kapatabilirsiniz ve kapalıyken orijinal kurulum kaynağı korunur. Gelişmiş, katılımlı bir
   **"başlatan kaynağı sahtele"** geçişi daha ileri gider ve ayrıca uygulamanın başlatan
-  paketini ve paket kaynağını Play'den kurulmuş gibi gösterir; sistem paket veritabanını
+  paketini ve paket kaynağını Play'den kurulmuş gibi gösterir, sistem paket veritabanını
   düzenler (önce yedeklenir) ve yeniden başlatmadan sonra geçerli olur.
 
 **Toplu geri yükleme.** **Backups** sekmesinde, Apps sekmesinin toplu yedekleme için sahip
@@ -397,7 +397,7 @@ kutusu seçimin tamamını kapsar, üzerine yazma onayı, geri yükleme testi ve
 kaynağı seçimi seçtiğiniz her yedeğe uygulanır, ve bunlar art arda geri yüklenir.
 
 **Bir yedeği silme.** Bir yedeğin ayrıntılarını (veya bir uygulamanın geçmişini) açın ve
-**Delete**'i kullanın; onaylamanız istenir ve silme işlemi etkinlik günlüğüne yazılır.
+**Delete**'i kullanın, onaylamanız istenir ve silme işlemi etkinlik günlüğüne yazılır.
 Ayrıca uygulama başına kaç yedek tutulacağını da sınırlayabilirsiniz (saklama), böylece
 eskiler otomatik olarak budanır.
 
@@ -405,14 +405,14 @@ eskiler otomatik olarak budanır.
 geçmişinden, **Mount as system**, uygulamanın APK'sını bir VDBackup overlay alt-modülüne
 hazırlar, böylece root yöneticisi onu `/system/app`'ten (veya `/system/priv-app`'ten)
 sunar, gerçek `/system` bölümüne asla dokunulmaz. KernelSU'da **NoMount** ile canlı
-olarak uygulanır; aksi takdirde yeniden başlatmadan sonra uygulanır. Bu asla NoMount'un
+olarak uygulanır, aksi takdirde yeniden başlatmadan sonra uygulanır. Bu asla NoMount'un
 kurulu olmasına bağlı değildir.
 
 ## 7. Hedefler: yerel ve uzak
 
 Varsayılan olarak, yedekler modülün durum dizini altındaki **yerel** depolamaya yazılır.
 Ayrıca **Destinations** sekmesinde uzak hedefler de ekleyebilirsiniz. Yerel bir hedef için,
-**Browse** bir klasör seçici açar; böylece yolu yazmak yerine paylaşılan depolama
+**Browse** bir klasör seçici açar, böylece yolu yazmak yerine paylaşılan depolama
 (`/sdcard`) altında bir alt klasör seçebilirsiniz.
 
 Uzak taşıma, paketlenmiş araçlar tarafından ele alınır:
@@ -421,7 +421,7 @@ Uzak taşıma, paketlenmiş araçlar tarafından ele alınır:
   Google Drive** ve 70'ten fazla başka hizmet.
 - **rsync** ve **ssh/scp/sftp** paketi, delta senkronizasyonu ve düz SSH hedefleri için.
 - **restic**: şifrelenmiş, yineleme giderilmiş **Snapshot** depoları (yerel veya uzak).
-- **Telegram**: yedekleme için kendi Telegram hesabınız (sınırsız dış depolama). **Telegram** hedefini seçin, bir kez giriş yapın (telefon -> kod -> varsa iki faktörlü parola) ve yedekler özel bir kanala yüklenir. Backups sekmesindeki **Restore from Telegram**, bir yedeği bu cihaza geri çeker; orada herhangi bir yerel yedek gibi geri yüklenir. **Aynı cihazda** geri yükleme güvenilir durumdur (oturum o cihazda kalır).
+- **Telegram**: yedekleme için kendi Telegram hesabınız (sınırsız dış depolama). **Telegram** hedefini seçin, bir kez giriş yapın (telefon -> kod -> varsa iki faktörlü parola) ve yedekler özel bir kanala yüklenir. Backups sekmesindeki **Restore from Telegram**, bir yedeği bu cihaza geri çeker, orada herhangi bir yerel yedek gibi geri yüklenir. **Aynı cihazda** geri yükleme güvenilir durumdur (oturum o cihazda kalır).
 
 **Bir bulut uzak birimi oluşturma (SSH gerekmez).** Destinations sekmesinde, **rclone**
 hedef türünü seçin ve **Add cloud remote**'u kullanın. **Herhangi bir rclone arka ucunu**
@@ -450,7 +450,7 @@ Kısıtladığınızda, her bulut aktarımı, manuel veya zamanlanmış, yüklem
 - önce etkin bağlantıyı kontrol eder ve yanlış olanda çalışmayı reddeder, böylece yalnızca
 Wi-Fi politikası asla mobil veri harcamaz. Yerel yedekler asla etkilenmez.
 
-**Yerel bir kopya tut ya da yalnızca uzak git.** Bir yedek, VDBackup'ın kendi başına listeleyip geri çekebileceği bir uzak hedefe (Telegram ya da bir rclone uzak hedefi) gittiğinde, **varsayılan olarak yalnızca uzaktır**: yedek yüklenir ve bu cihazda hiçbir şey tutulmaz, bu da yerden tasarruf sağlar ve yerel bir iz bırakmaz. Kopyayı anında yerel geri yükleme için cihazda da tutmak üzere Settings'te **"Bir yedek bir hedefe giderken yerel bir kopya tut"** seçeneğini aç. Her iki durumda da bir uzak yedeği, Backups sekmesindeki **Bulut uzak biriminden geri yükle** ile geri alabilirsin; bu, uzak yedeklerini listeler ve seçtiğini geri çeker.
+**Yerel bir kopya tut ya da yalnızca uzak git.** Bir yedek, VDBackup'ın kendi başına listeleyip geri çekebileceği bir uzak hedefe (Telegram ya da bir rclone uzak hedefi) gittiğinde, **varsayılan olarak yalnızca uzaktır**: yedek yüklenir ve bu cihazda hiçbir şey tutulmaz, bu da yerden tasarruf sağlar ve yerel bir iz bırakmaz. Kopyayı anında yerel geri yükleme için cihazda da tutmak üzere Settings'te **"Bir yedek bir hedefe giderken yerel bir kopya tut"** seçeneğini aç. Her iki durumda da bir uzak yedeği, Backups sekmesindeki **Bulut uzak biriminden geri yükle** ile geri alabilirsin, bu, uzak yedeklerini listeler ve seçtiğini geri çeker.
 
 **Google Drive.** Google Drive'a ulaşmanın iki yolu vardır:
 
@@ -473,7 +473,7 @@ VDBackup kurulumunuzun kendisi, yani hedefler, zamanlamalar, hazır ayarlar ve k
 
 - **Ayarları dışa aktar**, `VDBackup/.export` içine şifreli bir dosya yazar. Dosya uzak parolalarınızı içerdiği için her zaman bir parola ifadesi ister.
 - **Ayarları içe aktar**, böyle bir dosyayı geri okur ve zaten var olanları kaldırmadan bu cihazla birleştirir.
-- **Kayıtlı kimlik bilgilerini sil**, kayıtlı uzak parolaları ve cihaz şifreleme anahtarını tek adımda kaldırır; hedefleriniz, zamanlamalarınız ve yedekleriniz yerinde kalır.
+- **Kayıtlı kimlik bilgilerini sil**, kayıtlı uzak parolaları ve cihaz şifreleme anahtarını tek adımda kaldırır, hedefleriniz, zamanlamalarınız ve yedekleriniz yerinde kalır.
 
 ## 8. Zamanlama ve saklama
 
@@ -482,7 +482,7 @@ VDBackup, yedekleri, ve geri yüklemeleri, bir zamanlamaya göre otomatik olarak
 
 - bir **hedef**: tek bir uygulama, bir uygulama kümesi veya **tüm uygulamalar** (hariç
   tutulan uygulamalar listesi çıkarılarak), ve kullanılacak öğeler/mod,
-- bir **eylem**: **Back up** (varsayılan) veya **Restore latest**; bu, her hedef
+- bir **eylem**: **Back up** (varsayılan) veya **Restore latest**, bu, her hedef
   uygulamanın en son yedeğini geri yükler,
 - bir hedef,
 - bir **cron benzeri zamanlama**: saatlik, günlük veya haftalık, seçtiğiniz bir saatte
@@ -517,7 +517,7 @@ kurulu olduğunu kaydeder, böylece onu etkinleştirmek asla tüm cihazınızı 
 yedeklemez.
 
 **Hariç tutulan uygulamalar (engelleme listesi).** Yine Settings'te, otomatik olarak veya
-bir zamanlamayla asla yedeklenmesini istemediğiniz uygulamaları hariç tutabilirsiniz; aynı anda
+bir zamanlamayla asla yedeklenmesini istemediğiniz uygulamaları hariç tutabilirsiniz, aynı anda
 birkaçını ekleyebilirsiniz (çoklu seçim) ve hariç tutulan uygulamalar her ikisi tarafından da atlanır.
 
 **Yedek ön ayarları.** Yine Ayarlar'da, adlandırılmış ön ayarlar, dahil edilecek öğe kümeleri, yalnızca APK veya APK + OBB gibi, kaydedip yedek penceresinde birini seçerek öğe seçimlerini tek seferde doldurabilirsiniz.
@@ -583,8 +583,8 @@ Birini bir PC'de açmak için, kısaca:
 
 - **Şifre çöz** (yalnızca dosya `.age` ile bitiyorsa) standart `age` aracı ve parolanız
   veya anahtar dosyanızla.
-- **Sıkıştırmayı aç ve çıkar**: `.tar.zst`'yi `zstd` sonra `tar` ile; `.tar.gz`'yi
-  doğrudan `tar` ile; `.tar.lz4`'ü `zstd --format=lz4` ile. Bir APK, yalnızca
+- **Sıkıştırmayı aç ve çıkar**: `.tar.zst`'yi `zstd` sonra `tar` ile, `.tar.gz`'yi
+  doğrudan `tar` ile, `.tar.lz4`'ü `zstd --format=lz4` ile. Bir APK, yalnızca
   zstd-sıkıştırılmış bir APK'dır, bu nedenle `base.apk.zst`'yi sıkıştırmadan açmak size
   kurulabilir normal bir `base.apk` verir.
 
@@ -599,7 +599,7 @@ de tüm dosyalarınızı alırsınız, yalnızca Android'e özgü sahiplik zorun
 ## 12. VDBackup'ı bir YZ asistanından yönetme
 
 VDBackup, yalnızca insanlara değil, YZ asistanlarına ve ajanlarına dostane olacak şekilde
-inşa edilmiştir. WebUI, küçük bir JSON API'nin yalnızca bir istemcisidir; bir ajan,
+inşa edilmiştir. WebUI, küçük bir JSON API'nin yalnızca bir istemcisidir, bir ajan,
 modülün **her** eylemini aynı API üzerinden başsız olarak yönetebilir (her komut tek bir
 JSON nesnesi döndürür, uzun işlemler ayrık çalışır ve ilerlemelerini yoklarsınız ve aynı
 güvenlik korkulukları uygulanır, SSAID katılımlı kalır, değiştiren eylemler onaylı ve
@@ -623,28 +623,28 @@ herhangi bir işleme yeniden eklenir ve mevcut ilerlemeyi gösterir.
 **Bir `ERR_...` mesajı aldım.** Hatalar açık bir kodla bildirilir. Birkaç yaygın olanı:
 - `ERR_VERIFY`, yazılan bir arşiv manifest hash'iyle eşleşmedi (doğrulama kötü bir yedeği
   yakaladı). Yedeği yeniden çalıştırın.
-- `ERR_RESTORE_TEST`, bir geri yükleme testi başarısız oldu; yedek temiz bir şekilde
+- `ERR_RESTORE_TEST`, bir geri yükleme testi başarısız oldu, yedek temiz bir şekilde
   çıkarılmadı/doğrulanmadı ve canlı uygulamanız dokunulmadan bırakıldı.
 - `ERR_UNSAFE_ARCHIVE`, bir arşiv, hedef dizininin dışına yazmaya çalıştığı için reddedildi (mutlak
-  veya `..` yolları). Bu sizi kurcalanmış bir yedekten korur; hiçbir şey yazılmadı.
-- `ERR_QUOTA`, bir bulut uzak hedefinde bir Full yükleme için yeterli boş alan yoktu; yedek,
+  veya `..` yolları). Bu sizi kurcalanmış bir yedekten korur, hiçbir şey yazılmadı.
+- `ERR_QUOTA`, bir bulut uzak hedefinde bir Full yükleme için yeterli boş alan yoktu, yedek,
   hiçbir şey yüklenmeden önce durduruldu.
 
 **Uzak hedefim başarısız oluyor.** Kimlik bilgilerini ve bağlantıyı doğrulamak için
 Destinations sekmesindeki hedef **testini** kullanın. Yalnızca bulut hedeflerinin ağa
-ihtiyaç duyduğunu unutmayın; yerel yedekleme/geri yükleme tamamen çevrimdışıdır.
+ihtiyaç duyduğunu unutmayın, yerel yedekleme/geri yükleme tamamen çevrimdışıdır.
 
 **Bunlardan herhangi biri eve telefon eder mi veya çalışma zamanında indirir mi?** Hayır.
-Tüm ikili dosyalar derleme zamanında modülde paketlenir; çalışma zamanında cihaza hiçbir
+Tüm ikili dosyalar derleme zamanında modülde paketlenir, çalışma zamanında cihaza hiçbir
 şey getirilmez. Yalnızca bulut hedefleri (rclone/restic/ssh) ağla konuşur ve yalnızca
 onları kullandığınızda.
 
 **Yedeğim farklı bir telefonda geri yüklenir mi?** Evet, yedekler taşınabilirdir ve
 cihaz donanımına bağlı değildir. (SSAID, tek cihaza özgü istisnadır ve katılımlı ve
-yeniden başlatmada uygulanır; bkz. [bölüm 10](#10-ssaid-cihaz-android_id).)
+yeniden başlatmada uygulanır, bkz. [bölüm 10](#10-ssaid-cihaz-android_id).)
 
 **Şifrelenmiş yedeğim açılmıyor, parolayı kaybettim.** Tasarım gereği kurtarma arka
-kapısı yoktur; yedeği koruyan şey paroladır. Onu güvende tutun.
+kapısı yoktur, yedeği koruyan şey paroladır. Onu güvende tutun.
 
 ## 14. Kaldırma
 
@@ -654,4 +654,4 @@ VDBackup'ı diğer modüller gibi KernelSU / APatch / Magisk yöneticinizden kal
 
 ---
 
-> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır; bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Bu belgeler Claude (Anthropic) ile oluşturulmuş olup VD171 tarafından yürütülmektedir. Düzeltmeler ve iyileştirmeler memnuniyetle karşılanır, bkz. [CONTRIBUTING.md](CONTRIBUTING.md)._

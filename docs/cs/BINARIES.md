@@ -18,7 +18,7 @@ a jak ověřit, že nebylo nic neprůhledného podstrčeno.
   repozitáře balíčků Termux (podepsané soubory `.deb` na `packages.termux.dev/apt`), nikdy
   nejsou zkopírovány z Termuxu nainstalovaného na nějakém telefonu. Build selže hlasitě, nikdy
   neimprovizuje.
-- **Reprodukovatelné.** Spusťte build znovu a dostanete stejné soubory; znovu stáhněte připnuté
+- **Reprodukovatelné.** Spusťte build znovu a dostanete stejné soubory, znovu stáhněte připnuté
    zdroje a hodnoty SHA-256 budou souhlasit.
 - **Auditní stopa se dodává s modulem.** Není jen na webu, cestuje
   uvnitř nainstalovaného modulu, na vašem zařízení, takže můžete auditovat offline.
@@ -29,13 +29,13 @@ a jak ověřit, že nebylo nic neprůhledného podstrčeno.
 |---|---|---|
 | nativní nástroje v `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + jejich uzávěr `lib/` | Oficiální apt repozitář **Termux** (`packages.termux.dev/apt`), oficiální balíčky `.deb` | `.github/scripts/build_bin.sh` stáhne soubory `.deb` + jejich tranzitivní závislosti, rozbalí je a zkopíruje binární soubory plus pouze ty sdílené knihovny, které každý z nich potřebuje |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (záložní převodník ABX) | Vydání na GitHubu **rhythmcache/android-xml-converter** (`ABX_RELEASE`, statický ELF) | staženo z připnutého vydání skriptem `build_bin.sh` |
-| `companion.apk` (volitelný companion pro Google Drive) | **Tento repozitář**, `companion/` (Gradle/Kotlin) | sestaven ze zdroje v CI a podepsán klíčem projektu; není to předkompilovaný blob |
+| `companion.apk` (volitelný companion pro Google Drive) | **Tento repozitář**, `companion/` (Gradle/Kotlin) | sestaven ze zdroje v CI a podepsán klíčem projektu, není to předkompilovaný blob |
 | `vdbackup_helper.dex` (framework helper) | **Tento repozitář**, `dex/src/` (Java) | zkompilován ze zdroje v CI pomocí `javac` + `d8` |
 
-Pouze první dva řádky jsou předkompilované binární soubory třetích stran; poslední dva jsou sestaveny ze
+Pouze první dva řádky jsou předkompilované binární soubory třetích stran, poslední dva jsou sestaveny ze
 zdroje, který se nachází v tomto repozitáři a lze jej číst a znovu sestavit.
 
-> **Edice Full vs lite.** Edice lite vynechávají pouze `rclone` a `restic` (dva největší binární soubory), aby zůstaly malé, a stahují je na vyžádání (ověřené přes SHA-256) při prvním použití cloudového cíle nebo režimu snímků; `rsync` a `ssh`/`scp`/`sftp` jsou stále přítomné a každý další binární soubor uvedený výše je přítomen také. Edice Full dodávají `rclone` (poskytovatelé cloudu) a `restic` (snímky) zabudované, takže se nikdy nic nestahuje.
+> **Edice Full vs lite.** Edice lite vynechávají pouze `rclone` a `restic` (dva největší binární soubory), aby zůstaly malé, a stahují je na vyžádání (ověřené přes SHA-256) při prvním použití cloudového cíle nebo režimu snímků, `rsync` a `ssh`/`scp`/`sftp` jsou stále přítomné a každý další binární soubor uvedený výše je přítomen také. Edice Full dodávají `rclone` (poskytovatelé cloudu) a `restic` (snímky) zabudované, takže se nikdy nic nestahuje.
 
 ## Manifest na zařízení: `PROVENANCE.json`
 
@@ -67,7 +67,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
    repozitáři Termux jsou samy servírovány z podepsaného apt repozitáře Termuxu.
 3. **Sestavte od začátku.** Spusťte si sami `.github/scripts/build_bin.sh` (potřebuje pouze
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`) a porovnejte výstup s tím, co bylo dodáno.
-4. **Companion a dex.** Znovu sestavte `companion/` a `dex/` ze zdroje; podpisem
+4. **Companion a dex.** Znovu sestavte `companion/` a `dex/` ze zdroje, podpisem
    companion je klíč projektu (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
@@ -81,4 +81,4 @@ manifest existuje proto, aby jej učinil viditelným.
 
 ---
 
-> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md)._

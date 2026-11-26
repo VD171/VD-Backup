@@ -5,7 +5,7 @@ Mô tả PR này thay đổi điều gì và vì sao.
 ## Danh sách kiểm tra
 
 - [ ] Phần tiêu đề banner của dự án có mặt trên mỗi tập tin nguồn mới/đã thay đổi.
-- [ ] Code và chú thích bằng tiếng Anh; không có em/en-dash.
+- [ ] Code và chú thích bằng tiếng Anh, không có em/en-dash.
 - [ ] Nếu một nhãn UI thay đổi, tất cả `lang/<code>.json` và `README.<code>.md` đã được cập nhật.
 - [ ] Không có tính năng thực nào (bảo toàn SELinux/uid-gid/modes, v.v.) bị làm yếu.
 - [ ] Các commit đã được ký nhận (`git commit -s`).
@@ -19,4 +19,4 @@ Bất cứ điều gì người review nên biết.
 
 ---
 
-> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến; xem [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tài liệu này được tạo bằng Claude (Anthropic) và được duy trì bởi VD171. Chúng tôi hoan nghênh các chỉnh sửa và cải tiến, xem [CONTRIBUTING.md](CONTRIBUTING.md)._

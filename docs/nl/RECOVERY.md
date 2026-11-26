@@ -11,10 +11,10 @@ optioneel versleuteld met een achterliggende `.age`.
 
 ## Tools die je nodig kunt hebben
 
-- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`; Linux: `apt install zstd`)
+- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
 - **age** (alleen voor `.age`-bestanden): https://github.com/FiloSottile/age/releases
 - `tar` is ingebouwd in macOS, Linux en modern Windows 10/11.
-- `gzip` is overal ingebouwd; voor `.tar.gz` heb je niets extra's nodig.
+- `gzip` is overal ingebouwd, voor `.tar.gz` heb je niets extra's nodig.
 
 ## 1. Ontsleutelen (alleen als het bestand eindigt op `.age`)
 
@@ -62,7 +62,7 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ## Notities
 
-- Uitgepakte bestanden behouden hun relatieve paden; de SELinux-context, uid/gid en modes
+- Uitgepakte bestanden behouden hun relatieve paden, de SELinux-context, uid/gid en modes
   zitten binnen de tar (en worden alleen goed opnieuw toegepast wanneer je op Android terugzet).
 - `manifest.json` beschrijft precies wat elk bestand is, de app-versie en de
   oorspronkelijke eigenaar/context. Het is de bron van de waarheid.
@@ -73,4 +73,4 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ---
 
-> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md)._

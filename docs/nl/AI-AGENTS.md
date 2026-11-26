@@ -6,7 +6,7 @@
 
 VDBackup is zo gebouwd dat een AI-assistent of -agent **elke** inhoud en actie van de
 module headless kan beheren, net zoals een persoon dat doet via de WebUI. De WebUI is
-slechts één client van een kleine JSON-API; jouw agent is een andere. Gebruik de API,
+slechts één client van een kleine JSON-API, jouw agent is een andere. Gebruik de API,
 scrape de WebUI niet.
 
 ## Het contract
@@ -19,10 +19,10 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 
 - Argumenten vormen één enkel JSON-object, **base64-gecodeerd**, doorgegeven als één argv-token.
 - Het commando print **één JSON-object** op stdout: `{"ok":true,...}` of
-  `{"ok":false,"code":"ERR_...","message":"..."}`. Parse dat; scrape nooit tekst.
+  `{"ok":false,"code":"ERR_...","message":"..."}`. Parse dat, scrape nooit tekst.
 - Langdurige operaties (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) geven onmiddellijk
   `{"ok":true,"opid":"..."}` terug en draaien **losgekoppeld** (ze overleven het verdwijnen
-  van de aanroeper/WebUI). Pol hun voortgang; ze zijn niet klaar wanneer de aanroep terugkeert.
+  van de aanroeper/WebUI). Pol hun voortgang, ze zijn niet klaar wanneer de aanroep terugkeert.
 - `progress` en `cancel` nemen **base64 van de ruwe opid-tekenreeks**, geen JSON-object.
 
 Een piepkleine helper voor je shell:
@@ -36,20 +36,20 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 Om het vanaf een werkstation aan te sturen, voer je dat uit over je gebruikelijke root-kanaal
 naar het apparaat (adb shell als root, of een SSH-naar-root-opstelling). De module levert
 gebundelde binaries mee, dus na installatie heeft het **geen internet** nodig voor lokale
-backup/restore; alleen cloudbestemmingen (`rclone`/`restic`/ssh) praten met het netwerk.
+backup/restore, alleen cloudbestemmingen (`rclone`/`restic`/ssh) praten met het netwerk.
 
 ## Verbs
 
 | Verb | Args (JSON) | Geeft terug |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` aantallen (groottes in bytes): apps met backups, totaal aantal backup-instanties, losstaande pad-backups, geplande taken, totale backupgrootte, en vrij/totaal van het backup-bestandssysteem. Niet losgekoppeld, keert meteen terug; gebruikt door het startoverzicht van de WebUI. |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` aantallen (groottes in bytes): apps met backups, totaal aantal backup-instanties, losstaande pad-backups, geplande taken, totale backupgrootte, en vrij/totaal van het backup-bestandssysteem. Niet losgekoppeld, keert meteen terug, gebruikt door het startoverzicht van de WebUI. |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | het config-object (of `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | genereert het `age`-sleutelpaar voor versleuteling |
 | `list-apps` | `{user?}` | `{ok,apps:[{package,label,system,versionCode}]}` (dex, shell-fallback) |
 | `label` | `{package,user?}` | `{ok,label}` (echte gelokaliseerde app-naam, contextvrij) |
-| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64-PNG; gecachet per package+`vc`) |
+| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64-PNG, gecachet per package+`vc`) |
 | `backup` | zie hieronder | `{ok,opid}` (losgekoppeld) |
 | `restore` | zie hieronder | `{ok,opid}` (losgekoppeld) |
 | `import` | `{from,ref,password,ssaid,user}` | `{ok,opid}` (losgekoppeld) |
@@ -59,7 +59,7 @@ backup/restore; alleen cloudbestemmingen (`rclone`/`restic`/ssh) praten met het 
 | `list-ops` | `{}` | `{ok,ops:[...]}` (opnieuw aanhaken na herverbinden) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | app-lijst / batch base64-pictogrammen |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
-| `note-set` | `{ref,note?,tags?}` | `{ok}` stelt de eigen naam van een back-up (`note`) en vrije `tags` in of wist ze; opgeslagen in een begeleidend bestand dat met de back-up meereist, doorzoekbaar vanuit `list-backups`. |
+| `note-set` | `{ref,note?,tags?}` | `{ok}` stelt de eigen naam van een back-up (`note`) en vrije `tags` in of wist ze, opgeslagen in een begeleidend bestand dat met de back-up meereist, doorzoekbaar vanuit `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` Android-gebruikers van het apparaat (multi-user). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` submappen van een pad (mapkiezer). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` losse map-/bestandsback-ups. |
@@ -72,48 +72,48 @@ backup/restore; alleen cloudbestemmingen (`rclone`/`restic`/ssh) praten met het 
 | `log-export` | `{user?}` | `{ok:true,path}` (absoluut pad van een weggeschreven `.txt` onder de backupmap) of `{ok:false,code:"ERR_LOG_EXPORT"}`. Schrijft het activiteitenlogboek (`audit.jsonl`) plus een korte build/apparaat-header naar een enkel voor de gebruiker zichtbaar tekstbestand, zodat het aan een bugrapport kan worden toegevoegd. Niet losgekoppeld, keert meteen terug. |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` systeembrede back-up (losgekoppeld) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (herstart vereist; `confirm` schermt het af) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (herstart vereist, `confirm` schermt het af) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` maak een back-up van elk absoluut pad als `tar.zst`+`manifest.json` onder `.paths/` (losgekoppeld) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` herstel een pad-back-up naar zijn oorspronkelijke locatie (`confirm` schermt het af; losgekoppeld) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` herstel een pad-back-up naar zijn oorspronkelijke locatie (`confirm` schermt het af, losgekoppeld) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` een luie laag van de /data/adb-boom (standaard `/data/adb`), voor de kiezer. |
 | `adb-du` | `{path}` | `{ok,size}` recursieve byte-grootte van een /data/adb-deelboom, op aanvraag. |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` maakt een back-up van /data/adb - volledig (laat `paths` weg) of de gekozen sub-paden - met per-bestand SELinux-/eigenaar-trouw, onder `.adb/` (losgekoppeld) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` herstelt een /data/adb-back-up OVER de live boom - volledig of gekozen sub-paden - met behoud van de context van elk bestand (nooit een algemene chcon); `confirm` schermt het af (losgekoppeld) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` herstelt een /data/adb-back-up OVER de live boom - volledig of gekozen sub-paden - met behoud van de context van elk bestand (nooit een algemene chcon), `confirm` schermt het af (losgekoppeld) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` de /data/adb-bestandssysteem-back-ups. |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` de opgeslagen uitgebreide bestandslijst van een back-up, voor de herstel-boomkiezer. |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | koppel een geïnstalleerde app als system-app aan (systemless submodule; live via NoMount anders volgende boot) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | koppel een geïnstalleerde app als system-app aan (systemless submodule, live via NoMount anders volgende boot) |
 | `companion-status` / `companion-install` | `{}` | status / on-demand-installatie van de Google Drive-begeleider |
 | `telegram-check` | `{}` | status van de Telegram-sessie (`user` null = niet ingelogd) |
-| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | Telegram-login; `sign-in` geeft `2FA_REQUIRED` als het account 2FA heeft en `password` ontbreekt |
+| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | Telegram-login, `sign-in` geeft `2FA_REQUIRED` als het account 2FA heeft en `password` ontbreekt |
 | `telegram-logout` | `{}` | sluit de Telegram-sessie |
 | `telegram-list` | `{}` | back-ups in het Telegram-kanaal (namen `<pkg>__<ts>_<vc>.vdb.tar`) |
-| `telegram-pull` | `{message_id,name}` | `{ok,opid}` haalt een Telegram-back-up naar lokale opslag (detached); die wordt dan via de normale `restore`-stroom teruggezet |
+| `telegram-pull` | `{message_id,name}` | `{ok,opid}` haalt een Telegram-back-up naar lokale opslag (detached), die wordt dan via de normale `restore`-stroom teruggezet |
 | `telegram-delete` | `{message_id}` | `{ok,deleted:[...]}` verwijdert een back-up uit het Telegram-kanaal via `message_id` (batch: kommagescheiden) |
 | `rclone-list` | `{dest}` | `{ok,dest,backups:[{dest,rref,package,tsvc}]}` Full-back-ups die alleen-remote op een rclone-bestemming staan (`dest` is de bestemmings-id, `rref` is `<pkg>/<ts_vc>`) |
-| `rclone-pull` | `{dest,rref}` | `{ok,opid}` haalt een alleen-remote rclone-back-up naar lokale opslag (detached); die wordt dan via de normale `restore`-stroom teruggezet |
-| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` verwijdert één back-up uit een rclone-remote; `rref` moet exact `<pkg>/<ts_vc>` zijn |
+| `rclone-pull` | `{dest,rref}` | `{ok,opid}` haalt een alleen-remote rclone-back-up naar lokale opslag (detached), die wordt dan via de normale `restore`-stroom teruggezet |
+| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` verwijdert één back-up uit een rclone-remote, `rref` moet exact `<pkg>/<ts_vc>` zijn |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | bestemmingsbeheer |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone-remote-beheer (maakt het `rclone.conf`-item waarnaar een `type:"rclone"`-bestemming verwijst); `backend` mag elke rclone-backend zijn, geen whitelist |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone-remote-beheer (maakt het `rclone.conf`-item waarnaar een `type:"rclone"`-bestemming verwijst), `backend` mag elke rclone-backend zijn, geen whitelist |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (de engine heeft de browser van de telefoon al via een Android-VIEW-intent op die toestemmings-URL geopend) of `{ok:false,code:"ERR_AUTHORIZE"}`. Draait `rclone authorize <backend>` op een lokale callbackserver (`127.0.0.1:53682`) voor OAuth op het apparaat. |
 | `remote-authorize-poll` | `{}` | `{ok:true,done:false,url}` tijdens het wachten, `{ok:true,done:true,token}` zodra de gebruiker toestemming heeft gegeven (de `token` om aan `remote-add` door te geven), of `{ok:false,code:"ERR_AUTHORIZE"}`. |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; stopt een lopende autorisatie. |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, stopt een lopende autorisatie. |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (of de binaries `rclone`/`restic` aanwezig zijn, of deze `lite`-editie ze kan ophalen, downloadgrootte in bytes) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (losgekoppeld) downloadt+verifieert+installeert de `rclone`/`restic`-addon op een `lite`-editie |
-| `schedule-set` / `schedule-list` / `schedule-delete` | zie hieronder | geplande taken (een backup of een herstel; gericht op een app, een set, of alle apps) |
+| `schedule-set` / `schedule-list` / `schedule-delete` | zie hieronder | geplande taken (een backup of een herstel, gericht op een app, een set, of alle apps) |
 | `scheduler-tick` | `{}` | voert vervallen taken uit + past retentie toe + de auto-backup-observer (de boot-heartbeat roept dit aan) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (niet losgekoppeld; keert meteen terug; `ERR_UPDATE_CHECK` bij mislukking, zie hieronder) |
-| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) maakt een back-up van veel apps in één losgekoppelde op; voortgang bevat `n`/`of`. Een fout per app stopt de batch niet. |
-| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) herstelt veel back-ups in één losgekoppelde op; voortgang bevat `n`/`of`. Een fout per app stopt de batch niet. |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (niet losgekoppeld, keert meteen terug, `ERR_UPDATE_CHECK` bij mislukking, zie hieronder) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) maakt een back-up van veel apps in één losgekoppelde op, voortgang bevat `n`/`of`. Een fout per app stopt de batch niet. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) herstelt veel back-ups in één losgekoppelde op, voortgang bevat `n`/`of`. Een fout per app stopt de batch niet. |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` opslagvolumes voor de mappenkiezer: intern plus verwisselbare SD-kaart / USB. |
 | `config-export` | `{password}` | `{ok,opid}` (detached) exporteert config, taken, bestemmingen, inloggegevens en sleutels naar één met wachtwoordzin versleuteld bestand in de back-upmap. |
 | `config-import` | `{ref,password}` | `{ok,opid}` (detached) voegt een geëxporteerd configbestand terug samen in dit apparaat (overschrijft nooit blind). |
 | `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` somt de versleutelde configbestanden op die beschikbaar zijn om te importeren. |
-| `wipe-credentials` | `{}` | `{ok,wiped}` verwijdert opgeslagen externe wachtwoorden en de versleutelingssleutel van het apparaat; bestemmingen, taken en back-ups blijven. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` verwijdert opgeslagen externe wachtwoorden en de versleutelingssleutel van het apparaat, bestemmingen, taken en back-ups blijven. |
 | `log-prune` | `{}` | `{ok}` snoeit allang voltooide op-logs, beperkt het auditspoor en verwijdert verouderde iconen (de opstartservice roept dit aan). |
 | `sanitize` | `{}` | `{ok}` herbevestigt de zichtbaarheid (0755) van back-upmappen voor elke Android-gebruiker, zodat een bestandsbeheerder mappen kan openen die een rauwe root-kopie of een back-up van vóór v1.03.2 alleen voor de eigenaar toegankelijk liet. |
-| `boot-sweep` | `{}` | `{ok,reaped}` ruimt restanten op van een back-up die werd onderbroken of geforceerd afgebroken (de opstartservice roept dit aan); een back-up die mislukt of wordt geannuleerd wordt al opgeruimd door zijn eigen worker. |
+| `boot-sweep` | `{}` | `{ok,reaped}` ruimt restanten op van een back-up die werd onderbroken of geforceerd afgebroken (de opstartservice roept dit aan), een back-up die mislukt of wordt geannuleerd wordt al opgeruimd door zijn eigen worker. |
 
 ### `progress`-velden
 
@@ -140,7 +140,7 @@ restore-test):
 | `of` | int | totaal aantal items (0 = onbekend) |
 | `cur` | string | naam van het huidige item (leeg = geen) |
 
-Cloud-overdrachten vullen `rate`/`eta` (de percent-waarde komt van rclone); lokale Full-backups
+Cloud-overdrachten vullen `rate`/`eta` (de percent-waarde komt van rclone), lokale Full-backups
 vullen `n`/`of`/`cur`. Faselabels omvatten de checksum-verzegelfase **`verified`** en, voor
 cloud-overdrachten, **`transfer`** en **`mirror <item>`**.
 
@@ -166,12 +166,12 @@ cloud-overdrachten, **`transfer`** en **`mirror <item>`**.
 ```
 
 `restore`/`import` nemen `{ref}` (een backup-map / scan-ref). `restore` accepteert ook:
-`"items"` (een deelverzameling van de itemtypen van de backup om te herstellen; weglaten voor
+`"items"` (een deelverzameling van de itemtypen van de backup om te herstellen, weglaten voor
 alle), `"test": true` (uitpakken naar een tijdelijke map en verifiëren, zonder de live-app aan te
 raken), `"mode"` voor snapshot/mirror, `"password"` voor een versleutelde backup, `"ssaid"`
 (opt-in) en de installatiebron-opties `"spoof_installer"` (standaard uit config, zet het
 installatieprogramma bij installatie op de Play Store) en `"deep_spoof": true` (geavanceerd
-opt-in; vervalst ook het initiërende pakket en de pakketbron door de pakketdatabase te bewerken,
+opt-in, vervalst ook het initiërende pakket en de pakketbron door de pakketdatabase te bewerken,
 wordt na een herstart toegepast). `import` neemt `"from": "neo" | "databackup"` en, voor een
 versleutelde Neo-backup, `"password"`.
 
@@ -231,11 +231,11 @@ Een batch (`backup` met `packages`, `restore` met `refs`) voert elke app in zijn
 - **`batch_app_timeout`** (config, seconden, standaard `1800`, `0` schakelt uit): duurt een app langer, dan wordt zijn procesboom beëindigd, wordt hij als `ERR_TIMEOUT` geregistreerd en gaat de batch door, zodat één vastgelopen app nooit de hele run bevriest.
 - **Gedeeltelijk resultaat**: de afsluitende schrijfactie bevat `ok`, `n` van `of`, een `fails`-telling `{code:count}` (bijv. `{"ERR_NO_SPACE":24}`) en `free` (resterende bytes op het back-upbestandssysteem). Een gedeeltelijke batch is `ERR_BATCH_PARTIAL`, nooit een blinde fout.
 - **Thermische tempering** (config `thermal_throttle`, standaard aan): tussen apps pauzeert de worker om af te koelen wanneer het apparaat heet is, met een `cooling`-voortgangsfase, zodat een lange run het apparaat niet oververhit.
-- **Ruimteschatting vooraf** (config `space_preflight`, standaard aan): vóór een batch naar een lokale bestemming wordt de ongecomprimeerde omvang van de geselecteerde apps opgeteld; overschrijdt die al de vrije ruimte van de bestemming, dan stopt de batch vooraf met `ERR_NO_SPACE` (plus een `need`-veld) in plaats van de schijf halverwege te vullen. Overgeslagen voor streamende externe bestemmingen.
+- **Ruimteschatting vooraf** (config `space_preflight`, standaard aan): vóór een batch naar een lokale bestemming wordt de ongecomprimeerde omvang van de geselecteerde apps opgeteld, overschrijdt die al de vrije ruimte van de bestemming, dan stopt de batch vooraf met `ERR_NO_SPACE` (plus een `need`-veld) in plaats van de schijf halverwege te vullen. Overgeslagen voor streamende externe bestemmingen.
 
 ### `remote-add`-args
 
-Een cloudbestemming is een `type:"rclone"`-bestemming die een `rclone`-remote benoemt; maak
+Een cloudbestemming is een `type:"rclone"`-bestemming die een `rclone`-remote benoemt, maak
 die remote eerst aan met `remote-add`. De `backend` mag **elke rclone-backend** zijn, er is
 geen whitelist. `remote-add` accepteert elke backendnaam (`dropbox`, `onedrive`, `box`,
 `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive` en de ~70 andere die
@@ -278,7 +278,7 @@ taken. Lokale bestemmingen worden nooit beperkt.
 ### Cloud-integriteit en quota
 
 - **Checksum-verzegeling (cloud).** Na een geslaagde cloud-kopie voert de engine een
-  remote-checksumcontrole (`rclone check`) uit; een verschil laat de operatie mislukken met
+  remote-checksumcontrole (`rclone check`) uit, een verschil laat de operatie mislukken met
   `ERR_VERIFY`. Backends die geen gemeenschappelijke hash met de lokale kant delen, worden
   overgeslagen (geen mislukking).
 - **Quotacontrole (cloud, Full-modus).** Voor een upload in Full-modus naar een `rclone`-remote
@@ -294,27 +294,27 @@ cloud- of snapshot-actie uitvoert. `cloud-status` meldt of ze al aanwezig zijn, 
 kan ophalen, en de downloadgrootte in bytes. `cloud-fetch` draait **losgekoppeld** (poll
 `progress` met zijn `opid`): het downloadt de per-architectuur `rclone`+`restic`-addon, verifieert
 die tegen de in de module gebakken SHA-256, en installeert die in de runtime-cache. De
-voortgangsfasen zijn `downloading`, `verifying` en `installing`; de eindcode is `ERR_NONE` bij
+voortgangsfasen zijn `downloading`, `verifying` en `installing`, de eindcode is `ERR_NONE` bij
 succes, of `ERR_FETCH` (download mislukt) / `ERR_FETCH_VERIFY` (checksum komt niet overeen,
 weggegooid) bij mislukking. Op een `full`-editie is het overbodig. Een `backup`/`restore` naar een
 cloud- of snapshot-bestemming op de `lite`-editie mislukt, voordat de binaries aanwezig zijn, met
-`ERR_CLOUD_FETCHABLE`; de client zou moeten aanbieden om `cloud-fetch` uit te voeren, en het dan
+`ERR_CLOUD_FETCHABLE`, de client zou moeten aanbieden om `cloud-fetch` uit te voeren, en het dan
 opnieuw proberen.
 
 ### Speciale back-upcategorieën
 
-`special-categories` meldt welke systeembrede categorieën een apparaat heeft; `special-backup`
+`special-categories` meldt welke systeembrede categorieën een apparaat heeft, `special-backup`
 legt die vast die je in `categories` doorgeeft en `special-restore` past ze opnieuw toe. De
 categorieën zijn:
 
 | Categorie | Wat het is | Herstelsemantiek |
 |-----------|-----------|------------------|
 | `messages` | SMS/MMS | provider vervangen (wissen + uitpakken) |
-| `rcs` | RCS-chat (Google Messages, `bugle_db`); ook portabel geëxporteerd naar `rcs.json` | app-gegevens vervangen (wissen + uitpakken), zelfde apparaat |
+| `rcs` | RCS-chat (Google Messages, `bugle_db`), ook portabel geëxporteerd naar `rcs.json` | app-gegevens vervangen (wissen + uitpakken), zelfde apparaat |
 | `contacts` | contacten en belgeschiedenis | provider vervangen (wissen + uitpakken) |
 | `wifi` | opgeslagen Wi-Fi-netwerken | provider vervangen (wissen + uitpakken) |
 | `bluetooth` | Bluetooth-koppelingen | provider vervangen (wissen + uitpakken) |
-| `calendar` | de agenda-provider (`com.android.providers.calendar`, app + gegevens); ook overdraagbaar geëxporteerd naar `calendar.json` | provider vervangen (wissen + uitpakken) |
+| `calendar` | de agenda-provider (`com.android.providers.calendar`, app + gegevens), ook overdraagbaar geëxporteerd naar `calendar.json` | provider vervangen (wissen + uitpakken) |
 | `wallpaper` | start- en vergrendelscherm-achtergrond plus `wallpaper_info.xml`, ruw (binair) opgeslagen | bestanden vervangen |
 | `dns` | de private DNS-modus en -specificatie, gelezen uit settings | idempotente `settings put` |
 | `system_settings` | de volledige system/global/secure settings-dump | **opt-in**, idempotente `settings put`, overschrijft apparaatinstellingen |
@@ -322,7 +322,7 @@ categorieën zijn:
 **`system_settings` is strikt opt-in en destructief bij herstel.** Net als `ssaid`
 overschrijft het bij herstel apparaatbrede instellingen, dus het is afgeschermd achter
 expliciete gebruikerstoestemming en wordt naar het auditspoor geschreven. Selecteer het nooit
-standaard; alleen op een direct, bewust gebruikersverzoek.
+standaard, alleen op een direct, bewust gebruikersverzoek.
 
 ### Zelfstandige pad-back-up
 
@@ -340,12 +340,12 @@ archief wordt geschreven als `tar.zst` plus een `manifest.json` in VDBackups eig
 
 - Het bronpad moet **absoluut** zijn en onder een van de toegestane roots liggen:
   `/storage/emulated`, `/data/media`, `/sdcard`, `/data`. Een pad dat niet bestaat mislukt met
-  `ERR_NO_PATH`; een pad buiten de toegestane roots, of een dat `..` bevat, mislukt met
+  `ERR_NO_PATH`, een pad buiten de toegestane roots, of een dat `..` bevat, mislukt met
   `ERR_BAD_PATH`.
 - `path-restore` schrijft terug naar de oorspronkelijke locatie, dus het is destructief en
   vereist `"confirm": true`, een zware-frictie-afscherming, zoals `special-restore`. Een `ref`
   die geen geldige pad-back-up is mislukt met `ERR_BAD_REF`.
-- Beide draaien **losgekoppeld**; pol `progress` met de teruggegeven `opid`.
+- Beide draaien **losgekoppeld**, pol `progress` met de teruggegeven `opid`.
 
 ### /data/adb-bestandssysteem-back-up
 
@@ -354,17 +354,17 @@ archief wordt geschreven als `tar.zst` plus een `manifest.json` in VDBackups eig
 keer, `adb-du` voor de grootte van een map op aanvraag).
 
 - Volledig of selectief aan beide kanten: laat `paths` weg voor alles, of geef de gekozen sub-paden
-  (relatief aan /data/adb); het herstel neemt dezelfde `paths`.
+  (relatief aan /data/adb), het herstel neemt dezelfde `paths`.
 - **Per-bestand-trouw:** het archief behoudt de SELinux-context, eigenaar en xattrs van elk bestand, en
   het herstel vertrouwt daarop - het past NOOIT een algemene `chcon` toe, die de heterogene contexten
-  van /data/adb zou platslaan en root zou breken. `adb-restore` extraheert OVER de live boom; het wist
+  van /data/adb zou platslaan en root zou breken. `adb-restore` extraheert OVER de live boom, het wist
   die nooit.
 - Zelfreferentie: de eigen uitvoer van de back-up en de staging van de module worden uitgesloten, zodat
   een back-up nooit zichzelf bevat.
 - `adb-index` geeft de opgeslagen bestandslijst van een back-up terug zodat een herstel zijn boom kan
-  tonen; de UI-selectie wordt volledig uitgedrukt via `paths` (een volledig aangevinkte map is één pad;
+  tonen, de UI-selectie wordt volledig uitgedrukt via `paths` (een volledig aangevinkte map is één pad;
   een deels aangevinkte daalt af naar zijn aangevinkte kinderen, dus er is geen exclude-lijst nodig).
-- `adb-restore` vereist `"confirm": true` (zware-frictie-afscherming); beide draaien losgekoppeld, pol `progress`.
+- `adb-restore` vereist `"confirm": true` (zware-frictie-afscherming), beide draaien losgekoppeld, pol `progress`.
 
 ### `update-check`
 
@@ -393,14 +393,14 @@ Bij succes geeft het terug:
 Als er geen `updateJson`-URL is, het netwerkverzoek mislukt, of het manifest niet geparseerd kan
 worden, geeft het `{"ok":false,"code":"ERR_UPDATE_CHECK"}` terug.
 
-`update-check` **meldt** alleen de beschikbaarheid en de release-notes; de update zelf wordt
+`update-check` **meldt** alleen de beschikbaarheid en de release-notes, de update zelf wordt
 uitgevoerd door je root-manager (KernelSU / APatch / Magisk) via de `updateJson` van de module,
 nooit door dit werkwoord.
 
 ## Veiligheidsrails die je agent moet respecteren
 
 - **`ssaid` is strikt opt-in (standaard uit).** Het maakt een back-up van / herstelt de
-  ANDROID_ID van het apparaat door een systeembestand te herschrijven; een herstel wordt pas
+  ANDROID_ID van het apparaat door een systeembestand te herschrijven, een herstel wordt pas
   na een herstart toegepast, en het vorige bestand wordt altijd eerst opgeslagen voor rollback.
   Stuur `"ssaid": true` alleen op een directe, bewuste gebruikersaanvraag, nooit standaard.
 - **Muterende acties (restore, delete, import) zijn destructief** en worden vastgelegd in een
@@ -422,7 +422,7 @@ nooit door dit werkwoord.
   ontsnappen aan zijn doelmap.
 - **Verzwak nooit** het behoud (SELinux/uid/gid/modi/xattr) of de APK-regel (APK's worden
   altijd gecomprimeerd, nooit versleuteld tenzij `encrypt_apk` is ingesteld).
-- Behandel de JSON-uitvoer als de bron van waarheid; controleer `ok`/`code`, pol `progress` en
+- Behandel de JSON-uitvoer als de bron van waarheid, controleer `ok`/`code`, pol `progress` en
   toon `ERR_*`-codes in plaats van te gokken.
 
 Zie [ARCHITECTURE.md](ARCHITECTURE.md) en
@@ -432,4 +432,4 @@ Zie [ARCHITECTURE.md](ARCHITECTURE.md) en
 
 ---
 
-> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md)._

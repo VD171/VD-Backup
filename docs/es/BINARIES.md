@@ -19,7 +19,7 @@ nada opaco.
   repositorio de paquetes oficial de Termux (los archivos `.deb` firmados en
   `packages.termux.dev/apt`), nunca copiadas de un Termux instalado en algún teléfono. La
   compilación falla ruidosamente, nunca improvisa.
-- **Reproducible.** Vuelve a ejecutar la compilación y obtienes los mismos archivos; vuelve a
+- **Reproducible.** Vuelve a ejecutar la compilación y obtienes los mismos archivos, vuelve a
    obtener las fuentes fijadas y los valores SHA-256 coinciden.
 - **El rastro de auditoría se incluye con el módulo.** No está solo en el sitio web, viaja
   dentro del módulo instalado, en tu dispositivo, para que puedas auditar sin conexión.
@@ -30,13 +30,13 @@ nada opaco.
 |---|---|---|
 | `bin/<abi>/` herramientas nativas (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + su closure `lib/` | Repo apt oficial de **Termux** (`packages.termux.dev/apt`), paquetes `.deb` oficiales | `.github/scripts/build_bin.sh` descarga los archivos `.deb` + sus dependencias transitivas, los extrae y copia los binarios más solo las bibliotecas compartidas que cada uno necesita |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (alternativa del convertidor ABX) | Release de GitHub de **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF estático) | descargado desde la release fijada por `build_bin.sh` |
-| `companion.apk` (compañero opcional de Google Drive) | **Este repositorio**, `companion/` (Gradle/Kotlin) | compilado desde el código fuente por la CI y firmado con la clave del proyecto; no es un blob precompilado |
+| `companion.apk` (compañero opcional de Google Drive) | **Este repositorio**, `companion/` (Gradle/Kotlin) | compilado desde el código fuente por la CI y firmado con la clave del proyecto, no es un blob precompilado |
 | `vdbackup_helper.dex` (ayudante de framework) | **Este repositorio**, `dex/src/` (Java) | compilado desde el código fuente por la CI con `javac` + `d8` |
 
-Solo las dos primeras filas son binarios de terceros precompilados; las dos últimas se compilan
+Solo las dos primeras filas son binarios de terceros precompilados, las dos últimas se compilan
 desde código fuente que vive en este repositorio y puede leerse y recompilarse.
 
-> **Ediciones Full vs lite.** Las ediciones lite omiten solo `rclone` y `restic` (los dos binarios más grandes) para mantenerse pequeñas y los descargan bajo demanda (verificados por SHA-256) la primera vez que usas un destino en la nube o el modo de instantáneas; `rsync` y `ssh`/`scp`/`sftp` siguen presentes, y cualquier otro binario listado arriba también está presente. Las ediciones Full traen `rclone` (proveedores de nube) y `restic` (instantáneas) integrados, así que nunca se descarga nada.
+> **Ediciones Full vs lite.** Las ediciones lite omiten solo `rclone` y `restic` (los dos binarios más grandes) para mantenerse pequeñas y los descargan bajo demanda (verificados por SHA-256) la primera vez que usas un destino en la nube o el modo de instantáneas, `rsync` y `ssh`/`scp`/`sftp` siguen presentes, y cualquier otro binario listado arriba también está presente. Las ediciones Full traen `rclone` (proveedores de nube) y `restic` (instantáneas) integrados, así que nunca se descarga nada.
 
 ## El manifiesto en el dispositivo: `PROVENANCE.json`
 
@@ -68,7 +68,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
    del repo de Termux se sirven, a su vez, desde el repositorio apt firmado de Termux.
 3. **Recompila desde cero.** Ejecuta tú mismo `.github/scripts/build_bin.sh` (solo necesita `curl`,
    `ar`, `tar`, `xz`, `zstd`, `readelf`) y compara la salida con lo que se incluyó.
-4. **Compañero y dex.** Recompila `companion/` y `dex/` desde el código fuente; la firma del
+4. **Compañero y dex.** Recompila `companion/` y `dex/` desde el código fuente, la firma del
    compañero es la clave del proyecto (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
@@ -82,4 +82,4 @@ discrepancia que este manifiesto existe para hacer visible.
 
 ---
 
-> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas; consulta [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Esta documentación se generó con Claude (Anthropic) y la mantiene VD171. Las correcciones y mejoras son bienvenidas, consulta [CONTRIBUTING.md](CONTRIBUTING.md)._

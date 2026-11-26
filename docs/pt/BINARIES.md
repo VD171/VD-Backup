@@ -18,7 +18,7 @@ e como verificar que nada opaco foi inserido às escondidas.
   oficial de pacotes do Termux (os arquivos `.deb` assinados em `packages.termux.dev/apt`), nunca
   copiadas de um Termux instalado em algum telefone. O build falha de forma ruidosa, ele nunca
   improvisa.
-- **Reproduzível.** Refaça o build e você obtém os mesmos arquivos; rebusque as fontes fixadas
+- **Reproduzível.** Refaça o build e você obtém os mesmos arquivos, rebusque as fontes fixadas
    e os valores de SHA-256 batem.
 - **A trilha de auditoria viaja com o módulo.** Ela não está apenas no site, ela viaja
   dentro do módulo instalado, no seu dispositivo, para que você possa auditar offline.
@@ -29,15 +29,15 @@ e como verificar que nada opaco foi inserido às escondidas.
 |---|---|---|
 | ferramentas nativas em `bin/<abi>/` (`tar`, `zstd`, `gzip`, `lz4`, `jq`, `rclone`, `restic`, `rsync`, `ssh`/`scp`/`sftp`, `age`, `age-keygen`, `script`, `sqlite3`) + a closure de `lib/` delas | Repositório apt oficial do **Termux** (`packages.termux.dev/apt`), pacotes `.deb` oficiais | `.github/scripts/build_bin.sh` baixa os arquivos `.deb` + suas dependências transitivas, extrai-os, e copia os binários mais apenas as bibliotecas compartilhadas de que cada um precisa |
 | `bin/<abi>/abx2xml`, `bin/<abi>/xml2abx` (fallback do conversor ABX) | Release do GitHub **rhythmcache/android-xml-converter** (`ABX_RELEASE`, ELF estático) | baixado da release fixada pelo `build_bin.sh` |
-| `companion.apk` (companion opcional do Google Drive) | **Este repositório**, `companion/` (Gradle/Kotlin) | construído a partir do código pela CI e assinado com a chave do projeto; não é um blob pré-compilado |
+| `companion.apk` (companion opcional do Google Drive) | **Este repositório**, `companion/` (Gradle/Kotlin) | construído a partir do código pela CI e assinado com a chave do projeto, não é um blob pré-compilado |
 | `vdbackup_helper.dex` (helper de framework) | **Este repositório**, `dex/src/` (Java) | compilado a partir do código pela CI com `javac` + `d8` |
 
-Apenas as duas primeiras linhas são binários de terceiros pré-compilados; as duas últimas são
+Apenas as duas primeiras linhas são binários de terceiros pré-compilados, as duas últimas são
 construídas a partir do código que vive neste repositório e pode ser lido e reconstruído.
 
 > **Edições Full vs lite.** As edições lite omitem apenas `rclone` e `restic` (os dois
 > maiores binários) para ficarem pequenas e os buscam sob demanda (verificados por SHA-256) na
-> primeira vez que você usa um destino de nuvem ou o modo snapshot; `rsync` e `ssh`/`scp`/`sftp`
+> primeira vez que você usa um destino de nuvem ou o modo snapshot, `rsync` e `ssh`/`scp`/`sftp`
 > continuam presentes, e todo o restante dos binários listados acima também está presente. As
 > edições Full trazem `rclone` (provedores de nuvem) e `restic` (snapshots) embutidos, então
 > nada é baixado.
@@ -72,7 +72,7 @@ sh /data/adb/modules/vdbackup/helper.sh provenance '' | jq .
    repositório do Termux são eles mesmos servidos a partir do repositório apt assinado do Termux.
 3. **Reconstrua do zero.** Rode você mesmo o `.github/scripts/build_bin.sh` (precisa apenas de
    `curl`, `ar`, `tar`, `xz`, `zstd`, `readelf`) e compare a saída com o que foi distribuído.
-4. **Companion e dex.** Reconstrua `companion/` e `dex/` a partir do código; a assinatura do
+4. **Companion e dex.** Reconstrua `companion/` e `dex/` a partir do código, a assinatura do
    companion é a chave do projeto (SHA-256
    `F3:F8:2B:B9:2F:2C:69:A1:75:90:1D:40:BD:65:DD:A6:8F:2B:B5:88:69:77:F5:EA:8B:BA:AA:51:40:E5:25:2B`).
 
@@ -86,4 +86,4 @@ manifesto existe para tornar visível.
 
 ---
 
-> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas; veja [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md)._

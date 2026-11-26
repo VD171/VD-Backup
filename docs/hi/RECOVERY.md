@@ -11,10 +11,10 @@
 
 ## Tools जिनकी आपको जरूरत पड़ सकती है
 
-- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`; Linux: `apt install zstd`)
+- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
 - **age** (केवल `.age` files के लिए): https://github.com/FiloSottile/age/releases
 - `tar` macOS, Linux और आधुनिक Windows 10/11 में built-in है।
-- `gzip` हर जगह built in है; `.tar.gz` के लिए आपको कुछ अतिरिक्त की जरूरत नहीं।
+- `gzip` हर जगह built in है, `.tar.gz` के लिए आपको कुछ अतिरिक्त की जरूरत नहीं।
 
 ## 1. Decrypt (केवल अगर file `.age` में समाप्त होती है)
 
@@ -62,7 +62,7 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ## Notes
 
-- Extracted files अपने relative paths रखती हैं; SELinux context, uid/gid और modes
+- Extracted files अपने relative paths रखती हैं, SELinux context, uid/gid और modes
   tar के अंदर हैं (और केवल तभी ठीक से फिर से लागू होते हैं जब आप Android पर restore करते हैं)।
 - `manifest.json` ठीक-ठीक वर्णन करता है कि प्रत्येक file क्या है, app version और
   मूल owner/context। यह source of truth है।
@@ -73,4 +73,4 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 
 ---
 
-> _यह दस्तावेज़ Claude (Anthropic) से तैयार किया गया है और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और संशोधन का स्वागत है; देखें [CONTRIBUTING.md](CONTRIBUTING.md)।_
+> _यह दस्तावेज़ Claude (Anthropic) से तैयार किया गया है और इसे VD171 द्वारा अनुरक्षित किया जाता है। सुधार और संशोधन का स्वागत है, देखें [CONTRIBUTING.md](CONTRIBUTING.md)।_

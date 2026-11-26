@@ -30,7 +30,7 @@ Assistentes e agentes de IA são colaboradores de primeira classe aqui, não um 
 - Patches assistidos por IA são revisados e aceitos nos mesmos termos de qualquer outro, por
   correção, clareza e as convenções abaixo, não por quem (ou o quê) os escreveu.
 - Se você dirige o VDBackup a partir de um agente, use a saída JSON do `helper.sh` como o
-  contrato; não raspe a WebUI.
+  contrato, não raspe a WebUI.
 - Mesma régua para todos: recursos reais nunca são enfraquecidos, segredos e dados do dispositivo
   nunca vão para o repo (veja o estrito [.gitignore](../../.gitignore)), e ações
   mutáveis seguem confirmadas e auditadas.
@@ -42,15 +42,15 @@ Assistentes e agentes de IA são colaboradores de primeira classe aqui, não um 
 - A WebUI é `module/webroot/` (abra-a pelo gerenciador de root). O backend é
   `module/helper.sh` (dispatcher) e `module/worker.sh` (engine destacada).
 - Binários nativos vivem em `module/bin/<abi>/` e são produzidos pela CI
-  (`.github/scripts/build_bin.sh`); normalmente você não os recompila à mão.
+  (`.github/scripts/build_bin.sh`), normalmente você não os recompila à mão.
 
 ## Convenções
 
 - **Todo arquivo-fonte** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) começa com o
   cabeçalho banner do projeto (copie de qualquer arquivo existente). Sem exceções.
 - **Código e comentários em inglês.** Mantenha os comentários mínimos e só onde necessário.
-- **Sem em-dash ou en-dash**; sempre use um hífen simples `-`.
-- A WebUI é **vanilla JS** (um `scripts.js`); sem frameworks. Fale com o root só por meio do
+- **Sem em-dash ou en-dash**, sempre use um hífen simples `-`.
+- A WebUI é **vanilla JS** (um `scripts.js`), sem frameworks. Fale com o root só por meio do
   wrapper `helper(verb, args)`, e escape cada valor interpolado.
 - **Nunca enfraqueça** um recurso real (ex.: preservação de SELinux/uid/gid/modes).
 - Ações mutáveis (restauração, exclusão) devem pedir confirmação e gravar um log de auditoria.
@@ -58,7 +58,7 @@ Assistentes e agentes de IA são colaboradores de primeira classe aqui, não um 
 ## Internacionalização (i18n)
 
 - As strings da UI vivem em `module/webroot/lang/`. Inglês é o fallback canônico
-  (`en.js` + `en.json`); os outros 20 idiomas são `<code>.json`.
+  (`en.js` + `en.json`), os outros 20 idiomas são `<code>.json`.
 - Para adicionar ou mudar uma string: edite `en.js` **e** `en.json`, depois atualize cada
   `<code>.json`. Mexer num label visível significa atualizar **todos** os arquivos de idioma e
   **todos** os `README.<code>.md`.
@@ -80,4 +80,4 @@ presets de destino `rclone` e polimento da WebUI são todos ótimos pontos de pa
 
 ---
 
-> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas; veja [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Esta documentação foi gerada com o Claude (Anthropic) e é mantida por VD171. Correções e melhorias são bem-vindas, veja [CONTRIBUTING.md](CONTRIBUTING.md)._

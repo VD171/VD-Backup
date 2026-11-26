@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · 한국어 · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/ko/home-dark.png) | ![Apps](docs/screenshots/ko/apps-dark.png) | ![Schedule](docs/screenshots/ko/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/ko/destinations-dark.png) | ![Settings](docs/screenshots/ko/settings-dark.png) | ![Activity log](docs/screenshots/ko/activitylog-dark.png) |
 
 ---
 
@@ -65,16 +84,16 @@ VDBackup은 앱과 그 데이터를 백업하고 복원하는 root **WebUI 모�
   묶이지 않으므로 백업을 다른 기기에서 복원하거나 PC에서 열 수 있습니다.
 - **대상:** 로컬, SFTP, SCP, SMB, WebDAV, FTP, S3 및 70가지 이상 (`rclone`), 그리고 `rsync`
   와 `restic` 저장소. 작은 옵트인 동반 앱을 통한 Google Drive도 선택적으로 사용 가능.
-- **Telegram:** MTProto를 통해 비공개 Telegram 채널에 무제한 클라우드 저장소로 백업 - 복원과 삭제도 WebUI에서.
+- **Telegram:** MTProto를 통해 비공개 Telegram 채널에 무제한 클라우드 저장소로 백업, 복원과 삭제도 WebUI에서.
 - **무결성:** 모든 아카이브는 매니페스트와 대조하여 검증됩니다. dry-run과 복원 테스트로 아무것도
   건드리지 않고 백업을 확인할 수 있습니다.
 - **선택적 복원 및 일괄 복원:** 백업 항목의 어떤 부분집합이든 복원하거나, 여러 백업을 다중 선택해
   한 번에 모두 복원합니다. 백업을 삭제하고 모든 파괴적 동작의 활동/감사 로그를 보관합니다.
 - **특수 백업:** 메시지(SMS/MMS/RCS), 연락처와 통화 기록, Wi-Fi와 Bluetooth. PC에서 열 수 있는
   선택적 이식형 JSON 내보내기와 함께.
-- **시스템 파일 (`/data/adb`):** root 환경 자체 - 모듈, 그 데이터와 구성 - 을 백업합니다. 전체를,
+- **시스템 파일 (`/data/adb`):** root 환경 자체(모듈, 그 데이터와 구성)을 백업합니다. 전체를,
   또는 파일 트리에서 고른 하위 트리를 대상으로 할 수 있고, 각 파일은 원래 소유자와 SELinux
-  컨텍스트로 복원되어 root가 계속 작동합니다. 고급; 당신이 고른 것만.
+  컨텍스트로 복원되어 root가 계속 작동합니다. 고급, 당신이 고른 것만.
 - **스케줄링 + 자동화:** 단일 앱, 집합, 또는 모든 앱을 대상으로 하는 반복 **백업 또는 복원** 작업과
   keep-N 정리, 옵트인 방식의 설치/업데이트 시 자동 백업 및 제외 앱 목록.
 - **설치 출처:** 복원된 앱은 기본적으로 Play Store를 설치 출처로 보고합니다(전환 가능). 고급
@@ -108,7 +127,7 @@ JSON으로 말하고 (`helper.sh`의 모든 verb는 하나의 JSON 객체를 반
 스냅샷 모드(`restic`)를 처음 사용할 때 해당 아키텍처용 작은 애드온을 한 번(SHA-256으로 검증) 내려받아
 캐시하도록 제안하므로 그 기능도 동작함. `<abi>-full`(`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`) -
 단일 아키텍처에 모든 바이너리 내장, `universal-full`보다 작음. 아키텍처를 안다면 -> `<abi>-full`;
-가장 작게 쓰면서 클라우드나 스냅샷 첫 사용 시 한 번의 다운로드가 괜찮다면 -> `universal-lite`; 다운로드
+가장 작게 쓰면서 클라우드나 스냅샷 첫 사용 시 한 번의 다운로드가 괜찮다면 -> `universal-lite`, 다운로드
 없이 모든 것을 내장하길 원한다면(오프라인 / 복구) -> full 에디션. [릴리스](https://github.com/VD171/VD-Backup/releases)를 참고하세요.
 
 처음이신가요? [사용자 가이드](docs/USER-GUIDE.md)가 설치부터 복원까지 안내합니다.
@@ -187,3 +206,7 @@ VD Backup은 독립적인 비공식 프로젝트입니다. Google LLC 또는 다
 ## 태그
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **업데이트를 받으려면 채널에 참여하세요:** @Priv8_VD https://t.me/Priv8_VD

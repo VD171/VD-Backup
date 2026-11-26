@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · Nederlands · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/nl/home-dark.png) | ![Apps](docs/screenshots/nl/apps-dark.png) | ![Schedule](docs/screenshots/nl/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/nl/destinations-dark.png) | ![Settings](docs/screenshots/nl/settings-dark.png) | ![Activity log](docs/screenshots/nl/activitylog-dark.png) |
 
 ---
 
@@ -65,23 +84,23 @@ bestaande back-ups van Neo-Backup en Android-DataBackup importeren zodat je kunt
 - **Versleuteling:** optioneel en draagbaar (`age` + wachtwoordzin of AES-256-zip), nooit
   gebonden aan de apparaathardware, zodat een back-up op een ander apparaat wordt hersteld of op een pc wordt geopend.
 - **Bestemmingen:** lokaal, SFTP, SCP, SMB, WebDAV, FTP, S3 en 70+ meer (`rclone`),
-  plus `rsync`- en `restic`-repository's. Optioneel Google Drive via een piepkleine optionele begeleider.
-- **Telegram:** maak een back-up naar een prive Telegram-kanaal als onbeperkte cloudopslag via MTProto - herstellen en verwijderen ook vanuit de WebUI.
-- **Integriteit:** elk archief wordt geverifieerd tegen het manifest; droogloop (dry-run)
+  plus `rsync`-repository's en `restic`-repository's. Optioneel Google Drive via een piepkleine optionele begeleider.
+- **Telegram:** maak een back-up naar een prive Telegram-kanaal als onbeperkte cloudopslag via MTProto, herstellen en verwijderen ook vanuit de WebUI.
+- **Integriteit:** elk archief wordt geverifieerd tegen het manifest, droogloop (dry-run)
   en hersteltest laten je een back-up controleren zonder iets aan te raken.
 - **Selectief herstel en herstel in batch:** herstel een willekeurige deelverzameling van de items van
-  een back-up, of selecteer meerdere back-ups en herstel ze allemaal tegelijk; verwijder back-ups en
+  een back-up, of selecteer meerdere back-ups en herstel ze allemaal tegelijk, verwijder back-ups en
   houd een activiteiten-/auditlogboek bij van elke destructieve actie.
 - **Speciale back-ups:** berichten (SMS/MMS/RCS), contacten en belgeschiedenis, Wi-Fi en Bluetooth,
   met een optionele draagbare JSON-export die je op een pc kunt openen.
-- **Systeembestanden (`/data/adb`):** maak een back-up van de root-omgeving zelf - modules, hun
-  gegevens en configuraties - alles of een subboom die je kiest uit een bestandsboom, waarbij elk
-  bestand wordt hersteld naar zijn oorspronkelijke eigenaar en SELinux-context zodat root blijft werken. Geavanceerd; alleen wat je kiest.
+- **Systeembestanden (`/data/adb`):** maak een back-up van de root-omgeving zelf (modules, hun
+  gegevens en configuraties) alles of een subboom die je kiest uit een bestandsboom, waarbij elk
+  bestand wordt hersteld naar zijn oorspronkelijke eigenaar en SELinux-context zodat root blijft werken. Geavanceerd, alleen wat je kiest.
 - **Planning + automatisering:** terugkerende **back-up- of hersteltaken** gericht op een app, een set,
   of alle apps, met keep-N-opschoning, plus optionele automatische back-up bij installatie/update en een
   lijst met uitgesloten apps.
 - **Installatiebron:** herstelde apps melden standaard de Play Store als hun installatiebron
-  (in/uit te schakelen); een geavanceerde optionele instelling vervalst ook het initiërende pakket en de bron.
+  (in/uit te schakelen), een geavanceerde optionele instelling vervalst ook het initiërende pakket en de bron.
 - **System-app-aankoppeling:** koppel een geïnstalleerde app als system-app aan zonder de echte
   `/system`-partitie aan te raken (systemless overlay-submodule, NoMount-bewust).
 - **Achtergrond:** back-up/herstel draaien losgekoppeld en overleven het sluiten van de
@@ -108,14 +127,14 @@ actie van de module headless beheren via dezelfde API die de WebUI gebruikt, zie
 **Edities.** Zes zips per release. `universal-full`, elke architectuur en elke binary
 ingebouwd (incl. `rclone` voor cloud-providers, `restic` voor snapshots), volledig offline,
 er wordt nooit iets gedownload, elk apparaat, grootst. `universal-lite`, elke architectuur
-zonder de twee grootste binaries (`rclone`, `restic`), kleinst; doet nog steeds lokale,
+zonder de twee grootste binaries (`rclone`, `restic`), kleinst, doet nog steeds lokale,
 SSH/SFTP- en `rsync`-back-ups zonder download, en de eerste keer dat je een cloud-bestemming
 (`rclone`) of snapshot-modus (`restic`) gebruikt, biedt het aan die kleine
 architectuurspecifieke add-on eenmalig te downloaden (geverifieerd met SHA-256) en te
 cachen, zodat die functies ook werken. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`,
 `x86_64`), één architectuur met elke binary ingebouwd, kleiner dan `universal-full`. Ken je
-je architectuur -> kies `<abi>-full`; wil je de kleinste en vind je een eenmalige download
-voor cloud of snapshots geen bezwaar -> `universal-lite`; wil je alles ingebouwd zonder
+je architectuur -> kies `<abi>-full`, wil je de kleinste en vind je een eenmalige download
+voor cloud of snapshots geen bezwaar -> `universal-lite`, wil je alles ingebouwd zonder
 downloads (offline / herstel) -> een full-editie. Zie
 [Releases](https://github.com/VD171/VD-Backup/releases).
 
@@ -123,7 +142,7 @@ Nieuw hier? De [Gebruikershandleiding](docs/USER-GUIDE.md) leidt je van installa
 
 ## Beveiliging
 
-VDBackup draait als root en verwerkt je app-gegevens en, optioneel, je inloggegevens en versleutelingswachtwoorden; een back-up kan gevoelige gegevens bevatten, bescherm hem dus met een wachtwoord en bewaar hem op een plek die je vertrouwt. Inloggegevens worden versleuteld opgeslagen in rust, nooit in platte tekst, en de versleuteling is nooit gebonden aan de hardware van het apparaat, dus het wachtwoord is wat een versleutelde back-up beschermt. Meld een kwetsbaarheid volgens [SECURITY.md](SECURITY.md).
+VDBackup draait als root en verwerkt je app-gegevens en, optioneel, je inloggegevens en versleutelingswachtwoorden, een back-up kan gevoelige gegevens bevatten, bescherm hem dus met een wachtwoord en bewaar hem op een plek die je vertrouwt. Inloggegevens worden versleuteld opgeslagen in rust, nooit in platte tekst, en de versleuteling is nooit gebonden aan de hardware van het apparaat, dus het wachtwoord is wat een versleutelde back-up beschermt. Meld een kwetsbaarheid volgens [SECURITY.md](SECURITY.md).
 
 ## Bouwen
 
@@ -143,11 +162,11 @@ een **RECOVERY**-notitie met de exacte opdrachten om op een pc te ontsleutelen e
 VD Backup bevat de **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)**-engine (ingebouwd in `vdlu/`): de module werkt zichzelf bij door alleen de
 bestanden op te halen die zijn gewijzigd (inhoud-geadresseerde blobs + een ondertekende `manifest.json`), in
 plaats van de hele `.zip` opnieuw te downloaden. **Gehard** profiel: de ed25519-handtekening is verplicht en
-downgrades worden geblokkeerd; de volledige `.zip` blijft geldig als terugval.
+downgrades worden geblokkeerd, de volledige `.zip` blijft geldig als terugval.
 
 - **Alleen LIVE** (geen herstart): updates worden bij de volgende start toegepast via `service.sh`, op de achtergrond, een no-op wanneer er geen feed bereikbaar is.
 - **Status** in `/data/adb/vdbackup/vdlu/`, buiten de module, zodat het een herflash overleeft.
-- **WebUI:** een paneel **Updates** met een voortgangstoast en annuleren; automatisch bijwerken is opt-in.
+- **WebUI:** een paneel **Updates** met een voortgangstoast en annuleren, automatisch bijwerken is opt-in.
 
 ## Documentatie
 
@@ -198,3 +217,7 @@ VD Backup is een onafhankelijk, onofficieel project. Het is niet verbonden met, 
 ## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **Word lid van het kanaal voor updates:** @Priv8_VD https://t.me/Priv8_VD

@@ -30,7 +30,7 @@ Asystenci i agenci AI są tu pełnoprawnymi współtwórcami, a nie dodatkiem na
 - Łatki tworzone z pomocą AI są recenzowane i akceptowane na tych samych zasadach co każde inne, według
   poprawności, przejrzystości i konwencji poniżej, a nie według tego, kto (lub co) je napisał.
 - Jeśli sterujesz VDBackup z poziomu agenta, używaj wyjścia JSON z `helper.sh` jako
-  kontraktu; nie zdrapuj WebUI.
+  kontraktu, nie zdrapuj WebUI.
 - Ta sama poprzeczka dla wszystkich: prawdziwe funkcje nigdy nie są osłabiane, sekrety i dane urządzenia
   nigdy nie trafiają do repozytorium (zobacz surowy [.gitignore](../../.gitignore)), a akcje
   mutujące pozostają potwierdzane i audytowane.
@@ -42,15 +42,15 @@ Asystenci i agenci AI są tu pełnoprawnymi współtwórcami, a nie dodatkiem na
 - WebUI to `module/webroot/` (otwórz je z menedżera roota). Backend to
   `module/helper.sh` (dispatcher) i `module/worker.sh` (odłączony silnik).
 - Natywne pliki binarne znajdują się w `module/bin/<abi>/` i są tworzone przez CI
-  (`.github/scripts/build_bin.sh`); zwykle nie przebudowujesz ich ręcznie.
+  (`.github/scripts/build_bin.sh`), zwykle nie przebudowujesz ich ręcznie.
 
 ## Konwencje
 
 - **Każdy plik źródłowy** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) zaczyna się od
   nagłówka banera projektu (skopiuj go z dowolnego istniejącego pliku). Bez wyjątków.
 - **Kod i komentarze po angielsku.** Komentarze trzymaj minimalne i tylko tam, gdzie potrzeba.
-- **Bez em-dash ani en-dash**; zawsze używaj zwykłego łącznika `-`.
-- WebUI to **vanilla JS** (jeden `scripts.js`); bez frameworków. Rozmawiaj z rootem tylko przez
+- **Bez em-dash ani en-dash**, zawsze używaj zwykłego łącznika `-`.
+- WebUI to **vanilla JS** (jeden `scripts.js`), bez frameworków. Rozmawiaj z rootem tylko przez
   opakowanie `helper(verb, args)` i escapuj każdą interpolowaną wartość.
 - **Nigdy nie osłabiaj** prawdziwej funkcji (np. zachowania SELinux/uid/gid/trybów).
 - Akcje mutujące (restore, delete) muszą prosić o potwierdzenie i zapisywać log audytu.
@@ -58,7 +58,7 @@ Asystenci i agenci AI są tu pełnoprawnymi współtwórcami, a nie dodatkiem na
 ## Internacjonalizacja (i18n)
 
 - Ciągi UI znajdują się w `module/webroot/lang/`. Angielski to kanoniczne rozwiązanie awaryjne
-  (`en.js` + `en.json`); pozostałe 20 języków to `<code>.json`.
+  (`en.js` + `en.json`), pozostałe 20 języków to `<code>.json`.
 - Aby dodać lub zmienić ciąg: edytuj `en.js` **oraz** `en.json`, a następnie zaktualizuj każdy
   `<code>.json`. Dotknięcie widocznej etykiety oznacza aktualizację **wszystkich** plików językowych i
   **wszystkich** `README.<code>.md`.
@@ -80,4 +80,4 @@ gotowe ustawienia miejsc docelowych `rclone` i dopieszczanie WebUI to świetne p
 
 ---
 
-> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane; zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Ta dokumentacja została wygenerowana za pomocą Claude (Anthropic) i jest utrzymywana przez VD171. Poprawki i ulepszenia są mile widziane, zobacz [CONTRIBUTING.md](CONTRIBUTING.md)._

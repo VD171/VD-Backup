@@ -420,15 +420,18 @@ function renderBackups(list) {
     grow.appendChild(el("div", "pkg", b.note ? (b.label || b.package) : b.package));
     grow.appendChild(el("div", "sub", shortDate(b.created_at)));
     if ((b.tags || []).length) { var tb = el("div", "tags"); b.tags.forEach(function (t) { tb.appendChild(tagChip(t)); }); grow.appendChild(tb); }
-    if (bkSelectMode) {
+    if (bkSelectMode && b.mode !== "mirror") {
       var cb = el("input", "selbox"); cb.type = "checkbox"; cb.checked = !!bkSelected[b.ref];
       cb.onclick = function (e) { e.stopPropagation(); toggleBkSel(b, cb.checked); li.classList.toggle("sel", cb.checked); };
       li.appendChild(cb); li.appendChild(ic); li.appendChild(grow);
       if (bkSelected[b.ref]) li.classList.add("sel");
       li.onclick = function () { cb.checked = !cb.checked; toggleBkSel(b, cb.checked); li.classList.toggle("sel", cb.checked); };
+    } else if (bkSelectMode) {
+      // A Mirror restores by dest+package, not by ref, so it is not part of the ref-list batch (#38).
+      li.appendChild(ic); li.appendChild(grow);
     } else {
       var btn = el("button", "btn go", I18N.t("restore"));
-      btn.onclick = function (e) { e.stopPropagation(); startRestore(b.ref, b.package, b.items); };
+      btn.onclick = function (e) { e.stopPropagation(); startRestore(b.ref, b.package, b.items, b.mode, b.dest); };
       li.appendChild(ic); li.appendChild(grow); li.appendChild(btn);
       li.onclick = function () { openBackupInfo(b); };
     }
@@ -459,13 +462,22 @@ function setBkSelectMode(on) {
 // batch restore: one options modal (applies to all), then restore each in turn.
 function startBatchRestore() {
   var refs = Object.keys(bkSelected); if (!refs.length) return;
+  // per-app SSAID list for the batch modal: one toggle per app being restored (off by default)
+  var ssaidApps = refs.map(function (ref) {
+    var b = (BACKUPS || []).filter(function (x) { return x.ref === ref; })[0];
+    var s = bkSelected[ref];
+    return { ref: ref, pkg: s.package, label: (b && (b.label || b.package)) || s.package };
+  });
   openOpModal({ batchPassword: true, overwriteAck: true, allowTest: true, allowSpoof: true,
+                ssaidApps: ssaidApps,
                 titleKey: "restore", confirmKey: "restore",
                 msg: I18N.t("confirm_restore_n", { n: refs.length }) }).then(function (res) {
     if (res == null) return;
     setBkSelectMode(false);
     // ONE detached op restores the whole list server-side (survives the WebUI closing).
-    var args = { refs: refs, ssaid: res.ssaid, netpolicy: res.netpolicy, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
+    var args = { refs: refs, netpolicy: res.netpolicy, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
+    // batch passes the ticked packages as ssaid_pkgs (per-app); single restore still uses .ssaid
+    if (res.ssaid_pkgs) args.ssaid_pkgs = res.ssaid_pkgs; else args.ssaid = res.ssaid;
     if (res.batch_password) args.batch_password = res.batch_password;   // #17: shared password for apps whose default fails
     var run = function () { helper("restore-batch", args).then(function (r) { if (r && r.opid) trackOp(r.opid, { batch: true, retry: run }); else modalAlert(errMsg(r)); }).catch(function () { modalAlert(errMsg()); }); };
     run();
@@ -521,7 +533,7 @@ function openBackupInfo(b) {
   body.innerHTML = "<div class='muted'>" + I18N.t("apps_loading") + "</div>";
   m.hidden = false;
   $("#info-close").onclick = function () { m.hidden = true; };
-  $("#info-restore").onclick = function () { m.hidden = true; startRestore(b.ref, b.package, b.items); };
+  $("#info-restore").onclick = function () { m.hidden = true; startRestore(b.ref, b.package, b.items, b.mode, b.dest); };
   $("#info-delete").onclick = function () { deleteBackup(b.ref, function () { m.hidden = true; loadBackups(); }); };
   // user name + tags editor: a custom name and free tags for this backup, stored in a sidecar
   // that travels with it (note-set). Searchable from the backups list. Reloads so the change shows.
@@ -538,6 +550,24 @@ function openBackupInfo(b) {
       else { $("#info-note-status").textContent = errMsg(r); }
     }).catch(function () { $("#info-note-save").disabled = false; $("#info-note-status").textContent = errMsg(); });
   };
+  // A Mirror has no manifest, so backup-info has nothing to read: render its summary from the
+  // list entry (package, mode, date, components) instead of calling the backend (#38).
+  if (b.mode === "mirror") {
+    body.innerHTML = "";
+    var mbadges = el("div", "badge-row");
+    mbadges.appendChild(statusBadge("info", I18N.t("opt_mode_mirror")));
+    body.appendChild(mbadges);
+    [[I18N.t("info_package"), b.package],
+     [I18N.t("info_date"), shortDate(b.created_at)],
+     [I18N.t("info_items"), (b.items || []).join(", ")]].forEach(function (kv) {
+      if (kv[1] == null || kv[1] === "") return;
+      var row = el("div", "kv");
+      row.appendChild(el("span", "k", kv[0]));
+      row.appendChild(el("span", "v", String(kv[1])));
+      body.appendChild(row);
+    });
+    return;
+  }
   helper("backup-info", { ref: b.ref }).then(function (r) {
     if (!r || !r.ok) { body.textContent = errMsg(r); return; }
     var rows = [
@@ -625,7 +655,7 @@ function renderStorage(used, free, total) {
     { used: fmtSize(used), free: fmtSize(free), total: fmtSize(total) });
   wrap.hidden = false;
 }
-function startRestore(ref, pkg, items) {
+function startRestore(ref, pkg, items, mode, dest) {
   openOpModal({
     needPassword: false,
     overwriteAck: true,
@@ -639,6 +669,9 @@ function startRestore(ref, pkg, items) {
     if (res == null) return;
     var args = { ref: ref, ssaid: res.ssaid, netpolicy: res.netpolicy, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
     if (res.items) args.items = res.items;
+    // A Mirror has no manifest and is not a <TS_VC> dir: the worker's restore() resolves it by
+    // dest+package (do_restore_mirror), not by ref, so tell it the mode and pass those (#38).
+    if (mode === "mirror") { args.mode = "mirror"; args.package = pkg; args.dest = dest || "local"; }
     var ctx = { restoreRef: ref, restorePkg: pkg, ssaid: res.ssaid, netpolicy: res.netpolicy, items: res.items, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
     ctx.retry = function () { helper("restore", args).then(function (r) { if (r && r.opid) trackOp(r.opid, ctx); else modalAlert(errMsg(r)); }).catch(function () { modalAlert(errMsg()); }); };
     ctx.retry();
@@ -706,6 +739,24 @@ function openOpModal(o) {
     var appnet = $("#pw-app-netpolicy");
     var okBtn = $("#pw-ok"), ackRow = $("#pw-overwrite-row"), ack = $("#pw-overwrite");
     var ssaidRow = $("#pw-ssaid-row"); ssaidRow.hidden = (o.allowSsaid === false);   // hide for flows where SSAID is irrelevant (e.g. settings backup)
+    // batch restore: swap the single global SSAID checkbox for a per-app list (one toggle each, off by default)
+    var ssaidAppsRow = $("#pw-ssaid-apps-row"), ssaidAppsBox = $("#pw-ssaid-apps");
+    ssaidAppsBox.innerHTML = "";
+    var batchSsaid = o.ssaidApps && o.ssaidApps.length;
+    if (batchSsaid) {
+      ssaidRow.hidden = true; ssaidAppsRow.hidden = false;
+      var seenPkg = {};
+      o.ssaidApps.forEach(function (app) {
+        if (seenPkg[app.pkg]) return;   // de-dup: two backups of the same app = one toggle
+        seenPkg[app.pkg] = true;
+        var lab = document.createElement("label"), cb = document.createElement("input");
+        cb.type = "checkbox"; cb.checked = false; cb.dataset.pkg = app.pkg;
+        var sp = document.createElement("span"); sp.textContent = app.label;
+        lab.appendChild(cb); lab.appendChild(sp); ssaidAppsBox.appendChild(lab);
+      });
+    } else {
+      ssaidAppsRow.hidden = true;
+    }
     var appnetRow = $("#pw-app-netpolicy-row"); appnetRow.hidden = (o.allowSsaid === false);   // same gating: system-file opt-ins are irrelevant for settings backup
     input.value = ""; ssaid.checked = false; appnet.checked = false; input.hidden = !(o.needPassword || o.batchPassword);
     var batchRow = $("#pw-batch-row"), batchApply = $("#pw-batch-apply"); batchApply.checked = false; batchRow.hidden = !o.batchPassword;
@@ -745,6 +796,7 @@ function openOpModal(o) {
     function cleanup() {
       input.value = ""; errBox.textContent = ""; modal.hidden = true; input.hidden = false;
       okBtn.disabled = false; ackRow.hidden = true; ackRow.classList.remove("needsack"); ack.onchange = null; itemsBox.hidden = true; itemsBox.innerHTML = ""; ssaidRow.hidden = false; appnetRow.hidden = false;
+      ssaidAppsRow.hidden = true; ssaidAppsBox.innerHTML = "";   // reset per-app SSAID list so the next single flow is normal
       testRow.hidden = true; test.onchange = null; spoofRow.hidden = true; batchRow.hidden = true;
       deepRow.hidden = true; deep.disabled = false; spoof.onchange = null;
       okBtn.onclick = null; $("#pw-cancel").onclick = null; input.onkeydown = null;
@@ -756,7 +808,12 @@ function openOpModal(o) {
         try { ack.focus(); } catch (e) {}
         return;
       }
-      var r = { password: o.needPassword ? input.value : null, ssaid: ssaid.checked, netpolicy: appnet.checked };
+      var r = { password: o.needPassword ? input.value : null, netpolicy: appnet.checked };
+      if (o.ssaidApps && o.ssaidApps.length) {   // batch: list of packages whose per-app toggle is ticked
+        r.ssaid_pkgs = Array.prototype.map.call(ssaidAppsBox.querySelectorAll("input:checked"), function (c) { return c.dataset.pkg; });
+      } else {
+        r.ssaid = ssaid.checked;
+      }
       if (o.batchPassword && batchApply.checked && input.value) r.batch_password = input.value;   // #17: one shared password tried on apps the default cannot open
       if (o.allowTest) r.test = test.checked;
       if (o.allowSpoof) { r.spoof_installer = spoof.checked; r.deep_spoof = deep.checked; }
@@ -838,7 +895,7 @@ function openAppBackups(pkg, label) {
       grow.appendChild(el("div", "name", (b.versionName || b.versionCode || "") + ""));
       grow.appendChild(el("div", "pkg", (b.created_at || "") + " - " + (b.items || []).join(", ")));
       var btn = el("button", "btn go small", I18N.t("restore"));
-      btn.onclick = function () { m.hidden = true; startRestore(b.ref, b.package, b.items); };
+      btn.onclick = function () { m.hidden = true; startRestore(b.ref, b.package, b.items, b.mode, b.dest); };
       var del = el("button", "btn danger small", I18N.t("delete"));
       del.onclick = function () { deleteBackup(b.ref, function () { openAppBackups(pkg, label); }); };
       li.appendChild(grow); li.appendChild(btn); li.appendChild(del);

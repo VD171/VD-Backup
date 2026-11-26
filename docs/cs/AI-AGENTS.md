@@ -6,7 +6,7 @@
 
 VDBackup je navržen tak, aby AI asistent nebo agent mohl spravovat **veškerý** obsah a
 akce modulu bezhlavě, stejně jako to člověk dělá přes WebUI. WebUI je jen jedním
-klientem malého JSON API; váš agent je dalším. Používejte API,
+klientem malého JSON API, váš agent je dalším. Používejte API,
 nescrapujte WebUI.
 
 ## Kontrakt
@@ -19,10 +19,10 @@ sh /data/adb/modules/vdbackup/scripts/helper.sh <verb> <base64(JSON-args)>
 
 - Argumenty jsou jeden JSON objekt, **zakódovaný v base64**, předaný jako jeden argv token.
 - Příkaz vytiskne **jeden JSON objekt** na stdout: `{"ok":true,...}` nebo
-  `{"ok":false,"code":"ERR_...","message":"..."}`. Ten parsujte; nikdy nescrapujte text.
+  `{"ok":false,"code":"ERR_...","message":"..."}`. Ten parsujte, nikdy nescrapujte text.
 - Dlouhé operace (`backup`, `restore`, `import`, `backup-batch`, `restore-batch`, `config-export`, `config-import`) vracejí `{"ok":true,"opid":"..."}`
   okamžitě a běží **oddělené** (přežijí odchod volajícího/WebUI). Dotazujte se
-  na jejich průběh; nejsou dokončené, když se volání vrátí.
+  na jejich průběh, nejsou dokončené, když se volání vrátí.
 - `progress` a `cancel` berou **base64 surového řetězce opid**, ne JSON objekt.
 
 Malý pomocník pro váš shell:
@@ -35,7 +35,7 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 
 Pro ovládání z pracovní stanice spusťte to přes svůj obvyklý root kanál na zařízení
 (adb shell jako root, nebo nastavení SSH-to-root). Modul dodává přibalené binárky, takže
-po instalaci nepotřebuje **žádný internet** pro lokální zálohu/obnovu; pouze cloudové
+po instalaci nepotřebuje **žádný internet** pro lokální zálohu/obnovu, pouze cloudové
 cíle (`rclone`/`restic`/ssh) komunikují se sítí.
 
 ## Verby
@@ -43,13 +43,13 @@ cíle (`rclone`/`restic`/ssh) komunikují se sítí.
 | Verb | Args (JSON) | Vrací |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` počty (velikosti v bajtech): aplikace se zálohami, celkový počet instancí záloh, samostatné zálohy cest, naplánované úlohy, celková velikost záloh a volné/celkové místo souborového systému záloh. Neoddělená, vrací okamžitě; používaná úvodním přehledem WebUI. |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` počty (velikosti v bajtech): aplikace se zálohami, celkový počet instancí záloh, samostatné zálohy cest, naplánované úlohy, celková velikost záloh a volné/celkové místo souborového systému záloh. Neoddělená, vrací okamžitě, používaná úvodním přehledem WebUI. |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | konfigurační objekt (nebo `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | generuje `age` klíčový pár pro šifrování |
 | `list-apps` | `{user?}` | `{ok,apps:[{package,label,system,versionCode}]}` (dex, shell fallback) |
 | `label` | `{package,user?}` | `{ok,label}` (skutečné lokalizované jméno aplikace, bez kontextu) |
-| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG; cachováno per package+`vc`) |
+| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG, cachováno per package+`vc`) |
 | `backup` | viz níže | `{ok,opid}` (oddělené) |
 | `restore` | viz níže | `{ok,opid}` (oddělené) |
 | `import` | `{from,ref,password,ssaid,user}` | `{ok,opid}` (oddělené) |
@@ -59,7 +59,7 @@ cíle (`rclone`/`restic`/ssh) komunikují se sítí.
 | `list-ops` | `{}` | `{ok,ops:[...]}` (znovupřipojení po opětovném připojení) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | seznam aplikací / dávkové base64 ikony |
 | `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
-| `note-set` | `{ref,note?,tags?}` | `{ok}` nastaví nebo zruší vlastní název zálohy (`note`) a volné `tags`; uloženo v průvodním souboru, který cestuje se zálohou, prohledatelné z `list-backups`. |
+| `note-set` | `{ref,note?,tags?}` | `{ok}` nastaví nebo zruší vlastní název zálohy (`note`) a volné `tags`, uloženo v průvodním souboru, který cestuje se zálohou, prohledatelné z `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` uživatelé Androidu v zařízení (více uživatelů). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` podadresáře cesty (výběr složky). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` samostatné zálohy složky/souboru. |
@@ -72,48 +72,48 @@ cíle (`rclone`/`restic`/ssh) komunikují se sítí.
 | `log-export` | `{user?}` | `{ok:true,path}` (absolutní cesta k zapsanému souboru `.txt` v adresáři záloh) nebo `{ok:false,code:"ERR_LOG_EXPORT"}`. Zapíše protokol aktivity (`audit.jsonl`) plus krátkou hlavičku sestavení/zařízení do jediného uživatelsky viditelného textového souboru, aby jej bylo možné přiložit k hlášení chyby. Neoddělená, vrací okamžitě. |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` celosystémová záloha (oddělené) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (vyžaduje restart; `confirm` to chrání) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (vyžaduje restart, `confirm` to chrání) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` zálohuje libovolnou absolutní cestu jako `tar.zst`+`manifest.json` pod `.paths/` (oddělené) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` obnoví zálohu cesty na její původní umístění (`confirm` to chrání; oddělené) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` obnoví zálohu cesty na její původní umístění (`confirm` to chrání, oddělené) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` jedna líná úroveň stromu /data/adb (výchozí `/data/adb`), pro výběr. |
 | `adb-du` | `{path}` | `{ok,size}` rekurzivní velikost v bajtech jednoho podstromu /data/adb, na vyžádání. |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` zálohuje /data/adb - celé (vynechte `paths`) nebo zvolené pod-cesty - s věrností SELinux/vlastníka po souborech, pod `.adb/` (oddělené) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` obnoví zálohu /data/adb PŘES živý strom - celý nebo zvolené pod-cesty - se zachováním kontextu každého souboru (nikdy plošný chcon); `confirm` to chrání (oddělené) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` obnoví zálohu /data/adb PŘES živý strom - celý nebo zvolené pod-cesty - se zachováním kontextu každého souboru (nikdy plošný chcon), `confirm` to chrání (oddělené) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` zálohy souborového systému /data/adb. |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` uložený podrobný výpis souborů zálohy, pro výběr stromu obnovy. |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | připojí nainstalovanou aplikaci jako systémovou (bezsystémový podmodul; živě přes NoMount, jinak při příštím bootu) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | připojí nainstalovanou aplikaci jako systémovou (bezsystémový podmodul, živě přes NoMount, jinak při příštím bootu) |
 | `companion-status` / `companion-install` | `{}` | stav společníka Google Drive / instalace na vyžádání |
 | `telegram-check` | `{}` | stav relace Telegramu (`user` null = nepřihlášen) |
-| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | přihlášení k Telegramu; `sign-in` vrací `2FA_REQUIRED`, pokud účet má 2FA a chybí `password` |
+| `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | přihlášení k Telegramu, `sign-in` vrací `2FA_REQUIRED`, pokud účet má 2FA a chybí `password` |
 | `telegram-logout` | `{}` | ukončí relaci Telegramu |
 | `telegram-list` | `{}` | zálohy v kanálu Telegram (názvy `<pkg>__<ts>_<vc>.vdb.tar`) |
-| `telegram-pull` | `{message_id,name}` | `{ok,opid}` stáhne zálohu z Telegramu do místního úložiště (detached); pak se obnoví normálním tokem `restore` |
+| `telegram-pull` | `{message_id,name}` | `{ok,opid}` stáhne zálohu z Telegramu do místního úložiště (detached), pak se obnoví normálním tokem `restore` |
 | `telegram-delete` | `{message_id}` | `{ok,deleted:[...]}` smaže zálohu z kanálu Telegram podle `message_id` (dávka: oddělené čárkou) |
 | `rclone-list` | `{dest}` | `{ok,dest,backups:[{dest,rref,package,tsvc}]}` zálohy Full uložené pouze vzdáleně v cíli rclone (`dest` je id cíle, `rref` je `<pkg>/<ts_vc>`) |
-| `rclone-pull` | `{dest,rref}` | `{ok,opid}` stáhne pouze vzdáleně uloženou zálohu rclone do místního úložiště (detached); pak se obnoví normálním tokem `restore` |
-| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` smaže jednu zálohu z rclone remotu; `rref` musí být přesně `<pkg>/<ts_vc>` |
+| `rclone-pull` | `{dest,rref}` | `{ok,opid}` stáhne pouze vzdáleně uloženou zálohu rclone do místního úložiště (detached), pak se obnoví normálním tokem `restore` |
+| `rclone-delete` | `{dest,rref}` | `{ok,deleted}` smaže jednu zálohu z rclone remotu, `rref` musí být přesně `<pkg>/<ts_vc>` |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | správa cílů |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | správa rclone remotů (vytvoří záznam v `rclone.conf`, na který cíl `type:"rclone"` ukazuje); `backend` může být libovolný rclone backend, bez whitelistu |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | správa rclone remotů (vytvoří záznam v `rclone.conf`, na který cíl `type:"rclone"` ukazuje), `backend` může být libovolný rclone backend, bez whitelistu |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (engine už otevřel prohlížeč telefonu na této URL souhlasu přes Android VIEW intent) nebo `{ok:false,code:"ERR_AUTHORIZE"}`. Spustí `rclone authorize <backend>` na místním callback serveru (`127.0.0.1:53682`) pro OAuth na zařízení. |
 | `remote-authorize-poll` | `{}` | `{ok:true,done:false,url}` během čekání, `{ok:true,done:true,token}` jakmile uživatel udělí souhlas (`token` k předání do `remote-add`), nebo `{ok:false,code:"ERR_AUTHORIZE"}`. |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; zastaví probíhající autorizaci. |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, zastaví probíhající autorizaci. |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (zda jsou binárky `rclone`/`restic` přítomny, zda je tato edice `lite` umí stáhnout, velikost stažení v bytech) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (oddělené) stáhne+ověří+nainstaluje `rclone`/`restic` doplněk v edici `lite` |
-| `schedule-set` / `schedule-list` / `schedule-delete` | viz níže | naplánované úlohy (záloha nebo obnova; cílí na jednu aplikaci, sadu nebo všechny aplikace) |
+| `schedule-set` / `schedule-list` / `schedule-delete` | viz níže | naplánované úlohy (záloha nebo obnova, cílí na jednu aplikaci, sadu nebo všechny aplikace) |
 | `scheduler-tick` | `{}` | spustí splatné úlohy + aplikuje retenci + pozorovatel automatické zálohy (volá to bootovací heartbeat) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (neoddělené; vrací se okamžitě; `ERR_UPDATE_CHECK` při selhání, viz níže) |
-| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) zálohuje mnoho aplikací v jedné oddělené operaci; průběh nese `n`/`of`. Selhání jedné aplikace dávku nezastaví. |
-| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) obnoví mnoho záloh v jedné oddělené operaci; průběh nese `n`/`of`. Selhání jedné aplikace dávku nezastaví. |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (neoddělené, vrací se okamžitě, `ERR_UPDATE_CHECK` při selhání, viz níže) |
+| `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) zálohuje mnoho aplikací v jedné oddělené operaci, průběh nese `n`/`of`. Selhání jedné aplikace dávku nezastaví. |
+| `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) obnoví mnoho záloh v jedné oddělené operaci, průběh nese `n`/`of`. Selhání jedné aplikace dávku nezastaví. |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` svazky úložiště pro výběr složky: vnitřní plus vyměnitelná SD karta / USB. |
 | `config-export` | `{password}` | `{ok,opid}` (detached) exportuje konfiguraci, úlohy, cíle, přihlašovací údaje a klíče do jednoho souboru šifrovaného heslovou frází ve složce záloh. |
 | `config-import` | `{ref,password}` | `{ok,opid}` (detached) sloučí exportovaný konfigurační soubor zpět do tohoto zařízení (nikdy slepě nepřepisuje). |
 | `config-exports` | `{}` | `{ok,exports:[{ref,name,size}]}` vypíše šifrované konfigurační soubory dostupné k importu. |
-| `wipe-credentials` | `{}` | `{ok,wiped}` odstraní uložená vzdálená hesla a šifrovací klíč zařízení; cíle, úlohy a zálohy zůstávají. |
+| `wipe-credentials` | `{}` | `{ok,wiped}` odstraní uložená vzdálená hesla a šifrovací klíč zařízení, cíle, úlohy a zálohy zůstávají. |
 | `log-prune` | `{}` | `{ok}` prořeže dávno dokončené protokoly operací, omezí auditní stopu a odstraní zastaralé ikony (volá to spouštěcí služba). |
 | `sanitize` | `{}` | `{ok}` znovu prosadí viditelnost (0755) složek záloh pro každého uživatele Androidu, aby správce souborů mohl otevřít složky, které syrová kopie root nebo záloha před v1.03.2 ponechaly přístupné jen vlastníkovi. |
-| `boot-sweep` | `{}` | `{ok,reaped}` uklidí zbytky po záloze, která byla přerušena nebo násilně ukončena (volá to spouštěcí služba); záloha, která selže nebo je zrušena, je už uklizena vlastním workerem. |
+| `boot-sweep` | `{}` | `{ok,reaped}` uklidí zbytky po záloze, která byla přerušena nebo násilně ukončena (volá to spouštěcí služba), záloha, která selže nebo je zrušena, je už uklizena vlastním workerem. |
 
 ### Pole `progress`
 
@@ -139,7 +139,7 @@ když nejsou známa, a jsou **vynechána u koncových zápisů** (finish / dry-r
 | `of` | int | celkový počet položek (0 = neznámé) |
 | `cur` | string | název aktuální položky (prázdné = žádná) |
 
-Cloudové přenosy plní `rate`/`eta` (percent pochází z rclone); lokální zálohy Full plní
+Cloudové přenosy plní `rate`/`eta` (percent pochází z rclone), lokální zálohy Full plní
 `n`/`of`/`cur`. Popisky fází zahrnují fázi zapečetění kontrolního součtu **`verified`** a,
 u cloudových přenosů, **`transfer`** a **`mirror <item>`**.
 
@@ -165,11 +165,11 @@ u cloudových přenosů, **`transfer`** a **`mirror <item>`**.
 ```
 
 `restore`/`import` berou `{ref}` (adresář zálohy / scan ref). `restore` také přijímá:
-`"items"` (podmnožinu typů položek zálohy k obnově; vynechte pro všechny), `"test": true`
+`"items"` (podmnožinu typů položek zálohy k obnově, vynechte pro všechny), `"test": true`
 (rozbalí do dočasného adresáře a ověří, bez dotknutí se živé aplikace), `"mode"` pro
 snapshot/mirror, `"password"` pro šifrovanou zálohu, `"ssaid"` (opt-in), a volby zdroje
 instalace `"spoof_installer"` (výchozí z config, nastaví instalátor na Play Store v době
-instalace) a `"deep_spoof": true` (pokročilý opt-in; také zfalšuje iniciující balíček a
+instalace) a `"deep_spoof": true` (pokročilý opt-in, také zfalšuje iniciující balíček a
 zdroj balíčku úpravou databáze balíčků, projeví se po restartu). `import` bere
 `"from": "neo" | "databackup"` a, pro šifrovanou Neo zálohu, `"password"`.
 
@@ -228,11 +228,11 @@ Dávka (`backup` s `packages`, `restore` s `refs`) spouští každou aplikaci ve
 - **`batch_app_timeout`** (konfigurace, sekundy, výchozí `1800`, `0` vypíná): pokud aplikace trvá déle, její strom procesů je ukončen, zaznamená se jako `ERR_TIMEOUT` a dávka pokračuje, takže jedna zaseknutá aplikace nikdy nezmrazí celý běh.
 - **Částečný výsledek**: závěrečný zápis obsahuje `ok`, `n` z `of`, přehled `fails` `{code:count}` (např. `{"ERR_NO_SPACE":24}`) a `free` (volné bajty v souborovém systému záloh). Částečná dávka je `ERR_BATCH_PARTIAL`, nikdy slepá chyba.
 - **Tepelné tempo** (konfigurace `thermal_throttle`, ve výchozím stavu zapnuto): mezi aplikacemi se worker pozastaví, aby vychladl, když je zařízení horké, a vydá fázi průběhu `cooling`, takže dlouhý běh zařízení nepřehřeje.
-- **Odhad místa před během** (konfigurace `space_preflight`, ve výchozím stavu zapnuto): před dávkou do místního cíle se sečte nekomprimovaná velikost vybraných aplikací; pokud už překračuje volné místo v cíli, dávka se předem zastaví s `ERR_NO_SPACE` (plus pole `need`) místo toho, aby disk zaplnila jen zpola. Přeskočeno u streamovaných vzdálených cílů.
+- **Odhad místa před během** (konfigurace `space_preflight`, ve výchozím stavu zapnuto): před dávkou do místního cíle se sečte nekomprimovaná velikost vybraných aplikací, pokud už překračuje volné místo v cíli, dávka se předem zastaví s `ERR_NO_SPACE` (plus pole `need`) místo toho, aby disk zaplnila jen zpola. Přeskočeno u streamovaných vzdálených cílů.
 
 ### Argumenty `remote-add`
 
-Cloudový cíl je `type:"rclone"` cíl, který pojmenovává `rclone` remote; vytvořte
+Cloudový cíl je `type:"rclone"` cíl, který pojmenovává `rclone` remote, vytvořte
 ten remote nejprve pomocí `remote-add`. `backend` může být **libovolný rclone backend** -
 žádný whitelist neexistuje. `remote-add` přijme libovolný název backendu (`dropbox`,
 `onedrive`, `box`, `pcloud`, `mega`, `b2`, `s3`, `sftp`, `smb`, `webdav`, `ftp`, `drive`
@@ -275,7 +275,7 @@ Lokální cíle nejsou nikdy omezeny.
 ### Cloudová integrita a kvóta
 
 - **Zapečetění kontrolním součtem (cloud).** Po úspěšném cloudovém kopírování engine provede
-  vzdálenou kontrolu kontrolního součtu (`rclone check`); neshoda ukončí operaci s `ERR_VERIFY`.
+  vzdálenou kontrolu kontrolního součtu (`rclone check`), neshoda ukončí operaci s `ERR_VERIFY`.
   Backendy, které nesdílejí žádný společný hash s lokální stranou, se přeskočí (není to selhání).
 - **Kontrola kvóty (cloud, režim Full).** Před nahráváním v režimu Full na remote `rclone`
   engine dotáže volné místo remotu (`rclone about --json`) a odmítne s `ERR_QUOTA`, pokud by se
@@ -290,33 +290,33 @@ snapshot akce. `cloud-status` hlásí, zda už jsou přítomny, zda je tato edic
 velikost stažení v bytech. `cloud-fetch` běží **odděleně** (dotazujte se na `progress` s jeho
 `opid`): stáhne doplněk `rclone`+`restic` pro danou architekturu, ověří jej proti SHA-256
 zapečenému v modulu, a nainstaluje jej do runtime cache. Jeho fáze průběhu jsou `downloading`,
-`verifying` a `installing`; finální kód je `ERR_NONE` při úspěchu, nebo `ERR_FETCH` (stažení
+`verifying` a `installing`, finální kód je `ERR_NONE` při úspěchu, nebo `ERR_FETCH` (stažení
 selhalo) / `ERR_FETCH_VERIFY` (nesouhlasí kontrolní součet, zahozeno) při selhání. V edici
 `full` je zbytečný. `backup`/`restore` na cloudový nebo snapshot cíl v edici `lite`, dříve než
-jsou binárky přítomny, selže s `ERR_CLOUD_FETCHABLE`; klient by měl nabídnout spuštění
+jsou binárky přítomny, selže s `ERR_CLOUD_FETCHABLE`, klient by měl nabídnout spuštění
 `cloud-fetch` a poté opakovat.
 
 ### Kategorie speciálních záloh
 
-`special-categories` hlásí, které celosystémové kategorie zařízení má; `special-backup`
+`special-categories` hlásí, které celosystémové kategorie zařízení má, `special-backup`
 zachytí ty, které předáte v `categories`, a `special-restore` je znovu aplikuje. Kategorie
 jsou:
 
 | Kategorie | Co to je | Sémantika obnovy |
 |----------|-----------|-------------------|
 | `messages` | SMS/MMS | nahrazení provideru (vymazání + extrakce) |
-| `rcs` | RCS chat (Google Messages, `bugle_db`); také přenositelně exportován do `rcs.json` | nahrazení dat aplikace (smaže + rozbalí), stejné zařízení |
+| `rcs` | RCS chat (Google Messages, `bugle_db`), také přenositelně exportován do `rcs.json` | nahrazení dat aplikace (smaže + rozbalí), stejné zařízení |
 | `contacts` | kontakty a seznam hovorů | nahrazení provideru (vymazání + extrakce) |
 | `wifi` | uložené Wi-Fi sítě | nahrazení provideru (vymazání + extrakce) |
 | `bluetooth` | Bluetooth párování | nahrazení provideru (vymazání + extrakce) |
-| `calendar` | provider kalendáře (`com.android.providers.calendar`, aplikace + data); také přenositelně exportováno do `calendar.json` | nahrazení provideru (vymazání + extrakce) |
+| `calendar` | provider kalendáře (`com.android.providers.calendar`, aplikace + data), také přenositelně exportováno do `calendar.json` | nahrazení provideru (vymazání + extrakce) |
 | `wallpaper` | tapeta domovské a zamykací obrazovky plus `wallpaper_info.xml`, uložená surová (binární) | soubory nahrazeny |
 | `dns` | režim a specifikátor privátního DNS, načtený z nastavení | idempotentní `settings put` |
 | `system_settings` | úplný dump system/global/secure nastavení | **opt-in**, idempotentní `settings put`, přepíše nastavení zařízení |
 
 **`system_settings` je striktně opt-in a při obnově destruktivní.** Stejně jako `ssaid`
 přepisuje při obnově celosystémová nastavení, takže je chráněn za výslovným souhlasem uživatele a
-zapsán do auditní stopy. Nikdy jej nevybírejte ve výchozím stavu; pouze na přímou, záměrnou žádost
+zapsán do auditní stopy. Nikdy jej nevybírejte ve výchozím stavu, pouze na přímou, záměrnou žádost
 uživatele.
 
 ### Samostatná záloha cesty
@@ -335,11 +335,11 @@ sadou při šifrování) pod `.paths/` v adresáři záloh.
 
 - Zdrojová cesta musí být **absolutní** a pod jedním z povolených rootů:
   `/storage/emulated`, `/data/media`, `/sdcard`, `/data`. Cesta, která neexistuje, selže s
-  `ERR_NO_PATH`; cesta mimo povolené rooty nebo cesta obsahující `..` selže s `ERR_BAD_PATH`.
+  `ERR_NO_PATH`, cesta mimo povolené rooty nebo cesta obsahující `..` selže s `ERR_BAD_PATH`.
 - `path-restore` zapisuje zpět na původní umístění, je tedy destruktivní a vyžaduje
   `"confirm": true`, silně frikční zábrana, jako `special-restore`. `ref`, který není platná
   záloha cesty, selže s `ERR_BAD_REF`.
-- Oba běží **oddělené**; dotazujte se na `progress` s vráceným `opid`.
+- Oba běží **oddělené**, dotazujte se na `progress` s vráceným `opid`.
 
 ### Záloha souborového systému /data/adb
 
@@ -348,16 +348,16 @@ jejich data a konfigurace), řízené línym výběrem stromu (`adb-list` po jed
 pro velikost složky na vyžádání).
 
 - Celé nebo výběrové na obou koncích: vynechte `paths` pro vše, nebo předejte zvolené pod-cesty
-  (relativní k /data/adb); obnova bere stejné `paths`.
+  (relativní k /data/adb), obnova bere stejné `paths`.
 - **Věrnost po souborech:** archiv zachovává kontext SELinux, vlastníka a xattrs každého souboru a
   obnova se na to spoléhá - NIKDY neaplikuje plošný `chcon`, který by zploštil heterogenní
-  kontexty /data/adb a rozbil root. `adb-restore` rozbaluje PŘES živý strom; nikdy jej nemaže.
+  kontexty /data/adb a rozbil root. `adb-restore` rozbaluje PŘES živý strom, nikdy jej nemaže.
 - Sebereference: vlastní výstup zálohy a staging modulu jsou vyloučeny, takže záloha nikdy
   neobsahuje sebe sama.
-- `adb-index` vrací uložený výpis souborů zálohy, aby obnova mohla ukázat svůj strom; výběr v UI
-  je vyjádřen zcela přes `paths` (plně zaškrtnutá složka je jedna cesta; částečně zaškrtnutá
+- `adb-index` vrací uložený výpis souborů zálohy, aby obnova mohla ukázat svůj strom, výběr v UI
+  je vyjádřen zcela přes `paths` (plně zaškrtnutá složka je jedna cesta, částečně zaškrtnutá
   sestupuje ke svým zaškrtnutým potomkům, takže seznam vyloučení není potřeba).
-- `adb-restore` vyžaduje `"confirm": true` (silně frikční zábrana); oba běží odděleně, dotazujte se na `progress`.
+- `adb-restore` vyžaduje `"confirm": true` (silně frikční zábrana), oba běží odděleně, dotazujte se na `progress`.
 
 ### `update-check`
 
@@ -385,20 +385,20 @@ Při úspěchu vrací:
 Pokud neexistuje URL `updateJson`, síťový požadavek selže, nebo manifest nelze naparsovat, vrací
 `{"ok":false,"code":"ERR_UPDATE_CHECK"}`.
 
-`update-check` pouze **hlásí** dostupnost a poznámky k vydání; samotnou aktualizaci provádí váš
+`update-check` pouze **hlásí** dostupnost a poznámky k vydání, samotnou aktualizaci provádí váš
 root manažer (KernelSU / APatch / Magisk) přes `updateJson` modulu, nikdy toto sloveso.
 
 ## Bezpečnostní zábrany, které váš agent musí respektovat
 
 - **`ssaid` je striktně opt-in (výchozí vypnuto).** Zálohuje / obnovuje
-  ANDROID_ID zařízení přepsáním systémového souboru; obnova se uplatní až po restartu, a
+  ANDROID_ID zařízení přepsáním systémového souboru, obnova se uplatní až po restartu, a
   předchozí soubor je vždy nejprve uložen pro rollback. Posílejte `"ssaid": true`
   pouze na přímý, záměrný požadavek uživatele, nikdy ve výchozím stavu.
 - **Mutující akce (restore, delete, import) jsou destruktivní** a jsou zalogovány do
   lokální auditní stopy (`logs/audit.jsonl`). Obnova je věrná (wipe-then-extract), takže
   vrátí aplikaci do přesného stavu zálohy. Potvrďte záměr, než je zavoláte.
 - **`system_settings` je opt-in a destruktivní, přesně jako `ssaid`.** Jeho obnova
-  přepíše celosystémová nastavení, takže jej posílejte jen na přímou žádost uživatele; je chráněn
+  přepíše celosystémová nastavení, takže jej posílejte jen na přímou žádost uživatele, je chráněn
   výslovným souhlasem a zaznamenán do auditní stopy.
 - **Obnova je idempotentní.** Surové obnovy provideru (messages/contacts/wifi/bluetooth/calendar)
   data **nahrazují** místo slučování, data provideru jsou vymazána a archiv je přes ně extrahován -
@@ -411,7 +411,7 @@ root manažer (KernelSU / APatch / Magisk) přes `updateJson` modulu, nikdy toto
   Manipulovaný archiv nikdy nemůže uniknout ze svého cílového adresáře.
 - **Nikdy neoslabujte** zachování (SELinux/uid/gid/režimy/xattr) ani pravidlo APK (APK
   jsou vždy komprimované, nikdy šifrované, pokud není nastaveno `encrypt_apk`).
-- Považujte JSON výstup za zdroj pravdy; kontrolujte `ok`/`code`, dotazujte se na `progress`,
+- Považujte JSON výstup za zdroj pravdy, kontrolujte `ok`/`code`, dotazujte se na `progress`,
   a vynášejte `ERR_*` kódy místo hádání.
 
 Viz [ARCHITECTURE.md](ARCHITECTURE.md) a
@@ -421,4 +421,4 @@ Viz [ARCHITECTURE.md](ARCHITECTURE.md) a
 
 ---
 
-> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány; viz [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Tato dokumentace byla vytvořena pomocí Claude (Anthropic) a spravuje ji VD171. Opravy a vylepšení jsou vítány, viz [CONTRIBUTING.md](CONTRIBUTING.md)._

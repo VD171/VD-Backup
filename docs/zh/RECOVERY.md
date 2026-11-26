@@ -11,7 +11,7 @@
 
 ## 你可能需要的工具
 
-- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`; Linux: `apt install zstd`)
+- **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
 - **age** （仅用于 `.age` 文件）: https://github.com/FiloSottile/age/releases
 - `tar` 内置于 macOS、Linux 和现代的 Windows 10/11。
 - `gzip` 到处都内置；对于 `.tar.gz` 你不需要任何额外东西。

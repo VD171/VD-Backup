@@ -30,7 +30,7 @@ AI-assistenter och agenter är förstklassiga bidragsgivare här, inte en eftert
 - AI-assisterade patchar granskas och accepteras på samma villkor som alla andra, efter
   korrekthet, tydlighet och konventionerna nedan, inte efter vem (eller vad) som skrev dem.
 - Om du styr VDBackup från en agent, använd JSON-utdatan från `helper.sh` som
-  kontrakt; skrapa inte WebUI.
+  kontrakt, skrapa inte WebUI.
 - Samma ribba för alla: riktiga funktioner försvagas aldrig, hemligheter och enhetsdata
   landar aldrig i repot (se den strikta [.gitignore](../../.gitignore)), och muterande
   åtgärder förblir bekräftade och granskade.
@@ -42,15 +42,15 @@ AI-assistenter och agenter är förstklassiga bidragsgivare här, inte en eftert
 - WebUI:n är `module/webroot/` (öppna den från root-hanteraren). Backenden är
   `module/helper.sh` (dispatcher) och `module/worker.sh` (frånkopplad motor).
 - Native-binärer bor i `module/bin/<abi>/` och produceras av CI
-  (`.github/scripts/build_bin.sh`); du bygger dem normalt inte om för hand.
+  (`.github/scripts/build_bin.sh`), du bygger dem normalt inte om för hand.
 
 ## Konventioner
 
 - **Varje källfil** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) börjar med
   projektbanner-headern (kopiera den från valfri befintlig fil). Inga undantag.
 - **Kod och kommentarer på engelska.** Håll kommentarerna minimala och bara där de behövs.
-- **Ingen em-dash eller en-dash**; använd alltid ett vanligt bindestreck `-`.
-- WebUI är **vanilla JS** (en `scripts.js`); inga ramverk. Prata med root endast genom
+- **Ingen em-dash eller en-dash**, använd alltid ett vanligt bindestreck `-`.
+- WebUI är **vanilla JS** (en `scripts.js`), inga ramverk. Prata med root endast genom
   `helper(verb, args)`-omslaget, och escapea varje interpolerat värde.
 - **Försvaga aldrig** en riktig funktion (t.ex. bevarande av SELinux/uid/gid/modes).
 - Muterande åtgärder (restore, delete) måste be om bekräftelse och skriva en revisionslogg.
@@ -58,7 +58,7 @@ AI-assistenter och agenter är förstklassiga bidragsgivare här, inte en eftert
 ## Internationalisering (i18n)
 
 - UI-strängar bor i `module/webroot/lang/`. Engelska är den kanoniska fallbacken
-  (`en.js` + `en.json`); de andra 20 språken är `<code>.json`.
+  (`en.js` + `en.json`), de andra 20 språken är `<code>.json`.
 - För att lägga till eller ändra en sträng: redigera `en.js` **och** `en.json`, uppdatera sedan varje
   `<code>.json`. Att röra en synlig etikett innebär att uppdatera **alla** språkfiler och
   **alla** `README.<code>.md`.
@@ -80,4 +80,4 @@ Leta efter etiketterna `good first issue` och `help wanted`. Översättningar, d
 
 ---
 
-> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas; se [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Denna dokumentation genererades med Claude (Anthropic) och underhålls av VD171. Rättelser och förbättringar välkomnas, se [CONTRIBUTING.md](CONTRIBUTING.md)._

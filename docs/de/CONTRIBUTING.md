@@ -30,7 +30,7 @@ KI-Assistenten und -Agenten sind hier erstklassige Mitwirkende, kein nachträgli
 - KI-unterstützte Patches werden zu denselben Bedingungen geprüft und akzeptiert wie alle anderen -
   nach Korrektheit, Klarheit und den Konventionen unten, nicht danach, wer (oder was) sie geschrieben hat.
 - Wenn du VDBackup von einem Agenten aus steuerst, nutze die JSON-Ausgabe von `helper.sh` als
-  Vertrag; scrape nicht die WebUI.
+  Vertrag, scrape nicht die WebUI.
 - Gleicher Maßstab für alle: echte Funktionen werden nie geschwächt, Geheimnisse und Gerätedaten
   landen nie im Repo (siehe die strikte [.gitignore](../../.gitignore)), und verändernde
   Aktionen bleiben bestätigt und protokolliert.
@@ -42,15 +42,15 @@ KI-Assistenten und -Agenten sind hier erstklassige Mitwirkende, kein nachträgli
 - Die WebUI ist `module/webroot/` (öffne sie aus dem Root-Manager). Das Backend ist
   `module/helper.sh` (Dispatcher) und `module/worker.sh` (abgekoppelte Engine).
 - Native Binärdateien liegen in `module/bin/<abi>/` und werden von der CI erzeugt
-  (`.github/scripts/build_bin.sh`); normalerweise baust du sie nicht von Hand neu.
+  (`.github/scripts/build_bin.sh`), normalerweise baust du sie nicht von Hand neu.
 
 ## Konventionen
 
 - **Jede Quelldatei** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) beginnt mit dem
   Projekt-Banner-Header (kopiere ihn aus einer beliebigen vorhandenen Datei). Keine Ausnahmen.
 - **Code und Kommentare auf Englisch.** Halte Kommentare minimal und nur dort, wo nötig.
-- **Kein Geviert- oder Halbgeviertstrich**; verwende immer einen einfachen Bindestrich `-`.
-- Die WebUI ist **vanilla JS** (ein `scripts.js`); keine Frameworks. Sprich mit Root nur über
+- **Kein Geviert- oder Halbgeviertstrich**, verwende immer einen einfachen Bindestrich `-`.
+- Die WebUI ist **vanilla JS** (ein `scripts.js`), keine Frameworks. Sprich mit Root nur über
   den `helper(verb, args)`-Wrapper und maskiere jeden interpolierten Wert.
 - **Schwäche nie** eine echte Funktion (z.B. Erhalt von SELinux/uid/gid/Modi).
 - Verändernde Aktionen (Restore, Delete) müssen eine Bestätigung verlangen und ein Audit-Log schreiben.
@@ -58,7 +58,7 @@ KI-Assistenten und -Agenten sind hier erstklassige Mitwirkende, kein nachträgli
 ## Internationalisierung (i18n)
 
 - UI-Strings liegen in `module/webroot/lang/`. Englisch ist der kanonische Fallback
-  (`en.js` + `en.json`); die anderen 20 Sprachen sind `<code>.json`.
+  (`en.js` + `en.json`), die anderen 20 Sprachen sind `<code>.json`.
 - Um einen String hinzuzufügen oder zu ändern: bearbeite `en.js` **und** `en.json`, dann aktualisiere jede
   `<code>.json`. Ein sichtbares Label zu berühren bedeutet, **alle** Sprachdateien und
   **alle** `README.<code>.md` zu aktualisieren.
@@ -80,4 +80,4 @@ Halte Ausschau nach den Labels `good first issue` und `help wanted`. Übersetzun
 
 ---
 
-> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen; siehe [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Diese Dokumentation wurde mit Claude (Anthropic) erstellt und wird von VD171 gepflegt. Korrekturen und Verbesserungen sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md)._

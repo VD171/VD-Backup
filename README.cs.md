@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · Čeština · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/cs/home-dark.png) | ![Apps](docs/screenshots/cs/apps-dark.png) | ![Schedule](docs/screenshots/cs/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/cs/destinations-dark.png) | ![Settings](docs/screenshots/cs/settings-dark.png) | ![Activity log](docs/screenshots/cs/activitylog-dark.png) |
 
 ---
 
@@ -66,22 +85,22 @@ importovat existující zálohy Neo-Backup a Android-DataBackup, abyste mohli p�
   na hardware zařízení, takže se záloha obnoví na jiném zařízení nebo otevře na počítači.
 - **Cíle:** místní, SFTP, SCP, SMB, WebDAV, FTP, S3 a dalších 70+ (`rclone`),
   plus repozitáře `rsync` a `restic`. Volitelně Google Drive přes drobného volitelného společníka.
-- **Telegram:** zálohuj do soukromého kanálu Telegramu jako neomezené cloudové úložiště přes MTProto - obnovení i mazání také z WebUI.
-- **Integrita:** každý archiv je ověřen proti manifestu; zkušební běh (dry-run) a test
+- **Telegram:** zálohuj do soukromého kanálu Telegramu jako neomezené cloudové úložiště přes MTProto, obnovení i mazání také z WebUI.
+- **Integrita:** každý archiv je ověřen proti manifestu, zkušební běh (dry-run) a test
   obnovy umožňují zkontrolovat zálohu, aniž byste cokoli změnili.
 - **Selektivní a dávková obnova:** obnovte libovolnou podmnožinu položek zálohy nebo vyberte
-  více záloh a obnovte je všechny najednou; mažte zálohy a veďte protokol aktivity/auditu
+  více záloh a obnovte je všechny najednou, mažte zálohy a veďte protokol aktivity/auditu
   každé destruktivní akce.
 - **Speciální zálohy:** zprávy (SMS/MMS/RCS), kontakty a seznam hovorů, Wi-Fi a Bluetooth,
   s volitelným přenosným exportem do JSON, který otevřete na PC.
-- **Systémové soubory (`/data/adb`):** zazálohujte samotné rootové prostředí - moduly, jejich data a
-  konfigurace - celé, nebo podstrom, který si vyberete ze stromu souborů, přičemž každý soubor se obnoví
-  k původnímu vlastníkovi a kontextu SELinux, takže root dál funguje. Pokročilé; jen to, co zvolíte.
+- **Systémové soubory (`/data/adb`):** zazálohujte samotné rootové prostředí (moduly, jejich data a
+  konfigurace) celé, nebo podstrom, který si vyberete ze stromu souborů, přičemž každý soubor se obnoví
+  k původnímu vlastníkovi a kontextu SELinux, takže root dál funguje. Pokročilé, jen to, co zvolíte.
 - **Plánování + automatizace:** opakující se úlohy **zálohy nebo obnovy** cílící na jednu
   aplikaci, sadu nebo všechny aplikace, s prořezáváním keep-N, plus volitelná automatická
   záloha při instalaci/aktualizaci a seznam vyloučených aplikací.
 - **Zdroj instalace:** obnovené aplikace ve výchozím nastavení hlásí jako zdroj instalace
-  Play Store (přepínatelné); pokročilá volitelná možnost také zfalšuje iniciující balíček a zdroj.
+  Play Store (přepínatelné), pokročilá volitelná možnost také zfalšuje iniciující balíček a zdroj.
 - **Připojení jako systémová aplikace:** připojte nainstalovanou aplikaci jako systémovou, aniž
   byste se dotkli skutečného oddílu `/system` (bezsystémový overlay podmodul, s ohledem na NoMount).
 - **Na pozadí:** zálohování/obnova běží odpojeně a přežijí zavření WebUI, s oznámeními
@@ -105,13 +124,13 @@ stejné API, které používá WebUI, úplnou řídicí plochu najdete v
 2. Nainstalujte jej ve správci KernelSU / APatch / Magisk, použitelný okamžitě, restart není potřeba.
 3. Otevřete **WebUI** modulu, abyste nakonfigurovali a spouštěli zálohy. A je to.
 
-**Edice.** Každé vydání se dodává jako šest zipů. `universal-full`, každá architektura a každá binárka zabudovaná (včetně `rclone` pro cloudové poskytovatele a `restic` pro snímky), plně offline, nikdy se nic nestahuje, jakékoli zařízení, největší. `universal-lite`, každá architektura bez dvou největších binárek (`rclone`, `restic`), nejmenší; stále zvládá lokální zálohy, SSH/SFTP a `rsync` bez jakéhokoli stahování a při prvním použití cloudového cíle (`rclone`) nebo režimu snímků (`restic`) nabídne jednorázové stažení onoho malého doplňku pro danou architekturu (ověřeného přes SHA-256) a uloží jej do mezipaměti, takže poté fungují i tyto funkce. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), jediná architektura se všemi binárkami zabudovanými, menší než `universal-full`. Znáte svou architekturu -> zvolte `<abi>-full`; chcete nejmenší a nevadí vám jednorázové stažení pro cloud nebo snímky -> `universal-lite`; chcete vše zabudované bez jakéhokoli stahování (offline / obnova) -> edici full. Viz [Vydání](https://github.com/VD171/VD-Backup/releases).
+**Edice.** Každé vydání se dodává jako šest zipů. `universal-full`, každá architektura a každá binárka zabudovaná (včetně `rclone` pro cloudové poskytovatele a `restic` pro snímky), plně offline, nikdy se nic nestahuje, jakékoli zařízení, největší. `universal-lite`, každá architektura bez dvou největších binárek (`rclone`, `restic`), nejmenší, stále zvládá lokální zálohy, SSH/SFTP a `rsync` bez jakéhokoli stahování a při prvním použití cloudového cíle (`rclone`) nebo režimu snímků (`restic`) nabídne jednorázové stažení onoho malého doplňku pro danou architekturu (ověřeného přes SHA-256) a uloží jej do mezipaměti, takže poté fungují i tyto funkce. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), jediná architektura se všemi binárkami zabudovanými, menší než `universal-full`. Znáte svou architekturu -> zvolte `<abi>-full`, chcete nejmenší a nevadí vám jednorázové stažení pro cloud nebo snímky -> `universal-lite`, chcete vše zabudované bez jakéhokoli stahování (offline / obnova) -> edici full. Viz [Vydání](https://github.com/VD171/VD-Backup/releases).
 
 Jste tu noví? [Uživatelská příručka](docs/USER-GUIDE.md) vás provede od instalace až po obnovu.
 
 ## Bezpečnost
 
-VDBackup běží jako root a pracuje s daty vašich aplikací a volitelně s vašimi přihlašovacími údaji a šifrovacími heslovými frázemi; záloha může obsahovat citlivá data, proto ji chraňte heslovou frází a uchovávejte na místě, kterému důvěřujete. Přihlašovací údaje jsou uloženy šifrovaně v klidu, nikdy v otevřeném textu, a šifrování není nikdy vázáno na hardware zařízení, takže to, co chrání šifrovanou zálohu, je heslová fráze. Zranitelnost nahlaste podle [SECURITY.md](SECURITY.md).
+VDBackup běží jako root a pracuje s daty vašich aplikací a volitelně s vašimi přihlašovacími údaji a šifrovacími heslovými frázemi, záloha může obsahovat citlivá data, proto ji chraňte heslovou frází a uchovávejte na místě, kterému důvěřujete. Přihlašovací údaje jsou uloženy šifrovaně v klidu, nikdy v otevřeném textu, a šifrování není nikdy vázáno na hardware zařízení, takže to, co chrání šifrovanou zálohu, je heslová fráze. Zranitelnost nahlaste podle [SECURITY.md](SECURITY.md).
 
 ## Sestavení
 
@@ -130,12 +149,12 @@ poznámkou **RECOVERY** obsahující přesné příkazy pro dešifrování a roz
 
 VD Backup obsahuje **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)** engine (vestavěný v `vdlu/`): modul se aktualizuje tak, že stahuje jen
 soubory, které se změnily (obsahově adresované bloby + podepsaný `manifest.json`), místo opětovného stažení
-celého `.zip`. **Zpevněný** profil: podpis ed25519 je povinný a downgrady jsou blokovány; úplný `.zip`
+celého `.zip`. **Zpevněný** profil: podpis ed25519 je povinný a downgrady jsou blokovány, úplný `.zip`
 zůstává platný jako záloha.
 
 - **Pouze LIVE** (bez restartu): aktualizace se použijí při příštím startu přes `service.sh`, na pozadí, bez efektu, když není dostupný žádný feed.
 - **Stav** v `/data/adb/vdbackup/vdlu/`, mimo modul, takže přežije přeflashování.
-- **WebUI:** panel **Aktualizace** s toastem průběhu a zrušením; automatická aktualizace je volitelná (opt-in).
+- **WebUI:** panel **Aktualizace** s toastem průběhu a zrušením, automatická aktualizace je volitelná (opt-in).
 
 ## Dokumentace
 
@@ -186,3 +205,7 @@ VD Backup je nezávislý, neoficiální projekt. Není spojen se společností G
 ## Tagy
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **Připojte se ke kanálu pro aktualizace:** @Priv8_VD https://t.me/Priv8_VD

@@ -68,13 +68,13 @@ perangkat spesifik Anda. Lihat [bagian 11](#11-portabilitas-membuka-backup-di-pc
 - **Perangkat Android yang di-root** yang dikelola oleh **KernelSU**, **APatch** atau **Magisk**.
   VDBackup dipasang sebagai modul dari manajer tersebut.
 - Penyimpanan kosong yang cukup untuk backup Anda (backup lokal berada di bawah direktori
-  state modul; lihat [bagian 3](#3-pasang-dan-jalankan-pertama-kali)).
+  state modul, lihat [bagian 3](#3-pasang-dan-jalankan-pertama-kali)).
 - Tidak ada yang lain. Modul membundel semua biner yang dibutuhkannya (tar, zstd, lz4, rclone,
   rsync, ssh, restic), jadi **backup dan restore lokal bekerja sepenuhnya offline**. Hanya tujuan
   cloud yang berkomunikasi dengan jaringan.
 
 Beberapa ekstra yang halus (AppOps, SSAID, beberapa bit sistem berhak istimewa) bergantung pada
-framework Android; modul menangani ini secara internal, dengan fallback plain-shell,
+framework Android, modul menangani ini secara internal, dengan fallback plain-shell,
 dan mereka merosot dengan mulus saat tidak tersedia di perangkat Anda.
 
 ## 3. Pasang dan jalankan pertama kali
@@ -83,13 +83,13 @@ dan mereka merosot dengan mulus saat tidak tersedia di perangkat Anda.
 2. Di manajer KernelSU / APatch / Magisk Anda, flash zip modul seperti modul
    lainnya.
 3. Ia langsung bisa dipakai, **tidak perlu reboot**. (Reboot hanya pernah relevan
-   saat merestore SSAID; lihat [bagian 10](#10-ssaid-android_id-perangkat).)
+   saat merestore SSAID, lihat [bagian 10](#10-ssaid-android_id-perangkat).)
 4. Buka **WebUI** modul dari manajer. Itulah seluruh antarmukanya.
 
 **Edisi mana yang diunduh.** Setiap rilis hadir sebagai beberapa edisi zip yang bisa di-flash, jadi Anda hanya mengunduh yang Anda butuhkan. Pilih salah satu:
 
 - **`VD-Backup-<ver>-universal-full.zip`**: setiap arsitektur CPU dan setiap biner tertanam, termasuk `rclone` (penyedia cloud: Google Drive, S3 dan 70+ backend rclone lainnya) dan `restic` (snapshot terdeduplikasi). Sepenuhnya offline, tidak pernah ada yang diunduh. Berfungsi di perangkat mana pun. Unduhan terbesar.
-- **`VD-Backup-<ver>-universal-lite.zip`**: setiap arsitektur, tetapi **tanpa** dua biner terbesar (`rclone` dan `restic`). Unduhan terkecil; tetap bisa backup lokal, SSH/SFTP, dan rsync tanpa unduhan, dengan enkripsi portabel `age`. Pertama kali Anda memakai tujuan cloud (`rclone`) atau mode snapshot (`restic`), WebUI menawarkan untuk mengunduh addon kecil per-arsitektur itu sekali (diverifikasi dengan SHA-256) lalu menyimpannya di cache; setelah itu fitur-fitur tersebut pun berfungsi.
+- **`VD-Backup-<ver>-universal-lite.zip`**: setiap arsitektur, tetapi **tanpa** dua biner terbesar (`rclone` dan `restic`). Unduhan terkecil, tetap bisa backup lokal, SSH/SFTP, dan rsync tanpa unduhan, dengan enkripsi portabel `age`. Pertama kali Anda memakai tujuan cloud (`rclone`) atau mode snapshot (`restic`), WebUI menawarkan untuk mengunduh addon kecil per-arsitektur itu sekali (diverifikasi dengan SHA-256) lalu menyimpannya di cache, setelah itu fitur-fitur tersebut pun berfungsi.
 - **`VD-Backup-<ver>-<abi>-full.zip`** (salah satu dari `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`), satu arsitektur dengan setiap biner tertanam (fitur yang sama dengan `universal-full` tetapi hanya untuk arsitektur perangkat Anda, jadi lebih kecil dari `universal-full`).
 
 Jika Anda tahu arsitektur perangkat Anda dan ingin semuanya tertanam, pilih **`<abi>-full`** yang cocok (kebanyakan ponsel adalah **`arm64-v8a`**). Jika Anda ingin unduhan terkecil dan tidak keberatan dengan satu kali unduhan terverifikasi SHA-256 saat pertama kali memakai penyedia cloud (`rclone`) atau snapshot (`restic`), pilih **`universal-lite`**. Jika Anda ingin semuanya tertanam tanpa unduhan apa pun (offline / pemulihan) dan tidak yakin dengan arsitekturnya, pilih edisi **full**. Saat dipasang, modul hanya menyimpan arsitektur perangkat Anda terlepas dari edisi yang Anda flash.
@@ -123,7 +123,7 @@ WebUI diatur dalam beberapa tab:
 - **Home**: ringkasan beranda yang menampilkan jumlah backup Anda (aplikasi, backup, folder, dan pekerjaan terjadwal) dan sebuah bilah penyimpanan untuk berapa banyak ruang yang dipakai backup Anda dibanding yang bebas, dengan lencana status, salin hash dan path ke papan klip, serta aksi **Check for updates**.
 - **Apps**: daftar aplikasi terpasang (pengguna dan sistem), masing-masing ditampilkan dengan nama
   aslinya, nama package-nya, dan ikonnya (ikon dimuat secara malas dan di-cache, jadi daftar
-  tetap responsif). Tombol pada baris membackup aplikasi; menekan baris membuka riwayat
+  tetap responsif). Tombol pada baris membackup aplikasi, menekan baris membuka riwayat
   backup aplikasi itu, tempat Anda bisa merestore backup sebelumnya mana pun.
 - **Backups**: backup yang sudah Anda miliki, masing-masing menampilkan nama aplikasi di satu baris dan
   package di baris berikutnya. Ketuk sebuah backup untuk melihat detail lengkapnya (versi, tanggal, ukuran,
@@ -142,7 +142,7 @@ WebUI diatur dalam beberapa tab:
   yang dikecualikan, opsi sumber pemasangan, kunci enkripsi, dan penjadwalan. Pengaturan aktif/mati memakai sakelar bergaya Android.
 - **About**: versi, tautan, proyek saudara (See also), manifest audit biner yang dibundel, dan aksi **Check for updates** yang melaporkan apakah versi yang lebih baru telah dirilis (beserta catatan rilisnya). Anda memasang pembaruan apa pun melalui manajer root Anda, sama seperti saat Anda mem-flash modul.
 
-Aplikasi juga memeriksa sendiri versi yang lebih baru setiap kali kamu membukanya (paling banyak sekali per jam) dan menampilkan banner pembaruan hanya ketika ada; tetap diam jika sudah terbaru atau luring.
+Aplikasi juga memeriksa sendiri versi yang lebih baru setiap kali kamu membukanya (paling banyak sekali per jam) dan menampilkan banner pembaruan hanya ketika ada, tetap diam jika sudah terbaru atau luring.
 
 Konfirmasi dan pesan memakai dialog dalam-aplikasi (bukan pop-up sistem lama), dan sebuah
 restore atau impor meminta Anda mengakui bahwa ia menimpa data aplikasi saat ini sebelum
@@ -154,7 +154,7 @@ WebUI reattach dan menampilkan kemajuan live dengan label fase terlokalisasi. Un
 pekerjaan yang sedang berjalan, kartu kemajuan juga menampilkan kecepatan transfer live dan
 perkiraan waktu tersisa, plus penghitung item (misalnya "12 of 40") dengan nama item saat ini. Pada
 ROM yang menampilkan notifikasi shell, Anda juga mendapat notifikasi Android saat sebuah pekerjaan
-mulai dan selesai; bagaimanapun kartu kemajuan dalam-aplikasi adalah indikator yang andal.
+mulai dan selesai, bagaimanapun kartu kemajuan dalam-aplikasi adalah indikator yang andal.
 
 ## 5. Membuat backup
 
@@ -162,11 +162,11 @@ Alur dasar: buka **Apps**, pilih sebuah aplikasi, pilih apa yang disertakan, pil
 setel kompresi dan (opsional) enkripsi, lalu jalankan. Kemajuan muncul live dan sebuah
 notifikasi memberi tahu Anda saat selesai.
 
-Saat pencadangan atau pemulihan sedang berjalan, kartu kemajuannya punya tombol **Batal**. Membatalkan pencadangan akan menghentikannya dan menghapus salinan sebagian apa pun yang sudah dimulainya, jadi tidak ada yang tertulis separuh yang tertinggal. Membatalkan pemulihan juga menghentikannya, tetapi aplikasi mungkin tertinggal dalam keadaan dipulihkan sebagian, jadi VDBackup memperingatkan Anda terlebih dahulu; jalankan pemulihan lagi untuk menyelesaikannya.
+Saat pencadangan atau pemulihan sedang berjalan, kartu kemajuannya punya tombol **Batal**. Membatalkan pencadangan akan menghentikannya dan menghapus salinan sebagian apa pun yang sudah dimulainya, jadi tidak ada yang tertulis separuh yang tertinggal. Membatalkan pemulihan juga menghentikannya, tetapi aplikasi mungkin tertinggal dalam keadaan dipulihkan sebagian, jadi VDBackup memperingatkan Anda terlebih dahulu, jalankan pemulihan lagi untuk menyelesaikannya.
 
 Pada dialog pencadangan kamu juga bisa memilih **tujuan** cadangan ini, penyimpanan lokal atau tujuan cloud/jarak jauh mana pun yang kamu tambahkan, tanpa mengubah tujuan default di Pengaturan terlebih dahulu.
 
-VDBackup menjalankan dua pengaman otomatis selama pencadangan, keduanya aktif secara default di Pengaturan. **"Jeda untuk mendingin saat perangkat panas"** memberi napas pada tugas yang panjang, dan menunggu perangkat mendingin jika benar-benar panas, jadi pencadangan besar tidak pernah membuat ponsel kepanasan; hanya temponya yang berubah, bukan fidelitasnya. **"Periksa ruang kosong sebelum pencadangan batch"** memperkirakan kebutuhan pencadangan banyak aplikasi dan berhenti di awal, bukan di tengah jalan, jika penyimpanan tidak akan muat.
+VDBackup menjalankan dua pengaman otomatis selama pencadangan, keduanya aktif secara default di Pengaturan. **"Jeda untuk mendingin saat perangkat panas"** memberi napas pada tugas yang panjang, dan menunggu perangkat mendingin jika benar-benar panas, jadi pencadangan besar tidak pernah membuat ponsel kepanasan, hanya temponya yang berubah, bukan fidelitasnya. **"Periksa ruang kosong sebelum pencadangan batch"** memperkirakan kebutuhan pencadangan banyak aplikasi dan berhenti di awal, bukan di tengah jalan, jika penyimpanan tidak akan muat.
 
 ### 5.1 Memilih apa yang dibackup
 
@@ -259,12 +259,12 @@ langkah **terverifikasi-checksum** terakhir yang memeriksa ulang salinan yang di
 di remote, dan menggagalkan pekerjaan (alih-alih meninggalkan salinan rusak di cloud) jika keduanya tidak
 cocok. Dan sebelum unggahan Full, ia memeriksa **ruang bebas** remote dan berhenti lebih awal dengan error
 **"ruang tidak cukup"** yang jelas jika backup tidak akan muat, alih-alih memenuhi remote dan gagal di
-tengah jalan. (Pemeriksaan ruang untuk unggahan Full; Mirror adalah sinkronisasi delta dan dikecualikan.)
+tengah jalan. (Pemeriksaan ruang untuk unggahan Full, Mirror adalah sinkronisasi delta dan dikecualikan.)
 
 ### 5.6 Backup khusus (pesan, log panggilan, Wi-Fi, Bluetooth, kalender, wallpaper, DNS, pengaturan sistem)
 
 Di bawah daftar aplikasi pada tab **Backups**, **Backup khusus** mencakup data sistem-wide
-yang tidak terikat pada satu aplikasi. Pilih kategorinya dan backup; mereka diarsipkan
+yang tidak terikat pada satu aplikasi. Pilih kategorinya dan backup, mereka diarsipkan
 dengan pelestarian SELinux/xattr yang sama dan enkripsi opsional seperti backup aplikasi.
 Kategorinya adalah:
 
@@ -317,7 +317,7 @@ konfigurasinya - lingkungan root itu sendiri. VDBackup dapat membackupnya, selur
 sebagian, sehingga Anda dapat membawa setup root Anda melintasi wipe atau penggantian ROM.
 
 - **Total atau selektif.** Backup seluruh `/data/adb`, atau buka pohon file dan pilih persis
-  folder dan file yang Anda inginkan; folder yang tercentang separuh hanya menyertakan anak yang
+  folder dan file yang Anda inginkan, folder yang tercentang separuh hanya menyertakan anak yang
   Anda centang.
 - **Semuanya tetap di tangan Anda.** Pohon ini netral - tidak ada yang dipilih sebelumnya atau
   disembunyikan, kecuali file kerja milik VDBackup sendiri, yang jika tidak hanya akan membackup
@@ -327,7 +327,7 @@ sebagian, sehingga Anda dapat membawa setup root Anda melintasi wipe atau pengga
   wipe menyeluruh), sehingga konteks yang berbeda-beda di bawah `/data/adb` dipertahankan dan
   manajer root Anda tetap boot.
 - **Lanjutan.** Ini menyentuh lingkungan root secara langsung. Merestore bersifat merusak dan
-  meminta Anda mengonfirmasi; restore selektif hanya menulis kembali path yang Anda pilih.
+  meminta Anda mengonfirmasi, restore selektif hanya menulis kembali path yang Anda pilih.
 
 ## 6. Merestore backup
 
@@ -358,7 +358,7 @@ Opsi restore yang berguna:
   pemeriksaan aplikasi. Anda bisa mematikannya secara global di Settings atau per restore, dan saat
   mati sumber pemasangan aslinya dipertahankan. Sebuah sakelar opt-in tingkat lanjut **"palsukan sumber
   penginisiasi"** melangkah lebih jauh dan juga membuat paket penginisiasi dan sumber paket aplikasi
-  tampak terpasang-dari-Play; ia mengedit basis data paket sistem (dibackup terlebih dahulu) dan berlaku
+  tampak terpasang-dari-Play, ia mengedit basis data paket sistem (dibackup terlebih dahulu) dan berlaku
   setelah reboot.
 
 **Restore massal.** Tab **Backups** punya mode **Select**, sama seperti yang dimiliki tab **Apps** untuk backup
@@ -373,7 +373,7 @@ berapa banyak backup yang disimpan per aplikasi (retensi) sehingga yang lama dip
 **Memasang aplikasi terpasang sebagai aplikasi sistem.** Dari riwayat backup sebuah aplikasi, **Mount as
 system** menempatkan APK aplikasi ke dalam sub-modul overlay VDBackup sehingga manajer root
 menyajikannya dari `/system/app` (atau `/system/priv-app`), partisi `/system` yang asli tidak pernah
-disentuh. Dengan **NoMount** pada KernelSU ia berlaku live; jika tidak, ia berlaku setelah reboot.
+disentuh. Dengan **NoMount** pada KernelSU ia berlaku live, jika tidak, ia berlaku setelah reboot.
 Ini tidak pernah bergantung pada NoMount terpasang.
 
 ## 7. Tujuan: lokal dan remote
@@ -439,7 +439,7 @@ Penyiapan VDBackup itu sendiri, yaitu tujuan, jadwal, prasetel, dan kredensial t
 
 - **Ekspor pengaturan** menulis berkas terenkripsi ke `VDBackup/.export`. Ia selalu meminta frasa sandi, karena berkas berisi kata sandi jarak jauh Anda.
 - **Impor pengaturan** membaca kembali berkas semacam itu dan menggabungkannya ke perangkat ini, tanpa menghapus apa pun yang sudah ada.
-- **Hapus kredensial tersimpan** menghapus kata sandi jarak jauh tersimpan dan kunci enkripsi perangkat dalam satu langkah; tujuan, jadwal, dan cadangan Anda tetap di tempatnya.
+- **Hapus kredensial tersimpan** menghapus kata sandi jarak jauh tersimpan dan kunci enkripsi perangkat dalam satu langkah, tujuan, jadwal, dan cadangan Anda tetap di tempatnya.
 
 ## 8. Penjadwalan dan retensi
 
@@ -480,7 +480,7 @@ dan membackup-nya untuk Anda (dengan retensi keep-N). Jalankan pertama hanya men
 sehingga mengaktifkannya tidak pernah membackup seluruh perangkat Anda sekaligus.
 
 **Aplikasi yang dikecualikan (blocklist).** Juga di Settings, Anda bisa mengecualikan aplikasi yang
-tidak pernah ingin dibackup secara otomatis atau sesuai jadwal; Anda bisa menambahkan beberapa sekaligus (pilih-banyak), dan aplikasi yang dikecualikan dilewati oleh keduanya.
+tidak pernah ingin dibackup secara otomatis atau sesuai jadwal, Anda bisa menambahkan beberapa sekaligus (pilih-banyak), dan aplikasi yang dikecualikan dilewati oleh keduanya.
 
 **Praset cadangan.** Juga di Pengaturan, Anda bisa menyimpan praset bernama, kumpulan item yang disertakan, seperti hanya APK atau APK + OBB, dan memilih satu di dialog cadangan untuk mengisi pilihan item sekaligus.
 
@@ -541,8 +541,8 @@ Untuk membuka satu di PC, singkatnya:
 
 - **Dekripsi** (hanya jika file berakhir `.age`) dengan alat `age` standar dan
   passphrase atau keyfile Anda.
-- **Dekompresi dan ekstrak**: `.tar.zst` dengan `zstd` lalu `tar`; `.tar.gz` dengan `tar`
-  langsung; `.tar.lz4` via `zstd --format=lz4`. Sebuah APK hanyalah APK terkompresi-zstd,
+- **Dekompresi dan ekstrak**: `.tar.zst` dengan `zstd` lalu `tar`, `.tar.gz` dengan `tar`
+  langsung, `.tar.lz4` via `zstd --format=lz4`. Sebuah APK hanyalah APK terkompresi-zstd,
   jadi mendekompresi `base.apk.zst` memberi Anda `base.apk` normal yang bisa dipasang.
 
 Setiap backup terenkripsi disertai catatan **RECOVERY** berisi perintah salin-tempel
@@ -556,7 +556,7 @@ hanya tanpa kepemilikan spesifik-Android ditegakkan.
 ## 12. Mengendalikan VDBackup dari asisten AI
 
 VDBackup dibangun agar ramah terhadap asisten dan agen AI, bukan hanya orang. WebUI
-hanyalah salah satu klien dari sebuah JSON API kecil; sebuah agen bisa mengelola **setiap** tindakan
+hanyalah salah satu klien dari sebuah JSON API kecil, sebuah agen bisa mengelola **setiap** tindakan
 modul secara headless melalui API yang sama itu (setiap perintah mengembalikan satu objek JSON
 tunggal, operasi panjang berjalan terlepas dan Anda poll kemajuannya, dan pengaman yang sama
 berlaku, SSAID tetap opt-in, tindakan yang mengubah tetap dikonfirmasi dan diaudit).
@@ -581,27 +581,27 @@ berjalan dan menampilkan kemajuan saat ini.
 umum:
 - `ERR_VERIFY`, sebuah arsip yang ditulis tidak cocok dengan hash manifestnya (verifikasi
   menangkap backup buruk). Jalankan ulang backup.
-- `ERR_RESTORE_TEST`, sebuah restore-test gagal; backup tidak diekstrak/diverifikasi
+- `ERR_RESTORE_TEST`, sebuah restore-test gagal, backup tidak diekstrak/diverifikasi
   dengan bersih dan aplikasi live Anda dibiarkan tak tersentuh.
 - `ERR_UNSAFE_ARCHIVE`, sebuah arsip ditolak karena mencoba menulis di luar direktori targetnya
-  (path absolut atau `..`). Ini melindungi Anda dari backup yang dirusak; tidak ada yang ditulis.
-- `ERR_QUOTA`, sebuah remote cloud tidak punya cukup ruang bebas untuk unggahan Full; backup
+  (path absolut atau `..`). Ini melindungi Anda dari backup yang dirusak, tidak ada yang ditulis.
+- `ERR_QUOTA`, sebuah remote cloud tidak punya cukup ruang bebas untuk unggahan Full, backup
   dihentikan sebelum mengunggah apa pun.
 
 **Tujuan remote saya gagal.** Gunakan **tes** tujuan di tab Destinations
 untuk memvalidasi kredensial dan konektivitas. Ingat bahwa hanya tujuan cloud yang butuh
-jaringan; backup/restore lokal sepenuhnya offline.
+jaringan, backup/restore lokal sepenuhnya offline.
 
 **Apakah ada yang menghubungi-pulang atau mengunduh saat runtime?** Tidak. Semua biner dibundel
-di modul saat build; tidak ada yang diambil ke perangkat saat runtime. Hanya tujuan cloud
+di modul saat build, tidak ada yang diambil ke perangkat saat runtime. Hanya tujuan cloud
 (rclone/restic/ssh) yang berkomunikasi dengan jaringan, dan hanya saat Anda memakainya.
 
 **Apakah backup saya akan direstore di ponsel lain?** Ya, backup portabel dan tidak
 terikat pada perangkat keras perangkat. (SSAID adalah satu pengecualian spesifik-perangkat, dan ia opt-in
-dan berlaku-reboot; lihat [bagian 10](#10-ssaid-android_id-perangkat).)
+dan berlaku-reboot, lihat [bagian 10](#10-ssaid-android_id-perangkat).)
 
 **Backup terenkripsi saya tidak mau terbuka, saya kehilangan passphrase.** Tidak ada backdoor
-pemulihan berdasarkan desain; passphrase itulah yang melindungi backup. Jaga agar tetap aman.
+pemulihan berdasarkan desain, passphrase itulah yang melindungi backup. Jaga agar tetap aman.
 
 ## 14. Menghapus instalasi
 
@@ -611,4 +611,4 @@ Copot VDBackup seperti modul lain dari pengelola KernelSU / APatch / Magisk Anda
 
 ---
 
-> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan; lihat [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Dokumentasi ini dibuat dengan Claude (Anthropic) dan dikelola oleh VD171. Koreksi dan perbaikan dipersilakan, lihat [CONTRIBUTING.md](CONTRIBUTING.md)._

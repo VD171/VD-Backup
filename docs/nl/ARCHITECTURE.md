@@ -44,12 +44,12 @@ toestemmingsvraag en geen begeleidende app voor de kernfuncties.
 - **Al root.** Het moduleproces is root, dus de engine is gewone shell. ~85% van
   het werk is pure shell (`tar`/`zstd`/`age`/`pm`/`am`/`chown`/`chcon`/`rclone`/...).
 - **Losgekoppelde uitvoering.** Backup/restore draaien via `setsid nohup`, als een onafhankelijk root-
-  proces. Het sluiten van de WebUI onderbreekt ze niet; de UI koppelt zich opnieuw door
+  proces. Het sluiten van de WebUI onderbreekt ze niet, de UI koppelt zich opnieuw door
   `logs/progress-<opid>.json` te lezen.
 - **Framework-helper (~15%).** Fijnmazige rechten, AppOps, SSAID, StorageStats,
   pictogrammen en geprivilegieerde wifi hebben het Android-framework nodig. Een kleine `dex`-run via
   `app_process` (geen geïnstalleerde app) handelt deze af, met een shell-fallback.
-- **Portabiliteit.** Alleen standaardformaten; backups openen op een pc zonder deze module.
+- **Portabiliteit.** Alleen standaardformaten, backups openen op een pc zonder deze module.
 - **De staat** leeft in `/data/adb/vdbackup/` (configuratie, jobs, bestemmingen, versleutelde
   inloggegevens, logs, staging). **Backups** worden geschreven naar voor de gebruiker zichtbare, met
   inloggegevens versleutelde opslag op `/sdcard/VDBackup/` (`/data/media/<user>/VDBackup`, per gebruiker),
@@ -61,7 +61,7 @@ Een backup moet voor altijd herstelbaar blijven. Dit is een harde regel, geen lo
 
 **Reikwijdte.** De garantie dekt backups geschreven door **v1.01 en later** (de eerste officieel
 gepubliceerde release) en alleen door officieel gepubliceerde, uitgebrachte versies. v1.00 was een
-alleen-voor-tests-build en valt uitdrukkelijk buiten de reikwijdte; pre-release- en
+alleen-voor-tests-build en valt uitdrukkelijk buiten de reikwijdte, pre-release- en
 ontwikkelingsbuilds vallen er niet onder. Vanaf de eerste publieke release is de onderstaande
 belofte absoluut:
 
@@ -81,14 +81,14 @@ belofte absoluut:
 
 Kortom: alles wat VDBackup ooit heeft geschreven, kan elk toekomstig VDBackup (en een gewone pc)
 nog steeds herstellen. Het formaat wijzigen op een manier die een eerdere backup breekt, is niet
-toegestaan; nieuwe mogelijkheden worden toegevoegd achter `format_version` en nieuwe, toevoegende velden.
+toegestaan, nieuwe mogelijkheden worden toegevoegd achter `format_version` en nieuwe, toevoegende velden.
 
 Voor het volledige technische ontwerp (archiefformaat, metadataschema, pijplijnen, crypto,
-bestemmingen, importeurs) houden de maintainers gedetailleerde ontwerpnotities bij; dit bestand is het
+bestemmingen, importeurs) houden de maintainers gedetailleerde ontwerpnotities bij, dit bestand is het
 overzicht gericht op bijdragers.
 
 <!-- doc-footer -->
 
 ---
 
-> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom; zie [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Deze documentatie is gegenereerd met Claude (Anthropic) en wordt onderhouden door VD171. Correcties en verbeteringen zijn welkom, zie [CONTRIBUTING.md](CONTRIBUTING.md)._

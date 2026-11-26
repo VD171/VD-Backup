@@ -30,7 +30,7 @@ Les assistants et agents IA sont des contributeurs de premier plan ici, pas une 
 - Les patches assistés par IA sont examinés et acceptés aux mêmes conditions que les autres, selon
   l'exactitude, la clarté et les conventions ci-dessous, et non selon qui (ou quoi) les a écrits.
 - Si vous pilotez VDBackup depuis un agent, utilisez la sortie JSON de `helper.sh` comme
-  contrat ; ne scrapez pas la WebUI.
+  contrat, ne scrapez pas la WebUI.
 - Même exigence pour tous : les fonctionnalités réelles ne sont jamais affaiblies, les secrets et les données
   de l'appareil n'atterrissent jamais dans le dépôt (voir le [.gitignore](../../.gitignore) strict), et les
   actions mutantes restent confirmées et auditées.
@@ -42,15 +42,15 @@ Les assistants et agents IA sont des contributeurs de premier plan ici, pas une 
 - La WebUI est `module/webroot/` (ouvrez-la depuis le gestionnaire root). Le backend est
   `module/helper.sh` (dispatcher) et `module/worker.sh` (moteur détaché).
 - Les binaires natifs résident dans `module/bin/<abi>/` et sont produits par la CI
-  (`.github/scripts/build_bin.sh`) ; normalement vous ne les reconstruisez pas à la main.
+  (`.github/scripts/build_bin.sh`), normalement vous ne les reconstruisez pas à la main.
 
 ## Conventions
 
 - **Chaque fichier source** (`.sh`, `.js`, `.css`, `.html`, `.svg`, `.yml`) commence par l'en-tête
   bannière du projet (copiez-le depuis n'importe quel fichier existant). Aucune exception.
 - **Code et commentaires en anglais.** Gardez les commentaires minimaux et seulement là où c'est nécessaire.
-- **Pas de tiret cadratin ni demi-cadratin** ; utilisez toujours un simple trait d'union `-`.
-- La WebUI est en **vanilla JS** (un seul `scripts.js`) ; pas de frameworks. Communiquez avec root uniquement via
+- **Pas de tiret cadratin ni demi-cadratin**, utilisez toujours un simple trait d'union `-`.
+- La WebUI est en **vanilla JS** (un seul `scripts.js`), pas de frameworks. Communiquez avec root uniquement via
   le wrapper `helper(verb, args)`, et échappez chaque valeur interpolée.
 - **N'affaiblissez jamais** une fonctionnalité réelle (par exemple la préservation des SELinux/uid/gid/modes).
 - Les actions mutantes (restore, delete) doivent demander une confirmation et écrire un log d'audit.
@@ -58,7 +58,7 @@ Les assistants et agents IA sont des contributeurs de premier plan ici, pas une 
 ## Internationalisation (i18n)
 
 - Les chaînes de l'UI résident dans `module/webroot/lang/`. L'anglais est le repli canonique
-  (`en.js` + `en.json`) ; les 20 autres langues sont `<code>.json`.
+  (`en.js` + `en.json`), les 20 autres langues sont `<code>.json`.
 - Pour ajouter ou modifier une chaîne : éditez `en.js` **et** `en.json`, puis mettez à jour chaque
   `<code>.json`. Toucher un libellé visible implique de mettre à jour **tous** les fichiers de langue et
   **tous** les `README.<code>.md`.
@@ -80,4 +80,4 @@ presets de destination `rclone` et les finitions de la WebUI sont tous d'excelle
 
 ---
 
-> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues ; voir [CONTRIBUTING.md](CONTRIBUTING.md)._
+> _Cette documentation a été générée avec Claude (Anthropic) et est maintenue par VD171. Les corrections et améliorations sont les bienvenues, voir [CONTRIBUTING.md](CONTRIBUTING.md)._

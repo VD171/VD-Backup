@@ -1,6 +1,25 @@
 <!--
-  VD BACKUP: full app & data backup and restore as root, from a WebUI.
-  Copyright (C) 2026  VD171. SPDX-License-Identifier: AGPL-3.0-or-later
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
 -->
 
 # VD Backup
@@ -32,13 +51,13 @@
   <a href="https://xdaforums.com/t/VD-Backup.4807267/">XDA thread</a>
 </p>
 
-> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · [Svenska](README.sv.md) · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
+> **Languages:** [English](README.md) · [العربية](README.ar.md) · [Čeština](README.cs.md) · [Deutsch](README.de.md) · [Español](README.es.md) · [فارسی](README.fa.md) · [Français](README.fr.md) · [हिन्दी](README.hi.md) · [Bahasa Indonesia](README.id.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Português](README.pt.md) · [Русский](README.ru.md) · Svenska · [ไทย](README.th.md) · [Türkçe](README.tr.md) · [Українська](README.uk.md) · [Tiếng Việt](README.vi.md) · [中文](README.zh.md)
 
 | Home | Apps | Schedule |
 |:---:|:---:|:---:|
-| ![Home](docs/screenshots/en/home-dark.png) | ![Apps](docs/screenshots/en/apps-dark.png) | ![Schedule](docs/screenshots/en/schedule-dark.png) |
+| ![Home](docs/screenshots/sv/home-dark.png) | ![Apps](docs/screenshots/sv/apps-dark.png) | ![Schedule](docs/screenshots/sv/schedule-dark.png) |
 | **Destinations** | **Settings** | **Activity log** |
-| ![Destinations](docs/screenshots/en/destinations-dark.png) | ![Settings](docs/screenshots/en/settings-dark.png) | ![Activity log](docs/screenshots/en/activitylog-dark.png) |
+| ![Destinations](docs/screenshots/sv/destinations-dark.png) | ![Settings](docs/screenshots/sv/settings-dark.png) | ![Activity log](docs/screenshots/sv/activitylog-dark.png) |
 
 ---
 
@@ -65,24 +84,24 @@ importera befintliga säkerhetskopior från Neo-Backup och Android-DataBackup s�
 - **Kryptering:** valfri och portabel (`age` + lösenfras eller AES-256-zip), aldrig bunden
   till enhetens hårdvara, så att en säkerhetskopia återställs på en annan enhet eller öppnas på en dator.
 - **Destinationer:** lokalt, SFTP, SCP, SMB, WebDAV, FTP, S3 och 70+ till (`rclone`),
-  plus `rsync`- och `restic`-förråd. Valfritt Google Drive via en pytteliten valfri följeslagare.
-- **Telegram:** säkerhetskopiera till en privat Telegram-kanal som obegränsad molnlagring via MTProto - återställ och ta bort även från WebUI.
-- **Integritet:** varje arkiv verifieras mot manifestet; torrkörning (dry-run) och
+  plus `rsync`-förråd och `restic`-förråd. Valfritt Google Drive via en pytteliten valfri följeslagare.
+- **Telegram:** säkerhetskopiera till en privat Telegram-kanal som obegränsad molnlagring via MTProto, återställ och ta bort även från WebUI.
+- **Integritet:** varje arkiv verifieras mot manifestet, torrkörning (dry-run) och
   återställningstest låter dig kontrollera en säkerhetskopia utan att röra något.
 - **Selektiv återställning och batchåterställning:** återställ valfri delmängd av en säkerhetskopias
-  objekt, eller markera flera säkerhetskopior och återställ dem alla på en gång; radera säkerhetskopior
+  objekt, eller markera flera säkerhetskopior och återställ dem alla på en gång, radera säkerhetskopior
   och för en aktivitets-/revisionslogg över varje destruktiv åtgärd.
 - **Särskilda säkerhetskopior:** meddelanden (SMS/MMS/RCS), kontakter och samtalslogg, Wi-Fi och
   Bluetooth, med en valfri portabel JSON-export som du kan öppna på en PC.
-- **Systemfiler (`/data/adb`):** säkerhetskopiera själva root-miljön - moduler, deras data och
-  konfigurationer - allt eller ett delträd som du väljer i ett filträd, där varje fil återställs
+- **Systemfiler (`/data/adb`):** säkerhetskopiera själva root-miljön (moduler, deras data och
+  konfigurationer) allt eller ett delträd som du väljer i ett filträd, där varje fil återställs
   med sin ursprungliga ägare och SELinux-kontext så att root fortsätter att fungera. Avancerat;
   bara det du väljer.
 - **Schemaläggning + automatisering:** återkommande jobb för **säkerhetskopiering eller återställning**
   mot en app, en uppsättning, eller alla appar, med keep-N-gallring, plus valfri auto-säkerhetskopiering
   vid installation/uppdatering och en lista över uteslutna appar.
 - **Installationskälla:** återställda appar anger som standard Play Store som sin
-  installationskälla (växlingsbart); ett avancerat tillval förfalskar även det initierande paketet och källan.
+  installationskälla (växlingsbart), ett avancerat tillval förfalskar även det initierande paketet och källan.
 - **Montering som systemapp:** montera en installerad app som en systemapp utan att röra den
   riktiga `/system`-partitionen (systemlöst overlay-undermodul, NoMount-medvetet).
 - **Bakgrund:** säkerhetskopiering/återställning körs frikopplat och överlever att WebUI
@@ -109,14 +128,14 @@ modulen huvudlöst via samma API som WebUI använder, se
 **Utgåvor.** Sex zip-filer per release. `universal-full`, alla arkitekturer och alla
 binärer inbäddade (inkl. `rclone` för molnleverantörer, `restic` för ögonblicksbilder),
 helt offline, inget laddas någonsin ner, alla enheter, störst. `universal-lite`, alla
-arkitekturer utan de två största binärerna (`rclone`, `restic`), minst; klarar fortfarande
+arkitekturer utan de två största binärerna (`rclone`, `restic`), minst, klarar fortfarande
 lokala, SSH/SFTP och `rsync` utan nedladdning, och första gången du använder en
 molndestination (`rclone`) eller ögonblicksbildsläge (`restic`) erbjuder den sig att ladda
 ner det lilla arkitekturspecifika tillägget en gång (verifierat med SHA-256) och cachar det,
 så att även de funktionerna fungerar. `<abi>-full` (`arm64-v8a`, `armeabi-v7a`, `x86`,
 `x86_64`), en enda arkitektur med alla binärer inbäddade, mindre än `universal-full`. Vet
-du din arkitektur -> välj `<abi>-full`; vill du ha minst och har inget emot en
-engångsnedladdning för moln eller ögonblicksbilder -> `universal-lite`; vill du ha allt
+du din arkitektur -> välj `<abi>-full`, vill du ha minst och har inget emot en
+engångsnedladdning för moln eller ögonblicksbilder -> `universal-lite`, vill du ha allt
 inbäddat utan några nedladdningar (offline / återställning) -> en full-utgåva. Se
 [Utgåvor](https://github.com/VD171/VD-Backup/releases).
 
@@ -124,7 +143,7 @@ Ny här? [Användarguiden](docs/USER-GUIDE.md) tar dig från installation till �
 
 ## Säkerhet
 
-VDBackup körs som root och hanterar dina appdata och, valfritt, dina autentiseringsuppgifter och krypteringslösenfraser; en säkerhetskopia kan innehålla känsliga data, så skydda den med en lösenfras och förvara den på en plats du litar på. Autentiseringsuppgifter lagras krypterade i vila, aldrig i klartext, och krypteringen är aldrig bunden till enhetens hårdvara, så det är lösenfrasen som skyddar en krypterad säkerhetskopia. Rapportera en sårbarhet enligt [SECURITY.md](SECURITY.md).
+VDBackup körs som root och hanterar dina appdata och, valfritt, dina autentiseringsuppgifter och krypteringslösenfraser, en säkerhetskopia kan innehålla känsliga data, så skydda den med en lösenfras och förvara den på en plats du litar på. Autentiseringsuppgifter lagras krypterade i vila, aldrig i klartext, och krypteringen är aldrig bunden till enhetens hårdvara, så det är lösenfrasen som skyddar en krypterad säkerhetskopia. Rapportera en sårbarhet enligt [SECURITY.md](SECURITY.md).
 
 ## Bygga
 
@@ -144,11 +163,11 @@ vanliga verktyg eller filhanterare. Varje krypterad säkerhetskopia levereras me
 VD Backup levereras med **[VDLiveUpdate](https://github.com/VD171/VDLiveUpdate) (VDLU)**-motorn (inbäddad i `vdlu/`): modulen uppdaterar sig själv genom att bara
 hämta de filer som har ändrats (innehållsadresserade blobbar + en signerad `manifest.json`), i stället för att
 ladda ner hela `.zip`-filen igen. **Härdad** profil: ed25519-signaturen är obligatorisk och nedgraderingar
-blockeras; den fullständiga `.zip`-filen förblir giltig som reservalternativ.
+blockeras, den fullständiga `.zip`-filen förblir giltig som reservalternativ.
 
 - **Endast LIVE** (ingen omstart): uppdateringar tillämpas vid nästa start via `service.sh`, i bakgrunden, en no-op när ingen feed går att nå.
 - **Tillstånd** i `/data/adb/vdbackup/vdlu/`, utanför modulen, så att det överlever en omflashning.
-- **WebUI:** en **Uppdateringar**-panel med en förloppstoast och avbryt; automatisk uppdatering är opt-in.
+- **WebUI:** en **Uppdateringar**-panel med en förloppstoast och avbryt, automatisk uppdatering är opt-in.
 
 ## Dokumentation
 
@@ -199,3 +218,7 @@ VD Backup är ett oberoende, inofficiellt projekt. Det är inte anslutet till, r
 ## Tags
 
 `android` `backup` `restore` `app-data` `migration` `neo-backup` `databackup` `kernelsu` `apatch` `magisk` `webui` `root` `tar` `zstd` `restic` `rclone` `age` `encryption` `ssaid` `appops` `on-device` `agpl` `ai-friendly` `telegram` `rcs` `vdbackup`
+
+---
+
+📣 **Gå med i kanalen för uppdateringar:** @Priv8_VD https://t.me/Priv8_VD

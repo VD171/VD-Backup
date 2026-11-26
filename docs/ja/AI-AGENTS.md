@@ -45,13 +45,13 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | Verb | Args (JSON) | Returns |
 |------|-------------|---------|
 | `ping` | `{}` | `{ok,version,abi}` |
-| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` 件数 (サイズはバイト単位): backup を持つアプリ、backup インスタンスの総数、スタンドアロンの path backup、スケジュール済みジョブ、backup の総サイズ、および backup ファイルシステムの空き/合計。非 detached で、即座に返る; WebUI のホーム概要が使用する。 |
+| `overview` | `{user?}` | `{ok:true,apps,instances,path_backups,jobs,backups_size,free,total}` 件数 (サイズはバイト単位): backup を持つアプリ、backup インスタンスの総数、スタンドアロンの path backup、スケジュール済みジョブ、backup の総サイズ、および backup ファイルシステムの空き/合計。非 detached で、即座に返る、WebUI のホーム概要が使用する。 |
 | `config-get` | `{}` | `{ok,config}` |
 | `config-set` | config オブジェクト (または `{key,value}`) | `{ok}` |
 | `keygen` | `{}` | 暗号化用の `age` 鍵ペアを生成する |
 | `list-apps` | `{user?}` | `{ok,apps:[{package,label,system,versionCode}]}` (dex, shell fallback) |
 | `label` | `{package,user?}` | `{ok,label}` (実際にローカライズされたアプリ名、コンテキスト非依存) |
-| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG; package+`vc` 単位でキャッシュ) |
+| `icon` | `{package,user?,vc?}` | `{ok,package,icon}` (base64 PNG, package+`vc` 単位でキャッシュ) |
 | `backup` | 下記参照 | `{ok,opid}` (detached) |
 | `restore` | 下記参照 | `{ok,opid}` (detached) |
 | `import` | `{from,ref,password,ssaid,user}` | `{ok,opid}` (detached) |
@@ -74,18 +74,18 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `log-export` | `{user?}` | `{ok:true,path}` (backups ディレクトリ下に書き出した `.txt` の絶対パス) または `{ok:false,code:"ERR_LOG_EXPORT"}`。アクティビティログ (`audit.jsonl`) と短いビルド/デバイスヘッダーを、ユーザーが見える単一のテキストファイルに書き出し、バグレポートに添付できるようにする。非 detached で、即座に返る。 |
 | `special-categories` | `{}` | `{ok,categories:[{id,available}]}` (messages/contacts/wifi/bluetooth/calendar/wallpaper/dns/system_settings) |
 | `special-backup` | `{categories,compression?,password?,portable?}` | `{ok,opid}` システム全体の backup (detached) |
-| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (リブート必須; `confirm` がゲートする) |
+| `special-restore` | `{ref,confirm:true,categories?,password?}` | `{ok,opid}` (リブート必須、`confirm` がゲートする) |
 | `special-list` | `{}` | `{ok,backups:[{ref,created_at,categories}]}` |
 | `path-backup` | `{path,compression?,password?}` | `{ok,opid}` 任意の絶対パスを `tar.zst`+`manifest.json` として `.paths/` 配下に backup する (detached) |
-| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` パス backup を元の場所に復元する (`confirm` がゲートする; detached) |
+| `path-restore` | `{ref,confirm:true,password?}` | `{ok,opid}` パス backup を元の場所に復元する (`confirm` がゲートする、detached) |
 | `adb-list` | `{path?}` | `{ok,entries:[{name,type,size,has_children}]}` /data/adb ツリーの 1 つの遅延レベル (デフォルト `/data/adb`)、picker 用。 |
 | `adb-du` | `{path}` | `{ok,size}` /data/adb の 1 つのサブツリーの再帰的なバイトサイズ、オンデマンド。 |
 | `adb-backup` | `{paths?,exclude?,compression?,encrypt_data?,password?}` | `{ok,opid}` /data/adb を backup する - 全体 (`paths` を省略) または選択したサブパス - ファイルごとの SELinux/所有者の忠実性を保ち、`.adb/` 配下に (detached) |
-| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` /data/adb backup を稼働中のツリーの上に復元する - 全体または選択したサブパス - 各ファイルのコンテキストを保ちつつ (一括 chcon は決してしない); `confirm` がゲートする (detached) |
+| `adb-restore` | `{ref,paths?,confirm:true,password?}` | `{ok,opid}` /data/adb backup を稼働中のツリーの上に復元する - 全体または選択したサブパス - 各ファイルのコンテキストを保ちつつ (一括 chcon は決してしない), `confirm` がゲートする (detached) |
 | `adb-backups` | `{}` | `{ok,backups:[{ref,created_at,mode,paths,encryption}]}` /data/adb ファイルシステムの backup 群。 |
 | `adb-index` | `{ref}` | `{ok,lines:[...]}` backup の保存された詳細なファイル一覧、復元ツリーの picker 用。 |
 | `sysmount-status` | `{}` | `{ok,nomount,nm,ksu,live_capable}` |
-| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | インストール済みアプリをシステムアプリとしてマウント (systemless サブモジュール; NoMount でライブ、なければ次回ブート) |
+| `sysmount-add` / `sysmount-del` / `sysmount-list` | `{package,priv?}` | インストール済みアプリをシステムアプリとしてマウント (systemless サブモジュール、NoMount でライブ、なければ次回ブート) |
 | `companion-status` / `companion-install` | `{}` | Google Drive コンパニオンの状態 / オンデマンドのインストール |
 | `telegram-check` | `{}` | Telegram セッションの状態（`user` が null = 未ログイン） |
 | `telegram-send-code` / `telegram-sign-in` | `{phone}` / `{phone,code,password?}` | Telegram ログイン。アカウントに 2FA があり `password` がない場合、`sign-in` は `2FA_REQUIRED` を返す |
@@ -97,15 +97,15 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `rclone-pull` | `{dest,rref}` | `{ok,opid}` remote のみで保存された rclone バックアップをローカルストレージにダウンロード（detached）。その後は通常の `restore` フローで復元 |
 | `rclone-delete` | `{dest,rref}` | `{ok,deleted}` rclone remote からバックアップを1つ削除。`rref` は厳密に `<pkg>/<ts_vc>` でなければならない |
 | `dests-list` / `dest-add` / `dest-test` / `dest-del` | `{id,type,...}` | 宛先の管理 |
-| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone remote の管理 (`type:"rclone"` の宛先が指す `rclone.conf` エントリを作成する); `backend` は任意の rclone backend でよく、ホワイトリストはない |
+| `remote-add` / `remote-list` / `remote-del` | `{name,backend,params:{...}}` | rclone remote の管理 (`type:"rclone"` の宛先が指す `rclone.conf` エントリを作成する), `backend` は任意の rclone backend でよく、ホワイトリストはない |
 | `remote-authorize` | `{backend}` | `{ok:true,url}` (エンジンは Android の VIEW intent 経由で、その同意 URL を電話のブラウザですでに開いている) または `{ok:false,code:"ERR_AUTHORIZE"}`。端末上の OAuth のため、ローカルのコールバックサーバー (`127.0.0.1:53682`) で `rclone authorize <backend>` を実行する。 |
 | `remote-authorize-poll` | `{}` | 待機中は `{ok:true,done:false,url}`、ユーザーが同意したら `{ok:true,done:true,token}` (`remote-add` に渡す `token`)、または `{ok:false,code:"ERR_AUTHORIZE"}`。 |
-| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`; 保留中の認可を停止する。 |
+| `remote-authorize-cancel` | `{}` | `{ok:true,cancelled:true}`, 保留中の認可を停止する。 |
 | `cloud-status` | `{}` | `{ok,rclone,restic,fetchable,size}` (`rclone`/`restic` バイナリが存在するか、この `lite` エディションがそれらを取得できるか、ダウンロードサイズ(バイト)) |
 | `cloud-fetch` | `{}` | `{ok,opid}` (detached) `lite` エディションで `rclone`/`restic` アドオンをダウンロード+検証+インストールする |
 | `schedule-set` / `schedule-list` / `schedule-delete` | 下記参照 | スケジュールされたジョブ (backup または復元。単一のアプリ, 集合, またはすべてのアプリを対象) |
 | `scheduler-tick` | `{}` | 期限が来たジョブを実行 + リテンションを適用 + 自動バックアップのオブザーバー (ブート時の heartbeat がこれを呼ぶ) |
-| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached ではない; すぐに返る; 失敗時は `ERR_UPDATE_CHECK`, 下記参照) |
+| `update-check` | `{}` | `{ok,current_version,current_code,latest_version,latest_code,update_available,zipUrl,changelog,notes}` (detached ではない、すぐに返る、失敗時は `ERR_UPDATE_CHECK`, 下記参照) |
 | `backup-batch` | `{packages:[...], ...backup args}` | `{ok,opid}` (detached) 多数のアプリを 1 つの切り離されたオペレーションでバックアップします。進捗に `n`/`of` を含みます。アプリ単位の失敗でバッチは止まりません。 |
 | `restore-batch` | `{refs:[...], ...restore args}` | `{ok,opid}` (detached) 多数のバックアップを 1 つの切り離されたオペレーションで復元します。進捗に `n`/`of` を含みます。アプリ単位の失敗でバッチは止まりません。 |
 | `list-volumes` | `{}` | `{ok,volumes:[{path,removable,id?}]}` フォルダ選択用のストレージボリューム（内部＋リムーバブル SD カード/USB）。 |
@@ -311,7 +311,7 @@ config フィールドの `network_policy` は、クラウド転送が使える�
 | `contacts` | 連絡先と通話履歴 | provider の置き換え (消去 + 展開) |
 | `wifi` | 保存された Wi-Fi ネットワーク | provider の置き換え (消去 + 展開) |
 | `bluetooth` | Bluetooth のペアリング | provider の置き換え (消去 + 展開) |
-| `calendar` | カレンダー provider (`com.android.providers.calendar`, app + データ); `calendar.json` へポータブルにもエクスポート | provider の置き換え (消去 + 展開) |
+| `calendar` | カレンダー provider (`com.android.providers.calendar`, app + データ), `calendar.json` へポータブルにもエクスポート | provider の置き換え (消去 + 展開) |
 | `wallpaper` | ホームとロックの壁紙と `wallpaper_info.xml`、raw (バイナリ) で保存 | ファイルを置き換え |
 | `dns` | settings から読む private DNS モードと指定子 | idempotent な `settings put` |
 | `system_settings` | system/global/secure settings の完全な dump | **opt-in**、idempotent な `settings put`、デバイスの settings を上書き |
