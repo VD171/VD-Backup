@@ -1,9 +1,9 @@
 {
-  "version": "v1.10",
-  "versionCode": 11000,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.10/VD-Backup-v1.10-x86_64-full.zip",
+  "version": "v1.18",
+  "versionCode": 11800,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.18/VD-Backup-v1.18-x86_64-full.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "",
-  "size": 0,
-  "sha256": ""
+  "notes": "New:\n\n- The device ID (SSAID) can be applied or restored per app now, off by default and chosen in the restore dialog, so you keep it for the apps that rely on it (such as banking) and leave standard behavior everywhere else. (#35)\n- A new \"Off\" network option blocks every cloud transfer for a backup or restore. (#35)\n- The flashless updater is ABI-aware: a per-architecture install keeps only its own ABI instead of re-fetching the full universal payload, the update bar's dismissal survives a restart, and a new toggle silences it entirely. (#35)\n- Mirror backups show up in the Backups tab and restore from there, like Full and Snapshot backups. (#38)\n\nFixes:\n\n- Disabling the automatic-backup option clears its baseline, so re-enabling starts fresh from the current state instead of backing up every app that changed while the option was off. (#37)\n\nThanks to @walrus543 and @Emad200000 for the reports.",
+  "size": 72752562,
+  "sha256": "9e0f03a6ead6b80bf65a49308768691a26845fb346df2e9a21acd26a55283ca2"
 }
