@@ -3,7 +3,7 @@
   "versionCode": 11900,
   "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.19/VD-Backup-v1.19-universal-full.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "",
-  "size": 0,
-  "sha256": ""
+  "notes": "#42 metadata privacy: encrypted backups now seal all of their metadata (permissions, app label/icon, file list, sizes, SELinux contexts), stay portable, and still list instantly. A Show details button reveals the sealed metadata with the passphrase, without restoring. The same sealing covers the special, folder and /data/adb backups (and their file index). The flashless update check now fails gracefully when offline or already running.",
+  "size": 267105507,
+  "sha256": "44b89635c9e31c16f748c40e8c8a322ed93da79f8c492c0a37a24c973f16acb4"
 }

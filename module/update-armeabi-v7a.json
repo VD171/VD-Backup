@@ -1,9 +1,9 @@
 {
-  "version": "v1.10",
-  "versionCode": 11000,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.10/VD-Backup-v1.10-armeabi-v7a-full.zip",
+  "version": "v1.19",
+  "versionCode": 11900,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.19/VD-Backup-v1.19-armeabi-v7a-full.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "",
-  "size": 0,
-  "sha256": ""
+  "notes": "#42 metadata privacy: encrypted backups now seal all of their metadata (permissions, app label/icon, file list, sizes, SELinux contexts), stay portable, and still list instantly. A Show details button reveals the sealed metadata with the passphrase, without restoring. The same sealing covers the special, folder and /data/adb backups (and their file index). The flashless update check now fails gracefully when offline or already running.",
+  "size": 61753043,
+  "sha256": "64dce822e3daa75bd82f068beb89c313eacf94da09a1860673b49f818479f7d4"
 }
