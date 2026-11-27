@@ -313,26 +313,30 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           VER: ${{ steps.v.outputs.name }}
-          NOTES: ${{ inputs.notes }}
         run: |
           set -e
-          # Build notes: user-provided notes, the asset legend, then the channel banner
-          # LAST (always). Strip any banner pasted into NOTES so it never duplicates nor
-          # lands mid-body.
-          notes_clean=$(printf '%s\n' "$NOTES" | grep -vi 't.me/Priv8_VD' || true)
-          {
-            printf '%s\n\n' "$notes_clean"
-            printf '### Assets\n\n'
-            printf -- '- `VD-Backup-%s-universal-full.zip` - every architecture, every binary (incl. rclone for cloud providers and restic for snapshots). Works on any device.\n' "$VER"
-            printf -- '- `VD-Backup-%s-universal-lite.zip` - every architecture, without the two largest binaries (rclone, restic). Smallest; local, SSH/SFTP and rsync backups.\n' "$VER"
-            printf -- '- `VD-Backup-%s-<abi>-full.zip` - a single architecture, every binary (smaller than universal-full).\n\n' "$VER"
-            printf 'full = every binary, including rclone (cloud providers) and restic (snapshots).\n'
-            printf 'lite = without the two largest binaries (rclone, restic); it fetches them on demand (verified by SHA-256) the first time you use a cloud or snapshot feature. Local, SSH/SFTP and rsync work without any download.\n'
-            printf 'universal = every architecture; per-ABI = pick your device (arm64-v8a, armeabi-v7a, x86, x86_64).\n'
-            printf '\nThe `assets-<abi>.tar.zst` files are the on-demand rclone+restic addons the lite edition downloads on first cloud use; they are not flashable builds, do not flash them.\n'
-            printf '\n---\n\n'
-            printf '📣 Join the channel for updates: @Priv8_VD https://t.me/Priv8_VD\n'
-          } > release-notes.md
+          # SHA256SUMS: every published asset (the .zip variants + the on-demand .tar.zst
+          # addons) plus every shipped per-ABI binary (bin/<abi>/*), never a per-file listing
+          # of the zip contents (release_sha_zip_binarios_only). Published as an asset so the
+          # bytes are verifiable; the body quotes the asset lines and points here for the rest.
+          : > SHA256SUMS.txt
+          for z in "VD-Backup-${VER}-universal-full.zip" "VD-Backup-${VER}-universal-lite.zip" \
+                   "VD-Backup-${VER}-arm64-v8a-full.zip" "VD-Backup-${VER}-armeabi-v7a-full.zip" \
+                   "VD-Backup-${VER}-x86-full.zip" "VD-Backup-${VER}-x86_64-full.zip" \
+                   assets-${VER}-*.tar.zst; do
+            [ -f "$z" ] && sha256sum "$z" >> SHA256SUMS.txt
+          done
+          ( cd module && for abi in arm64-v8a armeabi-v7a x86 x86_64; do
+              for f in bin/$abi/*; do
+                [ -f "$f" ] || continue
+                case "$f" in *.sha256|*.gitkeep|*PROVENANCE*) continue ;; esac
+                sha256sum "$f"
+              done
+            done ) >> SHA256SUMS.txt
+          # Canonical body (CHANGELOG section + install + checksums + See also + the @Priv8_VD
+          # footer): the same generator the notes-refresh workflow calls, so a build and a
+          # later refresh of the same version emit byte-identical notes (STANDARDS 22).
+          sh .github/scripts/release-notes-body.sh "$VER" SHA256SUMS.txt > release-notes.md
           # Idempotent: drop any existing release/tag for this version first.
           gh release delete "$VER" -y --cleanup-tag || true
           gh release create "$VER" \
@@ -343,6 +347,7 @@ jobs:
             "VD-Backup-${VER}-x86-full.zip" \
             "VD-Backup-${VER}-x86_64-full.zip" \
             assets-${VER}-*.tar.zst \
+            SHA256SUMS.txt \
             --title "VDBackup ${VER}" \
             --notes-file release-notes.md
 

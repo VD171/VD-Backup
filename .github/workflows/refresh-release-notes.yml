@@ -1,0 +1,93 @@
+# ======================================================================
+#  VD BACKUP  ::  root backup & restore, no grant prompt
+#  Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+#
+#  Copyright (C) 2026  VD171
+#  SPDX-License-Identifier: AGPL-3.0-or-later
+#
+#  Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+#  modified version, even as a service, and you MUST offer its source.
+#
+#  Site           : https://vd171.ru
+#  Site           : https://vd.priv8.ru
+#  Source         : https://github.com/VD171/VD-Backup
+#  GitHub         : @VD171 https://github.com/VD171
+#  XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+#  XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+#  Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+#  Channel        : @Priv8_VD https://t.me/Priv8_VD
+#  Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+#  E-mail         : vd.priv8@pm.me
+# ======================================================================
+#
+#  Regenerate the canonical body + SHA256SUMS.txt for an ALREADY published
+#  release and apply them as github-actions[bot], WITHOUT rebuilding. A local
+#  `gh release edit` uses a human PAT and re-attributes the release, breaking
+#  auditability (github_release_sempre_bot_author); from CI the bot stays the
+#  author. Rebuilding instead would churn the non-reproducible dex/APK bytes
+#  and desync the live VDLU feed, so this reuses the published assets.
+#
+#  Use it to bring an older release up to the current release-notes contract
+#  (STANDARDS 22) or after editing release-notes-body.sh.
+name: Refresh release notes
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag to refresh, e.g. v1.19"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Regenerate notes for ${{ inputs.version }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VER: ${{ inputs.version }}
+        run: |
+          set -e
+          gh release view "$VER" >/dev/null 2>&1 || { echo "::error::release $VER not found"; exit 1; }
+
+          # Asset sha256 straight from the published digests - no download for the .zip / .tar.zst.
+          : > SHA256SUMS.txt
+          gh release view "$VER" --json assets \
+            -q '.assets[] | select(.name | test("\\.(zip|tar\\.zst)$")) | "\(.digest | sub("sha256:";""))  \(.name)"' \
+            | sort -k2 >> SHA256SUMS.txt
+
+          # Per-binary sha256: the universal-full zip holds every ABI's bin/<abi>/*. Pull only
+          # that one asset, extract just bin/, and hash the shipped binaries (same filter as the
+          # build step) - never a per-file listing of the zip (release_sha_zip_binarios_only).
+          gh release download "$VER" -p "VD-Backup-${VER}-universal-full.zip" -D _dl
+          mkdir -p _x
+          ( cd _x && unzip -q -o "$GITHUB_WORKSPACE/_dl/VD-Backup-${VER}-universal-full.zip" 'bin/*' )
+          ( cd _x && for abi in arm64-v8a armeabi-v7a x86 x86_64; do
+              for f in bin/$abi/*; do
+                [ -f "$f" ] || continue
+                case "$f" in *.sha256|*.gitkeep|*PROVENANCE*) continue ;; esac
+                sha256sum "$f"
+              done
+            done ) >> SHA256SUMS.txt
+          rm -rf _dl _x
+
+          sh .github/scripts/release-notes-body.sh "$VER" SHA256SUMS.txt > release-notes.md
+
+          gh release edit "$VER" --notes-file release-notes.md
+          gh release upload "$VER" SHA256SUMS.txt --clobber
+
+      - name: Assert the release is still authored by github-actions[bot]
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VER: ${{ inputs.version }}
+        run: |
+          author="$(gh release view "$VER" --json author -q '.author.login')"
+          if [ "$author" != "github-actions[bot]" ]; then
+            echo "::error::Release $VER is authored by '$author', not github-actions[bot] - auditability rule violated."
+            exit 1
+          fi
