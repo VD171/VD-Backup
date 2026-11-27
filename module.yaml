@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/KernelSU-Modules/tools/main/schemas/module.schema.json
+schemaVersion: 1
+id: vdbackup
+name: VD Backup
+summary: Full app and data backup and restore as root, driven from a KernelSU/APatch/Magisk WebUI with no grant prompt.
+description: README.md
+license: AGPL-3.0-or-later
+homepage: https://github.com/VD171/VD-Backup
+support: https://xdaforums.com/t/4807267
+tags:
+  - kernelsu
+  - apatch
+  - magisk
+  - root
+  - backup
+  - restore
+  - encryption
+  - webui
+compatibility:
+  architectures:
+    - arm64-v8a
+    - armeabi-v7a
+    - x86
+    - x86_64
+release:
+  assetPattern: "*-universal-lite.zip"
