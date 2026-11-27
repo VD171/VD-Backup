@@ -58,13 +58,13 @@ chmurowe (`rclone`/`restic`/ssh) komunikują się z siecią.
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (ponowne podłączenie po przywróceniu połączenia) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | lista aplikacji / wsadowe ikony base64 |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = metadane są zapieczętowane; `locked` = zaszyfrowana i to urządzenie nie może odczytać nawet skrawka listowania, np. kopia z innego urządzenia - nadal przywraca się z hasłem) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` ustawia lub kasuje własną nazwę kopii zapasowej (`note`) i swobodne `tags`, przechowywane w pliku towarzyszącym, który podróżuje z kopią, przeszukiwalne z `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` użytkownicy Androida na urządzeniu (wielu użytkowników). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` podkatalogi ścieżki (wybór folderu). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` samodzielne kopie folderu/pliku. |
 | `provenance` | `{}` | manifest audytu dołączonych plików binarnych (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` pełne szczegóły jednej kopii (wersja, źródło instalacji, stan, data, tryb, rozmiar, elementy, liczby uprawnień, urządzenie) |
+| `backup-info` | `{ref}` | `{ok,...}` pełne szczegóły jednej kopii (wersja, źródło instalacji, stan, data, tryb, rozmiar, elementy, liczby uprawnień, urządzenie); dla zaszyfrowanej kopii zwraca `encrypted:true` tylko z polami na poziomie skrawka (pełne szczegóły są zapieczętowane i widoczne przy przywracaniu, z hasłem) |
 | `backup-icon` | `{ref}` | `{ok,icon}` PNG base64 z manifestu (działa, gdy aplikacja jest odinstalowana) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref musi być pod katalogiem kopii) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` zachowuje N najnowszych kopii pakietu |

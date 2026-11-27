@@ -28,6 +28,6 @@ window.VDLU_I18N_NL = {
   ahead: 'Nieuwer dan de feed', aheadSub: 'jouw versie is nieuwer dan de gepubliceerde update', silentUpdate: 'Stille update', silentUpdateSub: 'Past updates op de achtergrond toe zonder de herstartbalk te tonen.',
   deferred: 'Download uitgesteld', deferredSub: 'wacht op het toegestane netwerk, hervat bij de volgende controle',
   updateAvail: 'Update beschikbaar', install: 'installeren', fileOne: 'bestand', fileMany: 'bestanden',
-  requiresReboot: 'vereist herstart', checkFail: 'Controle mislukt', ksuUnavailable: 'KSU-API niet beschikbaar',
+  requiresReboot: 'vereist herstart', checkFail: 'Controle mislukt', offline: 'Offline', busy: 'Er wordt al een controle uitgevoerd', ksuUnavailable: 'KSU-API niet beschikbaar',
   pendingUpdate: 'Update in behandeling', notNow: 'Niet nu', srcPlaceholder: 'https://…/&lt;module&gt;'
 };

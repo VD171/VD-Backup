@@ -9,6 +9,14 @@ without this module. A backup folder contains a `manifest.json`, the APKs
 (`*.apk.zst`) and the data archives (`<item>.tar.zst`, `.tar.gz` or `.tar.lz4`),
 optionally encrypted with a trailing `.age`.
 
+**If the data is encrypted**, the metadata is encrypted too, so none of it leaks to
+anyone who only has the files. The folder then also holds `manifest.full.age` (the full
+manifest) and two small `stub.*.age` files. `manifest.json` is only a tiny non-sensitive
+marker in that case; the real details are in `manifest.full.age`. Everything portable
+(the data archives and `manifest.full.age`) decrypts with just your **passphrase** - see
+step 1. The `stub.dev.age` / `stub.pass.age` files are only the module's on-device listing
+cache; you can ignore them on a PC.
+
 ## Tools you may need
 
 - **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
@@ -18,19 +26,18 @@ optionally encrypted with a trailing `.age`.
 
 ## 1. Decrypt (only if the file ends with `.age`)
 
-Keyfile (recommended):
-
-```
-age -d -i age.key -o data.tar.zst  data.tar.zst.age
-```
-
-Passphrase:
+Passphrase (the portable way - works on any PC with just your passphrase):
 
 ```
 age -d -o data.tar.zst  data.tar.zst.age      # age will prompt for the passphrase
 ```
 
-Do the same for each `*.age` file (APKs and data archives).
+Do the same for each `*.age` file (APKs and data archives). If the backup is encrypted,
+decrypt `manifest.full.age` the same way to read the full manifest:
+
+```
+age -d -o manifest.json  manifest.full.age    # the full, readable manifest
+```
 
 ## 2. Decompress + extract
 
@@ -65,9 +72,10 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 - Extracted files keep their relative paths, the SELinux context, uid/gid and modes
   are inside the tar (and are reapplied properly only when you restore on Android).
 - `manifest.json` describes exactly what each file is, the app version and the
-  original owner/context. It is the source of truth.
-- Nothing here is tied to a specific device: the same passphrase/keyfile works on any
-  machine.
+  original owner/context. It is the source of truth. For an encrypted backup the full
+  manifest is `manifest.full.age` (decrypt it as in step 1); the plaintext `manifest.json`
+  is only a small marker and carries no sensitive data.
+- Nothing here is tied to a specific device: the same passphrase works on any machine.
 
 <!-- doc-footer -->
 

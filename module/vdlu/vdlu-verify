@@ -89,7 +89,7 @@ sig=$(field "$c" sig) || { echo "vdlu-verify: no sig in manifest" >&2; exit 1; }
 
 case "$key_id" in */*|..|.|*'"'*) echo "vdlu-verify: unsafe key_id: $key_id" >&2; exit 1;; esac
 
-# VDLU#1 trust-root allowlist (mirror of the engine's verify_manifest): the key_id must be an ACCEPTED
+# Trust-root allowlist (mirror of the engine's verify_manifest): the key_id must be an ACCEPTED
 # module-update key BEFORE a pubkey is selected, so a lower-trust key that merely sits in the keyring
 # (e.g. a fingerprint-feed key) can never sign a module/tools update. Allowlist = VDLU_KEYID_ALLOW
 # (comma/space/newline separated, passed by the engine from config `key_id`); when unset, default-safe =

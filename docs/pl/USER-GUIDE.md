@@ -249,6 +249,15 @@ Szyfrowanie **nigdy** nie jest związane z kluczami sprzętowymi twojego urządz
 przywraca się na innym urządzeniu i otwiera na PC. (Dostępny jest też zgodny tryb zip AES-256
 dla zaszyfrowanych archiwów, które chcesz otworzyć dwuklikiem i hasłem.)
 
+Gdy kopia jest zaszyfrowana, jej **metadane również są zapieczętowane** - uprawnienia, etykieta
+aplikacji, rozmiary plików i lista plików są w całości zaszyfrowane, więc ktokolwiek zdobędzie
+same pliki (kopię z chmury, wyjętą kartę SD), niczego się z nich nie dowie. WebUI nadal
+wyświetla twoje zaszyfrowane kopie natychmiast, ponieważ mały skrawek listowania jest
+przechowywany zaszyfrowany kluczem tylko dla tego urządzenia; kopia przeniesiona na inne
+urządzenie pozostaje tam możliwa do wylistowania, gdy wpiszesz jej passphrase. Tylko nazwa
+pakietu aplikacji pozostaje widoczna w nazwie folderu, więc kopie pozostają przenośne i łatwe w
+zarządzaniu.
+
 Aby użyć szyfrowania, wygeneruj klucz szyfrujący raz (Settings), następnie włącz
 szyfrowanie dla swojego zadania i ustaw passphrase. Passphrase jest tym, co chroni
 kopię, więc wybierz silne, nie ma klucza sprzętowego ani tylnej furtki do odzyskiwania.

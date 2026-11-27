@@ -83,6 +83,8 @@ importer les sauvegardes existantes de Neo-Backup et d'Android-DataBackup pour q
 - **Compression :** aucune / lz4 / zstd / gzip (gzip = "mode compatibilité", s'ouvre partout).
 - **Chiffrement :** optionnel et portable (`age` + phrase secrète, ou zip AES-256), jamais
   lié au matériel de l'appareil, de sorte qu'une sauvegarde se restaure sur un autre appareil ou s'ouvre sur un PC.
+  Une sauvegarde chiffrée scelle aussi ses métadonnées (permissions, nom de l'app, liste des fichiers), donc les
+  fichiers seuls ne révèlent rien, tandis que la WebUI la liste toujours instantanément.
 - **Destinations :** local, SFTP, SCP, SMB, WebDAV, FTP, S3 et plus de 70 (`rclone`),
   ainsi que les dépôts `rsync` et `restic`. Google Drive en option via un petit compagnon opt-in.
 - **Telegram :** sauvegardez vers un canal Telegram privé comme stockage cloud illimité via MTProto, restauration et suppression aussi depuis la WebUI.

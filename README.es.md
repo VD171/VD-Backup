@@ -83,6 +83,8 @@ importar copias de seguridad existentes de Neo-Backup y Android-DataBackup para 
 - **Compresión:** ninguna / lz4 / zstd / gzip (gzip = "modo de compatibilidad", se abre en cualquier lugar).
 - **Cifrado:** opcional y portátil (`age` + contraseña, o zip AES-256), nunca
   atado al hardware del dispositivo, así que una copia se restaura en otro dispositivo o se abre en un PC.
+  Una copia cifrada también sella sus metadatos (permisos, etiqueta de la app, la lista de archivos),
+  así que los archivos por sí solos no revelan nada, mientras la WebUI sigue listándola al instante.
 - **Destinos:** local, SFTP, SCP, SMB, WebDAV, FTP, S3 y más de 70 (`rclone`),
   además de repositorios `rsync` y `restic`. Google Drive opcional mediante un pequeño complemento opt-in.
 - **Telegram:** respalda a un canal privado de Telegram como almacenamiento en la nube ilimitado mediante MTProto, restaurar y borrar también desde la WebUI.

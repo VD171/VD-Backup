@@ -84,6 +84,7 @@ importować istniejące kopie zapasowe Neo-Backup i Android-DataBackup, abyś m�
 - **Kompresja:** brak / lz4 / zstd / gzip (gzip = "tryb zgodności", otwiera się wszędzie).
 - **Szyfrowanie:** opcjonalne i przenośne (`age` + hasło lub AES-256 zip), nigdy nie
   powiązane ze sprzętem urządzenia, więc kopia przywraca się na innym urządzeniu lub otwiera na komputerze.
+  Zaszyfrowana kopia pieczętuje też swoje metadane (uprawnienia, etykietę aplikacji, listę plików), więc same pliki niczego nie zdradzają, a WebUI nadal wyświetla ją natychmiast.
 - **Miejsca docelowe:** lokalnie, SFTP, SCP, SMB, WebDAV, FTP, S3 i ponad 70 innych (`rclone`),
   a także repozytoria `rsync` i `restic`. Opcjonalnie Dysk Google przez malutki opcjonalny komponent towarzyszący.
 - **Integralność:** każde archiwum jest weryfikowane względem manifestu, próbny przebieg

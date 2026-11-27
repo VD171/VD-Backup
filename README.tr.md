@@ -83,6 +83,7 @@ Neo-Backup ve Android-DataBackup yedeklerini içe aktarabilir.
 - **Sıkıştırma:** yok / lz4 / zstd / gzip (gzip = "uyumluluk modu", her yerde açılır).
 - **Şifreleme:** isteğe bağlı ve taşınabilir (`age` + parola ya da AES-256 zip), asla cihaz
   donanımına bağlı değildir, böylece bir yedek başka bir cihazda geri yüklenir veya bir PC'de açılır.
+  Şifrelenmiş bir yedek, üst verisini de mühürler (izinler, uygulama etiketi, dosya listesi), böylece dosyalar tek başına hiçbir şey ele vermez, WebUI ise onu yine de anında listeler.
 - **Hedefler:** yerel, SFTP, SCP, SMB, WebDAV, FTP, S3 ve 70'ten fazlası (`rclone`),
   ayrıca `rsync` ve `restic` depoları. Küçük, tercihe bağlı bir yardımcı ile isteğe bağlı Google Drive.
 - **Telegram:** özel bir Telegram kanalına MTProto üzerinden sınırsız bulut depolama olarak yedekle, geri yükleme ve silme de WebUI'den.

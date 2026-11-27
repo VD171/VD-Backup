@@ -58,13 +58,13 @@ Backup/Restore benötigt, nur Cloud-Ziele (`rclone`/`restic`/ssh) sprechen mit d
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (nach dem Wiederverbinden erneut anhängen) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | App-Liste / base64-Icons im Batch |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = die Metadaten sind versiegelt; `locked` = verschlüsselt, und dieses Gerät kann nicht einmal den Auflistungs-Stub lesen, z. B. ein Backup von einem anderen Gerät - es lässt sich weiterhin mit der Passphrase wiederherstellen) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` setzt oder löscht den eigenen Namen einer Sicherung (`note`) und freie `tags`, gespeichert in einer Begleitdatei, die mit der Sicherung mitwandert, durchsuchbar über `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` Android-Benutzer des Geräts (Mehrbenutzer). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` Unterverzeichnisse eines Pfads (Ordnerauswahl). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` eigenständige Ordner-/Datei-Backups. |
 | `provenance` | `{}` | Audit-Manifest der mitgelieferten Binärdateien (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` alle Details eines Backups (Version, Installationsquelle, Status, Datum, Modus, Größe, Elemente, Berechtigungszählungen, Gerät) |
+| `backup-info` | `{ref}` | `{ok,...}` alle Details eines Backups (Version, Installationsquelle, Status, Datum, Modus, Größe, Elemente, Berechtigungszählungen, Gerät); bei einem verschlüsselten Backup liefert es `encrypted:true` nur mit den Feldern auf Stub-Ebene (die vollständigen Details sind versiegelt und werden bei der Wiederherstellung mit der Passphrase sichtbar) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64-PNG aus dem Manifest (funktioniert, wenn die App deinstalliert ist) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref muss unter dem backups-Verzeichnis liegen) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` die neuesten N eines Pakets behalten |

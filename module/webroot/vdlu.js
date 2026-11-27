@@ -66,7 +66,7 @@
       ahead: 'Newer than the feed', aheadSub: 'your version is ahead of the published update',
       deferred: 'Download deferred', deferredSub: 'waiting for the allowed network, resumes at the next check',
     updateAvail: 'Update available', install: 'install', fileOne: 'file', fileMany: 'files',
-    requiresReboot: 'requires reboot', checkFail: 'Check failed', ksuUnavailable: 'KSU API unavailable',
+    requiresReboot: 'requires reboot', checkFail: 'Check failed', offline: 'Offline', busy: 'A check is already running', ksuUnavailable: 'KSU API unavailable',
     pendingUpdate: 'Pending update', notNow: 'Not now', srcPlaceholder: 'https://…/&lt;module&gt;'
   };
   var I = {};
@@ -487,7 +487,10 @@
     return ensureToolchain().then(function () {
       return ex(envPrefix() + engine() + ' check 2>&1');
     }).then(function (out) {
-      var line = String(out).trim().split('\n').filter(function (l) { return l.trim(); }).pop() || '';
+      // 2>&1 merges the engine's stderr log with its stdout JSON; pick the LAST JSON object line so a
+      // trailing diagnostic can never shadow the result (the engine always emits one, even on failure).
+      var lines = String(out).trim().split('\n').filter(function (l) { return l.trim(); });
+      var line = ''; for (var li = lines.length - 1; li >= 0; li--) { if (/^\s*\{/.test(lines[li])) { line = lines[li]; break; } }
       var r;
       try { r = JSON.parse(line); } catch (e) { throw new Error(out.trim() || T('checkFail')); }
       return r;
@@ -579,6 +582,7 @@
     if (!box) return;
     box.hidden = false; box.className = 'vdlu-result';
     if (err) { box.classList.add('err'); box.innerHTML = '<b>' + esc(T('checkFail')) + '</b><br>' + esc(err && err.message ? err.message : err); return; }
+    if (r && r.ok === false) { box.classList.add('err'); box.innerHTML = '<b>' + esc(r.error === 'offline' ? T('offline') : r.error === 'busy' ? T('busy') : T('checkFail')) + '</b>'; return; }
     if (r.ahead) { box.classList.add('ok'); box.innerHTML = '<b>' + esc(T('ahead')) + '</b> · ' + esc(T('aheadSub')) + (r.from != null ? ' (v' + esc(r.from) + (r.to != null ? ' &gt; v' + esc(r.to) : '') + ')' : ''); return; }
     if (!r.update) { box.classList.add('ok'); box.innerHTML = '<b>' + esc(T('upToDate')) + '</b> · ' + esc(T('nothingNew')) + (r.from != null ? ' (v' + esc(r.from) + ')' : ''); return; }
     box.classList.add('upd');

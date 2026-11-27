@@ -28,6 +28,6 @@ window.VDLU_I18N_JA = {
   ahead: 'フィードより新しい', aheadSub: 'お使いのバージョンは公開済みの更新より新しいです', silentUpdate: 'サイレント更新', silentUpdateSub: '再起動バーを表示せずにバックグラウンドで更新を適用します。',
   deferred: 'ダウンロードを延期', deferredSub: '許可されたネットワークを待機中、次回の確認で再開します',
   updateAvail: '更新があります', install: 'インストール', fileOne: 'ファイル', fileMany: 'ファイル',
-  requiresReboot: '再起動が必要', checkFail: '確認に失敗しました', ksuUnavailable: 'KSU API を利用できません',
+  requiresReboot: '再起動が必要', checkFail: '確認に失敗しました', offline: 'オフライン', busy: '確認はすでに実行中です', ksuUnavailable: 'KSU API を利用できません',
   pendingUpdate: '保留中の更新', notNow: '今はしない', srcPlaceholder: 'https://…/&lt;モジュール&gt;'
 };

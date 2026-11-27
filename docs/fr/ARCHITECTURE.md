@@ -73,6 +73,14 @@ sont pas couvertes. À partir de la première version publique, la promesse ci-d
   chaque champ de manière défensive (les champs optionnels manquants retombent sur une valeur par défaut) et installe
   les APK et extrait les archives par leur nom et extension de fichier, sans supposer une forme fixe de
   manifest.
+- **Métadonnées scellées quand c'est chiffré.** Quand les données sont chiffrées, le manifeste complet
+  est chiffré avec la phrase de passe dans `manifest.full.age`, donc une sauvegarde ne laisse fuir aucune
+  métadonnée (permissions, nom de l'app, tailles, liste des fichiers) vers quiconque ne détient que les
+  fichiers ; `manifest.json` reste un petit marqueur non sensible pour que tout chemin du type "une sauvegarde
+  se trouve ici" continue de fonctionner. Un minuscule stub de listage est conservé deux fois - chiffré avec
+  une clé d'appareil (la WebUI liste vite sans la phrase de passe) et avec la phrase de passe (une sauvegarde
+  déplacée vers un autre appareil y reste listable). Le répertoire garde son nom `<package>/<timestamp>`, donc
+  le package est la seule chose que le chemin révèle encore ; tout le reste est scellé.
 - **Restauration compatible en avant.** La restauration ne rejette jamais une sauvegarde parce qu'elle est ancienne, et un
   VDBackup plus ancien ignore silencieusement les types d'élément qu'il ne connaît pas plutôt que d'échouer. Un VDBackup plus récent
   restaure donc n'importe quelle sauvegarde plus ancienne, et les archives au format standard restent

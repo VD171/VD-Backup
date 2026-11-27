@@ -9,6 +9,13 @@ utan den här modulen. En säkerhetskopiemapp innehåller en `manifest.json`, AP
 (`*.apk.zst`) och data-arkiven (`<item>.tar.zst`, `.tar.gz` eller `.tar.lz4`),
 valfritt krypterade med ett avslutande `.age`.
 
+**Om datan är krypterad** är metadatan också krypterad, så inget av den läcker till någon som
+bara har filerna. Mappen innehåller då även `manifest.full.age` (det fullständiga manifestet) och
+två små `stub.*.age`-filer. `manifest.json` är i så fall bara en liten icke-känslig markör; de
+verkliga detaljerna finns i `manifest.full.age`. Allt portabelt (data-arkiven och
+`manifest.full.age`) dekrypteras med bara din **lösenfras** - se steg 1. Filerna `stub.dev.age` /
+`stub.pass.age` är bara modulens listningscache på enheten; du kan ignorera dem på en PC.
+
 ## Verktyg du kan behöva
 
 - **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
@@ -18,19 +25,18 @@ valfritt krypterade med ett avslutande `.age`.
 
 ## 1. Dekryptera (endast om filen slutar med `.age`)
 
-Nyckelfil (rekommenderas):
-
-```
-age -d -i age.key -o data.tar.zst  data.tar.zst.age
-```
-
-Lösenfras:
+Lösenfras (det portabla sättet - fungerar på vilken PC som helst med bara din lösenfras):
 
 ```
 age -d -o data.tar.zst  data.tar.zst.age      # age will prompt for the passphrase
 ```
 
-Gör samma sak för varje `*.age`-fil (APK:er och data-arkiv).
+Gör samma sak för varje `*.age`-fil (APK:er och data-arkiv). Om säkerhetskopian är krypterad,
+dekryptera `manifest.full.age` på samma sätt för att läsa det fullständiga manifestet:
+
+```
+age -d -o manifest.json  manifest.full.age    # the full, readable manifest
+```
 
 ## 2. Dekomprimera + extrahera
 
@@ -65,8 +71,10 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 - Extraherade filer behåller sina relativa sökvägar, SELinux-kontexten, uid/gid och modes
   finns inuti tar-filen (och återtillämpas ordentligt endast när du återställer på Android).
 - `manifest.json` beskriver exakt vad varje fil är, app-versionen och den
-  ursprungliga ägaren/kontexten. Det är sanningskällan.
-- Inget här är bundet till en specifik enhet: samma lösenfras/nyckelfil fungerar på vilken
+  ursprungliga ägaren/kontexten. Det är sanningskällan. För en krypterad säkerhetskopia är det
+  fullständiga manifestet `manifest.full.age` (dekryptera det som i steg 1); klartext-
+  `manifest.json` är bara en liten markör och bär ingen känslig data.
+- Inget här är bundet till en specifik enhet: samma lösenfras fungerar på vilken
   maskin som helst.
 
 <!-- doc-footer -->

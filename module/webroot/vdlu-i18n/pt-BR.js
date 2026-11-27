@@ -23,7 +23,7 @@ window.VDLU_I18N_PT_BR = {
   savedToast: 'salvo', saveFail: 'falha ao salvar', sourceSaved: 'fonte salva',
   searching: 'Procurando…', upToDate: 'Atualizado', nothingNew: 'nada novo',
   updateAvail: 'Atualização disponível', install: 'instalar', fileOne: 'arquivo', fileMany: 'arquivos',
-  requiresReboot: 'requer reboot', checkFail: 'Falha no check', ksuUnavailable: 'KSU API indisponível',
+  requiresReboot: 'requer reboot', checkFail: 'Falha no check', offline: 'Offline', busy: 'Um check já está em andamento', ksuUnavailable: 'KSU API indisponível',
   pendingUpdate: 'Atualização pendente', notNow: 'Agora não', srcPlaceholder: 'https://…/&lt;módulo&gt;',
   ahead: 'Mais novo que o feed', aheadSub: 'sua versão está à frente da atualização publicada',
   bootRetryEvery: 'Repetir no boot a cada (s)', bootRetryUpTo: 'Repetir no boot até (min)',

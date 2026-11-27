@@ -83,6 +83,8 @@ importovat existující zálohy Neo-Backup a Android-DataBackup, abyste mohli p�
 - **Komprese:** žádná / lz4 / zstd / gzip (gzip = "režim kompatibility", otevře se kdekoli).
 - **Šifrování:** volitelné a přenosné (`age` + heslo nebo AES-256 zip), nikdy nevázané
   na hardware zařízení, takže se záloha obnoví na jiném zařízení nebo otevře na počítači.
+  Šifrovaná záloha navíc zapečetí svá metadata (oprávnění, název aplikace, seznam souborů),
+  takže ze samotných souborů nic nevyčtete, a přitom je WebUI stále okamžitě vypíše.
 - **Cíle:** místní, SFTP, SCP, SMB, WebDAV, FTP, S3 a dalších 70+ (`rclone`),
   plus repozitáře `rsync` a `restic`. Volitelně Google Drive přes drobného volitelného společníka.
 - **Telegram:** zálohuj do soukromého kanálu Telegramu jako neomezené cloudové úložiště přes MTProto, obnovení i mazání také z WebUI.

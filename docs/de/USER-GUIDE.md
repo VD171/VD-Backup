@@ -244,6 +244,15 @@ gebunden, sodass ein verschlüsseltes Backup auf einem anderen Gerät wiederherg
 einem PC geöffnet werden kann. (Ein kompatibler AES-256-Zip-Modus ist ebenfalls für
 verschlüsselte Archive verfügbar, die du mit einem Doppelklick und einem Passwort öffnen möchtest.)
 
+Wenn ein Backup verschlüsselt ist, werden auch seine **Metadaten versiegelt** - die
+Berechtigungen, die App-Bezeichnung, die Dateigrößen und die Dateiliste sind alle
+verschlüsselt, sodass jemand, der nur die Dateien in die Hände bekommt (eine Cloud-Kopie,
+eine entnommene SD-Karte), nichts daraus erfährt. Die WebUI listet deine verschlüsselten
+Backups weiterhin sofort auf, weil ein kleiner Auflistungs-Stub verschlüsselt mit einem
+nur-geräteeigenen Schlüssel vorgehalten wird; ein auf ein anderes Gerät verschobenes Backup
+bleibt dort auflistbar, sobald du seine Passphrase eingibst. Nur der Paketname der App bleibt
+im Ordnernamen sichtbar, sodass die Backups portabel und einfach zu verwalten bleiben.
+
 Um Verschlüsselung zu nutzen, erzeuge den Verschlüsselungsschlüssel einmal (Einstellungen),
 aktiviere dann die Verschlüsselung für deinen Auftrag und lege eine Passphrase fest. Die
 Passphrase ist das, was das Backup schützt, also wähle eine starke, es gibt keinen

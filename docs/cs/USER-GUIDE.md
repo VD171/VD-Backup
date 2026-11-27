@@ -231,6 +231,14 @@ passphrase (scrypt), což bylo zvoleno specificky pro přenositelnost: jakýkoli
 se obnoví na jiném zařízení a otevře se na PC. (K dispozici je také kompatibilní AES-256 zip režim
 pro šifrované archivy, které chcete otevřít dvojklikem a heslem.)
 
+Když je záloha šifrovaná, jsou **zapečetěná i její metadata** - oprávnění, název aplikace,
+velikosti souborů i seznam souborů jsou všechny šifrované, takže kdokoli, kdo získá pouze
+soubory (kopie v cloudu, vyjmutá SD karta), se z nich nic nedozví. WebUI přesto vaše šifrované
+zálohy stále okamžitě vypíše, protože malý výpisový stub je uchováván šifrovaný klíčem jen pro
+dané zařízení; záloha přesunutá na jiné zařízení tam zůstane vypsatelná, jakmile zadáte její
+passphrase. Ve jménu složky zůstává viditelný pouze název balíčku aplikace, takže zálohy
+zůstávají přenositelné a snadno spravovatelné.
+
 Chcete-li použít šifrování, vygenerujte šifrovací klíč jednou (Settings), poté povolte
 šifrování pro svou úlohu a nastavte passphrase. Passphrase je to, co chrání
 zálohu, takže zvolte silné, není žádný hardwarový klíč a žádná zadní vrátka pro obnovu.

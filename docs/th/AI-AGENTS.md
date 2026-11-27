@@ -57,13 +57,13 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (เชื่อมต่อใหม่หลังรีคอนเนกต์) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | รายการแอป / ไอคอน base64 แบบกลุ่ม |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = เมทาดาทาถูกผนึก; `locked` = เข้ารหัสและอุปกรณ์นี้อ่านแม้แต่ stub การแสดงรายการไม่ได้ เช่น backup จากอีกอุปกรณ์ - มันยังกู้คืนได้ด้วย passphrase) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` ตั้งหรือล้างชื่อที่กำหนดเองของการสำรองข้อมูล (`note`) และ `tags` อิสระ จัดเก็บในไฟล์ประกอบที่เดินทางไปพร้อมกับการสำรองข้อมูล ค้นหาได้จาก `list-backups` |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` ผู้ใช้ Android ของอุปกรณ์ (หลายผู้ใช้). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` ไดเรกทอรีย่อยของพาธ (ตัวเลือกโฟลเดอร์). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` การสำรองโฟลเดอร์/ไฟล์แบบเดี่ยว. |
 | `provenance` | `{}` | รายการตรวจสอบไบนารีที่มากับแอป (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` รายละเอียดครบของ backup หนึ่งชุด (เวอร์ชัน, แหล่งติดตั้ง, สถานะ, วันที่, mode, ขนาด, items, จำนวนสิทธิ์, อุปกรณ์) |
+| `backup-info` | `{ref}` | `{ok,...}` รายละเอียดครบของ backup หนึ่งชุด (เวอร์ชัน, แหล่งติดตั้ง, สถานะ, วันที่, mode, ขนาด, items, จำนวนสิทธิ์, อุปกรณ์); สำหรับ backup ที่เข้ารหัส มันคืนค่า `encrypted:true` พร้อมเฉพาะฟิลด์ระดับ stub เท่านั้น (รายละเอียดฉบับเต็มถูกผนึกไว้และเห็นได้ตอนกู้คืน ด้วย passphrase) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG จาก manifest (ใช้ได้แม้แอปถูกถอนการติดตั้ง) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref ต้องอยู่ใต้ไดเรกทอรี backups) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` เก็บ N ล่าสุดของ package |

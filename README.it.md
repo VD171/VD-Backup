@@ -82,7 +82,7 @@ importare i backup esistenti di Neo-Backup e Android-DataBackup così da poter m
 - **Conservazione fedele:** contesti SELinux, uid/gid, modes, xattr e capabilities.
 - **Compressione:** nessuna / lz4 / zstd / gzip (gzip = "modalità compatibilità", si apre ovunque).
 - **Cifratura:** opzionale e portatile (`age` + passphrase, o zip AES-256), mai
-  legata all'hardware del dispositivo, così un backup si ripristina su un altro dispositivo o si apre su un PC.
+  legata all'hardware del dispositivo, così un backup si ripristina su un altro dispositivo o si apre su un PC. Un backup cifrato sigilla anche i suoi metadati (permessi, etichetta dell'app, l'elenco dei file), così i file da soli non rivelano nulla, mentre la WebUI continua a elencarlo istantaneamente.
 - **Destinazioni:** locale, SFTP, SCP, SMB, WebDAV, FTP, S3 e oltre 70 (`rclone`),
   oltre ai repository `rsync` e `restic`. Google Drive opzionale tramite un piccolo companion opt-in.
 - **Telegram:** esegui il backup su un canale Telegram privato come archiviazione cloud illimitata tramite MTProto, ripristino ed eliminazione anche dalla WebUI.

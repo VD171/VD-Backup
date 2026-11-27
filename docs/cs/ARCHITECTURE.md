@@ -73,6 +73,15 @@ veřejného vydání dále je příslib níže absolutní:
   každé pole defenzivně (chybějící volitelná pole se vrátí k výchozí hodnotě) a instaluje
   APK a rozbaluje archivy podle jejich názvu souboru a přípony, nikoli předpokládáním pevného
   tvaru manifestu.
+- **Zapečetěná metadata při šifrování.** Když jsou data šifrovaná, je úplný manifest
+  šifrován heslovou frází v `manifest.full.age`, takže záloha neuniká žádná metadata
+  (oprávnění, název aplikace, velikosti, seznam souborů) nikomu, kdo má jen soubory;
+  `manifest.json` zůstává jako malý necitlivý ukazatel, takže každá cesta typu "zde je
+  uložena záloha" stále funguje. Drobný výpisový stub je uchováván dvakrát - šifrovaný
+  klíčem zařízení (WebUI vypisuje rychle bez heslové fráze) a heslovou frází (záloha
+  přesunutá na jiné zařízení tam zůstane vypsatelná). Adresář si ponechává svůj název
+  `<package>/<timestamp>`, takže balíček je to jediné, co cesta stále prozrazuje; vše
+  ostatní je zapečetěno.
 - **Dopředně kompatibilní obnova.** Obnova nikdy neodmítne zálohu kvůli jejímu stáří a
   starší VDBackup tiše přeskočí typy položek, které nezná, místo aby selhal. Novější
   VDBackup proto obnoví jakoukoli starší zálohu a archivy ve standardním formátu zůstávají

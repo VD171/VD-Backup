@@ -2,64 +2,76 @@
 
 All notable changes to VDBackup are documented here. English only.
 
+## v1.19
+
+New:
+
+- Encrypted backups now seal all of their metadata, not just the data: the permissions, the app label and icon, file sizes, the file list and SELinux contexts are all encrypted, so anyone who only gets hold of the backup files learns nothing from them. The Backups list still shows everything instantly on the device that made the backup, and a backup stays portable - it restores on another device and opens on a PC with just the passphrase. ([#42](https://github.com/VD171/VD-Backup/issues/42))
+- The backup details panel gained a "Show details" button for an encrypted backup: enter the passphrase to view its permissions, items and device details on the spot, without restoring anything.
+- The same metadata sealing now covers the special, folder and /data/adb backups too, including their stored file index, not only app backups.
+
+Fixes:
+
+- The flashless update check now fails gracefully when the device is offline or a check is already running, with a clear message, instead of an unhelpful "could not read the response" error.
+
 ## v1.18
 
 New:
 
-- The device ID (SSAID) can now be applied or restored per app, off by default and chosen from the restore dialog, so you can keep it for the apps that rely on it (such as banking) and leave standard behavior everywhere else. (#35)
-- A new "Off" network option blocks every cloud transfer for a backup or restore. (#35)
-- The flashless updater is now ABI-aware: a per-architecture install keeps only its own ABI's files instead of re-fetching the full universal payload, the update bar's dismissal survives a restart, and a new toggle silences it entirely. (#35)
-- Mirror backups now show up in the Backups tab and restore from there, like Full and Snapshot backups. (#38)
+- The device ID (SSAID) can now be applied or restored per app, off by default and chosen from the restore dialog, so you can keep it for the apps that rely on it (such as banking) and leave standard behavior everywhere else. ([#35](https://github.com/VD171/VD-Backup/issues/35))
+- A new "Off" network option blocks every cloud transfer for a backup or restore. ([#35](https://github.com/VD171/VD-Backup/issues/35))
+- The flashless updater is now ABI-aware: a per-architecture install keeps only its own ABI's files instead of re-fetching the full universal payload, the update bar's dismissal survives a restart, and a new toggle silences it entirely. ([#35](https://github.com/VD171/VD-Backup/issues/35))
+- Mirror backups now show up in the Backups tab and restore from there, like Full and Snapshot backups. ([#38](https://github.com/VD171/VD-Backup/issues/38))
 
 Fixes:
 
-- Disabling the automatic-backup option now clears its baseline, so re-enabling it starts fresh from the current state instead of backing up every app that changed while the option was off. (#37)
+- Disabling the automatic-backup option now clears its baseline, so re-enabling it starts fresh from the current state instead of backing up every app that changed while the option was off. ([#37](https://github.com/VD171/VD-Backup/issues/37))
 
 ## v1.17
 
 Fixes:
 
-- A Google Drive backup now stages each archive with the ownership and SELinux context the companion app needs to read it, so uploads no longer fail with a "source not found" error. (#24)
-- A batch backup or restore now retries an app once when it fails for a transient reason (a verification miss, a truncated write, a worker stopped under memory pressure), and counts apps it deliberately skipped (the root manager, or an app that is not installed) separately from real failures. (#5)
-- A failed backup now reports a specific reason (the archive could not be written, it came out incomplete, or the app's APK could not be saved) instead of one generic backup error. (#5)
-- A restore now waits longer for the system to recreate an app's data directory before it sets ownership, so the restored data is reliably owned by the app and readable, even for a large app on a slow device. (#5)
-- A mirror restore no longer deletes live app data when a backed-up component is empty, guarding against data loss from a partial backup. (#5)
-- The app-install verifier is put back on the next boot if a backup or restore is stopped before it can be re-enabled, so the device's install protection is never left off. (#5)
-- The pre-run space check for a batch now measures the correct user's data for a secondary user. (#5)
-- A backup plan no longer miscounts an app whose installed APKs total more than 2 GB. (#5)
+- A Google Drive backup now stages each archive with the ownership and SELinux context the companion app needs to read it, so uploads no longer fail with a "source not found" error. ([#24](https://github.com/VD171/VD-Backup/issues/24))
+- A batch backup or restore now retries an app once when it fails for a transient reason (a verification miss, a truncated write, a worker stopped under memory pressure), and counts apps it deliberately skipped (the root manager, or an app that is not installed) separately from real failures. ([#5](https://github.com/VD171/VD-Backup/issues/5))
+- A failed backup now reports a specific reason (the archive could not be written, it came out incomplete, or the app's APK could not be saved) instead of one generic backup error. ([#5](https://github.com/VD171/VD-Backup/issues/5))
+- A restore now waits longer for the system to recreate an app's data directory before it sets ownership, so the restored data is reliably owned by the app and readable, even for a large app on a slow device. ([#5](https://github.com/VD171/VD-Backup/issues/5))
+- A mirror restore no longer deletes live app data when a backed-up component is empty, guarding against data loss from a partial backup. ([#5](https://github.com/VD171/VD-Backup/issues/5))
+- The app-install verifier is put back on the next boot if a backup or restore is stopped before it can be re-enabled, so the device's install protection is never left off. ([#5](https://github.com/VD171/VD-Backup/issues/5))
+- The pre-run space check for a batch now measures the correct user's data for a secondary user. ([#5](https://github.com/VD171/VD-Backup/issues/5))
+- A backup plan no longer miscounts an app whose installed APKs total more than 2 GB. ([#5](https://github.com/VD171/VD-Backup/issues/5))
 
 ## v1.16
 
 Fixes:
 
-- A Google Drive backup that fails now records the real Drive error (the HTTP code and Drive's message) in the activity log, instead of a generic "try again", so a failed upload can be diagnosed. (#24)
-- The live-progress panel floats in a fixed spot again, the same on every tab, instead of being pinned inline at the bottom of the page. (#24)
-- A partial batch backup now names which apps failed and why, in the activity log and in an on-screen list at the end of the run, not just how many. (#5)
-- A bulk restore can take one optional shared password (with a tick) for backups whose saved password does not open them, it is tried for an app only after its own passphrase fails, so a mixed batch finishes without asking app by app. (#17)
+- A Google Drive backup that fails now records the real Drive error (the HTTP code and Drive's message) in the activity log, instead of a generic "try again", so a failed upload can be diagnosed. ([#24](https://github.com/VD171/VD-Backup/issues/24))
+- The live-progress panel floats in a fixed spot again, the same on every tab, instead of being pinned inline at the bottom of the page. ([#24](https://github.com/VD171/VD-Backup/issues/24))
+- A partial batch backup now names which apps failed and why, in the activity log and in an on-screen list at the end of the run, not just how many. ([#5](https://github.com/VD171/VD-Backup/issues/5))
+- A bulk restore can take one optional shared password (with a tick) for backups whose saved password does not open them, it is tried for an app only after its own passphrase fails, so a mixed batch finishes without asking app by app. ([#17](https://github.com/VD171/VD-Backup/issues/17))
 
 ## v1.15
 
 New:
 
-- Set a default passphrase once and encrypted backups use it automatically: the backup screen no longer asks for it every time, and shows a small note that the backup is encrypted. (#17)
-- Setting a passphrase (the global default, or an app's own) now has a Confirm field and only saves when both match, so a typo can no longer silently lock your backups. (#17)
+- Set a default passphrase once and encrypted backups use it automatically: the backup screen no longer asks for it every time, and shows a small note that the backup is encrypted. ([#17](https://github.com/VD171/VD-Backup/issues/17))
+- Setting a passphrase (the global default, or an app's own) now has a Confirm field and only saves when both match, so a typo can no longer silently lock your backups. ([#17](https://github.com/VD171/VD-Backup/issues/17))
 - Every file in a flashable zip now ships a .sha256 companion that the installer verifies at flash: a corrupt or truncated download is refused instead of installed.
-- Telegram restore is now a full screen: your Telegram backups are listed grouped by app, with names and a search box, so you can find and restore one quickly. (#18)
+- Telegram restore is now a full screen: your Telegram backups are listed grouped by app, with names and a search box, so you can find and restore one quickly. ([#18](https://github.com/VD171/VD-Backup/issues/18))
 - When several backups or restores run at once, the progress area stacks them like a download manager: the newest is expanded, the others collapse to a line with their progress and a close button, with a running count.
-- A new "Reopen apps after a backup" setting brings an app back to the foreground if it was open when its backup started. (#27)
-- You can select several backups and delete them in one go. (#28)
-- Settings has a "Reset / start fresh" option (a guarded danger zone) to wipe the app's own config and/or its backups. (#26)
-- The app list gained a "Show excluded" toggle, and the activity log a "Clear log" button. (#31)
+- A new "Reopen apps after a backup" setting brings an app back to the foreground if it was open when its backup started. ([#27](https://github.com/VD171/VD-Backup/issues/27))
+- You can select several backups and delete them in one go. ([#28](https://github.com/VD171/VD-Backup/issues/28))
+- Settings has a "Reset / start fresh" option (a guarded danger zone) to wipe the app's own config and/or its backups. ([#26](https://github.com/VD171/VD-Backup/issues/26))
+- The app list gained a "Show excluded" toggle, and the activity log a "Clear log" button. ([#31](https://github.com/VD171/VD-Backup/issues/31))
 
 Fixes:
 
-- Restoring an encrypted backup now tries your saved passphrase first and only asks if it does not fit (for example an older backup made with a different password), instead of prompting every time. (#17)
-- The out-of-space message now points you to a remote (Telegram, an rclone cloud, or SFTP/SMB) so only one app needs room at a time. (#5)
-- Large storage is measured correctly: free-space and quota checks no longer overflow on volumes or backups larger than 2 GB. (#33)
-- A snapshot (restic) backup that could not read a few files is no longer reported as failed, the snapshot is still saved, with a note, instead of an error. (#32)
-- Excluding an app now hides it from the list immediately, and clearing the activity log actually empties the on-screen list. (#31)
-- Confirm buttons show a spinner while the action runs instead of a silent pause, and the WebUI boots and scrolls faster with no flash of English before your language loads. (#23)
-- Clearer messages when an operation fails, and more complete translations across all 22 languages. (#22)
+- Restoring an encrypted backup now tries your saved passphrase first and only asks if it does not fit (for example an older backup made with a different password), instead of prompting every time. ([#17](https://github.com/VD171/VD-Backup/issues/17))
+- The out-of-space message now points you to a remote (Telegram, an rclone cloud, or SFTP/SMB) so only one app needs room at a time. ([#5](https://github.com/VD171/VD-Backup/issues/5))
+- Large storage is measured correctly: free-space and quota checks no longer overflow on volumes or backups larger than 2 GB. ([#33](https://github.com/VD171/VD-Backup/issues/33))
+- A snapshot (restic) backup that could not read a few files is no longer reported as failed, the snapshot is still saved, with a note, instead of an error. ([#32](https://github.com/VD171/VD-Backup/issues/32))
+- Excluding an app now hides it from the list immediately, and clearing the activity log actually empties the on-screen list. ([#31](https://github.com/VD171/VD-Backup/issues/31))
+- Confirm buttons show a spinner while the action runs instead of a silent pause, and the WebUI boots and scrolls faster with no flash of English before your language loads. ([#23](https://github.com/VD171/VD-Backup/issues/23))
+- Clearer messages when an operation fails, and more complete translations across all 22 languages. ([#22](https://github.com/VD171/VD-Backup/issues/22))
 - Self-update is safer: an update can no longer replace the module's own updater or signing keys, and it waits for a running backup to finish before applying.
 
 ## v1.14
@@ -77,8 +89,8 @@ Fixes:
 
 New:
 
-- You can set a default encryption passphrase in Settings, and override it per app, so encrypted backups no longer ask for a password every time. (#17)
-- A backup sent to a remote (Telegram or an rclone cloud remote) can now be remote-only: it uploads and keeps no local copy, which saves space and leaves no local trace, with a Settings switch to keep a local copy instead. You can also browse and restore your backups straight from an rclone remote. (#16)
+- You can set a default encryption passphrase in Settings, and override it per app, so encrypted backups no longer ask for a password every time. ([#17](https://github.com/VD171/VD-Backup/issues/17))
+- A backup sent to a remote (Telegram or an rclone cloud remote) can now be remote-only: it uploads and keeps no local copy, which saves space and leaves no local trace, with a Settings switch to keep a local copy instead. You can also browse and restore your backups straight from an rclone remote. ([#16](https://github.com/VD171/VD-Backup/issues/16))
 - A new Staging folder setting lets you choose where a backup is temporarily assembled when it goes to a remote or to external storage, a root-only folder keeps backup data off shared storage.
 
 Fixes:
@@ -105,7 +117,7 @@ Reliability:
 
 Fixes:
 
-- The free-space safeguards now work on every device. The checks that stop a backup before it fills the disk relied on a size measurement that stock Android quietly ignored, so on many devices they never triggered and a long backup could fill internal storage. They now measure space reliably everywhere. (#5)
+- The free-space safeguards now work on every device. The checks that stop a backup before it fills the disk relied on a size measurement that stock Android quietly ignored, so on many devices they never triggered and a long backup could fill internal storage. They now measure space reliably everywhere. ([#5](https://github.com/VD171/VD-Backup/issues/5))
 
 New:
 
@@ -124,7 +136,7 @@ Fixes:
 
 - A backup saved to the sdcard no longer also keeps a copy in internal storage, and deleting it now removes the real file in the location you chose.
 - Updating from your root manager now keeps the edition you installed (lite, full, or your device's architecture) instead of always replacing it with the full edition.
-- A blocked app comes back blocked after a restore even on ROMs that keep the block only in memory. VDBackup now reads the per-app network-access policy straight from the system when backing up, so it is captured even when the ROM has not written it to disk yet. (#9)
+- A blocked app comes back blocked after a restore even on ROMs that keep the block only in memory. VDBackup now reads the per-app network-access policy straight from the system when backing up, so it is captured even when the ROM has not written it to disk yet. ([#9](https://github.com/VD171/VD-Backup/issues/9))
 - Text in the "Updates" panel is now readable in the light theme.
 - Notifications now appear correctly in Indonesian and Ukrainian.
 

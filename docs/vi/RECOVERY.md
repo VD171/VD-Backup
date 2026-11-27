@@ -9,6 +9,14 @@ mà không cần module này. Một thư mục backup chứa một `manifest.jso
 (`*.apk.zst`) và các archive dữ liệu (`<item>.tar.zst`, `.tar.gz` hoặc `.tar.lz4`),
 tùy chọn được mã hóa với một đuôi `.age`.
 
+**Nếu dữ liệu được mã hóa**, siêu dữ liệu cũng được mã hóa, nên không có gì trong đó rò rỉ cho bất
+kỳ ai chỉ có các tập tin. Khi đó thư mục còn chứa `manifest.full.age` (manifest đầy đủ) và hai tập
+tin `stub.*.age` nhỏ. Trong trường hợp đó `manifest.json` chỉ là một điểm đánh dấu nhỏ không nhạy
+cảm; các chi tiết thật nằm trong `manifest.full.age`. Mọi thứ khả chuyển (các archive dữ liệu và
+`manifest.full.age`) giải mã chỉ bằng **cụm mật khẩu** của bạn - xem bước 1. Các tập tin
+`stub.dev.age` / `stub.pass.age` chỉ là bộ nhớ đệm liệt kê trên thiết bị của module; bạn có thể bỏ
+qua chúng trên một PC.
+
 ## Các công cụ bạn có thể cần
 
 - **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
@@ -18,19 +26,18 @@ tùy chọn được mã hóa với một đuôi `.age`.
 
 ## 1. Giải mã (chỉ khi tập tin kết thúc bằng `.age`)
 
-Keyfile (khuyến nghị):
-
-```
-age -d -i age.key -o data.tar.zst  data.tar.zst.age
-```
-
-Cụm mật khẩu:
+Cụm mật khẩu (cách khả chuyển - hoạt động trên bất kỳ PC nào chỉ với cụm mật khẩu của bạn):
 
 ```
 age -d -o data.tar.zst  data.tar.zst.age      # age will prompt for the passphrase
 ```
 
-Làm tương tự cho mỗi tập tin `*.age` (các APK và các archive dữ liệu).
+Làm tương tự cho mỗi tập tin `*.age` (các APK và các archive dữ liệu). Nếu bản backup được mã hóa,
+hãy giải mã `manifest.full.age` theo cùng cách để đọc manifest đầy đủ:
+
+```
+age -d -o manifest.json  manifest.full.age    # the full, readable manifest
+```
 
 ## 2. Giải nén + trích xuất
 
@@ -65,8 +72,10 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 - Các tập tin được trích xuất giữ các đường dẫn tương đối của chúng, context SELinux, uid/gid và modes
   nằm bên trong tar (và chỉ được áp dụng lại đúng khi bạn restore trên Android).
 - `manifest.json` mô tả chính xác mỗi tập tin là gì, phiên bản ứng dụng và
-  chủ sở hữu/context gốc. Nó là nguồn chân lý.
-- Không có gì ở đây bị gắn với một thiết bị cụ thể: cùng cụm mật khẩu/keyfile hoạt động trên bất kỳ
+  chủ sở hữu/context gốc. Nó là nguồn chân lý. Với một bản backup được mã hóa, manifest đầy đủ là
+  `manifest.full.age` (giải mã nó như ở bước 1); `manifest.json` dạng văn bản thuần chỉ là một điểm
+  đánh dấu nhỏ và không mang dữ liệu nhạy cảm.
+- Không có gì ở đây bị gắn với một thiết bị cụ thể: cùng cụm mật khẩu hoạt động trên bất kỳ
   máy nào.
 
 <!-- doc-footer -->

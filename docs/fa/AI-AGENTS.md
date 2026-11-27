@@ -63,13 +63,13 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (پیوند دوباره پس از اتصال مجدد) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | فهرست برنامه‌ها / آیکون‌های base64 به‌صورت دسته‌ای |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = فراداده مهروموم است؛ `locked` = رمزنگاری‌شده و این دستگاه حتی stub فهرست‌سازی را هم نمی‌تواند بخواند، مثلاً پشتیبانی از دستگاهی دیگر - با عبارت‌عبور هنوز بازیابی می‌شود) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` نام سفارشی یک پشتیبان (`note`) و `tags` آزاد را تنظیم یا پاک می‌کند؛ در یک فایل جانبی که همراه پشتیبان حرکت می‌کند ذخیره می‌شود و از `list-backups` قابل جست‌وجو است. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` کاربران اندروید دستگاه (چندکاربره). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` زیرشاخه‌های یک مسیر (انتخابگر پوشه). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` پشتیبان‌های مستقل پوشه/فایل. |
 | `provenance` | `{}` | مانیفست حسابرسی باینری‌های همراه (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` جزئیات کامل یک پشتیبان (نسخه، منبع نصب، وضعیت، تاریخ، حالت، اندازه، اقلام، شمار مجوزها، دستگاه) |
+| `backup-info` | `{ref}` | `{ok,...}` جزئیات کامل یک پشتیبان (نسخه، منبع نصب، وضعیت، تاریخ، حالت، اندازه، اقلام، شمار مجوزها، دستگاه)؛ برای یک پشتیبان رمزنگاری‌شده مقدار `encrypted:true` را فقط با فیلدهای سطحِ stub بازمی‌گرداند (جزئیات کامل مهروموم است و هنگام بازیابی، با عبارت‌عبور، دیده می‌شود) |
 | `backup-icon` | `{ref}` | `{ok,icon}` ‏base64 PNG از مانیفست (حتی وقتی برنامه حذف نصب شده کار می‌کند) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref باید زیر دایرکتوری پشتیبان‌ها باشد) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` ‏N تای جدیدترینِ یک بسته را نگه می‌دارد |

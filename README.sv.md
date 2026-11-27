@@ -83,6 +83,7 @@ importera befintliga säkerhetskopior från Neo-Backup och Android-DataBackup s�
 - **Komprimering:** ingen / lz4 / zstd / gzip (gzip = "kompatibilitetsläge", öppnas överallt).
 - **Kryptering:** valfri och portabel (`age` + lösenfras eller AES-256-zip), aldrig bunden
   till enhetens hårdvara, så att en säkerhetskopia återställs på en annan enhet eller öppnas på en dator.
+  En krypterad säkerhetskopia förseglar även sin metadata (behörigheter, appens etikett, fillistan), så enbart filerna avslöjar ingenting, medan WebUI fortfarande listar den direkt.
 - **Destinationer:** lokalt, SFTP, SCP, SMB, WebDAV, FTP, S3 och 70+ till (`rclone`),
   plus `rsync`-förråd och `restic`-förråd. Valfritt Google Drive via en pytteliten valfri följeslagare.
 - **Telegram:** säkerhetskopiera till en privat Telegram-kanal som obegränsad molnlagring via MTProto, återställ och ta bort även från WebUI.

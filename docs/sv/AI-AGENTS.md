@@ -58,13 +58,13 @@ destinationer (`rclone`/`restic`/ssh) kommunicerar med nätverket.
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (återanslut efter återanslutning) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | applista / base64-ikoner i batch |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = metadatan är förseglad; `locked` = krypterad och den här enheten kan inte ens läsa listningsstubben, t.ex. en säkerhetskopia från en annan enhet - den återställs ändå med lösenfrasen) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` anger eller rensar en säkerhetskopias egna namn (`note`) och fria `tags`, lagras i en följefil som följer med säkerhetskopian, sökbar från `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` enhetens Android-användare (fleranvändare). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` underkataloger för en sökväg (mappväljare). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` fristående mapp-/filsäkerhetskopior. |
 | `provenance` | `{}` | granskningsmanifest för medföljande binärer (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` en säkerhetskopias fullständiga detaljer (version, installationskälla, tillstånd, datum, läge, storlek, objekt, behörighetsantal, enhet) |
+| `backup-info` | `{ref}` | `{ok,...}` en säkerhetskopias fullständiga detaljer (version, installationskälla, tillstånd, datum, läge, storlek, objekt, behörighetsantal, enhet); för en krypterad säkerhetskopia returnerar den `encrypted:true` med endast fälten på stubbnivå (den fullständiga detaljen är förseglad och ses vid återställning, med lösenfrasen) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG från manifestet (fungerar när appen är avinstallerad) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref måste ligga under backup-katalogen) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` behåller de N senaste av ett paket |

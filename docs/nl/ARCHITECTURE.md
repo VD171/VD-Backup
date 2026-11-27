@@ -74,6 +74,15 @@ belofte absoluut:
   elk veld defensief (ontbrekende optionele velden vallen terug op een standaard) en installeert
   APK's en pakt archieven uit op basis van hun bestandsnaam en extensie, niet door een vaste
   manifestvorm aan te nemen.
+- **Verzegelde metadata bij versleuteling.** Wanneer de data is versleuteld, wordt het volledige
+  manifest met de wachtwoordzin versleuteld in `manifest.full.age`, zodat een backup geen metadata
+  (machtigingen, app-label, groottes, de bestandslijst) lekt naar wie alleen de bestanden heeft,
+  `manifest.json` blijft een kleine, niet-gevoelige markering zodat elk pad dat uitgaat van "hier
+  staat een backup" blijft werken. Een piepkleine listing-stub wordt tweemaal bewaard - versleuteld
+  met een apparaatsleutel (de WebUI vermeldt snel zonder de wachtwoordzin) en met de wachtwoordzin
+  (een backup die naar een ander apparaat is verplaatst blijft daar vermeldbaar). De map houdt zijn
+  `<package>/<timestamp>`-naam, dus het pakket is het enige wat het pad nog prijsgeeft, al het
+  andere is verzegeld.
 - **Voorwaarts compatibel herstel.** Restore weigert een backup nooit omdat deze oud is, en een
   ouder VDBackup slaat stilletjes itemtypen over die het niet kent in plaats van te falen. Een nieuwer
   VDBackup herstelt daarom elk ouder backup, en de standaardformaat-archieven blijven hoe dan ook

@@ -28,6 +28,6 @@ window.VDLU_I18N_TR = {
   ahead: 'Akıştan daha yeni', aheadSub: 'sürümünüz yayımlanan güncellemeden daha yeni', silentUpdate: 'Sessiz güncelleme', silentUpdateSub: 'Güncellemeleri yeniden başlatma çubuğunu göstermeden arka planda uygular.',
   deferred: 'İndirme ertelendi', deferredSub: 'izin verilen ağ bekleniyor, sonraki denetimde sürdürülecek',
   updateAvail: 'Güncelleme mevcut', install: 'yükle', fileOne: 'dosya', fileMany: 'dosya',
-  requiresReboot: 'yeniden başlatma gerektirir', checkFail: 'Denetim başarısız', ksuUnavailable: 'KSU API kullanılamıyor',
+  requiresReboot: 'yeniden başlatma gerektirir', checkFail: 'Denetim başarısız', offline: 'Çevrimdışı', busy: 'Bir denetim zaten çalışıyor', ksuUnavailable: 'KSU API kullanılamıyor',
   pendingUpdate: 'Bekleyen güncelleme', notNow: 'Şimdi değil', srcPlaceholder: 'https://…/&lt;modül&gt;'
 };

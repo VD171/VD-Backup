@@ -60,13 +60,13 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (再接続後に再アタッチ) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | アプリ一覧 / バッチの base64 アイコン |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}`（`encrypted` = メタデータが封印されている、`locked` = 暗号化されていて、このデバイスでは一覧用スタブすら読めない、例えば別のデバイスからのバックアップ - それでもパスフレーズで復元できます） |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` バックアップのカスタム名（`note`）と自由な `tags` を設定またはクリアします。バックアップと一緒に移動するサイドカーに保存され、`list-backups` から検索できます。 |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` デバイスの Android ユーザー（マルチユーザー）. |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` パスのサブディレクトリ（フォルダ選択）. |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` 単体のフォルダ/ファイルのバックアップ. |
 | `provenance` | `{}` | 同梱バイナリの監査マニフェスト (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` 1 つの backup の全詳細 (バージョン, インストール元, 状態, 日付, mode, サイズ, items, 権限数, デバイス) |
+| `backup-info` | `{ref}` | `{ok,...}` 1 つの backup の全詳細 (バージョン, インストール元, 状態, 日付, mode, サイズ, items, 権限数, デバイス); 暗号化されたバックアップでは `encrypted:true` とスタブレベルのフィールドだけを返します（完全な詳細は封印されており、パスフレーズを使った復元時に見られます） |
 | `backup-icon` | `{ref}` | `{ok,icon}` manifest からの base64 PNG (アプリがアンインストールされていても動作) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref は backups ディレクトリ配下でなければならない) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` パッケージの最新 N 個を保持 |

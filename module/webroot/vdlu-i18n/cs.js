@@ -28,6 +28,6 @@ window.VDLU_I18N_CS = {
   ahead: 'Novější než kanál', aheadSub: 'vaše verze je novější než zveřejněná aktualizace', silentUpdate: 'Tichá aktualizace', silentUpdateSub: 'Použije aktualizace na pozadí bez zobrazení lišty restartu.',
   deferred: 'Stahování odloženo', deferredSub: 'čeká na povolenou síť, obnoví se při příští kontrole',
   updateAvail: 'Dostupná aktualizace', install: 'instalovat', fileOne: 'soubor', fileMany: 'souborů',
-  requiresReboot: 'vyžaduje restart', checkFail: 'Kontrola selhala', ksuUnavailable: 'API KSU nedostupné',
+  requiresReboot: 'vyžaduje restart', checkFail: 'Kontrola selhala', offline: 'Offline', busy: 'Kontrola již probíhá', ksuUnavailable: 'API KSU nedostupné',
   pendingUpdate: 'Čekající aktualizace', notNow: 'Teď ne', srcPlaceholder: 'https://…/&lt;modul&gt;'
 };

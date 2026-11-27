@@ -256,6 +256,14 @@ sistemindeki herhangi bir standart `age` aracı, yedeğinizi yalnızca parolayla
 tıklama ve parola ile açmak istediğiniz şifrelenmiş arşivler için uyumlu bir AES-256 zip
 modu da mevcuttur.)
 
+Bir yedek şifrelendiğinde, **üst verisi de mühürlenir** - izinler, uygulama etiketi, dosya
+boyutları ve dosya listesinin tümü şifrelenir, böylece yalnızca dosyaları ele geçiren biri (bir
+bulut kopyası, çıkarılmış bir SD kart) onlardan hiçbir şey öğrenemez. WebUI şifreli yedeklerinizi
+yine de anında listeler, çünkü küçük bir listeleme saplaması yalnızca cihaza özgü bir anahtarla
+şifrelenmiş olarak tutulur; başka bir cihaza taşınan bir yedek, parolasını girdiğinizde orada
+listelenebilir kalır. Klasör adında yalnızca uygulamanın paket adı görünür kalır, böylece yedekler
+taşınabilir ve yönetimi kolay kalır.
+
 Şifrelemeyi kullanmak için şifreleme anahtarını bir kez oluşturun (Settings), ardından
 işiniz için şifrelemeyi etkinleştirin ve bir parola belirleyin. Yedeği koruyan şey
 paroladır, bu yüzden güçlü bir tane seçin, donanım anahtarı ve kurtarma arka kapısı

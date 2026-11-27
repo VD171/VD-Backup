@@ -28,6 +28,6 @@ window.VDLU_I18N_UK = {
   ahead: 'Новіша за канал', aheadSub: 'ваша версія новіша за опубліковане оновлення', silentUpdate: 'Тихе оновлення', silentUpdateSub: 'Застосовує оновлення у фоні, не показуючи панель перезавантаження.',
   deferred: 'Завантаження відкладено', deferredSub: 'очікування дозволеної мережі, відновиться за наступної перевірки',
   updateAvail: 'Доступне оновлення', install: 'встановити', fileOne: 'файл', fileMany: 'файлів',
-  requiresReboot: 'потрібне перезавантаження', checkFail: 'Помилка перевірки', ksuUnavailable: 'API KSU недоступний',
+  requiresReboot: 'потрібне перезавантаження', checkFail: 'Помилка перевірки', offline: 'Офлайн', busy: 'Перевірка вже виконується', ksuUnavailable: 'API KSU недоступний',
   pendingUpdate: 'Очікуване оновлення', notNow: 'Не зараз', srcPlaceholder: 'https://…/&lt;модуль&gt;'
 };

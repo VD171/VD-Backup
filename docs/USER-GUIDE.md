@@ -253,6 +253,14 @@ Encryption is **never** tied to your device's hardware keys, so an encrypted bac
 restores on another device and opens on a PC. (A compatible AES-256 zip mode is also
 available for encrypted archives you want to open with a double-click and a password.)
 
+When a backup is encrypted, its **metadata is sealed too** - the permissions, the app
+label, the file sizes and the file list are all encrypted, so anyone who only gets hold
+of the files (a cloud copy, a removed SD card) learns nothing from them. The WebUI still
+lists your encrypted backups instantly, because a small listing stub is kept encrypted to
+a device-only key; a backup moved to another device stays listable there once you enter
+its passphrase. Only the app's package name stays visible in the folder name, so the
+backups stay portable and easy to manage.
+
 To use encryption, generate the encryption key once (Settings), then enable
 encryption for your job and set a passphrase. The passphrase is what protects the
 backup, so choose a strong one, there is no hardware key and no recovery backdoor.

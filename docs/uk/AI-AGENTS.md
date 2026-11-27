@@ -59,13 +59,13 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (знову приєднатися після повторного під'єднання) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | список застосунків / пакет base64-піктограм |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = метадані запечатані; `locked` = зашифровано, і цей пристрій не може прочитати навіть заглушку списку, напр. резервна копія з іншого пристрою - вона все одно відновлюється парольною фразою) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` задає або очищує власну назву резервної копії (`note`) та вільні `tags`, зберігається у супровідному файлі, що подорожує разом із копією, доступний для пошуку з `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` користувачі Android пристрою (багатокористувацькість). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` підтеки шляху (засіб вибору теки). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` окремі резервні копії теки/файлу. |
 | `provenance` | `{}` | маніфест аудиту вбудованих бінарників (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` повні деталі однієї резервної копії (версія, джерело встановлення, стан, дата, режим, розмір, елементи, лічильники дозволів, пристрій) |
+| `backup-info` | `{ref}` | `{ok,...}` повні деталі однієї резервної копії (версія, джерело встановлення, стан, дата, режим, розмір, елементи, лічильники дозволів, пристрій); для зашифрованої резервної копії повертається `encrypted:true` лише з полями рівня заглушки (повні деталі запечатані й видимі під час відновлення, з парольною фразою) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG з маніфесту (працює, коли застосунок видалено) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref має бути під текою резервних копій) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` залишити N найновіших для пакунка |

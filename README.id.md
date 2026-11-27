@@ -82,7 +82,7 @@ mengimpor cadangan Neo-Backup dan Android-DataBackup yang sudah ada agar Anda bi
 - **Pelestarian setia:** konteks SELinux, uid/gid, mode, xattr dan kapabilitas.
 - **Kompresi:** tidak ada / lz4 / zstd / gzip (gzip = "mode kompatibilitas", terbuka di mana saja).
 - **Enkripsi:** opsional dan portabel (`age` + frasa sandi, atau zip AES-256), tidak pernah
-  terikat ke perangkat keras, sehingga sebuah cadangan dapat dipulihkan di perangkat lain atau dibuka di PC.
+  terikat ke perangkat keras, sehingga sebuah cadangan dapat dipulihkan di perangkat lain atau dibuka di PC. Sebuah cadangan terenkripsi juga menyegel metadata-nya (izin, label aplikasi, daftar berkas), sehingga berkasnya saja tidak mengungkap apa pun, sementara WebUI tetap mendaftarnya seketika.
 - **Tujuan:** lokal, SFTP, SCP, SMB, WebDAV, FTP, S3 dan 70+ lainnya (`rclone`),
   ditambah repo `rsync` dan `restic`. Google Drive opsional melalui pendamping kecil yang opt-in.
 - **Telegram:** cadangkan ke saluran Telegram pribadi sebagai penyimpanan cloud tanpa batas melalui MTProto, pulihkan dan hapus juga dari WebUI.

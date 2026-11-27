@@ -247,6 +247,14 @@ phục được trên một thiết bị khác và mở được trên một PC.
 cũng có sẵn cho các kho lưu trữ đã mã hóa mà bạn muốn mở bằng một cú nhấp đúp và một mật
 khẩu.)
 
+Khi một bản sao lưu được mã hóa, **siêu dữ liệu của nó cũng được niêm phong** - các quyền, nhãn
+ứng dụng, kích thước tập tin và danh sách tập tin đều được mã hóa, nên bất kỳ ai chỉ lấy được các
+tập tin (một bản sao trên đám mây, một thẻ SD đã tháo ra) chẳng học được gì từ chúng. WebUI vẫn
+liệt kê các bản sao lưu đã mã hóa của bạn tức thì, vì một stub liệt kê nhỏ được giữ ở dạng mã hóa
+bằng một khóa chỉ dành cho thiết bị; một bản sao lưu được chuyển sang thiết bị khác vẫn liệt kê
+được ở đó một khi bạn nhập cụm mật khẩu của nó. Chỉ tên gói của ứng dụng vẫn hiển thị trong tên
+thư mục, nên các bản sao lưu vẫn khả chuyển và dễ quản lý.
+
 Để dùng mã hóa, tạo khóa mã hóa một lần (Settings), rồi bật mã hóa cho công việc của bạn và
 đặt một cụm mật khẩu. Cụm mật khẩu là thứ bảo vệ bản sao lưu, vậy nên hãy chọn một cụm mạnh
 - không có khóa phần cứng và không có cửa hậu khôi phục.

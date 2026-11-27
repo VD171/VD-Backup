@@ -74,6 +74,16 @@ untenstehende Versprechen absolut:
   jedes Feld defensiv (fehlende optionale Felder fallen auf einen Standard zurück) und installiert
   APKs und entpackt Archive anhand ihres Dateinamens und ihrer Erweiterung, nicht durch die Annahme einer festen
   Manifest-Form.
+- **Versiegelte Metadaten bei Verschlüsselung.** Wenn die Daten verschlüsselt sind, wird das
+  vollständige Manifest mit der Passphrase in `manifest.full.age` verschlüsselt, sodass ein
+  Backup keine Metadaten (Berechtigungen, App-Bezeichnung, Größen, die Dateiliste) an jemanden
+  preisgibt, der nur die Dateien hat; `manifest.json` bleibt ein kleiner, nicht sensibler
+  Marker, sodass jeder "hier liegt ein Backup"-Pfad weiterhin funktioniert. Ein winziger
+  Auflistungs-Stub wird zweimal vorgehalten - verschlüsselt mit einem Geräteschlüssel (die
+  WebUI listet schnell ohne die Passphrase auf) und mit der Passphrase (ein auf ein anderes
+  Gerät verschobenes Backup bleibt dort auflistbar). Das Verzeichnis behält seinen
+  `<package>/<timestamp>`-Namen, sodass das Paket das Einzige ist, was der Pfad noch verrät;
+  alles andere ist versiegelt.
 - **Vorwärtskompatible Wiederherstellung.** Restore lehnt ein Backup nie wegen seines Alters ab, und ein
   älteres VDBackup überspringt stillschweigend Elementtypen, die es nicht kennt, statt zu scheitern. Ein neueres
   VDBackup stellt daher jedes ältere Backup wieder her, und die Standardformat-Archive bleiben ohnehin

@@ -9,6 +9,14 @@ VDBackup 백업은 **표준 형식**을 사용하므로, 이 모듈 없이 어�
 (`<item>.tar.zst`, `.tar.gz` 또는 `.tar.lz4`)가 들어 있으며, 선택적으로 끝에 `.age`가
 붙어 암호화됩니다.
 
+**데이터가 암호화된 경우**, 메타데이터도 함께 암호화되므로 파일만 가진 사람에게는 아무것도
+새어 나가지 않습니다. 이 경우 폴더에는 `manifest.full.age`(전체 manifest)와 두 개의 작은
+`stub.*.age` 파일도 들어 있습니다. 이때 `manifest.json`은 민감하지 않은 작은 표시자일
+뿐이며, 실제 세부 정보는 `manifest.full.age`에 있습니다. 이식 가능한 모든 것(데이터
+아카이브와 `manifest.full.age`)은 **passphrase**만으로 복호화됩니다 - 1단계를 참조하세요.
+`stub.dev.age` / `stub.pass.age` 파일은 모듈의 기기 내 목록 캐시일 뿐이므로, PC에서는
+무시해도 됩니다.
+
 ## 필요할 수 있는 도구
 
 - **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
@@ -18,19 +26,18 @@ VDBackup 백업은 **표준 형식**을 사용하므로, 이 모듈 없이 어�
 
 ## 1. 복호화 (파일이 `.age`로 끝나는 경우에만)
 
-Keyfile (권장):
-
-```
-age -d -i age.key -o data.tar.zst  data.tar.zst.age
-```
-
-Passphrase:
+Passphrase (이식 가능한 방법 - passphrase만 있으면 어떤 PC에서든 동작):
 
 ```
 age -d -o data.tar.zst  data.tar.zst.age      # age will prompt for the passphrase
 ```
 
-각 `*.age` 파일(APK와 데이터 아카이브)에 대해 동일하게 하세요.
+각 `*.age` 파일(APK와 데이터 아카이브)에 대해 동일하게 하세요. 백업이 암호화된 경우,
+전체 manifest를 읽으려면 같은 방식으로 `manifest.full.age`도 복호화하세요:
+
+```
+age -d -o manifest.json  manifest.full.age    # the full, readable manifest
+```
 
 ## 2. 압축 해제 + 추출
 
@@ -65,8 +72,10 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 - 추출된 파일은 상대 경로를 유지합니다, SELinux 컨텍스트, uid/gid, modes는
   tar 안에 있습니다 (그리고 Android에서 복원할 때만 제대로 재적용됩니다).
 - `manifest.json`은 각 파일이 정확히 무엇인지, 앱 버전, 원래 소유자/컨텍스트를
-  설명합니다. 그것이 진실의 원천입니다.
-- 여기 있는 어떤 것도 특정 장치에 묶여 있지 않습니다: 동일한 passphrase/keyfile이
+  설명합니다. 그것이 진실의 원천입니다. 암호화된 백업의 경우 전체 manifest는
+  `manifest.full.age`입니다(1단계처럼 복호화하세요), 평문 `manifest.json`은 작은
+  표시자일 뿐이며 민감한 데이터를 담고 있지 않습니다.
+- 여기 있는 어떤 것도 특정 장치에 묶여 있지 않습니다: 동일한 passphrase가
   어떤 기계에서든 작동합니다.
 
 <!-- doc-footer -->

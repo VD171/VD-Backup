@@ -232,6 +232,14 @@ Le chiffrement n'est **jamais** lié aux clés matérielles de votre appareil, d
 se restaure sur un autre appareil et s'ouvre sur un PC. (Un mode zip AES-256 compatible est aussi
 disponible pour les archives chiffrées que vous voulez ouvrir d'un double-clic avec un mot de passe.)
 
+Quand une sauvegarde est chiffrée, ses **métadonnées sont scellées aussi** - les permissions, le nom de
+l'app, les tailles de fichiers et la liste des fichiers sont toutes chiffrées, donc quiconque ne met la main
+que sur les fichiers (une copie cloud, une carte SD retirée) n'en apprend rien. La WebUI liste quand même vos
+sauvegardes chiffrées instantanément, car un petit stub de listage est conservé chiffré avec une clé propre à
+l'appareil ; une sauvegarde déplacée vers un autre appareil y reste listable dès que vous saisissez sa phrase
+secrète. Seul le nom de package de l'app reste visible dans le nom du dossier, donc les sauvegardes restent
+portables et faciles à gérer.
+
 Pour utiliser le chiffrement, générez une fois la clé de chiffrement (Settings), puis activez
 le chiffrement pour votre tâche et définissez une phrase secrète. La phrase secrète est ce qui protège la
 sauvegarde, choisissez-en donc une forte, il n'y a pas de clé matérielle et pas de porte dérobée de récupération.

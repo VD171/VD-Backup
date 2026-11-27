@@ -73,6 +73,15 @@ desarrollo no están cubiertas. Desde la primera versión pública en adelante, 
   cada campo de forma defensiva (los campos opcionales ausentes caen en un valor por defecto) e instala
   APKs y extrae archives por su nombre y extensión de archivo, sin asumir una forma fija de
   manifest.
+- **Metadatos sellados cuando está cifrado.** Cuando los datos están cifrados, el manifest
+  completo se cifra con la passphrase en `manifest.full.age`, así que un backup no filtra ningún
+  metadato (permisos, etiqueta de la app, tamaños, la lista de archivos) a quien solo tenga los
+  archivos; `manifest.json` queda como un pequeño marcador no sensible para que toda ruta del tipo
+  "aquí vive un backup" siga funcionando. Se guarda dos veces un stub de listado diminuto - cifrado
+  con una clave del dispositivo (la WebUI lista rápido sin la passphrase) y con la passphrase (un
+  backup movido a otro dispositivo sigue siendo listable allí). El directorio conserva su nombre
+  `<package>/<timestamp>`, así que el paquete es lo único que la ruta todavía revela; todo lo demás
+  queda sellado.
 - **Restauración compatible hacia adelante.** La restauración nunca rechaza un backup por ser antiguo, y un
   VDBackup más antiguo silenciosamente omite tipos de ítem que no conoce en vez de fallar. Un VDBackup más nuevo
   por tanto restaura cualquier backup más antiguo, y los archives en formato estándar siguen siendo

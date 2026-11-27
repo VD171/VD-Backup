@@ -28,6 +28,6 @@ window.VDLU_I18N_TH = {
   ahead: 'ใหม่กว่าฟีด', aheadSub: 'เวอร์ชันของคุณใหม่กว่าการอัปเดตที่เผยแพร่', silentUpdate: 'อัปเดตแบบเงียบ', silentUpdateSub: 'ใช้การอัปเดตในพื้นหลังโดยไม่แสดงแถบรีบูต',
   deferred: 'เลื่อนการดาวน์โหลด', deferredSub: 'กำลังรอเครือข่ายที่อนุญาต จะทำต่อเมื่อตรวจครั้งถัดไป',
   updateAvail: 'มีการอัปเดต', install: 'ติดตั้ง', fileOne: 'ไฟล์', fileMany: 'ไฟล์',
-  requiresReboot: 'ต้องรีบูต', checkFail: 'ตรวจสอบไม่สำเร็จ', ksuUnavailable: 'ไม่สามารถใช้ KSU API ได้',
+  requiresReboot: 'ต้องรีบูต', checkFail: 'ตรวจสอบไม่สำเร็จ', offline: 'ออฟไลน์', busy: 'กำลังตรวจสอบอยู่แล้ว', ksuUnavailable: 'ไม่สามารถใช้ KSU API ได้',
   pendingUpdate: 'การอัปเดตที่รอดำเนินการ', notNow: 'ยังไม่ใช่ตอนนี้', srcPlaceholder: 'https://…/&lt;โมดูล&gt;'
 };

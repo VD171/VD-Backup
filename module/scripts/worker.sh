@@ -195,8 +195,8 @@ ssaid_restore() {
 
 # Per-app network policy (opt-in). Some ROMs (LineageOS and derivatives) store a per-app
 # "deny network" toggle as a <uid-policy uid=.. policy=..> entry in /data/system/netpolicy.xml
-# (ABX), keyed by uid, not an AppOp, so it is not carried by the permission/appops path
-# (issue #9). On restore the app gets a fresh uid, so the captured policy is written for the
+# (ABX), keyed by uid, not an AppOp, so it is not carried by the permission/appops path.
+# On restore the app gets a fresh uid, so the captured policy is written for the
 # NEW uid: decode the ABX, update-or-insert the uid-policy, verify a round-trip, back up the
 # live file byte-exact, then overwrite. Applies after reboot (the service caches it).
 netpolicy_restore() {   # <pkg> <user> <policy-int>
@@ -205,7 +205,7 @@ netpolicy_restore() {   # <pkg> <user> <policy-int>
   _nuid="$(stat -c %u "/data/user/$_u/$_p" 2>/dev/null)"; case "$_nuid" in ''|*[!0-9]*) audit "netpolicy no uid $_p"; return 0 ;; esac
   # Preferred: apply the policy through NetworkPolicyManager (setUidPolicy), which applies it
   # live and persists it itself. Editing netpolicy.xml behind the running service is unreliable
-  # - NPMS rewrites that file, so the offline edit never took even after a reboot (issue #9).
+  # - NPMS rewrites that file, so the offline edit never took even after a reboot.
   # The XML path below stays as a fallback for ROMs where the framework call is unavailable.
   if [ -f "$MODDIR/etc/vdbackup_helper.dex" ]; then
     _hr="$(LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" \
@@ -289,13 +289,13 @@ _release_wakelock() { echo "vdbackup_$OPID" > /sys/power/wake_unlock 2>/dev/null
 # Release the wakelock + restore state on EVERY exit path. The clean-exit path and the
 # termination signals all run through the single EXIT trap (cleanup). SIGKILL cannot be
 # trapped, but the oom_score_adj above makes the LMK pick something else first.
-# issue #5: a prior `trap _release_wakelock EXIT` here was silently overridden by the
-# `trap cleanup EXIT` that followed (a second trap on a signal REPLACES the first), so a
-# cleanly-finished worker never released its wakelock and kept the device awake. Folding the
-# release into cleanup, and routing the signals into the same trap, fixes it for good.
+# A second trap on a signal REPLACES the first, so a standalone `trap _release_wakelock EXIT`
+# here would be silently overridden by the `trap cleanup EXIT` that follows, leaving a
+# cleanly-finished worker's wakelock held and the device awake. The release is folded into
+# cleanup, and the signals are routed into the same trap.
 # also reap this op's staging transients (dump/xe/ic/batch/restore/...): a kill anywhere,
 # even during preparing (before the per-op DEST trap in do_backup arms), leaves no scratch.
-# #27: optionally bring back an app that freeze() quiesced for a consistent snapshot (it was running
+# optionally bring back an app that freeze() quiesced for a consistent snapshot (it was running
 # when the op started). Best-effort launcher nudge, only when the user turned on "relaunch after
 # backup". Runs from cleanup(), which a batch skips per item (the parent cleans up) - so batch runs
 # do not flip each app to the foreground; it is the single manual/one-app op that gets its app back.
@@ -403,7 +403,7 @@ net_transport() {
 net_guard() {
   _pol="$(cfg .network_policy)"
   # "off": the user disabled network transfers entirely - block every cloud op regardless of
-  # the active transport (issue #35). wifi/mobile gate by transport; anything else = unrestricted.
+  # the active transport. wifi/mobile gate by transport; anything else = unrestricted.
   case "$_pol" in
     off) audit "network policy OFF: cloud transfer blocked $PKG"; finish false ERR_NET_POLICY; return 1 ;;
     wifi|mobile) ;;
@@ -416,9 +416,13 @@ net_guard() {
   return 1
 }
 
-# pm install-create flags: -r replace, -t allow test, -d allow downgrade, and
-# --bypass-low-target-sdk-block where the platform supports it, so restoring an
-# older or old-targetSdk build succeeds where a plain install would fail.
+# pm install-create flags: -r replace, -t allow test, -d allow downgrade,
+# --bypass-low-target-sdk-block where the platform supports it (so an older or old-targetSdk
+# build restores), and -g to grant the requested runtime permissions at install. Without -g a
+# FRESH install (restore after uninstall) comes up with perms revoked and restricted ones (SMS,
+# CALL_LOG, CONTACTS) not whitelisted, so fwstate_apply's plain `pm grant` silently fails on
+# them; -g gives the same baseline an over-install keeps, then fwstate_apply refines grant/revoke
+# to match the backup exactly.
 # force-stop the target app for a consistent snapshot, but NEVER the Drive
 # companion (could be mid-upload) or the framework itself.
 freeze() {
@@ -439,15 +443,15 @@ freeze() {
   # `am force-stop`. Every `am`/`cmd activity force-stop` is an ActivityManager binder
   # transaction, and ~100-120 of them in a bulk backup exhaust the binder/transaction buffer
   # ("Failure calling service activity: Failed transaction (2147483646)"), which failed the
-  # rest of the batch and left the run hung (issue #5). v1.08 cut the count to running apps
-  # only, but the wall merely moved to ~120 - the AMS call itself is the problem. kill makes
+  # rest of the batch and left the run hung. Limiting force-stop to running apps
+  # only still moves the wall to ~120 - the AMS call itself is the problem. kill makes
   # ZERO AMS calls, so it scales to any number of apps. Kill every process of the app's uid
   # (the main process AND its :sub-processes, which a `pidof` comm match alone would miss).
   # Only for an app uid: a system app can share uid 1000 with system_server, and killing that
   # whole uid soft-reboots the phone, so a system-range uid falls back to the pidof match (which
   # only hits the named app's processes). Android uid = userId*100000 + appId; appId >= 10000 is
   # a real app. Read the per-user data dir so the right user's app is measured.
-  _THAW="$1"   # #27: a running app is being quiesced; cleanup() relaunches it if the toggle is on
+  _THAW="$1"   # a running app is being quiesced; cleanup() relaunches it if the toggle is on
   _fu="$(stat -c %u "/data/user/${U:-0}/$1" 2>/dev/null)"
   case "$_fu" in ''|*[!0-9]*) _fu=0 ;; esac
   if [ $(( _fu % 100000 )) -lt 10000 ]; then kill -9 $(pidof "$1" 2>/dev/null) 2>/dev/null || true; return 0; fi
@@ -459,7 +463,7 @@ freeze() {
 PM_FLAGS=""
 pm_install_flags() {
   if [ -z "$PM_FLAGS" ]; then
-    PM_FLAGS="-r -t -d"
+    PM_FLAGS="-r -t -d -g"
     fw pm install-create --help 2>&1 | grep -q 'bypass-low-target-sdk-block' \
       && PM_FLAGS="$PM_FLAGS --bypass-low-target-sdk-block"
   fi
@@ -530,8 +534,8 @@ verifier_off() {
   # Recover the TRUE pre-disable values from a surviving snapshot (a prior op was -9 killed before
   # its restore ran, so the live settings are already the disabled 0 and reading them now would lose
   # the original); otherwise snapshot the live values and PERSIST them, so the boot-sweep can put
-  # them back if THIS op is killed before verifier_restore runs (issue #5: an uncatchable kill
-  # otherwise leaves the device package verifier disabled for good).
+  # them back if THIS op is killed before verifier_restore runs: an uncatchable kill
+  # otherwise leaves the device package verifier disabled.
   if [ -f "$STATE/verifier.snap" ]; then
     VERIFIER_OLD="$(sed -n 1p "$STATE/verifier.snap" 2>/dev/null)"
     PKGVERIF_OLD="$(sed -n 2p "$STATE/verifier.snap" 2>/dev/null)"
@@ -557,7 +561,7 @@ verifier_restore() {
 # Wait for the package manager to (re)create an app's data dir after install, so the live uid and
 # SELinux context can be read before we chown the restored tree onto it. A large app on a slow
 # device can take well over 5s; 15s avoids a race that left LIVEU=0 and the data root-owned and
-# unreadable by the app (issue #5). Returns 1 if the dir never appears, so callers can tell.
+# unreadable by the app. Returns 1 if the dir never appears, so callers can tell.
 wait_datadir() { _w=0; while [ "$_w" -lt 75 ]; do [ -d "$1" ] && return 0; exec_ns sleep 0.2 2>/dev/null; _w=$((_w+1)); done; return 1; }
 # install_ok <op>: after a restore's APK-install step, the package must actually be installed for
 # $U - otherwise we would chown/restore data into a package that is not there. Fail ERR_INSTALL
@@ -567,8 +571,8 @@ install_ok() {
   audit "$1: APK install failed for $PKG"; finish false ERR_INSTALL; return 1
 }
 
-# Re-map ownership + SELinux label of a restored tree onto the freshly installed app
-# (issue #8). Uses LIVEU/LIVEG/LIVECTX captured from the fresh install by the caller.
+# Re-map ownership + SELinux label of a restored tree onto the freshly installed app.
+# Uses LIVEU/LIVEG/LIVECTX captured from the fresh install by the caller.
 #  - internal data (data/data_de): chown to the live uid/gid, then chcon the live context
 #    so THIS install's per-app MCS categories land on every file. restorecon only applies
 #    the base file_contexts label and does not recompute those categories on some ROMs, so
@@ -599,7 +603,7 @@ remap_restored() {   # <type> <target>
 # exemption, notification-listener + accessibility grants, disabled flag, installer) as
 # a JSON object shaped like the manifest's .permissions + .package. The Full backup
 # embeds the same fields inline in its manifest; Snapshot and Mirror write this to a
-# meta.json so restore has permission/appops parity regardless of mode (issue #9). Keep
+# meta.json so restore has permission/appops parity regardless of mode. Keep
 # the shape in sync with the manifest block and with fwstate_apply.
 fwstate_capture() {   # echoes JSON on stdout; uses $PKG $U
   _df="$STATE/staging/fwdump.$OPID"; fw dumpsys package "$PKG" > "$_df" 2>/dev/null
@@ -615,7 +619,7 @@ fwstate_capture() {   # echoes JSON on stdout; uses $PKG $U
         |select(.op|test("^[A-Z][A-Z0-9_]*$")))')"; [ -n "$_faoj" ] || _faoj='[]'
   # uid-mode AppOps (LineageOS and similar store a revoked permission as a UID-scoped
   # "ignore" here, which the package-scoped get above misreports; capture it cleanly and
-  # restore it at uid scope so those revocations survive a restore (issue #9).
+  # restore it at uid scope so those revocations survive a restore.
   _fauid="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null)"; _fauoj='[]'
   case "$_fauid" in ''|*[!0-9]*) : ;; *)
     _fauoj="$(fw cmd appops get --uid "$_fauid" 2>/dev/null | "$JQ" -R -s '
@@ -638,7 +642,7 @@ fwstate_capture() {   # echoes JSON on stdout; uses $PKG $U
 # Apply the framework state a reinstall resets, from a manifest or a snapshot/mirror
 # meta.json (same shape): runtime permissions, AppOps, Doze exemption, notification-
 # listener + accessibility grants, and the disabled flag. Shared by all three restore
-# engines so permission/appops fidelity does not depend on the backup mode (issue #9).
+# engines so permission/appops fidelity does not depend on the backup mode.
 fwstate_apply() {   # <json-file>; uses $PKG $U
   _mf="$1"; [ -f "$_mf" ] || return 0
   "$JQ" -c '.permissions.runtime[]?' "$_mf" 2>/dev/null | while IFS= read -r row; do
@@ -654,7 +658,7 @@ fwstate_apply() {   # <json-file>; uses $PKG $U
     fw cmd appops set --user "$U" "$PKG" "$op" "$mode" 2>/dev/null
   done
   # uid-mode AppOps restored at the freshly installed uid (differs per device/reinstall);
-  # this is where LineageOS-style permission revocations live, so they survive (issue #9).
+  # this is where LineageOS-style permission revocations live, so they survive.
   _nuid="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null)"
   case "$_nuid" in ''|*[!0-9]*) : ;; *)
     "$JQ" -c '.permissions.appops_uid[]?' "$_mf" 2>/dev/null | while IFS= read -r row; do
@@ -708,11 +712,80 @@ crypto_available() {
   { [ -x "$AGE" ] || command -v age >/dev/null 2>&1; } || return 1
   "$SCRIPT" -qec true /dev/null >/dev/null 2>&1   # script present AND a pty can be allocated
 }
-# #17: stored default passphrase for a backup - the app's own if set, else the global one; empty if
+# stored default passphrase for a backup - the app's own if set, else the global one; empty if
 # neither. Root-only under SECRETS/creds (0600, CE), set write-only from the UI and never read back.
 default_pass() {
   [ -f "$SECRETS/creds/pass.app.$1" ] && { cat "$SECRETS/creds/pass.app.$1"; return; }
   [ -f "$SECRETS/creds/pass.global" ] && cat "$SECRETS/creds/pass.global"
+}
+
+# --- metadata privacy: encrypt the metadata sidecars, keep the backup PORTABLE ---------------
+# An encrypted backup must not leak metadata (permissions, app label, icon, sizes, SELinux context,
+# the file listing) to an attacker who only has the backup FILES (a synced copy, a removed SD card).
+# But two HARD rules constrain the fix: the WebUI must list FAST without the passphrase, AND a backup
+# must stay PORTABLE (restore + list on any other device / PC with just the passphrase - nothing tied
+# to this device). Those pull apart, so besides the passphrase-encrypted data + full manifest, an
+# encrypted backup carries a tiny LISTING stub (package/label/icon/version/date/mode/types) in TWO
+# encrypted copies:
+#   - stub.dev.age  : encrypted to a DEVICE age keypair (public encrypts, private stays local in CE).
+#                     THIS device lists fast with the local private key, no passphrase. Not portable
+#                     (only this device's key opens it) - a convenience, never the source of truth.
+#   - stub.pass.age : encrypted to the PASSPHRASE (age scrypt), like the data. PORTABLE - any other
+#                     device/PC lists it after one session unlock (enter the passphrase once). This is
+#                     what keeps a moved backup identifiable. age forbids mixing scrypt + keypair in
+#                     one file, hence two tiny copies.
+# The dir name stays `<pkg>/<TS_VC>` (NOT hashed): a device-keyed hash would break cross-device transit
+# (another device cannot map the hash back to the package), and a passphrase-keyed hash would need the
+# passphrase just to list/prune. So the package name is the ONE accepted residual in the path; every
+# sensitive field is encrypted. An attacker with the files reads neither stub (needs the device key OR
+# the passphrase). Graceful: if the device key is wiped, listing falls back to the passphrase stub.
+AGEKEYGEN="$(bin_or age-keygen)"
+device_keys() {   # ensure the device age keypair exists (reuses the keygen keypair); return 1 on failure
+  mkdir -p "$SECRETS/keys" 2>/dev/null; chmod 700 "$SECRETS/keys" 2>/dev/null
+  if [ ! -f "$SECRETS/keys/age.pub" ] || [ ! -f "$SECRETS/keys/age.key" ]; then
+    "$AGEKEYGEN" -o "$SECRETS/keys/age.key" 2>/dev/null \
+      && sed -n 's/^# public key: //p' "$SECRETS/keys/age.key" | head -1 > "$SECRETS/keys/age.pub" || return 1
+  fi
+  chmod 600 "$SECRETS/keys/age.key" "$SECRETS/keys/age.pub" 2>/dev/null
+  [ -s "$SECRETS/keys/age.pub" ]
+}
+enc_stub_dev() {   # <outfile> ; reads stub JSON on stdin, encrypts to the device PUBLIC key (X25519, fast)
+  _sp="$STATE/staging/stub.$OPID.$$"; cat > "$_sp"
+  AGE_BIN="$AGE" AGE_PUB="$SECRETS/keys/age.pub" AGE_IN="$_sp" AGE_OUT="$1" sh -c 'exec "$AGE_BIN" -R "$AGE_PUB" -o "$AGE_OUT" "$AGE_IN"' >/dev/null 2>&1
+  _sr=$?; rm -f "$_sp"; return $_sr
+}
+dec_stub_dev() {   # <infile> ; decrypts a device-key stub with the local PRIVATE key to stdout (no passphrase)
+  AGE_BIN="$AGE" AGE_KEY="$SECRETS/keys/age.key" AGE_IN="$1" sh -c 'exec "$AGE_BIN" -d -i "$AGE_KEY" "$AGE_IN"' 2>/dev/null
+}
+# the same metadata-privacy treatment for the Full app backup AND the special / path / adb backups.
+# seal_meta turns a plaintext manifest.json into manifest.full.age (passphrase) + a thin non-sensitive
+# marker + a dual listing stub (device-key for fast local listing, passphrase for a portable one).
+# The marker is kind-aware, so the app marker (which has `mode`, no `kind`) stays byte-identical while
+# a special/path/adb marker carries `kind`. The caller passes the jq filter for ITS listing stub and
+# gates on its own use_*_age. seal_index encrypts a generated plaintext file index (the biggest leak
+# for path/adb). All reuse the app's enc_age/enc_stub_dev/device_keys.
+seal_meta() {   # <dest> <jq-stub-filter> ; 0 on success, 1 on failure (caller does finish false ERR_META_ENC)
+  _sm="$1"; _smm="$_sm/manifest.json"
+  "$JQ" -c "$2" "$_smm" > "$_sm/.stub.$OPID" 2>/dev/null
+  enc_age "$_sm/stub.pass.age" < "$_sm/.stub.$OPID" || { rm -f "$_sm/.stub.$OPID"; return 1; }
+  device_keys && enc_stub_dev "$_sm/stub.dev.age" < "$_sm/.stub.$OPID"
+  rm -f "$_sm/.stub.$OPID"
+  enc_age "$_sm/manifest.full.age" < "$_smm" || return 1
+  sha256sum "$_smm" | cut -d' ' -f1 > "$_sm/manifest.full.age.sha256"
+  "$JQ" -c '{format_version, created_at, created_epoch, mode, encrypted:true} + (if .kind then {kind:.kind} else {} end)' "$_smm" > "$_sm/.m.$OPID" \
+    && mv -f "$_sm/.m.$OPID" "$_smm"
+  sha256sum "$_smm" | cut -d' ' -f1 > "$_smm.sha256"
+  return 0
+}
+seal_index() {   # <dest> <index-filename> ; encrypt a generated file index in place (<f> -> <f>.age), 0/1
+  [ -f "$1/$2" ] || return 0
+  enc_age "$1/$2.age" < "$1/$2" && rm -f "$1/$2" || { rm -f "$1/$2.age"; return 1; }
+}
+reveal_mani() {   # <ref> <out> ; decrypt manifest.full.age with $PW to <out> + verify sha. 0=ok 1=wrong-pass 2=sha
+  dec_age "$1/manifest.full.age" > "$2" 2>/dev/null
+  [ -s "$2" ] || { rm -f "$2"; return 1; }
+  if [ -f "$1/manifest.full.age.sha256" ] && [ "$(sha256sum "$2" | cut -d' ' -f1)" != "$(cat "$1/manifest.full.age.sha256")" ]; then rm -f "$2"; return 2; fi
+  return 0
 }
 
 # compression (write): none | zstd[:N] | gzip | lz4. gzip is the universal
@@ -802,7 +875,7 @@ companion_resdir() {                        # echo an app-writable result dir (i
 # Hand a root-created node inside the companion sandbox to the app uid: owner, a mode the app
 # can use, and the app's LIVE SELinux context (its per-app MCS categories). A plain restorecon
 # applies only the base app_data_file label, and a root-created node keeps root ownership plus an
-# ambient-umask mode, so the untrusted_app companion cannot traverse or read it (issue #24). Same
+# ambient-umask mode, so the untrusted_app companion cannot traverse or read it. Same
 # chcon-to-live-context idea as remap_restored.
 companion_own() {                           # <path> <mode>
   _co_au="$(stat -c %u "/data/data/$COMPANION_PKG" 2>/dev/null)"
@@ -876,8 +949,8 @@ safe_local_dest() {  # <path>; 0 = allowed, 1 = refuse
 }
 # free bytes available on the filesystem that holds <path> (0 when it cannot be read).
 # df -kP (available KiB, field 4) is the primary source - it matches the WebUI overview
-# (helper.sh) and reads the real data partition. toybox `stat -f` (f_bavail*f_frsize) was
-# issue #5: on f2fs internal storage it under-reports badly (reserved segments excluded,
+# (helper.sh) and reads the real data partition. toybox `stat -f` (f_bavail*f_frsize)
+# under-reports badly on f2fs internal storage (reserved segments excluded,
 # collapses under sustained write/GC load), tripping the space guards at a random app with a
 # bogus ~28 MB reading on a device with tens of GB free, so stat -f is no longer used.
 fs_free() {
@@ -886,7 +959,7 @@ fs_free() {
   set -- $_df
   case "${4:-}" in *[0-9]*) nmul "$4"; return ;; esac
   # df could not read it: toybox `stat -f` under-reports free space on f2fs
-  # internal storage (issue #5), so it is NOT a safe fallback - report 0
+  # internal storage, so it is NOT a safe fallback - report 0
   # (unknown) and let the guards fail open instead of aborting on a bogus value.
   echo 0
 }
@@ -1050,7 +1123,7 @@ do_snapshot() {
   PATHS="$(item_paths)"
   for a in $(fw pm path --all "$PKG" 2>/dev/null | sed 's/^package://'); do PATHS="$PATHS $a"; done
   # framework state (perms/appops/grants/enabled) so Snapshot restore matches Full's
-  # permission fidelity (issue #9). Stable path, backed up with the data; restore reads
+  # permission fidelity. Stable path, backed up with the data; restore reads
   # it back from the restored tree.
   SNAPMETA="$STATE/snapmeta/$PKG.json"; mkdir -p "$STATE/snapmeta"; fwstate_capture > "$SNAPMETA" 2>/dev/null
   PATHS="$PATHS $SNAPMETA"
@@ -1072,7 +1145,7 @@ do_snapshot() {
   # restic rc 3 = incomplete snapshot: a valid snapshot WAS created, some files just could not be read
   # (the pre-filter above drops MISSING paths; this covers UNREADABLE ones too - a locked/denied subfile).
   # Data read is saved + restorable, so rc 3 is success-with-warning, not ERR_RESTIC (which would wrongly
-  # tell the user nothing was backed up). Reported by Solomag (VD-Modules#1 / PR #32).
+  # tell the user nothing was backed up).
   if { [ $rc -eq 0 ] || [ $rc -eq 3 ]; } && [ "$VERIFY" != false ]; then
     exec_ns "$RESTIC" -r "$DREPO" check --read-data-subset=5% >/dev/null 2>&1 || { finish false ERR_VERIFY; return; }
   fi
@@ -1115,7 +1188,7 @@ do_mirror() {
   prog 78 mirror obb;      echo " $ITEMS " | grep -q ' obb '      && sync_one obb      "/data/media/$U/Android/obb/$PKG" 78
   prog 88 mirror media;    echo " $ITEMS " | grep -q ' media '    && sync_one media    "/data/media/$U/Android/media/$PKG" 88
   # framework state (perms/appops/grants/enabled) so Mirror restore matches Full's
-  # permission fidelity (issue #9); a small meta.json beside the mirrored trees.
+  # permission fidelity; a small meta.json beside the mirrored trees.
   _mmeta="$STATE/staging/mmeta.$OPID.json"; fwstate_capture > "$_mmeta" 2>/dev/null
   case "$DTYPE" in
     local)  mkdir -p "$(remote_pfx)/$PKG" && cp "$_mmeta" "$(remote_pfx)/$PKG/meta.json" 2>/dev/null ;;
@@ -1142,7 +1215,7 @@ backup() {
   ENCDATA="$(jget "$ARGS" '.encrypt_data')"; [ "$ENCDATA" = "null" ] && ENCDATA="$(cfg .encrypt_data)"
   ENCAPK="$(jget "$ARGS" '.encrypt_apk')";  [ "$ENCAPK"  = "null" ] && ENCAPK="$(cfg .encrypt_apk)"
   PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
-  # #17: no per-backup passphrase + encryption on -> fall back to the app's stored passphrase, else
+  # no per-backup passphrase + encryption on -> fall back to the app's stored passphrase, else
   # the global default, so a master password need not be retyped every backup.
   if [ -z "$PW" ] && { [ "$ENCDATA" = true ] || [ "$ENCAPK" = true ]; }; then PW="$(default_pass "$PKG")"; fi
   # encryption requested but no passphrase would silently yield a PLAINTEXT backup;
@@ -1261,7 +1334,7 @@ backup() {
     DEST="$BACKUPS/$PKG/${TS}_${VC}"; media_own "$BACKUPS"; media_own "$BACKUPS/$PKG"
   fi
   mkdir -p "$DEST"
-  # issue #5: a failed/cancelled backup left a partial DEST (and dump scratch) piling up under
+  # a failed/cancelled backup left a partial DEST (and dump scratch) piling up under
   # /data - keep-local had no cleanup, remote_only cleaned only its staging. One EXIT trap drops
   # both and still runs cleanup (a batch subshell leaves cleanup to the parent); cleared on success.
   BK_FAIL="$DEST"
@@ -1392,7 +1465,7 @@ backup() {
         |select(.op|test("^[A-Z][A-Z0-9_]*$")))')"
   [ -n "$APPOPS_JSON" ] || APPOPS_JSON='[]'
   # uid-mode AppOps (where LineageOS-style permission revocations live); captured cleanly
-  # per uid and restored at uid scope (issue #9). See fwstate_capture for the shared shape.
+  # per uid and restored at uid scope. See fwstate_capture for the shared shape.
   AUID="$(stat -c %u "/data/user/$U/$PKG" 2>/dev/null)"; APPOPS_UID_JSON='[]'
   case "$AUID" in ''|*[!0-9]*) : ;; *)
     APPOPS_UID_JSON="$(fw cmd appops get --uid "$AUID" 2>/dev/null | "$JQ" -R -s '
@@ -1426,7 +1499,7 @@ backup() {
     # Framework-first capture: read the LIVE policy via getUidPolicy. The running NPMS keeps the
     # policy in memory and can lag netpolicy.xml, so a UID with an active REJECT_ALL may have no
     # <uid-policy> entry on disk yet - the file capture then records nothing and the restore has
-    # nothing to apply (issue #9, confirmed on a reporter device: policy active, absent from file).
+    # nothing to apply (policy active in memory but absent from the file on disk).
     if [ -n "$_npau" ] && [ -f "$MODDIR/etc/vdbackup_helper.dex" ]; then
       _ngr="$(LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" \
           /system/bin ru.vd171.vdbackup.Helper netpolicy-get "$_npau" 2>/dev/null)"
@@ -1502,7 +1575,7 @@ backup() {
       { [ -z "$varc" ] || [ -z "$vwant" ]; } && continue
       vgot="$(sha256sum "$DEST/$varc" 2>/dev/null | cut -d' ' -f1)"
       # a killed/short sha read yields an empty hash; re-read once from disk before calling it a
-      # mismatch, so transient resource pressure never fakes a corruption (issue #5).
+      # mismatch, so transient resource pressure never fakes a corruption.
       [ -n "$vgot" ] || vgot="$(sha256sum "$DEST/$varc" 2>/dev/null | cut -d' ' -f1)"
       [ "$vgot" = "$vwant" ] || VERR="$VERR $varc"
     done
@@ -1513,12 +1586,30 @@ backup() {
   # ship the PC recovery guide inside every encrypted backup (openability)
   if use_data_age || use_apk_age; then cp "$MODDIR/etc/RECOVERY.md" "$DEST/RECOVERY.md" 2>/dev/null; fi
 
+  # metadata privacy: an encrypted-data backup must not leak its metadata (permissions,
+  # app label/icon, file sizes, SELinux context, the item list) to whoever only holds the files.
+  # Keep the full manifest, but encrypted: move it into manifest.full.age (passphrase), leave a
+  # NON-SENSITIVE marker in manifest.json so every "a finished backup lives here" loop still finds
+  # it, and drop a tiny LISTING stub in two forms - device-key (fast local listing, no passphrase)
+  # and passphrase (portable: a moved backup stays identifiable with the passphrase). The package
+  # name is the dir name either way (the one accepted residual); every other field is encrypted.
+  # Gated on use_data_age only: an APK-only encrypted backup has plaintext data, so hiding its
+  # metadata would buy nothing. Runs AFTER verify (which needs the plaintext manifest).
+  if use_data_age; then
+    # stub = only what the Backups list shows; the package name is already the dir name.
+    seal_meta "$DEST" '{format_version, created_at, mode, encrypted:true,
+               package:{name:.package.name, label:.package.label, icon:.package.icon,
+                        versionName:.package.versionName, versionCode:.package.versionCode},
+               types:(.summary.types // [])}' || { finish false ERR_META_ENC; return; }
+    media_own -R "$DEST"
+  fi
+
   # transfer the built backup to a remote destination when configured.
   # transfer_full already calls finish false + returns non-zero on failure;
   # do not overwrite that with success.
   prog 95 transfer "$PKG"; transfer_full || return
-  # destination-authoritative: an APP backup lives at the dest only, so drop the internal copy
-  # (issue #15 for a local dest, #16 for Telegram). local: list/restore/delete/info are dest-aware
+  # destination-authoritative: an APP backup lives at the dest only, so drop the internal copy.
+  # local: list/restore/delete/info are dest-aware
   # via backup_roots. telegram: the channel is the index (list-remote), restore pulls by message-id,
   # delete removes the message - so the internal copy is pure duplication (and double-lists). rclone
   # and gdrive have no remote list/pull yet, so remote_only() excludes them (they keep the internal
@@ -1635,7 +1726,7 @@ do_restore_mirror() {
     # component is legitimate (the live source was empty at backup time, and a failed mirror backup
     # finishes false instead of being kept), so Mirror must still run rsync --delete to empty the
     # live dir and keep its 1:1 contract. An ABSENT component (source did not exist at backup) is
-    # skipped. Do NOT add a non-empty guard here: it silently retains stale live data (issue #34).
+    # skipped. Do NOT add a non-empty guard here: it silently retains stale live data.
     [ -d "$SRC/$1" ] || return 0
     mkdir -p "$2"
     exec_ns "$RSYNC" -a --delete "$SRC/$1/" "$2/" >/dev/null 2>&1 || { _mfail=1; audit "restore-mirror rsync failed $PKG ($1)"; }
@@ -1664,34 +1755,56 @@ restore() {
   [ -f "$M" ] || { finish false ERR_NO_MANIFEST; return; }
   PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
   _enc=0; ls "$REF"/*.age >/dev/null 2>&1 && _enc=1
+  # an encrypted-data backup keeps its real manifest in manifest.full.age; manifest.json is a
+  # non-sensitive marker (no package/perms/items). Resolve the package from the path, decrypt the
+  # full manifest with the passphrase, then read everything from the plaintext exactly as before.
+  _encmani=0; [ -f "$REF/manifest.full.age" ] && _encmani=1
   # selective restore: .items limits what is restored (empty/absent = everything)
   RITEMS="$(jget "$ARGS" '.items | join(" ")')"; [ "$RITEMS" = null ] && RITEMS=""
   want_item() { [ -z "$RITEMS" ] && return 0; case " $RITEMS " in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
-  # integrity: verify the manifest before trusting its package.name.
+  # integrity: verify the marker before trusting it.
   if [ -f "$M.sha256" ]; then
     want="$(cat "$M.sha256")"; got="$(sha256sum "$M" | cut -d' ' -f1)"
     [ "$want" = "$got" ] || { finish false ERR_MANIFEST_SHA; return; }
+  fi
+  if [ "$_encmani" = 1 ]; then
+    # package from the path (<backups_dir>/<pkg>/<TS_VC>); needed to find the stored passphrase
+    PKG="$(basename "$(dirname "$REF")")"
+    [ -z "$PW" ] && PW="$(default_pass "$PKG")"
+    [ -n "$PW" ] || { finish false ERR_CRYPTO_PASS; return; }
+    crypto_available || { finish false ERR_CRYPTO_UNAVAIL; return; }
+    _pm="$STATE/staging/manifest.$OPID"
+    dec_age "$REF/manifest.full.age" > "$_pm" 2>/dev/null
+    if [ ! -s "$_pm" ]; then
+      # wrong default -> a batch may supply one shared passphrase; try it before giving up
+      _bpw="$(jget "$ARGS" '.batch_password')"
+      if [ -n "$_bpw" ]; then PW="$_bpw"; dec_age "$REF/manifest.full.age" > "$_pm" 2>/dev/null; fi
+      [ -s "$_pm" ] || { rm -f "$_pm"; finish false ERR_CRYPTO_PASS; return; }
+    fi
+    # integrity of the decrypted manifest (sha of the plaintext, recorded at backup time)
+    if [ -f "$REF/manifest.full.age.sha256" ]; then
+      [ "$(cat "$REF/manifest.full.age.sha256")" = "$(sha256sum "$_pm" | cut -d' ' -f1)" ] \
+        || { rm -f "$_pm"; finish false ERR_MANIFEST_SHA; return; }
+    fi
+    M="$_pm"   # read the real manifest from here on; the passphrase is already proven
   fi
   PKG="$("$JQ" -r '.package.name' "$M")"; U="$("$JQ" -r '.user_id // 0' "$M")"
   is_root_manager "$PKG" && { audit "refused root manager restore: $PKG"; finish false ERR_ROOT_MANAGER; return; }
   case "$U" in ""|*[!0-9]*) U=0 ;; esac
   valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
-  # #17: no password given but the backup is encrypted -> try the stored default (the app's OWN
-  # pass.app.<pkg> if set, else the global) before prompting. PKG is resolved above: it was
-  # previously read here with PKG still empty, so pass.app.<pkg> was never tried and only the
-  # global default ever applied (issue #29). Only prompt when nothing is stored, or it is wrong.
+  # encrypted DATA archives need the passphrase. For an encrypted-manifest backup it is
+  # already proven (the manifest decrypted above), so skip the re-check. For an older encrypted
+  # backup with a plaintext manifest, resolve the stored default (the app's OWN pass.app.<pkg> if
+  # set, else the global) and verify it up front so a wrong one prompts cleanly instead of failing
+  # partway through. A wrong age scrypt passphrase decrypts to nothing.
   [ "$_enc" = 1 ] && [ -z "$PW" ] && PW="$(default_pass "$PKG")"
-  if [ "$_enc" = 1 ]; then
+  if [ "$_enc" = 1 ] && [ "$_encmani" = 0 ]; then
     [ -n "$PW" ] || { finish false ERR_CRYPTO_PASS; return; }           # nothing stored to try
     crypto_available || { finish false ERR_CRYPTO_UNAVAIL; return; }
-    # verify the passphrase up front on the smallest encrypted archive, so a wrong default (e.g.
-    # an older backup made with a different password) prompts cleanly instead of failing partway
-    # through the restore. A wrong age scrypt passphrase decrypts to nothing.
     _vt="$(ls -S "$REF"/*.age 2>/dev/null | tail -n1)"
     if [ -n "$_vt" ] && [ -z "$(dec_age "$_vt" 2>/dev/null | head -c1)" ]; then
-      # #17: the default/own passphrase did not decrypt. If a batch restore supplied one shared
-      # password (for older backups made with a different passphrase), try it before giving up, so
-      # a mixed batch completes with the extra password entered once. Session-only, never stored.
+      # a batch restore may supply one shared password (for older backups made with a different
+      # passphrase); try it before giving up, so a mixed batch completes with it entered once.
       _bpw="$(jget "$ARGS" '.batch_password')"
       if [ -n "$_bpw" ]; then _opw="$PW"; PW="$_bpw"
         [ -n "$(dec_age "$_vt" 2>/dev/null | head -c1)" ] || { PW="$_opw"; finish false ERR_CRYPTO_PASS; return; }
@@ -1782,7 +1895,7 @@ restore() {
 
   # verify the APK actually installed when it was part of this restore: a silent pm
   # failure (broken binder call, rejected session) must never be reported as success,
-  # or data is restored into a package that is not there (issue #7).
+  # or data is restored into a package that is not there.
   if want_item apk && [ "$APK_PRESENT" = true ]; then
     if [ -z "$SESSION" ] || ! fw pm path --user "$U" "$PKG" >/dev/null 2>&1; then
       audit "restore: APK install failed for $PKG: $(printf '%s' "${CMT:-no session}" | tr '\n' ' ' | cut -c1-200)"
@@ -1797,7 +1910,7 @@ restore() {
   # live SELinux context of the freshly installed dir: it carries THIS install's per-app
   # MCS categories (c<n>,...). restorecon only applies the base file_contexts label and
   # does not recompute the seapp_contexts categories on some ROMs, so the backup's stale
-  # categories would persist and the app gets EACCES on its own data (issue #8). Captured
+  # categories would persist and the app gets EACCES on its own data. Captured
   # BEFORE the wipe; /data/user and /data/user_de share the same per-app categories.
   LIVECTX="$(exec_ns ls -Zd "/data/user/$U/$PKG" 2>/dev/null | cut -d' ' -f1)"
 
@@ -1869,7 +1982,7 @@ restore() {
   done
 
   # restore runtime permissions / appops / Doze / listener+accessibility grants / enabled
-  # flag: shared helper so Full, Snapshot and Mirror restore identically (issue #9).
+  # flag: shared helper so Full, Snapshot and Mirror restore identically.
   # install-source attribution is applied at install time via install-create -i (see
   # installer_flag); pm set-installer is rejected for uid 0, so nothing to do here.
   prog 90 framework "$PKG"
@@ -1886,7 +1999,7 @@ restore() {
   # decode round-trip before the live file is overwritten; any failure leaves it untouched.
   SS="$("$JQ" -r '.permissions.ssaid // empty' "$M" 2>/dev/null)"
   # A single restore passes .ssaid=true (whole op); a batch restore passes .ssaid_pkgs - the apps
-  # the user ticked for SSAID - so the device ID is applied per-app, not broadly (issue #35).
+  # the user ticked for SSAID - so the device ID is applied per-app, not broadly.
   _want_ssaid=false
   [ "$(jget "$ARGS" '.ssaid')" = true ] && _want_ssaid=true
   [ "$_want_ssaid" = true ] || { jget "$ARGS" '.ssaid_pkgs[]?' 2>/dev/null | grep -qxF "$PKG" && _want_ssaid=true; }
@@ -2290,6 +2403,12 @@ do_special_backup() {
   sha256sum "$DEST/manifest.json" | cut -d' ' -f1 > "$DEST/manifest.json.sha256"
   media_own -R "$DEST"
   [ -s "$DEST/manifest.json" ] || { finish false ERR_BACKUP_INCOMPLETE; return; }
+  # seal the metadata when encrypted, like the Full app backup - the list shows the categories
+  # from the device-key stub; an attacker with the files reads neither manifest nor stub.
+  if use_special_age; then
+    seal_meta "$DEST" '{format_version, created_at, encrypted:true, kind, categories:(.categories // [])}' || { finish false ERR_META_ENC; return; }
+    cp "$MODDIR/etc/RECOVERY.md" "$DEST/RECOVERY.md" 2>/dev/null; media_own -R "$DEST"
+  fi
   audit "special-backup done $CATS -> $DEST"; notify backup_done "special"
   finish true ERR_NONE
 }
@@ -2305,6 +2424,15 @@ do_special_restore() {
   fi
   [ "$(jget "$ARGS" '.confirm')" = true ] || { finish false ERR_CONFIRM; return; }   # heavy-friction gate
   PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
+  # encrypted-manifest -> decrypt the real manifest with the passphrase before reading its fields
+  if [ -f "$REF/manifest.full.age" ]; then
+    [ -n "$PW" ] || { finish false ERR_CRYPTO_PASS; return; }
+    crypto_available || { finish false ERR_CRYPTO_UNAVAIL; return; }
+    _pm="$STATE/staging/mani.$OPID"; reveal_mani "$REF" "$_pm"; _rr=$?
+    [ "$_rr" = 1 ] && { finish false ERR_CRYPTO_PASS; return; }
+    [ "$_rr" = 2 ] && { finish false ERR_MANIFEST_SHA; return; }
+    M="$_pm"
+  fi
   if "$JQ" -e '[.items[]?|select(.encryption=="age-scrypt")]|length>0' "$M" >/dev/null 2>&1 && [ -z "$PW" ]; then
     finish false ERR_CRYPTO_PASS; return; fi
   if "$JQ" -e '[.items[]?|select(.encryption=="age-scrypt")]|length>0' "$M" >/dev/null 2>&1 && ! crypto_available; then
@@ -2472,6 +2600,11 @@ do_path_backup() {
   use_data_age && cp "$MODDIR/etc/RECOVERY.md" "$DEST/RECOVERY.md" 2>/dev/null
   media_own -R "$DEST"
   [ -s "$DEST/manifest.json" ] || { finish false ERR_BACKUP_INCOMPLETE; return; }
+  # seal the metadata when encrypted. The listing shows the source from the device-key stub.
+  if use_data_age; then
+    seal_meta "$DEST" '{format_version, created_at, encrypted:true, kind, source:(.source // "")}' || { finish false ERR_META_ENC; return; }
+    media_own -R "$DEST"
+  fi
   # reuse the full-backup transfer path (namespaced under .paths/<sanitized>)
   PKG=".paths/$SAFE"; VC="$TS"
   prog 95 transfer "path"; transfer_full || return
@@ -2503,6 +2636,15 @@ do_path_restore() {
   if [ -f "$M.sha256" ]; then
     want="$(cat "$M.sha256")"; got="$(sha256sum "$M" | cut -d' ' -f1)"
     [ "$want" = "$got" ] || { finish false ERR_MANIFEST_SHA; return; }
+  fi
+  # encrypted-manifest -> decrypt the real manifest with the passphrase before reading its fields
+  if [ -f "$REF/manifest.full.age" ]; then
+    [ -n "$PW" ] || { finish false ERR_CRYPTO_PASS; return; }
+    crypto_available || { finish false ERR_CRYPTO_UNAVAIL; return; }
+    _pm="$STATE/staging/mani.$OPID"; reveal_mani "$REF" "$_pm"; _rr=$?
+    [ "$_rr" = 1 ] && { finish false ERR_CRYPTO_PASS; return; }
+    [ "$_rr" = 2 ] && { finish false ERR_MANIFEST_SHA; return; }
+    M="$_pm"
   fi
   SRCP="$("$JQ" -r '.source // empty' "$M")"
   arc="$("$JQ" -r '.archive // empty' "$M")"
@@ -2623,6 +2765,13 @@ do_adb_backup() {
   use_data_age && cp "$MODDIR/etc/RECOVERY.md" "$DEST/RECOVERY.md" 2>/dev/null
   media_own -R "$DEST"; rm -f "$_lst" "$_exl" "$_trc"
   [ -s "$DEST/manifest.json" ] || { finish false ERR_BACKUP_INCOMPLETE; return; }
+  # seal the metadata AND the file index - the listing of every /data/adb path (modules, configs)
+  # is the biggest leak; it must not sit in clear beside an encrypted archive.
+  if use_data_age; then
+    seal_index "$DEST" index.txt.gz || { finish false ERR_META_ENC; return; }
+    seal_meta "$DEST" '{format_version, created_at, encrypted:true, kind, mode:(.mode // ""), paths:(.paths // [])}' || { finish false ERR_META_ENC; return; }
+    media_own -R "$DEST"
+  fi
   PKG=".adb/$TS"; VC="$TS"
   prog 95 transfer "adb"; transfer_full || return
   audit "adb-backup done -> $DEST ($_mode)"; notify backup_done "adb"
@@ -2643,6 +2792,15 @@ do_adb_restore() {
   if [ -f "$M.sha256" ]; then
     want="$(cat "$M.sha256")"; got="$(sha256sum "$M" | cut -d' ' -f1)"
     [ "$want" = "$got" ] || { finish false ERR_MANIFEST_SHA; return; }
+  fi
+  # encrypted-manifest -> decrypt the real manifest with the passphrase before reading its fields
+  if [ -f "$REF/manifest.full.age" ]; then
+    [ -n "$PW" ] || { finish false ERR_CRYPTO_PASS; return; }
+    crypto_available || { finish false ERR_CRYPTO_UNAVAIL; return; }
+    _pm="$STATE/staging/mani.$OPID"; reveal_mani "$REF" "$_pm"; _rr=$?
+    [ "$_rr" = 1 ] && { finish false ERR_CRYPTO_PASS; return; }
+    [ "$_rr" = 2 ] && { finish false ERR_MANIFEST_SHA; return; }
+    M="$_pm"
   fi
   arc="$("$JQ" -r '.archive // empty' "$M")"; enc="$("$JQ" -r '.encryption // "none"' "$M")"
   { [ -n "$arc" ] && [ "$arc" != null ]; } || { finish false ERR_NO_BACKUP; return; }
@@ -2680,13 +2838,13 @@ do_adb_restore() {
 # --- batch backup / restore -------------------------------------------------------------
 # One detached worker drives the WHOLE list, so closing the WebUI or the root manager never
 # stops it. The WebUI used to chain per-app in JavaScript (trackOp.onDone -> next), which
-# died with the webview and left a bulk backup half-done (issue #5). Each app reuses the
+# died with the webview and left a bulk backup half-done. Each app reuses the
 # single-app backup()/restore() unchanged; finish() records the per-app result (IN_BATCH)
 # instead of ending the op, and progx reports the app position (n of N).
 #
 # Each item runs in a WATCHDOG'd background subshell so one app that hangs - a VPN whose kill
 # wedges the networking stack, a stuck mount, an unkillable archive - can never freeze the whole
-# batch (issue #5, separate from the disk cause). Past the per-app budget the subshell AND its
+# batch (separate from the disk-full cause). Past the per-app budget the subshell AND its
 # whole process tree (tar/zstd/...) are killed and the app is recorded ERR_TIMEOUT, then the
 # batch moves on. Budget via config .batch_app_timeout (default 1800s, generous for a big app);
 # 0 disables the watchdog.
@@ -2740,7 +2898,7 @@ thermal_level() {
 # Pace the batch by temperature: a short breather when warm, pause-until-cool when hot - capped
 # at ~10min so a device that never cools (charging, hot ambient) still finishes. The pause emits
 # a `cooling` progress so the UI shows an intentional wait, never a frozen bar (would look like
-# the #5 hang). Toggle cfg .thermal_throttle (default on); off/false/0 disables.
+# a hang). Toggle cfg .thermal_throttle (default on); off/false/0 disables.
 thermal_pace() {
   case "$(cfg .thermal_throttle)" in off|false|0) return 0 ;; esac
   _tpl="$(thermal_level)"; [ -n "$_tpl" ] || return 0
@@ -2779,8 +2937,8 @@ _read_rc() {
 }
 batch_finish() {  # <ok_count> <total> <fail_count> <fails_json> <free_bytes> <failed_json>
   # `fails` names WHY apps failed (a {code:count} tally) so a partial result is never a blind
-  # "something went wrong" - e.g. {"ERR_NO_SPACE":24} says the destination filled (issue #5).
-  # `failed` names WHICH apps failed ([{pkg,code}]) so the UI can list them by name (issue #5).
+  # "something went wrong" - e.g. {"ERR_NO_SPACE":24} says the destination filled.
+  # `failed` names WHICH apps failed ([{pkg,code}]) so the UI can list them by name.
   # `free` is the bytes left on the backups filesystem, so the UI can say how much space remains.
   printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":%s,"code":"%s","n":%s,"of":%s,"skipped":%s,"fails":%s,"failed":%s,"free":%s}\n' \
     "$OPID" "$([ "$3" -eq 0 ] && echo true || echo false)" \
@@ -2797,7 +2955,7 @@ backup_batch() {
   # scheduled/auto batches carry .keep: prune each app to <keep> finished backups (helper.sh
   # prune) only after ITS backup succeeded, so a failed run never costs an older good backup.
   _bkeep="$(jget "$_base" '.keep // empty')"; case "$_bkeep" in *[!0-9]*) _bkeep="" ;; esac
-  # Pre-run space check (issue #5): a batch to LOCAL storage keeps every app's archive, so a big
+  # Pre-run space check: a batch to LOCAL storage keeps every app's archive, so a big
   # run can fill the disk partway and end with a bare partial deep in. For a local destination,
   # sum the uncompressed app data (data + data_de, the always-present core footprint) up front;
   # if that alone already exceeds the destination's free space it cannot fit even before
@@ -2829,7 +2987,7 @@ backup_batch() {
   # Each app runs in a SUBSHELL so its fds / shell state are reclaimed per app (the batch
   # stays robust for ANY app count), and its result (ok + the failure code) comes back through
   # a tiny status file. The failure codes are tallied so the finished result NAMES why apps
-  # failed instead of a blind partial (issue #5).
+  # failed instead of a blind partial.
   while IFS= read -r _p <&3; do
     [ -n "$_p" ] || continue
     BATCH_I=$((BATCH_I + 1)); BATCH_CUR="$_p"
@@ -2868,7 +3026,7 @@ restore_batch() {
   # EXIT trap, so per-item verifier_off would save "0" as the old value and never restore it.
   verifier_off
   # each restore runs in a SUBSHELL (fds / shell state reclaimed per item) and reports back
-  # through a status file; failure codes are tallied so a partial names why (issue #5, as backup).
+  # through a status file; failure codes are tallied so a partial names why, as in backup.
   while IFS= read -r _r <&3; do
     [ -n "$_r" ] || continue
     BATCH_I=$((BATCH_I + 1)); BATCH_CUR="$_r"
@@ -2941,7 +3099,7 @@ config_import() {
   finish true ERR_NONE
 }
 
-# Detached-engine survival (issue #5): move this worker, and so every child it forks,
+# Detached-engine survival: move this worker, and so every child it forks,
 # out of the manager app's cgroup into the root cgroup, where root daemons run. Android's
 # cached-app freezer (cgroup.freeze on /apps/uid_<app>) and the phantom-process killer act
 # per app cgroup, so a worker left there is paused or killed when the WebUI/manager app is

@@ -20,7 +20,7 @@
 # POSIX sh (mksh/busybox/toybox). Env in: VDLU_DIR, MODULE_DIR, MODID.
 # Contract: docs/INTERFACES.md (CLI/layout/JSON keys = immutable).
 
-ENGINE_VERSION=8             # bumped 7->8 (ABI-aware plan reduction: a pruned/per-ABI install drops other-ABI adds instead of re-fetching the universal-full tree; pure REDUCTION, runs AFTER validate_plan, fail-safe when the ABI is unknown); 6->7 was: never revert a module ahead of the feed (installed versionCode floors FROMVER; boot self-heal of a stale downgrade plan); ANY engine logic change (verify/apply/path rules) bumps this - keep engine_min honest
+ENGINE_VERSION=9             # 8->9: cmd_check ALWAYS returns parseable JSON on stdout (busy/offline/check_failed, exit 0) + a bounded manifest-fetch time, so the WebUI never JSON.parses an empty response and a concurrent check is not blocked; bumped 7->8 (ABI-aware plan reduction: a pruned/per-ABI install drops other-ABI adds instead of re-fetching the universal-full tree; pure REDUCTION, runs AFTER validate_plan, fail-safe when the ABI is unknown); 6->7 was: never revert a module ahead of the feed (installed versionCode floors FROMVER; boot self-heal of a stale downgrade plan); ANY engine logic change (verify/apply/path rules) bumps this - keep engine_min honest
 MAX_FILE_BYTES=134217728     # 128 MiB per-file ceiling: anti decompression-bomb / disk DoS
 MAX_MANIFEST_BYTES=2097152   # 2 MiB manifest ceiling: anti OOM
 TAB=$(printf '\t')
@@ -87,7 +87,7 @@ init_tools() {
 		done > "$_cab" 2>/dev/null
 		if [ -s "$_cab" ]; then CACERT="$_cab"; else rm -f "$_cab"; fi
 	fi
-	# Diagnostic (VD-Modules#1): log the resolved TLS trust + cert count, so a boot-time curl rc 77
+	# Diagnostic: log the resolved TLS trust + cert count, so a boot-time curl rc 77
 	# (empty store -> curl falls back to a baked-in CA path) is self-explaining in boot.log instead of a
 	# mystery. certs=0 at boot means the store was not populated yet when the fetch ran.
 	_cn=0; _csz=0; _crd=no
@@ -262,6 +262,7 @@ fetch_url() { # url dest -> sets FETCH_RC (transport exit code) and returns it
 				# 1 byte/s for 60s (mid-stream stall). A slow-but-PROGRESSING blob download is NOT affected (no
 				# --max-time cap). A partial/corrupt download is caught anyway by the blob's sha256.
 				T="--connect-timeout 15 --speed-limit 1 --speed-time 60"
+				[ -n "${FETCH_MAXTIME:-}" ] && T="$T --max-time $FETCH_MAXTIME"
 				_ca=""; [ -n "$CACERT" ] && _ca="--cacert $CACERT"; [ -n "$CAPATH" ] && _ca="$_ca --capath $CAPATH"
 				"$CURL" -fsSL $T $_ca --max-filesize "$MAX_FILE_BYTES" -o "$dest" "$url"
 				FETCH_RC=$?
@@ -325,12 +326,17 @@ net_allowed() {
 
 dl_manifest() {
 	[ -n "$SOURCE" ] || { echo "VDLU: no source configured" >&2; return 1; }
-	fetch_url "${SOURCE%/}/manifest.json" "$WORK/manifest.json" || return 1
+	# The manifest is tiny, so bound its total transfer time: the check holds the lock only briefly and a
+	# concurrent check is never blocked long on a slow network. Blob downloads keep NO --max-time cap.
+	FETCH_MAXTIME=25
+	fetch_url "${SOURCE%/}/manifest.json" "$WORK/manifest.json"; _mr=$?
+	FETCH_MAXTIME=
+	[ "$_mr" = 0 ] || return 1
 	local sz; sz=$(wc -c <"$WORK/manifest.json" 2>/dev/null)
 	[ "${sz:-0}" -le "$MAX_MANIFEST_BYTES" ] || { echo "VDLU: manifest too large ($sz)" >&2; return 1; }
 }
 
-# ---- module-update signing-key allowlist (VDLU#1 trust root) --------------
+# ---- module-update signing-key allowlist (trust root) ---------------------
 # The keyring may ALSO carry a LOWER-trust key (e.g. a fingerprint-feed key - automated, different
 # account). Without an allowlist, a module-update manifest signed by that key (key_id=vd-fp-2026) would
 # verify against its pubkey and apply a FULL flashless root update = a root-RCE path if the lower-trust
@@ -387,7 +393,7 @@ verify_manifest() {
 	keyring="$MODULE_DIR/vdlu/$pd"
 	v="$MODULE_DIR/vdlu/vdlu-verify"
 	if [ -f "$v" ]; then
-		# VDLU#1 trust-root allowlist: restrict WHICH key_id may sign a MODULE-UPDATE, BEFORE vdlu-verify
+		# Trust-root allowlist: restrict WHICH key_id may sign a MODULE-UPDATE, BEFORE vdlu-verify
 		# selects the pubkey. A lower-trust key that merely sits in the keyring can never sign an update.
 		mkid=$(grep -o '"key_id":"[^"]*"' "$WORK/manifest.json" 2>/dev/null | head -n1 | cut -d'"' -f4)
 		resolve_keyid_allow || return 1
@@ -841,7 +847,7 @@ do_commit() { # allow_swap
 }
 
 # VDLU: defer APPLY while the module signals it is busy (e.g. a backup in flight), so an update never swaps
-# module files mid-operation (VD-Modules#1). Opt-in: the module sets `apply_busy_file` (an absolute path) in
+# module files mid-operation. Opt-in: the module sets `apply_busy_file` (an absolute path) in
 # config and touches it for the duration of its own operations. Absent config = never held (no behavior
 # change). The blobs are already fetched, so the next trigger (boot / WebUI open) applies without a re-download.
 apply_held() { local f; f=$(cfg apply_busy_file ""); [ -n "$f" ] && [ -e "$f" ]; }
@@ -856,7 +862,7 @@ run_pipeline() { # allow_swap
 	return 0
 }
 
-# ---- per-ABI plan reduction (install-parity, VDLU#3) ----------------------
+# ---- per-ABI plan reduction (install-parity) ------------------------------
 # The feed is packed from the universal-full zip (all 4 ABIs). customize.sh prunes every install to the
 # device's SINGLE in-use ABI, so a per-ABI/pruned device holds only one ABI's files on disk; the diff would
 # otherwise see the other 3 ABIs' files as missing->add and keep re-fetching them (~255 MiB), re-bloating the
@@ -936,7 +942,7 @@ do_diff() { # persist(0|1); rc: 2 fetch/parse, 3 verify/meta fail, 4 device AHEA
 	build_plan "$WORK/manifest.flat" >"$WORK/plan.raw"
 	finalize_plan "$WORK/plan.raw" >"$WORK/plan.work"
 	grep "^delete/[0-9]" "$WORK/manifest.flat" 2>/dev/null | cut -f2 >"$WORK/plan.del"
-	# VDLU#2: the trust anchor - the engine's own vdlu/ dir (update.sh, vdlu-verify, verify/*, keyring/*,
+	# The trust anchor - the engine's own vdlu/ dir (update.sh, vdlu-verify, verify/*, keyring/*,
 	# config) - is RE-FLASH ONLY. A published feed carries the WHOLE module tree, vdlu/ included, so
 	# EXCLUDE those paths from the plan: never fetch, apply or delete them over the feed. The module still
 	# updates; the trust anchor changes only by a full signed re-flash; a feed that tries to swap it is
@@ -945,7 +951,7 @@ do_diff() { # persist(0|1); rc: 2 fetch/parse, 3 verify/meta fail, 4 device AHEA
 	awk -F'\t' '$NF !~ /^vdlu\// && $NF != "vdlu"' "$WORK/plan.work" >"$WORK/plan.work.f" 2>/dev/null && mv -f "$WORK/plan.work.f" "$WORK/plan.work"
 	awk '$0 !~ /^vdlu\// && $0 != "vdlu"' "$WORK/plan.del" >"$WORK/plan.del.f" 2>/dev/null && mv -f "$WORK/plan.del.f" "$WORK/plan.del"
 	validate_plan || return 3
-	# Per-ABI plan reduction (VDLU#3): AFTER validate_plan (security saw the full manifest), drop other-ABI
+	# Per-ABI plan reduction: AFTER validate_plan (security saw the full manifest), drop other-ABI
 	# adds/deletes so a pruned/per-ABI device is not pushed back toward the universal-full feed. Reduction
 	# only; fail-safe (drops nothing) when the device ABI cannot be detected.
 	filter_abi_plan "$(device_abi)"
@@ -970,8 +976,14 @@ work_to_do() { # uses $WORK/plan.work + $WORK/plan.del
 cmd_check() {
 	# do_diff wipes+rebuilds $WORK; take the lock so a concurrent locked run can't have $WORK pulled out
 	# from under it (acquire_lock arms an EXIT trap -> release_lock fires on every exit path below).
-	acquire_lock
-	do_diff 0 || { _dr=$?; [ "$_dr" = 4 ] && { printf '{"update":false,"ahead":true,"from":%s,"to":%s}\n' "$FROMVER" "$TGTVER"; exit 0; }; exit "$_dr"; }
+	# Non-blocking: a busy lock or an offline/failed check must still return parseable JSON on stdout
+	# (exit 0), so the WebUI never JSON.parses an empty string (then it maps the error to a toast).
+	if ! acquire_lock_try; then printf '{"ok":false,"error":"busy"}\n'; return 0; fi
+	do_diff 0 || { _dr=$?; release_lock; case "$_dr" in
+		4) printf '{"update":false,"ahead":true,"from":%s,"to":%s}\n' "$FROMVER" "$TGTVER" ;;
+		2) if fetch_offline; then printf '{"ok":false,"error":"offline"}\n'; else printf '{"ok":false,"error":"check_failed"}\n'; fi ;;
+		*) printf '{"ok":false,"error":"check_failed"}\n' ;;
+	esac; return 0; }
 	local pend reb del fetchc upd rb
 	pend=$(awk -F'\t' '$2=="pending"{n++}END{print n+0}' "$WORK/plan.work")
 	reb=$(awk -F'\t' '$2=="pending" && $1=="reboot"{n++}END{print n+0}' "$WORK/plan.work")
@@ -1106,7 +1118,7 @@ cmd_install_tool() { # <abi>
 	# before the signature check runs. Same ceiling dl_manifest enforces on the module manifest.
 	tmsz=$(wc -c <"$tm" 2>/dev/null)
 	[ "${tmsz:-0}" -le "$MAX_MANIFEST_BYTES" ] || { echo "VDLU: tools-manifest too large ($tmsz)" >&2; exit 1; }
-	# VDLU#1 allowlist (same trust root as the module update): the tools-manifest is signed by the module
+	# Allowlist (same trust root as the module update): the tools-manifest is signed by the module
 	# key, so pin its key_id too. vdlu-verify enforces it via VDLU_KEYID_ALLOW.
 	resolve_keyid_allow || exit 1
 	VDLU_KEYID_ALLOW="$KEYID_ALLOW" sh "$MODULE_DIR/vdlu/vdlu-verify" "$tm" "$keyring" || { echo "VDLU: tools-manifest signature rejected" >&2; exit 1; }

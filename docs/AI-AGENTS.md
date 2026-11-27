@@ -59,13 +59,13 @@ destinations (`rclone`/`restic`/ssh) talk to the network.
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (reattach after reconnecting) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | app list / batch base64 icons |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = the metadata is sealed; `locked` = encrypted and this device cannot read even the listing stub, e.g. a backup from another device - it still restores with the passphrase) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` set or clear a backup's custom name (`note`) and free `tags`, stored in a sidecar that travels with the backup, searchable from `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` the device's Android users (multi-user). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` sub-directories of a path (the folder picker). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` standalone folder/file backups. |
 | `provenance` | `{}` | the bundled-binary audit manifest (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` one backup's full details (version, install source, state, date, mode, size, items, permission counts, device) |
+| `backup-info` | `{ref}` | `{ok,...}` one backup's full details (version, install source, state, date, mode, size, items, permission counts, device); for an encrypted backup it returns `encrypted:true` with the stub-level fields only (the full detail is sealed and seen on restore, with the passphrase) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG from the manifest (works when the app is uninstalled) |
 | `backup-icons` | `{refs:[...]}` | `{ok,icons:{<ref>:<b64 or "">}}` batched `backup-icon`, `""` = no icon, unknown refs left out |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref must be under the backups dir) |

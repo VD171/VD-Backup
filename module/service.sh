@@ -43,7 +43,7 @@ mkdir -p "$LOGS"
 # stale icons (never touches config/jobs/dests/creds/keys or the backups).
 "$MODDIR/scripts/helper.sh" log-prune >/dev/null 2>&1
 
-# issue #5: reap backup leftovers from an uncatchable kill (watchdog/LMK) - boot-only, so it
+# reap backup leftovers from an uncatchable kill (watchdog/LMK) - boot-only, so it
 # never races a running backup. The in-process EXIT trap covers every catchable failure/cancel.
 "$MODDIR/scripts/helper.sh" boot-sweep >/dev/null 2>&1
 

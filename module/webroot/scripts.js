@@ -305,7 +305,7 @@ function visibleApps(filter, ignoreTag) {
     if (f === "user" && a.system) return false;
     if (f === "system" && !a.system) return false;
     // apps excluded from auto/scheduled backups are hidden from the manual list too, unless
-    // "show excluded" is on (so a one-off manual backup of an excluded app is still possible). #31
+    // "show excluded" is on (so a one-off manual backup of an excluded app is still possible).
     if (isBlocked(a.package) && !($("#app-show-excluded") && $("#app-show-excluded").checked)) return false;
     if (!ignoreTag && tagFilters.length && !appTags(a.package).some(function (t) { return tagFilters.indexOf(t) >= 0; })) return false;
     return !q || a.package.toLowerCase().indexOf(q) >= 0 || (a.label || "").toLowerCase().indexOf(q) >= 0;
@@ -418,7 +418,7 @@ function renderBackups(list) {
     var grow = el("div", "grow");
     grow.appendChild(el("div", "name", b.note || b.label || b.package));
     grow.appendChild(el("div", "pkg", b.note ? (b.label || b.package) : b.package));
-    grow.appendChild(el("div", "sub", shortDate(b.created_at)));
+    grow.appendChild(el("div", "sub", (b.pinned ? "📌 " : "") + (b.locked ? "🔒 " : (b.encrypted ? "🔐 " : "")) + shortDate(b.created_at)));
     if ((b.tags || []).length) { var tb = el("div", "tags"); b.tags.forEach(function (t) { tb.appendChild(tagChip(t)); }); grow.appendChild(tb); }
     if (bkSelectMode && b.mode !== "mirror") {
       var cb = el("input", "selbox"); cb.type = "checkbox"; cb.checked = !!bkSelected[b.ref];
@@ -427,7 +427,7 @@ function renderBackups(list) {
       if (bkSelected[b.ref]) li.classList.add("sel");
       li.onclick = function () { cb.checked = !cb.checked; toggleBkSel(b, cb.checked); li.classList.toggle("sel", cb.checked); };
     } else if (bkSelectMode) {
-      // A Mirror restores by dest+package, not by ref, so it is not part of the ref-list batch (#38).
+      // A Mirror restores by dest+package, not by ref, so it is not part of the ref-list batch.
       li.appendChild(ic); li.appendChild(grow);
     } else {
       var btn = el("button", "btn go", I18N.t("restore"));
@@ -468,8 +468,15 @@ function startBatchRestore() {
     var s = bkSelected[ref];
     return { ref: ref, pkg: s.package, label: (b && (b.label || b.package)) || s.package };
   });
+  // union of item types across the selected backups, in canonical order, so the batch modal
+  // offers the same per-item toggles as single restore. Each app then restores the intersection of
+  // its own items and the picked types (restore skips a type the backup does not have).
+  var BITEMS_ORDER = ["apk", "data", "data_de", "external", "obb", "media"];
+  var bitemsSeen = {};
+  refs.forEach(function (ref) { (bkSelected[ref].items || []).forEach(function (t) { bitemsSeen[t] = true; }); });
+  var batchItems = BITEMS_ORDER.filter(function (t) { return bitemsSeen[t]; });
   openOpModal({ batchPassword: true, overwriteAck: true, allowTest: true, allowSpoof: true,
-                ssaidApps: ssaidApps,
+                ssaidApps: ssaidApps, items: batchItems,
                 titleKey: "restore", confirmKey: "restore",
                 msg: I18N.t("confirm_restore_n", { n: refs.length }) }).then(function (res) {
     if (res == null) return;
@@ -478,7 +485,8 @@ function startBatchRestore() {
     var args = { refs: refs, netpolicy: res.netpolicy, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
     // batch passes the ticked packages as ssaid_pkgs (per-app); single restore still uses .ssaid
     if (res.ssaid_pkgs) args.ssaid_pkgs = res.ssaid_pkgs; else args.ssaid = res.ssaid;
-    if (res.batch_password) args.batch_password = res.batch_password;   // #17: shared password for apps whose default fails
+    if (res.batch_password) args.batch_password = res.batch_password;   // shared password for apps whose default fails
+    if (res.items && res.items.length) args.items = res.items;   // restrict every app's restore to the picked item types
     var run = function () { helper("restore-batch", args).then(function (r) { if (r && r.opid) trackOp(r.opid, { batch: true, retry: run }); else modalAlert(errMsg(r)); }).catch(function () { modalAlert(errMsg()); }); };
     run();
   });
@@ -535,6 +543,19 @@ function openBackupInfo(b) {
   $("#info-close").onclick = function () { m.hidden = true; };
   $("#info-restore").onclick = function () { m.hidden = true; startRestore(b.ref, b.package, b.items, b.mode, b.dest); };
   $("#info-delete").onclick = function () { deleteBackup(b.ref, function () { m.hidden = true; loadBackups(); }); };
+  // toggle whether retention keeps this backup forever (exempt from the keep-N prune).
+  var pinBtn = $("#info-pin");
+  if (pinBtn) {
+    pinBtn.textContent = I18N.t(b.pinned ? "ui_unpin" : "ui_pin");
+    pinBtn.onclick = function () {
+      pinBtn.disabled = true;
+      helper("pin-set", { ref: b.ref, pinned: !b.pinned }).then(function (r) {
+        pinBtn.disabled = false;
+        if (r && r.ok) { b.pinned = !!r.pinned; pinBtn.textContent = I18N.t(b.pinned ? "ui_unpin" : "ui_pin"); loadBackups(); }
+        else modalAlert(errMsg(r));
+      }).catch(function () { pinBtn.disabled = false; modalAlert(errMsg()); });
+    };
+  }
   // user name + tags editor: a custom name and free tags for this backup, stored in a sidecar
   // that travels with it (note-set). Searchable from the backups list. Reloads so the change shows.
   $("#info-note").value = b.note || "";
@@ -551,7 +572,7 @@ function openBackupInfo(b) {
     }).catch(function () { $("#info-note-save").disabled = false; $("#info-note-status").textContent = errMsg(); });
   };
   // A Mirror has no manifest, so backup-info has nothing to read: render its summary from the
-  // list entry (package, mode, date, components) instead of calling the backend (#38).
+  // list entry (package, mode, date, components) instead of calling the backend.
   if (b.mode === "mirror") {
     body.innerHTML = "";
     var mbadges = el("div", "badge-row");
@@ -570,47 +591,99 @@ function openBackupInfo(b) {
   }
   helper("backup-info", { ref: b.ref }).then(function (r) {
     if (!r || !r.ok) { body.textContent = errMsg(r); return; }
-    var rows = [
-      [I18N.t("info_package"), r.package && r.package.name],
-      [I18N.t("info_version"), (r.package && (r.package.versionName || "")) + " (" + (r.package && r.package.versionCode || "") + ")"],
-      [I18N.t("info_installer"), r.package && (r.package.installer || I18N.t("info_sideloaded"))],
-      [I18N.t("info_enabled"), r.package ? I18N.t((r.package.enabled === 2 || r.package.enabled === 3) ? "info_disabled" : "info_enabled_yes") : ""],
-      [I18N.t("info_date"), r.created_at],
-      [I18N.t("info_user"), r.user_id],
-      [I18N.t("info_size"), fmtSize(r.size)],
-      [I18N.t("info_items"), (r.items || []).map(function (it) { return it.type; }).join(", ")],
-      [I18N.t("info_perms"), (r.permissions ? (r.permissions.granted + "/" + r.permissions.runtime) : "")],
-      [I18N.t("info_appops"), r.permissions && r.permissions.appops],
-      ["SDK / ABI", (r.device && r.device.sdk) + " / " + (r.device && r.device.abi)],
-      ["SELinux / root", (r.device && r.device.selinux) + " / " + (r.device && r.device.root)]
-    ];
-    body.innerHTML = "";
-    // scannable summary: mode + (opt-in) SSAID state as status badges
-    var badges = el("div", "badge-row");
-    var modeLabel = I18N.t("opt_mode_" + r.mode);
-    if (modeLabel === "opt_mode_" + r.mode) modeLabel = r.mode;
-    if (modeLabel) badges.appendChild(statusBadge("info", modeLabel));
-    if (r.permissions && r.permissions.ssaid) badges.appendChild(statusBadge("warn", I18N.t("info_ssaid")));
-    if (badges.children.length) body.appendChild(badges);
-    rows.forEach(function (kv) {
-      if (kv[1] == null || kv[1] === "") return;
-      var row = el("div", "kv");
-      row.appendChild(el("span", "k", kv[0]));
-      row.appendChild(el("span", "v", String(kv[1])));
-      body.appendChild(row);
-    });
-    // device fingerprint: a long technical value -> tap-to-copy
-    if (r.device && r.device.fingerprint) body.appendChild(copyRow(I18N.t("info_device"), r.device.fingerprint));
-    // per-item SHA-256 checksums: tap-to-copy for verification on a PC
-    var sums = (r.items || []).filter(function (it) { return it && it.sha256; });
-    if (sums.length) {
-      body.appendChild(el("div", "kv-head", I18N.t("info_checksums")));
-      sums.forEach(function (it) {
-        var label = I18N.t("item_" + it.type);
-        if (label === "item_" + it.type) label = it.type;
-        body.appendChild(copyRow(label, it.sha256));
+    // the full-detail render. Works for a plaintext backup and for an encrypted one once it has been
+    // unlocked with the passphrase (the reveal returns the same shape).
+    var renderFull = function (r) {
+      var rows = [
+        [I18N.t("info_package"), r.package && r.package.name],
+        [I18N.t("info_version"), (r.package && (r.package.versionName || "")) + " (" + (r.package && r.package.versionCode || "") + ")"],
+        [I18N.t("info_installer"), r.package && (r.package.installer || I18N.t("info_sideloaded"))],
+        [I18N.t("info_enabled"), r.package ? I18N.t((r.package.enabled === 2 || r.package.enabled === 3) ? "info_disabled" : "info_enabled_yes") : ""],
+        [I18N.t("info_date"), r.created_at],
+        [I18N.t("info_user"), r.user_id],
+        [I18N.t("info_size"), fmtSize(r.size)],
+        [I18N.t("info_items"), (r.items || []).map(function (it) { return it.type; }).join(", ")],
+        [I18N.t("info_perms"), (r.permissions ? (r.permissions.granted + "/" + r.permissions.runtime) : "")],
+        [I18N.t("info_appops"), r.permissions && r.permissions.appops],
+        ["SDK / ABI", (r.device && r.device.sdk) + " / " + (r.device && r.device.abi)],
+        ["SELinux / root", (r.device && r.device.selinux) + " / " + (r.device && r.device.root)]
+      ];
+      body.innerHTML = "";
+      // scannable summary: mode + (opt-in) SSAID state as status badges
+      var badges = el("div", "badge-row");
+      var modeLabel = I18N.t("opt_mode_" + r.mode);
+      if (modeLabel === "opt_mode_" + r.mode) modeLabel = r.mode;
+      if (modeLabel) badges.appendChild(statusBadge("info", modeLabel));
+      if (r.encrypted) badges.appendChild(statusBadge("info", I18N.t("info_encrypted")));
+      if (r.permissions && r.permissions.ssaid) badges.appendChild(statusBadge("warn", I18N.t("info_ssaid")));
+      if (badges.children.length) body.appendChild(badges);
+      rows.forEach(function (kv) {
+        if (kv[1] == null || kv[1] === "") return;
+        var row = el("div", "kv");
+        row.appendChild(el("span", "k", kv[0]));
+        row.appendChild(el("span", "v", String(kv[1])));
+        body.appendChild(row);
       });
+      // device fingerprint: a long technical value -> tap-to-copy
+      if (r.device && r.device.fingerprint) body.appendChild(copyRow(I18N.t("info_device"), r.device.fingerprint));
+      // per-item SHA-256 checksums: tap-to-copy for verification on a PC
+      var sums = (r.items || []).filter(function (it) { return it && it.sha256; });
+      if (sums.length) {
+        body.appendChild(el("div", "kv-head", I18N.t("info_checksums")));
+        sums.forEach(function (it) {
+          var label = I18N.t("item_" + it.type);
+          if (label === "item_" + it.type) label = it.type;
+          body.appendChild(copyRow(label, it.sha256));
+        });
+      }
+    };
+    // an encrypted backup hides its device/items/permissions until unlocked. Show the stub-level
+    // fields + a "show details" button that asks for the passphrase and reveals everything here,
+    // without restoring. locked = even the stub is unreadable on this device (a backup from another one).
+    if (r.encrypted && !r.unlocked) {
+      body.innerHTML = "";
+      var eb = el("div", "badge-row");
+      eb.appendChild(statusBadge("info", I18N.t("info_encrypted")));
+      if (r.locked) eb.appendChild(statusBadge("warn", I18N.t("info_locked")));
+      body.appendChild(eb);
+      [[I18N.t("info_package"), r.package && r.package.name],
+       [I18N.t("info_version"), (r.package && r.package.versionName) ? (r.package.versionName + " (" + (r.package.versionCode || "") + ")") : ""],
+       [I18N.t("info_date"), r.created_at],
+       [I18N.t("info_size"), fmtSize(r.size)]].forEach(function (kv) {
+        if (kv[1] == null || kv[1] === "") return;
+        var row = el("div", "kv"); row.appendChild(el("span", "k", kv[0])); row.appendChild(el("span", "v", String(kv[1]))); body.appendChild(row);
+      });
+      if (!r.locked) {
+        // "show details" reveals an INLINE passphrase field inside this same modal (a second dialog
+        // would stack behind the open info modal). On success renderFull replaces the body in place.
+        var sd = el("button", "btn small block", I18N.t("info_show_details"));
+        sd.onclick = function () {
+          sd.remove();
+          var rv = el("div", "info-note");   // reuse the modal's input styling
+          var inp = el("input"); inp.type = "password"; inp.autocomplete = "off"; inp.placeholder = I18N.t("info_reveal_prompt");
+          var go = el("button", "btn small block", I18N.t("info_show_details"));
+          var rerr = el("div", "muted");
+          var reveal = function () {
+            if (!inp.value) { inp.focus(); return; }
+            go.disabled = true; rerr.textContent = "";
+            helper("backup-info", { ref: b.ref, password: inp.value }).then(function (rr) {
+              go.disabled = false;
+              if (rr && rr.ok && rr.unlocked) renderFull(rr);
+              else rerr.textContent = errMsg(rr);
+            }).catch(function () { go.disabled = false; rerr.textContent = errMsg(); });
+          };
+          go.onclick = reveal;
+          inp.onkeydown = function (e) { if (e.key === "Enter") reveal(); };
+          rv.appendChild(inp); rv.appendChild(go);
+          body.appendChild(rv); body.appendChild(rerr);
+          inp.focus();
+        };
+        body.appendChild(sd);
+      }
+      body.appendChild(el("div", "hint", I18N.t(r.locked ? "info_locked_hint" : "info_encrypted_hint")));
+      return;
     }
+    renderFull(r);
   });
 }
 function shortDate(s) {
@@ -670,7 +743,7 @@ function startRestore(ref, pkg, items, mode, dest) {
     var args = { ref: ref, ssaid: res.ssaid, netpolicy: res.netpolicy, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
     if (res.items) args.items = res.items;
     // A Mirror has no manifest and is not a <TS_VC> dir: the worker's restore() resolves it by
-    // dest+package (do_restore_mirror), not by ref, so tell it the mode and pass those (#38).
+    // dest+package (do_restore_mirror), not by ref, so tell it the mode and pass those.
     if (mode === "mirror") { args.mode = "mirror"; args.package = pkg; args.dest = dest || "local"; }
     var ctx = { restoreRef: ref, restorePkg: pkg, ssaid: res.ssaid, netpolicy: res.netpolicy, items: res.items, test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
     ctx.retry = function () { helper("restore", args).then(function (r) { if (r && r.opid) trackOp(r.opid, ctx); else modalAlert(errMsg(r)); }).catch(function () { modalAlert(errMsg()); }); };
@@ -814,7 +887,7 @@ function openOpModal(o) {
       } else {
         r.ssaid = ssaid.checked;
       }
-      if (o.batchPassword && batchApply.checked && input.value) r.batch_password = input.value;   // #17: one shared password tried on apps the default cannot open
+      if (o.batchPassword && batchApply.checked && input.value) r.batch_password = input.value;   // one shared password tried on apps the default cannot open
       if (o.allowTest) r.test = test.checked;
       if (o.allowSpoof) { r.spoof_installer = spoof.checked; r.deep_spoof = deep.checked; }
       if (o.items && o.items.length) {
@@ -848,8 +921,7 @@ function openMsg(o) {
 function modalAlert(body, title) { return openMsg({ body: body, title: title || "", confirm: false }); }
 function modalConfirm(body, title) { return openMsg({ body: body, title: title || "", confirm: true }); }
 // Confirm dialog that runs an async action while STAYING OPEN, with the OK button disabled and
-// spinning, until the action settles - then it closes. (#spinners: every confirm-then-wait shows
-// progress instead of a silent pause.) actionFn returns a Promise (the async wait only; keep the
+// spinning, until the action settles - then it closes. actionFn returns a Promise (the async wait only; keep the
 // result-handling in the caller's .then). Resolves: null = cancelled (run nothing), the action's
 // value on success, or undefined if the action rejected (caller treats that as a failure, as before).
 function modalConfirmAction(body, title, actionFn) {
@@ -1558,7 +1630,7 @@ function openBackupModal(pkg, label) {
       m.hidden = true; pass.value = ""; $("#backup-ok").onclick = null; $("#backup-cancel").onclick = null;
       resolve(res);
     }
-    // #17: the worker uses a stored passphrase automatically (this app's override, else the global
+    // the worker uses a stored passphrase automatically (this app's override, else the global
     // default), so when one exists we neither show the field nor require it - just note it is encrypted.
     function build(havePass) {
       pass.hidden = !enc || havePass;
@@ -1599,8 +1671,7 @@ function startBackup(pkg, label) {
   });
 }
 // batch: one modal (items/verify/pass apply to all), then ONE detached op backs up the
-// whole list server-side, so closing the WebUI or the root manager never stops it (issue
-// #5: the old per-app JS chain died with the webview and left bulk backups half-done).
+// whole list server-side, so closing the WebUI or the root manager never stops it.
 function startBatchBackup() {
   var pkgs = Object.keys(selected);
   if (!pkgs.length) return;
@@ -1762,10 +1833,10 @@ function trackOp(opid, ctx) {
         }
         if (ctx && ctx.batch && typeof p.of === "number" && p.of > 0) {
           label.textContent = I18N.t("msg_batch_done", { n: p.n || 0, of: p.of });   // e.g. "148 of 150 done"
-          if (p.skipped > 0) {   // #5: apps intentionally skipped (root manager / not installed), distinct from failures
+          if (p.skipped > 0) {   // apps intentionally skipped (root manager / not installed), distinct from failures
             box.appendChild(el("div", "op-skipped", I18N.t("msg_batch_skipped", { n: p.skipped })));
           }
-          if (p.failed && p.failed.length) {   // #5: list WHICH apps failed (package + reason); keep the card open with a Close button
+          if (p.failed && p.failed.length) {   // list WHICH apps failed (package + reason); keep the card open with a Close button
             var fl = el("div", "op-failed");
             fl.appendChild(el("div", "op-failed-h", I18N.t("msg_batch_failed_head", { n: p.failed.length })));
             p.failed.forEach(function (f) {
@@ -2163,7 +2234,7 @@ function saveSettings() {
   CFG.default_mode = $("#set-mode").value;
   CFG.default_dest = $("#set-dest").value;
   if ($("#set-staging")) CFG.staging_dir = $("#set-staging").value.trim();
-  if ($("#set-gpass") && $("#set-gpass").value) {   // #17: setting a NEW passphrase must be confirmed (typo -> unrecoverable backups)
+  if ($("#set-gpass") && $("#set-gpass").value) {   // setting a NEW passphrase must be confirmed (typo -> unrecoverable backups)
     var _gc = $("#set-gpass-confirm");
     if (_gc && _gc.value !== $("#set-gpass").value) { var _ge = $("#set-gpass-state"); if (_ge) _ge.textContent = I18N.t("settings_pass_mismatch"); }
     else { helper("pass-set-global", { password: $("#set-gpass").value }).then(function (r) { var e = $("#set-gpass-state"); if (e) e.textContent = (r && r.ok !== false) ? I18N.t("settings_gpass_set") : errMsg(r); }); $("#set-gpass").value = ""; if (_gc) _gc.value = ""; }
@@ -2184,7 +2255,7 @@ function saveSettings() {
       I18N.init(CFG.language || "auto").then(function () {
         I18N.apply(); buildLangOptions();
         // Re-render the app list so dynamically-built labels (e.g. the per-app "Back up"
-        // button, created with I18N.t at render time) pick up the new language too (issue #12).
+        // button, created with I18N.t at render time) pick up the new language too.
         if (typeof renderApps === "function") renderApps($("#search") ? $("#search").value : "");
       });
     }
@@ -2285,7 +2356,7 @@ function setBlock(pkg, on) {
   persistBlocklist(); updateBlockCount();
   reflectBlockInApps(pkg, on);
 }
-// #31b: surgically hide/show ONLY the affected app's row in the Apps list, so excluding (or
+// surgically hide/show ONLY the affected app's row in the Apps list, so excluding (or
 // re-including) it takes effect immediately with no full re-render. A later renderApps (search /
 // filter / show-excluded toggle) rebuilds from visibleApps and stays consistent.
 function reflectBlockInApps(pkg, on) {
@@ -2786,14 +2857,30 @@ function adbOpenRestore(bk) {
   $("#adb-ok").textContent = I18N.t("restore");
   adbShow();
   var _s = ADB.seq;
-  helper("adb-index", { ref: bk.ref }).then(function (r) {
-    if (!ADB || ADB.seq !== _s) return;   // a later open supersedes this one (never cross backups)
-    if (!r || r.ok === false) { modalAlert(errMsg(r)); adbHide(); return; }
-    var parsed = adbParseIndex(r.lines || []);
-    ADB.idx = parsed.map; ADB.dirs = parsed.dirs;
-    ADB.nodes = adbIdxLevel("", null);
-    adbRender();
-  });
+  // an encrypted /data/adb backup seals its file index, so the tree picker needs the passphrase.
+  // Load without it for a plaintext backup; for an encrypted one, load once the user enters the
+  // passphrase (Enter), reusing the same field the restore itself reads.
+  var loadAdbIndex = function (pw) {
+    helper("adb-index", { ref: bk.ref, password: pw }).then(function (r) {
+      if (!ADB || ADB.seq !== _s) return;   // a later open supersedes this one (never cross backups)
+      if (!r || r.ok === false) {
+        if (r && r.code === "ERR_CRYPTO_PASS") { $("#adb-sub").textContent = I18N.t("msg_err_crypto_pass"); return; }
+        modalAlert(errMsg(r)); adbHide(); return;
+      }
+      $("#adb-sub").textContent = I18N.t("ui_adb_restore_pick");
+      var parsed = adbParseIndex(r.lines || []);
+      ADB.idx = parsed.map; ADB.dirs = parsed.dirs;
+      ADB.nodes = adbIdxLevel("", null);
+      adbRender();
+    });
+  };
+  if (ADB.enc) {
+    $("#adb-sub").textContent = I18N.t("msg_err_crypto_pass");
+    var _ap = $("#adb-pass");
+    _ap.onkeydown = function (e) { if (e.key === "Enter") { e.preventDefault(); if (_ap.value) loadAdbIndex(_ap.value); } };
+  } else {
+    loadAdbIndex("");
+  }
 }
 function adbParseIndex(lines) {
   var map = Object.create(null), dirs = Object.create(null);   // null-proto: a file named "constructor"/"__proto__" must not collide
@@ -3117,7 +3204,7 @@ var UPDATE_CHECK_THROTTLE_MS = 3600000;
 // network hold the queue for the whole timeout and freeze the app list, icons and navigation
 // (they all go through the same bridge). So it runs DEFERRED, once the UI is idle, and with a
 // short timeout; a finished or failed check only ever raises the "update available" banner,
-// never blocks. (issue: WebUI froze on bad internet while icons were loading.)
+// never blocks.
 function deferredUpdateCheck() {
   if (window.requestIdleCallback) requestIdleCallback(autoCheckUpdates, { timeout: 6000 });
   else setTimeout(autoCheckUpdates, 4000);
@@ -3134,7 +3221,7 @@ function autoCheckUpdates() {
 
 // --- boot ---------------------------------------------------------------
 function boot() {
-  if (I18N.primeFromCache) I18N.primeFromCache();   // #31: paint the saved language before the async config-get (no English flash)
+  if (I18N.primeFromCache) I18N.primeFromCache();   // paint the saved language before the async config-get (no English flash)
   applyTheme(getTheme());
   applyAccent(getAccent());
   applyDensity(getDensity());
@@ -3155,6 +3242,17 @@ function boot() {
   if ($("#bk-search")) $("#bk-search").oninput = debounce(function () { bkQuery = $("#bk-search").value; renderBackups(BACKUPS); }, 120);
   $("#bk-selall").onclick = function () { (BACKUPS || []).forEach(function (b) { bkSelected[b.ref] = { ref: b.ref, package: b.package, items: b.items }; }); updateBkSelCount(); renderBackups(BACKUPS); };
   $("#bk-selnone").onclick = function () { bkSelected = {}; updateBkSelCount(); renderBackups(BACKUPS); };
+  if ($("#bk-seluninstalled")) $("#bk-seluninstalled").onclick = function () {
+    // select the backups whose app is no longer installed, so they can be bulk-deleted to free
+    // space. Selects only (does not delete) - the user reviews and uses the existing Delete button.
+    helper("list-apps", { user: activeUser }).then(function (r) {
+      var inst = {}; ((r && r.apps) || []).forEach(function (a) { inst[a.package] = true; });
+      (BACKUPS || []).forEach(function (b) {
+        if (b.package && b.package.indexOf(".") >= 0 && !inst[b.package]) bkSelected[b.ref] = { ref: b.ref, package: b.package, items: b.items };
+      });
+      updateBkSelCount(); renderBackups(BACKUPS);
+    }).catch(function () { modalAlert(errMsg()); });
+  };
   $("#bk-restoresel").onclick = startBatchRestore;
   if ($("#bk-deletesel")) $("#bk-deletesel").onclick = startBatchDelete;
   if ($("#tg-backups-open")) $("#tg-backups-open").onclick = openTelegramBackups;
@@ -3177,7 +3275,7 @@ function boot() {
     if (!_aiPkg) return;
     var items = AI_ITEMS.filter(function (k) { var e = $("#ai-" + k); return e && e.checked; });
     if ($("#ai-note")) setAppNote(_aiPkg, $("#ai-note").value);
-    if ($("#ai-pass") && $("#ai-pass").value) {   // #17: confirm a NEW passphrase before saving (typo -> unrecoverable backups)
+    if ($("#ai-pass") && $("#ai-pass").value) {   // confirm a NEW passphrase before saving (typo -> unrecoverable backups)
       var _ac = $("#ai-pass-confirm");
       if (_ac && _ac.value !== $("#ai-pass").value) { var _ae = $("#ai-pass-state"); if (_ae) _ae.textContent = I18N.t("settings_pass_mismatch"); return; }
       helper("pass-set-app", { package: _aiPkg, password: $("#ai-pass").value }).then(function (r) { if (!r || !r.ok) modalAlert(errMsg(r)); }); $("#ai-pass").value = ""; if (_ac) _ac.value = "";

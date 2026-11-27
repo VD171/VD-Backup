@@ -28,6 +28,6 @@ window.VDLU_I18N_PL = {
   ahead: 'Nowsza niż kanał', aheadSub: 'twoja wersja jest nowsza niż opublikowana aktualizacja', silentUpdate: 'Cicha aktualizacja', silentUpdateSub: 'Stosuje aktualizacje w tle bez pokazywania paska ponownego uruchomienia.',
   deferred: 'Pobieranie odroczone', deferredSub: 'oczekiwanie na dozwoloną sieć, wznowi się przy następnym sprawdzeniu',
   updateAvail: 'Dostępna aktualizacja', install: 'zainstaluj', fileOne: 'plik', fileMany: 'plików',
-  requiresReboot: 'wymaga restartu', checkFail: 'Sprawdzanie nie powiodło się', ksuUnavailable: 'API KSU niedostępne',
+  requiresReboot: 'wymaga restartu', checkFail: 'Sprawdzanie nie powiodło się', offline: 'Offline', busy: 'Sprawdzanie już trwa', ksuUnavailable: 'API KSU niedostępne',
   pendingUpdate: 'Oczekująca aktualizacja', notNow: 'Nie teraz', srcPlaceholder: 'https://…/&lt;moduł&gt;'
 };

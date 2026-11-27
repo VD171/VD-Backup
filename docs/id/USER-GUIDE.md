@@ -230,6 +230,14 @@ Enkripsi **tidak pernah** terikat pada kunci perangkat keras perangkat Anda, jad
 direstore di perangkat lain dan terbuka di PC. (Mode zip AES-256 yang kompatibel juga
 tersedia untuk arsip terenkripsi yang ingin Anda buka dengan klik-ganda dan kata sandi.)
 
+Ketika sebuah backup terenkripsi, **metadata-nya juga tersegel** - izin, label aplikasi,
+ukuran file dan daftar file semuanya terenkripsi, jadi siapa pun yang hanya memperoleh
+filenya (salinan cloud, kartu SD yang dicabut) tidak belajar apa pun darinya. WebUI tetap
+mendaftar backup terenkripsi Anda seketika, karena sebuah stub daftar kecil disimpan
+terenkripsi ke kunci khusus-perangkat; sebuah backup yang dipindahkan ke perangkat lain
+tetap bisa didaftar di sana begitu Anda memasukkan passphrase-nya. Hanya nama package
+aplikasi yang tetap terlihat di nama folder, jadi backup tetap portabel dan mudah dikelola.
+
 Untuk memakai enkripsi, buat kunci enkripsi sekali (Settings), lalu aktifkan
 enkripsi untuk pekerjaan Anda dan setel passphrase. Passphrase itulah yang melindungi
 backup, jadi pilih yang kuat, tidak ada kunci perangkat keras dan tidak ada backdoor pemulihan.

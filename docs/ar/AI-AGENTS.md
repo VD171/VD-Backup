@@ -58,13 +58,13 @@ sh "$H" backup "$(b64 '{"package":"com.example.app","mode":"full"}')"
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (إعادة الارتباط بعد إعادة الاتصال) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | قائمة التطبيقات / أيقونات base64 بالدفعة |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = البيانات الوصفية محكمة الإغلاق؛ `locked` = مشفّرة وهذا الجهاز لا يستطيع قراءة حتى كعب السرد، مثل نسخة احتياطية من جهاز آخر - وتظل قابلة للاستعادة بعبارة المرور) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` يضبط أو يمسح الاسم المخصّص لنسخة احتياطية (`note`) و`tags` الحرة؛ مُخزَّنة في ملف جانبي يرافق النسخة الاحتياطية، وقابلة للبحث من `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` مستخدمو أندرويد في الجهاز (متعدد المستخدمين). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` المجلدات الفرعية لمسار (منتقي المجلدات). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` نسخ احتياطية مستقلة لمجلد/ملف. |
 | `provenance` | `{}` | بيان تدقيق الثنائيات المضمَّنة (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` تفاصيل نسخة احتياطية واحدة كاملة (الإصدار، مصدر التثبيت، الحالة، التاريخ، الوضع، الحجم، العناصر، أعداد الأذونات، الجهاز) |
+| `backup-info` | `{ref}` | `{ok,...}` تفاصيل نسخة احتياطية واحدة كاملة (الإصدار، مصدر التثبيت، الحالة، التاريخ، الوضع، الحجم، العناصر، أعداد الأذونات، الجهاز)؛ وبالنسبة لنسخة احتياطية مشفّرة تُرجع `encrypted:true` مع حقول مستوى الكعب فقط (التفاصيل الكاملة محكمة الإغلاق وتظهر عند الاستعادة بعبارة المرور) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG من البيان (يعمل عندما يكون التطبيق غير مثبّت) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (يجب أن يكون ref ضمن دليل النسخ الاحتياطية) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` الاحتفاظ بأحدث N من حزمة |

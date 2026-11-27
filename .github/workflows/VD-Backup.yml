@@ -170,7 +170,7 @@ jobs:
         run: |
           set -e
           VCODE="$(sed -n 's/^versionCode=//p' module/module.prop)"
-          # Per-variant updateJson (issue #15): each built zip's module.prop points to its OWN
+          # Per-variant updateJson: each built zip's module.prop points to its OWN
           # update manifest, so the root manager keeps the installed variant on update instead of
           # always pulling universal-full. One sed per staged dir, like the per-variant pruning.
           RAW="https://raw.githubusercontent.com/VD171/VD-Backup/main/module"
@@ -250,7 +250,7 @@ jobs:
           mv "$tmp" module/update.json
           cat module/update.json
 
-      # Per-variant update manifests (issue #15): clone the just-filled update.json into one
+      # Per-variant update manifests: clone the just-filled update.json into one
       # manifest per non-full variant, each carrying that zip's real url/size/sha256 (version,
       # versionCode, changelog and notes are inherited). Each variant zip's module.prop already
       # points here (set in Assemble), so the root manager keeps the installed variant on update.
@@ -346,7 +346,7 @@ jobs:
             --title "VDBackup ${VER}" \
             --notes-file release-notes.md
 
-      # Auditability guard (owner HARD rule, github_release_sempre_bot_author): every release MUST be
+      # Auditability guard (owner HARD rule): every release MUST be
       # published by github-actions[bot], never a human account. GH_TOKEN above is github.token (the
       # Actions bot), so this holds - but assert it, so a future switch to a user PAT (which would
       # publish the release under that user) fails the workflow loud instead of shipping unaudited.

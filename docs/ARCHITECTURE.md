@@ -73,6 +73,14 @@ covered. From the first public release forward, the promise below is absolute:
   every field defensively (missing optional fields fall back to a default) and installs
   APKs and extracts archives by their file name and extension, not by assuming a fixed
   manifest shape.
+- **Sealed metadata when encrypted.** When the data is encrypted, the full manifest is
+  encrypted with the passphrase in `manifest.full.age`, so a backup leaks no metadata
+  (permissions, app label, sizes, the file list) to whoever only holds the files;
+  `manifest.json` stays as a small non-sensitive marker so every "a backup lives here"
+  path still works. A tiny listing stub is kept twice - encrypted to a device key (the
+  WebUI lists fast without the passphrase) and to the passphrase (a backup moved to
+  another device stays listable there). The directory keeps its `<package>/<timestamp>`
+  name, so the package is the one thing the path still reveals; everything else is sealed.
 - **Forward compatible restore.** Restore never rejects a backup for being old, and an
   older VDBackup silently skips item types it does not know rather than failing. A newer
   VDBackup therefore restores any older backup, and the standard-format archives remain

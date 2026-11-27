@@ -58,13 +58,13 @@ de nube (`rclone`/`restic`/ssh) hablan con la red.
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (reacoplar tras reconectar) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | lista de apps / iconos base64 por lote |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = los metadatos están sellados; `locked` = cifrado y este dispositivo no puede leer ni siquiera el stub de listado, p. ej. un backup de otro dispositivo - aún se restaura con la frase de cifrado) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` establece o borra el nombre personalizado de una copia (`note`) y las `tags` libres, se guarda en un archivo adjunto que viaja con la copia, buscable desde `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` usuarios de Android del dispositivo (multiusuario). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` subdirectorios de una ruta (selector de carpeta). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` copias de carpeta/archivo independientes. |
 | `provenance` | `{}` | manifiesto de auditoría de los binarios incluidos (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` todos los detalles de un backup (versión, origen de instalación, estado, fecha, modo, tamaño, items, conteos de permisos, dispositivo) |
+| `backup-info` | `{ref}` | `{ok,...}` todos los detalles de un backup (versión, origen de instalación, estado, fecha, modo, tamaño, items, conteos de permisos, dispositivo); para un backup cifrado devuelve `encrypted:true` solo con los campos a nivel de stub (el detalle completo queda sellado y se ve al restaurar, con la frase de cifrado) |
 | `backup-icon` | `{ref}` | `{ok,icon}` PNG base64 desde el manifest (funciona cuando la app está desinstalada) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref debe estar bajo el directorio de backups) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` mantiene los N más recientes de un paquete |

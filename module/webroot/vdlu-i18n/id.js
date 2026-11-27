@@ -28,6 +28,6 @@ window.VDLU_I18N_ID = {
   ahead: 'Lebih baru dari feed', aheadSub: 'versi Anda lebih baru dari pembaruan yang dipublikasikan', silentUpdate: 'Pembaruan senyap', silentUpdateSub: 'Menerapkan pembaruan di latar belakang tanpa menampilkan bilah reboot.',
   deferred: 'Unduhan ditunda', deferredSub: 'menunggu jaringan yang diizinkan, dilanjutkan pada pemeriksaan berikutnya',
   updateAvail: 'Pembaruan tersedia', install: 'pasang', fileOne: 'berkas', fileMany: 'berkas',
-  requiresReboot: 'perlu mulai ulang', checkFail: 'Pemeriksaan gagal', ksuUnavailable: 'API KSU tidak tersedia',
+  requiresReboot: 'perlu mulai ulang', checkFail: 'Pemeriksaan gagal', offline: 'Luring', busy: 'Pemeriksaan sudah berjalan', ksuUnavailable: 'API KSU tidak tersedia',
   pendingUpdate: 'Pembaruan tertunda', notNow: 'Nanti saja', srcPlaceholder: 'https://…/&lt;modul&gt;'
 };

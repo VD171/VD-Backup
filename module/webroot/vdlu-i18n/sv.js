@@ -28,6 +28,6 @@ window.VDLU_I18N_SV = {
   ahead: 'Nyare än flödet', aheadSub: 'din version är nyare än den publicerade uppdateringen', silentUpdate: 'Tyst uppdatering', silentUpdateSub: 'Tillämpar uppdateringar i bakgrunden utan att visa omstartsfältet.',
   deferred: 'Nedladdning uppskjuten', deferredSub: 'väntar på tillåtet nätverk, återupptas vid nästa kontroll',
   updateAvail: 'Uppdatering tillgänglig', install: 'installera', fileOne: 'fil', fileMany: 'filer',
-  requiresReboot: 'kräver omstart', checkFail: 'Kontrollen misslyckades', ksuUnavailable: 'KSU-API ej tillgängligt',
+  requiresReboot: 'kräver omstart', checkFail: 'Kontrollen misslyckades', offline: 'Offline', busy: 'En kontroll pågår redan', ksuUnavailable: 'KSU-API ej tillgängligt',
   pendingUpdate: 'Väntande uppdatering', notNow: 'Inte nu', srcPlaceholder: 'https://…/&lt;modul&gt;'
 };

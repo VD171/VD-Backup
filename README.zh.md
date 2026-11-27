@@ -81,6 +81,7 @@ VDBackup 是一个 root **WebUI 模块**，用于备份和还原你的应用及�
 - **压缩:** none / lz4 / zstd / gzip (gzip =「兼容模式」，随处可开)。
 - **加密:** 可选、可移植 (`age` + 口令，或 AES-256 zip), 绝不绑定到设备硬件，因此备份可在
   另一台设备上还原或在 PC 上打开。
+  加密备份还会封存其元数据（权限、应用标签、文件列表），因此仅凭这些文件无从得知任何信息，而 WebUI 仍能即时列出它。
 - **目标位置:** 本地、SFTP、SCP、SMB、WebDAV、FTP、S3 以及 70 多种 (`rclone`)，外加 `rsync`
   和 `restic` 仓库。还可通过一个小型的选择加入配套应用选用 Google Drive。
 - **Telegram:** 通过 MTProto 备份到私有 Telegram 频道作为无限云存储，恢复和删除也可在 WebUI 中完成。

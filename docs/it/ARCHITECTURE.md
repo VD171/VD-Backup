@@ -73,6 +73,15 @@ release pubblica in poi, la promessa qui sotto è assoluta:
   ogni campo in modo difensivo (i campi opzionali mancanti ricadono su un valore di default) e installa
   gli APK ed estrae gli archive per nome ed estensione del file, senza assumere una forma fissa di
   manifest.
+- **Metadati sigillati quando cifrati.** Quando i dati sono cifrati, il manifest completo è cifrato
+  con la passphrase in `manifest.full.age`, così un backup non fa trapelare alcun metadato (permessi,
+  etichetta dell'app, dimensioni, l'elenco dei file) a chi possiede solo i file; `manifest.json`
+  resta un piccolo marcatore non sensibile, così che ogni percorso del tipo "qui vive un backup"
+  continui a funzionare. Un minuscolo stub di listing è conservato due volte - cifrato con una chiave
+  del dispositivo (la WebUI elenca velocemente senza la passphrase) e con la passphrase (un backup
+  spostato su un altro dispositivo resta elencabile lì). La directory mantiene il suo nome
+  `<package>/<timestamp>`, così il pacchetto è l'unica cosa che il percorso rivela ancora; tutto il
+  resto è sigillato.
 - **Ripristino compatibile in avanti.** Il ripristino non rifiuta mai un backup perché vecchio, e un
   VDBackup più vecchio salta silenziosamente i tipi di elemento che non conosce invece di fallire. Un VDBackup più nuovo
   quindi ripristina qualsiasi backup più vecchio, e gli archive in formato standard restano

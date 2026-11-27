@@ -9,6 +9,14 @@ her yerde açabilirsiniz. Bir yedek klasörü bir `manifest.json`, APK'ları (`*
 veri arşivlerini (`<item>.tar.zst`, `.tar.gz` veya `.tar.lz4`) içerir, isteğe bağlı olarak
 sonunda bir `.age` ile şifrelenmiş.
 
+**Veri şifrelenmişse** üst veri de şifrelenir, dolayısıyla yalnızca dosyalara sahip olan birine
+hiçbiri sızmaz. Klasör o zaman ayrıca `manifest.full.age` (tam manifesto) ve iki küçük
+`stub.*.age` dosyası tutar. Bu durumda `manifest.json` yalnızca küçük, hassas olmayan bir
+işaretçidir; gerçek ayrıntılar `manifest.full.age` içindedir. Taşınabilir olan her şey (veri
+arşivleri ve `manifest.full.age`) yalnızca **parolanızla** şifresi çözülür - bkz. adım 1.
+`stub.dev.age` / `stub.pass.age` dosyaları yalnızca modülün cihaz üzerindeki listeleme
+önbelleğidir; bir PC'de bunları yok sayabilirsiniz.
+
 ## İhtiyaç duyabileceğiniz araçlar
 
 - **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
@@ -18,19 +26,18 @@ sonunda bir `.age` ile şifrelenmiş.
 
 ## 1. Şifre çözme (yalnızca dosya `.age` ile bitiyorsa)
 
-Anahtar dosyası (önerilen):
-
-```
-age -d -i age.key -o data.tar.zst  data.tar.zst.age
-```
-
-Parola:
+Parola (taşınabilir yol - yalnızca parolanızla herhangi bir PC'de çalışır):
 
 ```
 age -d -o data.tar.zst  data.tar.zst.age      # age will prompt for the passphrase
 ```
 
-Her `*.age` dosyası için aynısını yapın (APK'lar ve veri arşivleri).
+Her `*.age` dosyası için aynısını yapın (APK'lar ve veri arşivleri). Yedek şifrelenmişse, tam
+manifestoyu okumak için `manifest.full.age` dosyasının şifresini aynı şekilde çözün:
+
+```
+age -d -o manifest.json  manifest.full.age    # the full, readable manifest
+```
 
 ## 2. Sıkıştırmayı aç + çıkar
 
@@ -65,8 +72,10 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 - Çıkarılan dosyalar göreli yollarını korur, SELinux bağlamı, uid/gid ve modlar tar'ın
   içindedir (ve yalnızca Android'de geri yüklediğinizde düzgün bir şekilde yeniden uygulanır).
 - `manifest.json`, her dosyanın tam olarak ne olduğunu, uygulama sürümünü ve orijinal
-  sahibi/bağlamı açıklar. Doğruluk kaynağıdır.
-- Buradaki hiçbir şey belirli bir cihaza bağlı değildir: aynı parola/anahtar dosyası herhangi
+  sahibi/bağlamı açıklar. Doğruluk kaynağıdır. Şifrelenmiş bir yedek için tam manifesto
+  `manifest.full.age` dosyasıdır (adım 1'deki gibi şifresini çözün); düz metin `manifest.json`
+  yalnızca küçük bir işaretçidir ve hassas veri taşımaz.
+- Buradaki hiçbir şey belirli bir cihaza bağlı değildir: aynı parola herhangi
   bir makinede çalışır.
 
 <!-- doc-footer -->

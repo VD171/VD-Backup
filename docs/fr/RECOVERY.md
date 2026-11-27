@@ -9,6 +9,14 @@ sans ce module. Un dossier de backup contient un `manifest.json`, les APK
 (`*.apk.zst`) et les archives de données (`<item>.tar.zst`, `.tar.gz` ou `.tar.lz4`),
 éventuellement chiffrées avec un `.age` en suffixe.
 
+**Si les données sont chiffrées**, les métadonnées le sont aussi, donc rien n'en fuit vers
+quiconque n'a que les fichiers. Le dossier contient alors aussi `manifest.full.age` (le manifeste
+complet) et deux petits fichiers `stub.*.age`. Dans ce cas, `manifest.json` n'est qu'un marqueur
+minuscule et non sensible ; les vrais détails sont dans `manifest.full.age`. Tout ce qui est portable
+(les archives de données et `manifest.full.age`) se déchiffre avec seulement votre **phrase de passe** -
+voir l'étape 1. Les fichiers `stub.dev.age` / `stub.pass.age` ne sont que le cache de listage de la
+vue de la liste du module sur l'appareil ; vous pouvez les ignorer sur un PC.
+
 ## Outils dont vous pourriez avoir besoin
 
 - **zstd** : https://github.com/facebook/zstd/releases  (macOS : `brew install zstd`, Linux : `apt install zstd`)
@@ -18,19 +26,18 @@ sans ce module. Un dossier de backup contient un `manifest.json`, les APK
 
 ## 1. Déchiffrer (seulement si le fichier se termine par `.age`)
 
-Fichier de clé (recommandé) :
-
-```
-age -d -i age.key -o data.tar.zst  data.tar.zst.age
-```
-
-Phrase de passe :
+Phrase de passe (la méthode portable - fonctionne sur n'importe quel PC avec seulement votre phrase de passe) :
 
 ```
 age -d -o data.tar.zst  data.tar.zst.age      # age will prompt for the passphrase
 ```
 
-Faites de même pour chaque fichier `*.age` (APK et archives de données).
+Faites de même pour chaque fichier `*.age` (APK et archives de données). Si le backup est chiffré,
+déchiffrez `manifest.full.age` de la même façon pour lire le manifeste complet :
+
+```
+age -d -o manifest.json  manifest.full.age    # the full, readable manifest
+```
 
 ## 2. Décompresser + extraire
 
@@ -65,8 +72,10 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 - Les fichiers extraits conservent leurs chemins relatifs, le contexte SELinux, uid/gid et modes
   sont à l'intérieur du tar (et ne sont réappliqués correctement que lorsque vous restaurez sur Android).
 - `manifest.json` décrit exactement ce qu'est chaque fichier, la version de l'application et
-  l'owner/contexte d'origine. C'est la source de vérité.
-- Rien ici n'est lié à un appareil spécifique : la même phrase de passe/fichier de clé fonctionne sur n'importe quelle
+  l'owner/contexte d'origine. C'est la source de vérité. Pour un backup chiffré, le manifeste complet
+  est `manifest.full.age` (déchiffrez-le comme à l'étape 1) ; le `manifest.json` en clair n'est qu'un
+  petit marqueur et ne porte aucune donnée sensible.
+- Rien ici n'est lié à un appareil spécifique : la même phrase de passe fonctionne sur n'importe quelle
   machine.
 
 <!-- doc-footer -->

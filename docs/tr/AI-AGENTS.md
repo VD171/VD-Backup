@@ -58,13 +58,13 @@ dosyalarla gelir, bu yüzden kurulduktan sonra yerel yedekleme/geri yükleme iç
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (yeniden bağlandıktan sonra yeniden eklenir) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | uygulama listesi / toplu base64 simgeler |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = üst veri mühürlüdür; `locked` = şifreli ve bu cihaz listeleme saplamasını bile okuyamaz, örn. başka bir cihazdan gelen bir yedek - yine de parolayla geri yüklenir) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` bir yedeğin özel adını (`note`) ve serbest `tags` değerini ayarlar veya temizler, yedekle birlikte taşınan bir yardımcı dosyada saklanır, `list-backups` üzerinden aranabilir. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` cihazın Android kullanıcıları (çoklu kullanıcı). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` bir yolun alt dizinleri (klasör seçici). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` bağımsız klasör/dosya yedekleri. |
 | `provenance` | `{}` | paket ikili dosyaların denetim bildirimi (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` bir yedeğin tüm ayrıntıları (sürüm, kurulum kaynağı, durum, tarih, mod, boyut, öğeler, izin sayıları, cihaz) |
+| `backup-info` | `{ref}` | `{ok,...}` bir yedeğin tüm ayrıntıları (sürüm, kurulum kaynağı, durum, tarih, mod, boyut, öğeler, izin sayıları, cihaz); şifrelenmiş bir yedek için yalnızca saplama düzeyindeki alanlarla `encrypted:true` döndürür (tam ayrıntı mühürlüdür ve geri yüklemede, parolayla görülür) |
 | `backup-icon` | `{ref}` | `{ok,icon}` manifestten base64 PNG (uygulama kaldırıldığında da çalışır) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref, backups dizininin altında olmalıdır) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` bir paketin en yeni N tanesini tutar |

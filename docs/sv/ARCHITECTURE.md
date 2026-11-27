@@ -73,6 +73,14 @@ utvecklingsbyggen täcks inte. Från den första offentliga utgåvan och framåt
   varje fält defensivt (saknade valfria fält faller tillbaka till ett standardvärde) och installerar
   APK:er och extraherar arkiv efter deras filnamn och filändelse, inte genom att anta en fast
   manifestform.
+- **Förseglad metadata när krypterad.** När datan är krypterad krypteras det fullständiga
+  manifestet med lösenfrasen i `manifest.full.age`, så en säkerhetskopia läcker ingen metadata
+  (behörigheter, appens etikett, storlekar, fillistan) till den som bara har filerna;
+  `manifest.json` förblir en liten icke-känslig markör så att varje "här ligger en säkerhetskopia"-
+  väg fortfarande fungerar. En pytteliten listningsstubbe hålls två gånger - krypterad till en
+  enhetsnyckel (WebUI listar snabbt utan lösenfrasen) och till lösenfrasen (en säkerhetskopia som
+  flyttats till en annan enhet förblir listbar där). Katalogen behåller sitt `<package>/<timestamp>`-
+  namn, så paketet är det enda som vägen fortfarande avslöjar; allt annat är förseglat.
 - **Framåtkompatibel återställning.** Återställningen avvisar aldrig en säkerhetskopia för att den är gammal, och en
   äldre VDBackup hoppar tyst över objekttyper den inte känner till i stället för att misslyckas. En nyare
   VDBackup återställer därför vilken äldre säkerhetskopia som helst, och arkiven i standardformat förblir

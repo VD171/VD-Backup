@@ -9,6 +9,8 @@ bez tohoto modulu. Složka zálohy obsahuje `manifest.json`, APK
 (`*.apk.zst`) a datové archivy (`<item>.tar.zst`, `.tar.gz` nebo `.tar.lz4`),
 volitelně šifrované s koncovou `.age`.
 
+**Pokud jsou data šifrovaná**, jsou šifrovaná i metadata, takže z nich nic neunikne nikomu, kdo má jen soubory. Složka pak obsahuje také `manifest.full.age` (úplný manifest) a dva malé soubory `stub.*.age`. `manifest.json` je v tom případě jen drobný necitlivý ukazatel; skutečné podrobnosti jsou v `manifest.full.age`. Vše přenositelné (datové archivy a `manifest.full.age`) se dešifruje jen vaší **heslovou frází** - viz krok 1. Soubory `stub.dev.age` / `stub.pass.age` jsou jen vyrovnávací paměť modulu pro výpis v zařízení; na PC je můžete ignorovat.
+
 ## Nástroje, které můžete potřebovat
 
 - **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
@@ -18,19 +20,17 @@ volitelně šifrované s koncovou `.age`.
 
 ## 1. Dešifrování (jen pokud soubor končí na `.age`)
 
-Keyfile (doporučeno):
-
-```
-age -d -i age.key -o data.tar.zst  data.tar.zst.age
-```
-
-Heslová fráze:
+Heslová fráze (přenositelný způsob - funguje na jakémkoli PC jen s vaší heslovou frází):
 
 ```
 age -d -o data.tar.zst  data.tar.zst.age      # age will prompt for the passphrase
 ```
 
-Totéž proveďte pro každý soubor `*.age` (APK a datové archivy).
+Totéž proveďte pro každý soubor `*.age` (APK a datové archivy). Pokud je záloha šifrovaná, stejným způsobem dešifrujte `manifest.full.age`, abyste si přečetli úplný manifest:
+
+```
+age -d -o manifest.json  manifest.full.age    # the full, readable manifest
+```
 
 ## 2. Dekomprese + rozbalení
 
@@ -65,8 +65,10 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 - Rozbalené soubory si uchovávají své relativní cesty, SELinux kontext, uid/gid a režimy
   jsou uvnitř taru (a znovu se správně aplikují jen při obnově na Androidu).
 - `manifest.json` popisuje přesně, co je každý soubor, verzi aplikace a
-  původního vlastníka/kontext. Je to zdroj pravdy.
-- Nic zde není vázáno na konkrétní zařízení: tatáž heslová fráze/keyfile funguje na jakémkoli
+  původního vlastníka/kontext. Je to zdroj pravdy. U šifrované zálohy je úplný
+  manifest `manifest.full.age` (dešifrujte jej jako v kroku 1); čitelný `manifest.json`
+  je jen malý ukazatel a neobsahuje žádná citlivá data.
+- Nic zde není vázáno na konkrétní zařízení: tatáž heslová fráze funguje na jakémkoli
   počítači.
 
 <!-- doc-footer -->

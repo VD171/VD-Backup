@@ -73,6 +73,14 @@ objęte. Od pierwszego publicznego wydania obietnica poniżej jest absolutna:
   każde pole defensywnie (brakujące pola opcjonalne wracają do wartości domyślnej) oraz instaluje
   pliki APK i rozpakowuje archiwa według ich nazwy pliku i rozszerzenia, a nie przez założenie stałego
   kształtu manifestu.
+- **Zapieczętowane metadane przy szyfrowaniu.** Gdy dane są zaszyfrowane, pełny manifest jest
+  szyfrowany hasłem w `manifest.full.age`, więc kopia nie ujawnia żadnych metadanych (uprawnień,
+  etykiety aplikacji, rozmiarów, listy plików) nikomu, kto ma tylko pliki; `manifest.json`
+  pozostaje drobnym, niewrażliwym znacznikiem, aby każda ścieżka "tu znajduje się kopia" nadal
+  działała. Drobny skrawek listowania jest przechowywany dwukrotnie - zaszyfrowany kluczem
+  urządzenia (WebUI listuje szybko bez hasła) oraz hasłem (kopia przeniesiona na inne urządzenie
+  pozostaje tam możliwa do wylistowania). Katalog zachowuje swoją nazwę `<package>/<timestamp>`,
+  więc pakiet jest jedyną rzeczą, którą ścieżka nadal ujawnia; cała reszta jest zapieczętowana.
 - **Przywracanie zgodne w przód.** Przywracanie nigdy nie odrzuca kopii zapasowej z powodu jej wieku, a
   starszy VDBackup po cichu pomija typy elementów, których nie zna, zamiast zawodzić. Nowszy
   VDBackup przywraca zatem każdą starszą kopię zapasową, a archiwa w standardowym formacie i tak pozostają

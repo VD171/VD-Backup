@@ -73,6 +73,15 @@ pengembangan tidak tercakup. Sejak rilis publik pertama dan seterusnya, janji di
   setiap field secara defensif (field opsional yang hilang jatuh ke nilai default) dan memasang
   APK serta mengekstrak arsip berdasarkan nama dan ekstensi filenya, bukan dengan mengasumsikan bentuk
   manifest yang tetap.
+- **Metadata tersegel saat terenkripsi.** Ketika datanya terenkripsi, manifest lengkap
+  dienkripsi dengan frasa-sandi di `manifest.full.age`, jadi sebuah backup tidak membocorkan
+  metadata apa pun (izin, label aplikasi, ukuran, daftar berkas) kepada siapa pun yang hanya
+  memegang berkasnya; `manifest.json` tetap sebagai penanda kecil yang tidak sensitif sehingga
+  setiap jalur "sebuah backup ada di sini" tetap bekerja. Sebuah stub daftar kecil disimpan dua
+  kali - terenkripsi ke sebuah kunci perangkat (WebUI mendaftar cepat tanpa frasa-sandi) dan ke
+  frasa-sandi (sebuah backup yang dipindahkan ke perangkat lain tetap bisa didaftar di sana).
+  Direktori mempertahankan nama `<package>/<timestamp>`-nya, jadi package adalah satu-satunya hal
+  yang masih diungkapkan jalur itu; segala yang lain tersegel.
 - **Restore kompatibel-maju.** Restore tidak pernah menolak backup karena usianya tua, dan
   VDBackup yang lebih lama diam-diam melewati tipe item yang tidak dikenalnya alih-alih gagal. Sebuah VDBackup
   yang lebih baru karenanya merestore backup lama mana pun, dan arsip format-standar tetap

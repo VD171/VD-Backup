@@ -58,13 +58,13 @@ destinations cloud (`rclone`/`restic`/ssh) communiquent avec le réseau.
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (se rattache après reconnexion) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | liste d'apps / icônes base64 par lot |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = les métadonnées sont scellées ; `locked` = chiffré et cet appareil ne peut même pas lire le stub de listage, p. ex. une sauvegarde venant d'un autre appareil - elle se restaure quand même avec la phrase de passe) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` définit ou efface le nom personnalisé d'une sauvegarde (`note`) et les `tags` libres, stocké dans un fichier annexe qui voyage avec la sauvegarde, interrogeable depuis `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` utilisateurs Android de l'appareil (multi-utilisateur). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` sous-dossiers d'un chemin (sélecteur de dossier). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` sauvegardes autonomes de dossier/fichier. |
 | `provenance` | `{}` | manifeste d'audit des binaires fournis (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` tous les détails d'une sauvegarde (version, source d'installation, état, date, mode, taille, items, nombres de permissions, appareil) |
+| `backup-info` | `{ref}` | `{ok,...}` tous les détails d'une sauvegarde (version, source d'installation, état, date, mode, taille, items, nombres de permissions, appareil) ; pour une sauvegarde chiffrée, il renvoie `encrypted:true` avec seulement les champs de niveau stub (le détail complet est scellé et visible à la restauration, avec la phrase de passe) |
 | `backup-icon` | `{ref}` | `{ok,icon}` PNG base64 depuis le manifeste (fonctionne quand l'app est désinstallée) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref doit être sous le répertoire des sauvegardes) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` garde les N plus récentes d'un package |

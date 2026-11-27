@@ -54,7 +54,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git clone "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" wiki
-          # single source of generation (same script the Forgejo wiki is built with)
+          # single source of generation (same script every wiki mirror is built with)
           bash .github/scripts/gen_wiki.sh docs wiki
           cd wiki
           git add -A

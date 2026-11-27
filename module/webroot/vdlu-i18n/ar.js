@@ -28,6 +28,6 @@ window.VDLU_I18N_AR = {
   ahead: 'أحدث من الخلاصة', aheadSub: 'نسختك أحدث من التحديث المنشور', silentUpdate: 'تحديث صامت', silentUpdateSub: 'يطبّق التحديثات في الخلفية دون إظهار شريط إعادة التشغيل.',
   deferred: 'تأجّل التنزيل', deferredSub: 'بانتظار الشبكة المسموح بها، يُستأنف عند الفحص التالي',
   updateAvail: 'يتوفر تحديث', install: 'تثبيت', fileOne: 'ملف', fileMany: 'ملفات',
-  requiresReboot: 'يتطلب إعادة التشغيل', checkFail: 'فشل الفحص', ksuUnavailable: 'واجهة KSU غير متاحة',
+  requiresReboot: 'يتطلب إعادة التشغيل', checkFail: 'فشل الفحص', offline: 'غير متصل', busy: 'يوجد فحص قيد التشغيل بالفعل', ksuUnavailable: 'واجهة KSU غير متاحة',
   pendingUpdate: 'تحديث معلّق', notNow: 'ليس الآن', srcPlaceholder: 'https://…/&lt;وحدة&gt;'
 };

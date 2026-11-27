@@ -28,6 +28,6 @@ window.VDLU_I18N_DE = {
   ahead: 'Neuer als der Feed', aheadSub: 'deine Version ist neuer als das veröffentlichte Update', silentUpdate: 'Stilles Update', silentUpdateSub: 'Wendet Updates im Hintergrund an, ohne die Neustart-Leiste anzuzeigen.',
   deferred: 'Download verschoben', deferredSub: 'wartet auf das erlaubte Netzwerk, wird bei der nächsten Prüfung fortgesetzt',
   updateAvail: 'Update verfügbar', install: 'installieren', fileOne: 'Datei', fileMany: 'Dateien',
-  requiresReboot: 'erfordert Neustart', checkFail: 'Prüfung fehlgeschlagen', ksuUnavailable: 'KSU-API nicht verfügbar',
+  requiresReboot: 'erfordert Neustart', checkFail: 'Prüfung fehlgeschlagen', offline: 'Offline', busy: 'Eine Prüfung läuft bereits', ksuUnavailable: 'KSU-API nicht verfügbar',
   pendingUpdate: 'Ausstehendes Update', notNow: 'Nicht jetzt', srcPlaceholder: 'https://…/&lt;Modul&gt;'
 };

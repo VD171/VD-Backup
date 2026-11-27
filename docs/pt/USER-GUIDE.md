@@ -250,6 +250,15 @@ A criptografia **nunca** fica atrelada às chaves de hardware do seu dispositivo
 restaura em outro dispositivo e abre num PC. (Um modo zip AES-256 compatível também está
 disponível para archives criptografados que você quer abrir com um duplo-clique e uma senha.)
 
+Quando um backup é criptografado, seus **metadados também são selados** - as permissões, o
+rótulo do app, os tamanhos dos arquivos e a lista de arquivos são todos criptografados, então
+quem conseguir apenas os arquivos (uma cópia na nuvem, um cartão SD removido) não aprende nada
+com eles. A WebUI ainda lista seus backups criptografados instantaneamente, porque um pequeno
+stub de listagem é guardado criptografado com uma chave exclusiva do dispositivo; um backup
+movido para outro dispositivo continua listável lá assim que você digita sua passphrase. Apenas
+o nome do pacote do app fica visível no nome da pasta, então os backups permanecem portáveis e
+fáceis de gerenciar.
+
 Para usar criptografia, gere a chave de criptografia uma vez (Settings), depois habilite a
 criptografia para seu job e defina uma passphrase. A passphrase é o que protege o
 backup, então escolha uma forte, não há chave de hardware e nenhum backdoor de recuperação.

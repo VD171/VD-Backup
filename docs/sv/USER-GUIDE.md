@@ -250,6 +250,14 @@ Kryptering är **aldrig** bunden till din enhets hårdvarunycklar, så en krypte
 återställs på en annan enhet och öppnas på en PC. (Ett kompatibelt AES-256-zip-läge är också
 tillgängligt för krypterade arkiv som du vill öppna med ett dubbelklick och ett lösenord.)
 
+När en säkerhetskopia är krypterad är dess **metadata också förseglad** - behörigheterna, appens
+etikett, filstorlekarna och fillistan är alla krypterade, så den som bara kommer över filerna (en
+molnkopia, ett uttaget SD-kort) lär sig ingenting av dem. WebUI listar fortfarande dina krypterade
+säkerhetskopior direkt, eftersom en liten listningsstubbe hålls krypterad till en enhetsbunden
+nyckel; en säkerhetskopia som flyttats till en annan enhet förblir listbar där så snart du anger
+dess lösenfras. Bara appens paketnamn förblir synligt i mappnamnet, så säkerhetskopiorna förblir
+portabla och lätta att hantera.
+
 För att använda kryptering, generera krypteringsnyckeln en gång (Settings), aktivera sedan
 kryptering för ditt jobb och ställ in en lösenfras. Lösenfrasen är det som skyddar
 säkerhetskopian, så välj en stark, det finns ingen hårdvarunyckel och ingen återställnings-bakdörr.

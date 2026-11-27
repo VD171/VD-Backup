@@ -31,7 +31,7 @@ STATE=/data/adb/vdbackup
 valid_pkg() { case "$1" in ''|null|.*|*[!A-Za-z0-9._]*) return 1 ;; esac; }   # same rule as worker.sh
 bdir() { case "$1" in ''|*[!0-9]*) set -- 0 ;; esac; printf '/data/media/%s/VDBackup' "$1"; }  # /sdcard/VDBackup per Android user (credential-encrypted)
 # A backup sent to a local destination lives at that destination, not duplicated in the internal
-# store (destination-authoritative, issue #15): the user picks a local dest to keep the backup OFF
+# store (destination-authoritative): the user picks a local dest to keep the backup OFF
 # internal storage, so keeping an internal copy would defeat that and waste the space. list/restore/
 # delete therefore look in every backup root. local_dest_roots echoes each configured local
 # destination root ($path/vdbackup); backup_roots prepends the internal store for a user. Dest paths
@@ -114,6 +114,61 @@ export LD_LIBRARY_PATH="$BIN/lib:${LD_LIBRARY_PATH:-}"
 # bare calls below; the bundled binaries keep LD_LIBRARY_PATH via their full $BIN path.
 pm()      { /system/bin/env -u LD_LIBRARY_PATH -u LD_PRELOAD PATH=/system/bin:/system_ext/bin:/vendor/bin:/product/bin /system/bin/pm "$@"; }
 dumpsys() { /system/bin/env -u LD_LIBRARY_PATH -u LD_PRELOAD PATH=/system/bin:/system_ext/bin:/vendor/bin:/product/bin /system/bin/dumpsys "$@"; }
+
+JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+
+# Listing fields for a backup dir. A plaintext backup exposes them in manifest.json; an
+# encrypted one keeps the real manifest sealed in manifest.full.age (passphrase) and the few
+# listing fields in a device-key stub, so the WebUI lists fast WITHOUT the passphrase while an
+# attacker holding only the files sees neither. If the device key cannot open the stub (a backup
+# moved here from another device), fall back to a "locked" shape: the package from the path (the one
+# residual), no label/icon - it still restores with the passphrase. Echoes one compact JSON object:
+# {package,label,icon,versionName,versionCode,created_at,mode,types,encrypted,locked}.
+backup_listing() {
+  _bl_ref="$1"; _bl_m="$_bl_ref/manifest.json"
+  if [ -f "$_bl_ref/manifest.full.age" ]; then
+    _bl_s="$("$BIN/age" -d -i "$SECRETS/keys/age.key" "$_bl_ref/stub.dev.age" 2>/dev/null)"
+    if [ -n "$_bl_s" ]; then
+      printf '%s' "$_bl_s" | "$JQ" -c '{package:.package.name, label:(.package.label // .package.name),
+        icon:(.package.icon // ""), versionName:(.package.versionName // ""), versionCode:(.package.versionCode // 0),
+        created_at:.created_at, mode:.mode, types:(.types // []), encrypted:true, locked:false}' 2>/dev/null
+    else
+      _bl_pkg="$(basename "$(dirname "$_bl_ref")")"
+      "$JQ" -c -n --arg pkg "$_bl_pkg" --slurpfile mm "$_bl_m" \
+        '{package:$pkg, label:$pkg, icon:"", versionName:"", versionCode:0,
+          created_at:($mm[0].created_at // null), mode:($mm[0].mode // "full"), types:[], encrypted:true, locked:true}' 2>/dev/null
+    fi
+  else
+    "$JQ" -c '{package:.package.name, label:(.package.label // .package.name),
+      icon:(.package.icon // ""), versionName:.package.versionName, versionCode:.package.versionCode,
+      created_at:.created_at, mode:.mode, types:[.items[].type], encrypted:false, locked:false}' "$_bl_m" 2>/dev/null
+  fi
+}
+
+# Reveal: decrypt the full manifest of an encrypted backup with the passphrase, so the info
+# panel can show the sealed details (permissions/items/device) on demand WITHOUT restoring. age reads
+# the passphrase from a controlling terminal, so it runs under a pty (`script`), like worker.sh.
+# Decrypts to a FILE (not a command substitution, which strips the trailing newline and breaks the
+# sha check against the recorded one); echoes the temp path, empty on wrong passphrase/failure.
+SCRIPTB="$(command -v "$BIN/script" 2>/dev/null || command -v script || echo script)"
+dec_mani_pw() {   # <passphrase> <age-file> ; decrypts to a temp file, echoes its path (empty on failure)
+  _dpw="$STATE/staging/reveal.$$"; mkdir -p "$STATE/staging" 2>/dev/null
+  printf '%s\n' "$1" | AGE_BIN="$BIN/age" AGE_IN="$2" AGE_OUT="$_dpw" "$SCRIPTB" -qec 'exec "$AGE_BIN" -d -o "$AGE_OUT" "$AGE_IN"' /dev/null >/dev/null 2>&1
+  [ -s "$_dpw" ] && printf '%s' "$_dpw" || { rm -f "$_dpw"; return 1; }
+}
+# Listing metadata for a special/path/adb backup dir (like backup_listing, but generic - these
+# have no app label/icon). Plaintext -> the manifest; encrypted -> the device-key stub (fast, no
+# passphrase); moved here from another device -> the thin marker + locked:true (fields stay hidden).
+read_meta() {
+  _rm="$1"
+  if [ -f "$_rm/manifest.full.age" ]; then
+    _rs="$("$BIN/age" -d -i "$SECRETS/keys/age.key" "$_rm/stub.dev.age" 2>/dev/null)"
+    if [ -n "$_rs" ]; then printf '%s' "$_rs" | "$JQ" -c '. + {encrypted:true, locked:false}' 2>/dev/null
+    else "$JQ" -c '{created_at, kind, mode} + {encrypted:true, locked:true}' "$_rm/manifest.json" 2>/dev/null; fi
+  else
+    "$JQ" -c '. + {encrypted:false, locked:false}' "$_rm/manifest.json" 2>/dev/null
+  fi
+}
 
 mkdir -p "$LOGS"
 
@@ -217,6 +272,10 @@ prune_pkg() {                                    # <user> <pkg> <keep>
   # being written (or one that failed), and must neither push a good one out nor be deleted.
   for _sub in $(ls -1 "$_d" 2>/dev/null | sort -r); do
     [ -f "$_d/$_sub/manifest.json" ] || continue
+    # a pinned backup is exempt from retention: it never counts toward <keep> nor is deleted, so a
+    # user can keep a known-good backup forever while newer ones still rotate (a `.pinned` marker
+    # file in the backup dir, set via pin-set; it travels with the backup on export/import).
+    [ -f "$_d/$_sub/.pinned" ] && continue
     _n=$(( _n + 1 ))
     [ "$_n" -gt "$_keep" ] || continue
     case "$_d/$_sub" in
@@ -243,7 +302,7 @@ autobackup_snapshot() {   # <jq> <user> <outfile>
       | "$1" -R -s 'split("\n")|map(select(length>0))|map({(.):0})|add // {}' > "$3" 2>/dev/null
   fi
 }
-# seed the auto-backup baseline from the apps installed right now, if not already seeded (#30). The
+# seed the auto-backup baseline from the apps installed right now, if not already seeded. The
 # scan only seeds on its first tick (up to one INTERVAL after the toggle), so an app installed in
 # that window was baked into the baseline and never backed up; config-set calls this the moment
 # auto-backup is enabled so the baseline is the state at enable-time and later installs are caught.
@@ -402,7 +461,7 @@ case "$verb" in
     ok "\"sanitized\":$_n" ;;
 
   boot-sweep)
-    # issue #5: reap backup leftovers from an UNCATCHABLE kill (watchdog kill -9 / LMK / OOM),
+    # Reap backup leftovers from an UNCATCHABLE kill (watchdog kill -9 / LMK / OOM),
     # which no in-process EXIT trap can clean. BOOT-ONLY (called from service.sh), so it never
     # races a detached backup in progress - unlike sanitize, which also runs on WebUI load. Drops
     # the remote-only build staging wholesale, then reaps partial op dirs: a completed backup
@@ -411,7 +470,7 @@ case "$verb" in
     _sd="$("$JQ" -r '.staging_dir // empty' "$STATE/config.json" 2>/dev/null)"; case "$_sd" in /*) : ;; *) _sd=/data/local/tmp ;; esac
     rm -rf "$_sd/.vdstage" /data/local/tmp/.vdstage 2>/dev/null
     rm -f "$STATE/apply.busy" 2>/dev/null   # VDLU apply-busy: a -9'd op can leave this; clear at boot so the boot update is not wrongly deferred
-    # issue #5: a -9 kill during install/restore skips verifier_restore, leaving the device package
+    # A -9 kill during install/restore skips verifier_restore, leaving the device package
     # verifier disabled for good. A surviving snapshot means no clean restore ran; put the user's
     # ORIGINAL verifier settings back (exactly, leaving absent when they were absent) and drop it.
     if [ -f "$STATE/verifier.snap" ]; then
@@ -729,7 +788,7 @@ case "$verb" in
     ok '"wiped":true' ;;
 
   reset-data)
-    # Scoped self-reset to start fresh (#26). DESTRUCTIVE - the WebUI gates it behind an explicit
+    # Scoped self-reset to start fresh. DESTRUCTIVE - the WebUI gates it behind an explicit
     # confirm. Only ever touches this module's own state ($STATE), its credentials ($SECRETS) and
     # the backup roots (each guarded to a */VDBackup or */vdbackup path) - never anything else and
     # never a cloud remote. ARGS: {config:bool, backups:bool}; either/both.
@@ -803,7 +862,7 @@ case "$verb" in
       [ -f "$m" ] || continue
       [ "$first" = 1 ] || printf ','; first=0
       ref="$(dirname "$m")"
-      "$JQ" -c --arg ref "$ref" '{ref:$ref, created_at:.created_at, categories:.categories}' "$m" 2>/dev/null
+      printf '%s' "$(read_meta "$ref")" | "$JQ" -c --arg ref "$ref" '{ref:$ref, created_at:.created_at, categories:(.categories // null), encrypted:.encrypted, locked:.locked}' 2>/dev/null
     done
     printf ']}\n' ;;
 
@@ -851,7 +910,8 @@ case "$verb" in
     for m in "$_bk"/*/manifest.json; do
       [ -f "$m" ] || continue
       [ "$first" = 1 ] || printf ','; first=0
-      "$JQ" -c --arg ref "$(dirname "$m")" '{ref:$ref, created_at:.created_at, mode:.mode, paths:.paths, encryption:.encryption}' "$m" 2>/dev/null
+      _r="$(dirname "$m")"
+      printf '%s' "$(read_meta "$_r")" | "$JQ" -c --arg ref "$_r" '{ref:$ref, created_at:.created_at, mode:.mode, paths:(.paths // null), encryption:(.encryption // (if .encrypted then "age" else "none" end)), encrypted:.encrypted, locked:.locked}' 2>/dev/null
     done
     printf ']}\n' ;;
 
@@ -861,8 +921,15 @@ case "$verb" in
     ref="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.ref // empty' 2>/dev/null)"
     case "$ref" in /data/media/*/VDBackup/.adb/*) : ;; *) err ERR_BAD_REF "bad ref"; exit 0 ;; esac
     case "$ref" in *..*) err ERR_BAD_REF "traversal"; exit 0 ;; esac
-    [ -f "$ref/index.txt.gz" ] || { err ERR_NO_BACKUP "no index"; exit 0; }
-    gzip -dc "$ref/index.txt.gz" 2>/dev/null | "$JQ" -R -s -c '{ok:true,lines:(split("\n")|map(select(length>0)))}' ;;
+    _bipw="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.password // empty' 2>/dev/null)"
+    # An encrypted /data/adb backup seals its file index too; the tree picker needs the passphrase.
+    if [ -f "$ref/index.txt.gz.age" ]; then
+      [ -n "$_bipw" ] || { err ERR_CRYPTO_PASS "passphrase required"; exit 0; }
+      _ix="$(dec_mani_pw "$_bipw" "$ref/index.txt.gz.age")" || { err ERR_CRYPTO_PASS "wrong passphrase"; exit 0; }
+      gzip -dc "$_ix" 2>/dev/null | "$JQ" -R -s -c '{ok:true,lines:(split("\n")|map(select(length>0)))}'; rm -f "$_ix"
+    elif [ -f "$ref/index.txt.gz" ]; then
+      gzip -dc "$ref/index.txt.gz" 2>/dev/null | "$JQ" -R -s -c '{ok:true,lines:(split("\n")|map(select(length>0)))}'
+    else err ERR_NO_BACKUP "no index"; exit 0; fi ;;
 
   progress)
     opid="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
@@ -955,17 +1022,20 @@ case "$verb" in
       # user-set name + tags live in a sidecar note.json in the backup dir, so they travel with
       # the backup on export/import and never touch the immutable manifest. Default when absent.
       _nt="$("$JQ" -c '{note:(.note//""),tags:((.tags//[])|map(select(type=="string")))}' "$ref/note.json" 2>/dev/null)"; case "$_nt" in '') _nt='{"note":"","tags":[]}' ;; esac
-      "$JQ" -c --arg ref "$ref" --argjson hasapk "$_hasapk" --argjson nt "$_nt" \
-        '{ref:$ref, package:.package.name, label:(.package.label // .package.name),
-          versionName:.package.versionName,
-          versionCode:.package.versionCode, created_at:.created_at, mode:.mode,
-          note:$nt.note, tags:$nt.tags,
-          items:((if $hasapk then ["apk"] else [] end) + [.items[].type])}' "$m" 2>/dev/null
+      _pin=false; [ -f "$ref/.pinned" ] && _pin=true   # pinned backups are exempt from retention (#pin)
+      # Pull the listing fields from the plaintext manifest OR, for an encrypted backup, from
+      # the device-key stub (fast, no passphrase); locked:true marks one whose stub this device
+      # cannot open (moved from elsewhere) - still restorable with the passphrase.
+      printf '%s' "$(backup_listing "$ref")" | "$JQ" -c --arg ref "$ref" --argjson hasapk "$_hasapk" --argjson nt "$_nt" --argjson pin "$_pin" \
+        '{ref:$ref, package:.package, label:.label, versionName:.versionName,
+          versionCode:.versionCode, created_at:.created_at, mode:.mode,
+          note:$nt.note, tags:$nt.tags, pinned:$pin, encrypted:.encrypted, locked:.locked,
+          items:((if $hasapk then ["apk"] else [] end) + .types)}' 2>/dev/null
     done
     done <<EOF
 $(backup_roots "$_u")
 EOF
-    # Mirror backups (issue #38): a Mirror keeps ONE live copy per app under
+    # Mirror backups: a Mirror keeps ONE live copy per app under
     # <backups_dir>/.mirror/vdbackup/<pkg>/{component,meta.json} - no <TS_VC> level and no
     # manifest.json, so the loop above (keyed on manifest.json) never lists them. Surface each as
     # a single mode:"mirror" entry. Restore resolves a mirror by dest+package (do_restore_mirror),
@@ -1005,8 +1075,22 @@ EOF
     fi
     printf '{"ok":true}\n' ;;
 
+  pin-set)
+    # pin/unpin a backup so retention (prune_pkg) never deletes it. A `.pinned` marker file in the
+    # backup dir: its presence = pinned. It lives in the backup dir, so it travels on export/import.
+    # Same ref guards as note-set (must be under a VDBackup store, no traversal).
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    _a="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    ref="$(printf '%s' "$_a" | "$JQ" -r '.ref // empty' 2>/dev/null)"
+    case "$ref" in /data/media/*/VDBackup/*) : ;; *) err ERR_BAD_REF "bad ref"; exit 0 ;; esac
+    case "$ref" in *..*) err ERR_BAD_REF "traversal"; exit 0 ;; esac
+    [ -d "$ref" ] || { err ERR_NO_BACKUP "no backup"; exit 0; }
+    _pin="$(printf '%s' "$_a" | "$JQ" -r '.pinned // false' 2>/dev/null)"
+    if [ "$_pin" = true ]; then : > "$ref/.pinned"; else rm -f "$ref/.pinned"; _pin=false; fi
+    printf '{"ok":true,"pinned":%s}\n' "$_pin" ;;
+
   pass-set-global)
-    # #17: store or clear the global default passphrase (root-only, CE, 0600). Write-only - the value
+    # Store or clear the global default passphrase (root-only, CE, 0600). Write-only - the value
     # is never returned; the UI only learns whether one is set.
     _pw="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.password // ""' 2>/dev/null)"
     secrets_init 2>/dev/null; mkdir -p "$SECRETS/creds" 2>/dev/null
@@ -1039,9 +1123,11 @@ EOF
       [ -f "$m" ] || continue
       [ "$("$JQ" -r '.kind // empty' "$m" 2>/dev/null)" = path ] || continue
       [ "$first" = 1 ] || printf ','; first=0
-      "$JQ" -c --arg ref "$(dirname "$m")" \
+      _r="$(dirname "$m")"
+      printf '%s' "$(read_meta "$_r")" | "$JQ" -c --arg ref "$_r" \
         '{ref:$ref, source:(.source // ""), created_at:(.created_at // ""),
-          encryption:(.encryption // "none"), compression:(.compression // "")}' "$m" 2>/dev/null
+          encryption:(.encryption // (if .encrypted then "age" else "none" end)), compression:(.compression // ""),
+          encrypted:.encrypted, locked:.locked}' 2>/dev/null
     done
     printf ']}\n' ;;
 
@@ -1055,7 +1141,7 @@ EOF
     bk="$(bdir "$u")"
     # Count across EVERY backup root (internal store + each configured local destination), exactly
     # like list-backups: a backup sent to a local dest lives there, not in the internal store, so
-    # counting only bdir reported 0 for a user whose backups sit on an SD/USB local dest (issue #34).
+    # counting only bdir reported 0 for a user whose backups sit on an SD/USB local dest.
     # apps is de-duplicated by package (an app backed up to two roots is one app, N instances).
     apps=0; insts=0; paths=0; size=0
     _ovapps="$STATE/staging/overview.$$.apps"; mkdir -p "$STATE/staging"; : > "$_ovapps"
@@ -1087,18 +1173,41 @@ EOF
 
   backup-info)
     JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
-    ref="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.ref // empty' 2>/dev/null)"
+    _bi="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
+    ref="$(printf '%s' "$_bi" | "$JQ" -r '.ref // empty' 2>/dev/null)"
+    _bipw="$(printf '%s' "$_bi" | "$JQ" -r '.password // empty' 2>/dev/null)"
     [ -n "$(ref_root "$ref")" ] || { err ERR_BAD_REF "invalid ref"; exit 0; }
     m="$ref/manifest.json"; [ -f "$m" ] || { err ERR_NO_BACKUP "manifest not found"; exit 0; }
     size="$(du -sk "$ref" 2>/dev/null | cut -f1)"; case "$size" in ''|*[!0-9]*) size=0 ;; esac; size="$("$JQ" -n "${size:-0} * 1024")"
-    "$JQ" -c --argjson size "${size:-0}" \
-      '{ok:true, ref:(.ref // ""), created_at:.created_at, mode:.mode, user_id:.user_id,
+    # jq filter for a plaintext manifest -> the full info shape. Reused for an unencrypted backup and
+    # for an encrypted one once the caller supplies the passphrase and we decrypt manifest.full.age.
+    _bi_full='{ok:true, ref:(.ref // $ref), created_at:.created_at, mode:.mode, user_id:(.user_id // 0),
         size:$size, package:(.package|del(.icon)), device:.device,
         items:[.items[]|{type, archive, sha256, size}],
         permissions:{runtime:((.permissions.runtime|length)//0),
                      granted:([.permissions.runtime[]?|select(.granted)]|length),
                      appops:((.permissions.appops|length)//0),
-                     ssaid:((.permissions.ssaid|length)>0)}}' "$m" 2>/dev/null ;;
+                     ssaid:((.permissions.ssaid|length)>0)}, encrypted:$enc, locked:false, unlocked:true}'
+    # An encrypted backup keeps its device/items/permissions sealed in manifest.full.age. Without
+    # the passphrase the panel shows only the stub-level fields and marks it encrypted (locked); WITH
+    # the passphrase (the "show details" button) we decrypt the full manifest and reveal everything,
+    # on demand, without restoring anything.
+    if [ -f "$ref/manifest.full.age" ]; then
+      if [ -n "$_bipw" ]; then
+        _fm="$(dec_mani_pw "$_bipw" "$ref/manifest.full.age")" || { err ERR_CRYPTO_PASS "wrong passphrase"; exit 0; }
+        if [ -f "$ref/manifest.full.age.sha256" ] && [ "$(sha256sum "$_fm" | cut -d' ' -f1)" != "$(cat "$ref/manifest.full.age.sha256")" ]; then
+          rm -f "$_fm"; err ERR_MANIFEST_SHA "integrity check failed"; exit 0; fi
+        "$JQ" -c --argjson size "${size:-0}" --arg ref "$ref" --argjson enc true "$_bi_full" "$_fm" 2>/dev/null
+        rm -f "$_fm"
+      else
+        printf '%s' "$(backup_listing "$ref")" | "$JQ" -c --argjson size "${size:-0}" --arg ref "$ref" \
+          '{ok:true, ref:$ref, created_at:.created_at, mode:.mode, user_id:0, size:$size,
+            package:{name:.package, label:.label, versionName:.versionName, versionCode:.versionCode},
+            device:null, items:null, permissions:null, encrypted:true, locked:.locked, unlocked:false}' 2>/dev/null
+      fi
+    else
+      "$JQ" -c --argjson size "${size:-0}" --arg ref "$ref" --argjson enc false "$_bi_full" "$m" 2>/dev/null
+    fi ;;
 
   backup-icon)
     # the app icon (base64 PNG) stored in the backup manifest, so the Backups list
@@ -1107,7 +1216,8 @@ EOF
     ref="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.ref // empty' 2>/dev/null)"
     [ -n "$(ref_root "$ref")" ] || { err ERR_BAD_REF "invalid ref"; exit 0; }
     m="$ref/manifest.json"; [ -f "$m" ] || { err ERR_NO_BACKUP "manifest not found"; exit 0; }
-    ic="$("$JQ" -r '.package.icon // empty' "$m" 2>/dev/null)"
+    if [ -f "$ref/manifest.full.age" ]; then ic="$(backup_listing "$ref" | "$JQ" -r '.icon // empty' 2>/dev/null)"
+    else ic="$("$JQ" -r '.package.icon // empty' "$m" 2>/dev/null)"; fi
     if [ -n "$ic" ]; then ok "\"icon\":\"$ic\""; else err ERR_ICON "no icon in manifest"; fi ;;
 
   backup-icons)
@@ -1118,13 +1228,17 @@ EOF
       | while IFS= read -r ref; do
           [ -n "$(ref_root "$ref")" ] || continue
           [ -f "$ref/manifest.json" ] || continue
-          "$JQ" -c --arg r "$ref" '{($r): (.package.icon // "")}' "$ref/manifest.json" 2>/dev/null
+          if [ -f "$ref/manifest.full.age" ]; then
+            "$JQ" -c -n --arg r "$ref" --arg ic "$(backup_listing "$ref" | "$JQ" -r '.icon // ""' 2>/dev/null)" '{($r): $ic}'
+          else
+            "$JQ" -c --arg r "$ref" '{($r): (.package.icon // "")}' "$ref/manifest.json" 2>/dev/null
+          fi
         done | "$JQ" -s -c '{ok:true, icons:(add // {})}' ;;
 
   delete-backup)
     ref="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | \
            "$(command -v "$BIN/jq" 2>/dev/null || echo jq)" -r '.ref // empty' 2>/dev/null)"
-    # A backup lives under the internal store OR a configured local destination (issue #15).
+    # A backup lives under the internal store OR a configured local destination.
     # Resolve which root this ref sits under, so the delete and the empty-parent cleanup are
     # scoped to a known backups dir, never an arbitrary path. `..` is rejected first (it matches
     # no root), so no ref can traverse out of its root.
@@ -1132,7 +1246,7 @@ EOF
     if [ -z "$_root" ]; then err ERR_BAD_REF "ref must be under a backups dir"
     elif rm -rf "$ref"; then
       # Remove now-empty parent dirs up to (not including) the root, so a deleted backup leaves
-      # no empty app folder behind (issue #14). rmdir only removes empty dirs; stop at the root.
+      # no empty app folder behind. rmdir only removes empty dirs; stop at the root.
       _dd="$(dirname "$ref")"
       while case "$_dd" in "$_root"/?*) : ;; *) false ;; esac && rmdir "$_dd" 2>/dev/null; do
         _dd="$(dirname "$_dd")"
@@ -1195,7 +1309,7 @@ EOF
     id="$(printf '%s' "$_a" | "$JQ" -r '.id // empty' 2>/dev/null)"
     _force="$(printf '%s' "$_a" | "$JQ" -r '.force // false' 2>/dev/null)"
     case "$id" in ""|*/*) err ERR_DEST_ID "invalid id" ;; *)
-      # A local dest is authoritative for its backups (issue #15): deleting its config would orphan
+      # A local dest is authoritative for its backups: deleting its config would orphan
       # any app backup living under it - it drops out of list/restore/delete and no internal copy is
       # left. Refuse while such backups exist, unless force:true, so the user moves/deletes them
       # first. (Path backups keep an internal copy, and `*` skips the dotted .paths dir, so they do

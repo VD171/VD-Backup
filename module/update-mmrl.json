@@ -1,9 +1,9 @@
 {
-  "version": "v1.18",
-  "versionCode": 11800,
-  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.18/VD-Backup-v1.18-universal-lite.zip",
+  "version": "v1.07",
+  "versionCode": 10700,
+  "zipUrl": "https://github.com/VD171/VD-Backup/releases/download/v1.07/VD-Backup-v1.07-universal-lite.zip",
   "changelog": "https://raw.githubusercontent.com/VD171/VD-Backup/main/CHANGELOG.md",
-  "notes": "New:\n\n- The device ID (SSAID) can be applied or restored per app now, off by default and chosen in the restore dialog, so you keep it for the apps that rely on it (such as banking) and leave standard behavior everywhere else. (#35)\n- A new \"Off\" network option blocks every cloud transfer for a backup or restore. (#35)\n- The flashless updater is ABI-aware: a per-architecture install keeps only its own ABI instead of re-fetching the full universal payload, the update bar's dismissal survives a restart, and a new toggle silences it entirely. (#35)\n- Mirror backups show up in the Backups tab and restore from there, like Full and Snapshot backups. (#38)\n\nFixes:\n\n- Disabling the automatic-backup option clears its baseline, so re-enabling starts fresh from the current state instead of backing up every app that changed while the option was off. (#37)\n\nThanks to @walrus543 and @Emad200000 for the reports.",
-  "size": 65429049,
-  "sha256": "1b7a8e883c77cc82ce369cf529a811a3ed001f082c9cc2e2c3a27dfb12ae079a"
+  "notes": "Reliability: unattended and scheduled backups no longer stop when you leave the app - the backup now runs fully outside the app's process group.\n\nRestore: app permissions restore correctly on custom ROMs - per-UID permission modes and a restored app's network-access policy are reapplied (Android 16 and 17). You can opt in, per app, to also back up its network policy.\n\nSettings: exporting settings, or any encrypted backup, now reports a clear message when encryption cannot run on this device, instead of a generic error.\n\nInterface: dragging the interface-scale slider no longer switches tabs.\n\nLanguages: Ukrainian added - 22 languages.",
+  "size": 49628589,
+  "sha256": "4979f4db88a84e9f7176bfea87a98ad00c94fa1044af120162693f04196f4d34"
 }

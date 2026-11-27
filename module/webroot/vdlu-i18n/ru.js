@@ -28,6 +28,6 @@ window.VDLU_I18N_RU = {
   ahead: 'Новее, чем в ленте', aheadSub: 'ваша версия новее опубликованного обновления', silentUpdate: 'Тихое обновление', silentUpdateSub: 'Применяет обновления в фоне, не показывая панель перезагрузки.',
   deferred: 'Загрузка отложена', deferredSub: 'ожидание разрешённой сети, возобновится при следующей проверке',
   updateAvail: 'Доступно обновление', install: 'установить', fileOne: 'файл', fileMany: 'файлов',
-  requiresReboot: 'требуется перезагрузка', checkFail: 'Ошибка проверки', ksuUnavailable: 'API KSU недоступен',
+  requiresReboot: 'требуется перезагрузка', checkFail: 'Ошибка проверки', offline: 'Не в сети', busy: 'Проверка уже выполняется', ksuUnavailable: 'API KSU недоступен',
   pendingUpdate: 'Ожидающее обновление', notNow: 'Не сейчас', srcPlaceholder: 'https://…/&lt;модуль&gt;'
 };

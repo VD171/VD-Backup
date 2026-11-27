@@ -22,7 +22,7 @@
 # ======================================================================
 #
 #  Generate the project Wiki from docs/. Single source of generation, used by
-#  both the GitHub wiki-sync workflow and the manual Forgejo wiki push, so both
+#  both the GitHub wiki-sync workflow and a manual mirror wiki push, so both
 #  wikis are byte-identical. docs/ stays the source of truth; this only renders
 #  a Home, a _Sidebar and a Languages index around the mirrored pages.
 #
@@ -274,7 +274,7 @@ write_home() {   # <code>
 write_home en
 for _c in $NAV_LANGS; do write_home "$_c"; done
 
-# home-note mode: the Claude attribution footer lands on the generated Home pages here (every
+# home-note mode: the documentation attribution footer lands on the generated Home pages here (every
 # other page carries it from its docs/ source). append-all mode already did Home inside write_home
 # and does the doc pages in the prepend_nav loop below.
 if [ "$WIKI_FOOTER_MODE" = home-note ]; then

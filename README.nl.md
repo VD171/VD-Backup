@@ -82,7 +82,7 @@ bestaande back-ups van Neo-Backup en Android-DataBackup importeren zodat je kunt
 - **Getrouw behoud:** SELinux-contexten, uid/gid, modi, xattr en capabilities.
 - **Compressie:** geen / lz4 / zstd / gzip (gzip = "compatibiliteitsmodus", opent overal).
 - **Versleuteling:** optioneel en draagbaar (`age` + wachtwoordzin of AES-256-zip), nooit
-  gebonden aan de apparaathardware, zodat een back-up op een ander apparaat wordt hersteld of op een pc wordt geopend.
+  gebonden aan de apparaathardware, zodat een back-up op een ander apparaat wordt hersteld of op een pc wordt geopend. Een versleutelde back-up verzegelt ook zijn metadata (machtigingen, app-label, de bestandslijst), zodat de bestanden alleen niets prijsgeven, terwijl de WebUI hem nog steeds meteen vermeldt.
 - **Bestemmingen:** lokaal, SFTP, SCP, SMB, WebDAV, FTP, S3 en 70+ meer (`rclone`),
   plus `rsync`-repository's en `restic`-repository's. Optioneel Google Drive via een piepkleine optionele begeleider.
 - **Telegram:** maak een back-up naar een prive Telegram-kanaal als onbeperkte cloudopslag via MTProto, herstellen en verwijderen ook vanuit de WebUI.

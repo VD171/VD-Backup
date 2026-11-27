@@ -73,6 +73,14 @@ Kể từ bản phát hành công khai đầu tiên trở đi, lời hứa dư�
   mọi trường một cách phòng thủ (các trường tùy chọn bị thiếu sẽ quay về giá trị mặc định) và cài đặt
   các APK cũng như giải nén các kho lưu trữ theo tên tệp và phần mở rộng của chúng, chứ không giả định một hình dạng
   manifest cố định.
+- **Siêu dữ liệu được niêm phong khi mã hóa.** Khi dữ liệu được mã hóa, manifest đầy đủ được mã
+  hóa bằng cụm mật khẩu trong `manifest.full.age`, nên một bản sao lưu không rò rỉ siêu dữ liệu nào
+  (quyền, nhãn ứng dụng, kích thước, danh sách tập tin) cho ai chỉ giữ các tập tin; `manifest.json`
+  vẫn là một điểm đánh dấu nhỏ không nhạy cảm để mọi lối "một bản sao lưu nằm ở đây" vẫn hoạt động.
+  Một stub liệt kê nhỏ xíu được giữ hai lần - mã hóa bằng khóa thiết bị (WebUI liệt kê nhanh mà
+  không cần cụm mật khẩu) và bằng cụm mật khẩu (một bản sao lưu được chuyển sang thiết bị khác vẫn
+  liệt kê được ở đó). Thư mục giữ tên `<package>/<timestamp>` của nó, nên gói là thứ duy nhất mà
+  lối vẫn để lộ; mọi thứ khác đều được niêm phong.
 - **Khôi phục tương thích tiến.** Khôi phục không bao giờ từ chối một bản sao lưu vì nó cũ, và một
   VDBackup cũ hơn sẽ âm thầm bỏ qua các loại mục mà nó không biết thay vì thất bại. Do đó một VDBackup mới hơn
   khôi phục được bất kỳ bản sao lưu cũ nào, và các kho lưu trữ định dạng chuẩn vẫn

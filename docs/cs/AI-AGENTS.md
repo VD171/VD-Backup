@@ -58,13 +58,13 @@ cíle (`rclone`/`restic`/ssh) komunikují se sítí.
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (znovupřipojení po opětovném připojení) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | seznam aplikací / dávkové base64 ikony |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = metadata jsou zapečetěná; `locked` = šifrovaná a toto zařízení nedokáže přečíst ani výpisový stub, např. záloha z jiného zařízení - stále se obnoví s heslovou frází) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` nastaví nebo zruší vlastní název zálohy (`note`) a volné `tags`, uloženo v průvodním souboru, který cestuje se zálohou, prohledatelné z `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` uživatelé Androidu v zařízení (více uživatelů). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` podadresáře cesty (výběr složky). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` samostatné zálohy složky/souboru. |
 | `provenance` | `{}` | auditní manifest přibalených binárek (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` úplné detaily jedné zálohy (verze, zdroj instalace, stav, datum, režim, velikost, položky, počty oprávnění, zařízení) |
+| `backup-info` | `{ref}` | `{ok,...}` úplné detaily jedné zálohy (verze, zdroj instalace, stav, datum, režim, velikost, položky, počty oprávnění, zařízení); u šifrované zálohy vrací `encrypted:true` pouze s poli na úrovni stubu (úplné detaily jsou zapečetěné a zobrazí se při obnově, s heslovou frází) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64 PNG z manifestu (funguje, když je aplikace odinstalována) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref musí být pod adresářem záloh) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` ponechá N nejnovějších záloh balíčku |

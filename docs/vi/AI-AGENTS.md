@@ -58,13 +58,13 @@ các đích đám mây (`rclone`/`restic`/ssh) mới nói chuyện với mạng.
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (gắn lại sau khi kết nối lại) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | danh sách ứng dụng / lô biểu tượng base64 |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = siêu dữ liệu được niêm phong; `locked` = đã mã hóa và thiết bị này không thể đọc ngay cả stub liệt kê, ví dụ một bản sao lưu từ thiết bị khác - nó vẫn khôi phục được bằng cụm mật khẩu) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` đặt hoặc xóa tên tùy chỉnh của một bản sao lưu (`note`) và các `tags` tự do, được lưu trong một tệp đi kèm di chuyển cùng bản sao lưu, có thể tìm kiếm từ `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` người dùng Android của thiết bị (đa người dùng). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` thư mục con của một đường dẫn (bộ chọn thư mục). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` sao lưu thư mục/tệp độc lập. |
 | `provenance` | `{}` | tệp kê khai kiểm toán các nhị phân đi kèm (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` toàn bộ chi tiết của một bản sao lưu (phiên bản, nguồn cài đặt, trạng thái, ngày, chế độ, kích thước, mục, số lượng quyền, thiết bị) |
+| `backup-info` | `{ref}` | `{ok,...}` toàn bộ chi tiết của một bản sao lưu (phiên bản, nguồn cài đặt, trạng thái, ngày, chế độ, kích thước, mục, số lượng quyền, thiết bị); với một bản sao lưu đã mã hóa, nó trả về `encrypted:true` chỉ với các trường mức stub (chi tiết đầy đủ được niêm phong và thấy khi khôi phục, bằng cụm mật khẩu) |
 | `backup-icon` | `{ref}` | `{ok,icon}` PNG base64 từ manifest (hoạt động cả khi ứng dụng đã bị gỡ cài đặt) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref phải nằm dưới thư mục backups) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` giữ N bản mới nhất của một gói |

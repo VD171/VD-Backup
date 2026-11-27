@@ -9,6 +9,15 @@ zonder deze module. Een backupmap bevat een `manifest.json`, de APK's
 (`*.apk.zst`) en de data-archieven (`<item>.tar.zst`, `.tar.gz` of `.tar.lz4`),
 optioneel versleuteld met een achterliggende `.age`.
 
+**Als de data is versleuteld**, wordt de metadata ook versleuteld, zodat er niets
+van uitlekt naar iemand die alleen de bestanden heeft. De map bevat dan ook
+`manifest.full.age` (het volledige manifest) en twee kleine `stub.*.age`-bestanden.
+`manifest.json` is in dat geval slechts een piepkleine, niet-gevoelige markering, de
+echte details staan in `manifest.full.age`. Alles wat draagbaar is (de data-archieven
+en `manifest.full.age`) ontsleutel je met alleen je **wachtwoordzin** - zie stap 1. De
+`stub.dev.age` / `stub.pass.age`-bestanden zijn alleen de listing-cache van de module op
+het apparaat, op een pc kun je ze negeren.
+
 ## Tools die je nodig kunt hebben
 
 - **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
@@ -18,19 +27,19 @@ optioneel versleuteld met een achterliggende `.age`.
 
 ## 1. Ontsleutelen (alleen als het bestand eindigt op `.age`)
 
-Keyfile (aanbevolen):
-
-```
-age -d -i age.key -o data.tar.zst  data.tar.zst.age
-```
-
-Wachtwoordzin:
+Wachtwoordzin (de draagbare manier - werkt op elke pc met alleen je wachtwoordzin):
 
 ```
 age -d -o data.tar.zst  data.tar.zst.age      # age will prompt for the passphrase
 ```
 
-Doe hetzelfde voor elk `*.age`-bestand (APK's en data-archieven).
+Doe hetzelfde voor elk `*.age`-bestand (APK's en data-archieven). Als de backup
+versleuteld is, ontsleutel je `manifest.full.age` op dezelfde manier om het volledige
+manifest te lezen:
+
+```
+age -d -o manifest.json  manifest.full.age    # the full, readable manifest
+```
 
 ## 2. Decomprimeren + uitpakken
 
@@ -65,8 +74,10 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 - Uitgepakte bestanden behouden hun relatieve paden, de SELinux-context, uid/gid en modes
   zitten binnen de tar (en worden alleen goed opnieuw toegepast wanneer je op Android terugzet).
 - `manifest.json` beschrijft precies wat elk bestand is, de app-versie en de
-  oorspronkelijke eigenaar/context. Het is de bron van de waarheid.
-- Niets hier is gebonden aan een specifiek apparaat: dezelfde wachtwoordzin/keyfile werkt op elke
+  oorspronkelijke eigenaar/context. Het is de bron van de waarheid. Bij een versleutelde
+  backup is het volledige manifest `manifest.full.age` (ontsleutel het zoals in stap 1), de
+  leesbare `manifest.json` is slechts een kleine markering en bevat geen gevoelige gegevens.
+- Niets hier is gebonden aan een specifiek apparaat: dezelfde wachtwoordzin werkt op elke
   machine.
 
 <!-- doc-footer -->

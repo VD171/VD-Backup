@@ -58,13 +58,13 @@ backup/restore, alleen cloudbestemmingen (`rclone`/`restic`/ssh) praten met het 
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (opnieuw aanhaken na herverbinden) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | app-lijst / batch base64-pictogrammen |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = de metadata is verzegeld; `locked` = versleuteld en dit apparaat kan zelfs de listing-stub niet lezen, bv. een backup van een ander apparaat - het wordt nog steeds hersteld met de wachtwoordzin) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` stelt de eigen naam van een back-up (`note`) en vrije `tags` in of wist ze, opgeslagen in een begeleidend bestand dat met de back-up meereist, doorzoekbaar vanuit `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` Android-gebruikers van het apparaat (multi-user). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` submappen van een pad (mapkiezer). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` losse map-/bestandsback-ups. |
 | `provenance` | `{}` | audit-manifest van de meegeleverde binaries (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` alle details van één backup (versie, installatiebron, staat, datum, modus, grootte, items, machtigingstellingen, apparaat) |
+| `backup-info` | `{ref}` | `{ok,...}` alle details van één backup (versie, installatiebron, staat, datum, modus, grootte, items, machtigingstellingen, apparaat); voor een versleutelde backup geeft het `encrypted:true` terug met alleen de velden op stub-niveau (het volledige detail is verzegeld en wordt bij herstel gezien, met de wachtwoordzin) |
 | `backup-icon` | `{ref}` | `{ok,icon}` base64-PNG uit het manifest (werkt wanneer de app is verwijderd) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref moet onder de backups-map liggen) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` bewaar nieuwste N van een pakket |

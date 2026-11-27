@@ -9,6 +9,12 @@ backup ของ VDBackup ใช้ **รูปแบบมาตรฐาน** 
 (`*.apk.zst`) และ archive ข้อมูล (`<item>.tar.zst`, `.tar.gz` หรือ `.tar.lz4`)
 ซึ่งอาจเข้ารหัสด้วย `.age` ต่อท้ายเป็นตัวเลือก
 
+**หากข้อมูลถูกเข้ารหัส** เมทาดาทาก็จะถูกเข้ารหัสด้วย ดังนั้นจึงไม่มีส่วนใดรั่วไหลไปยังใครก็ตามที่มีเพียงไฟล์
+จากนั้นโฟลเดอร์จะมี `manifest.full.age` (manifest ฉบับเต็ม) และไฟล์ `stub.*.age` ขนาดเล็กสองไฟล์เพิ่มเข้ามาด้วย
+ในกรณีนั้น `manifest.json` เป็นเพียง marker ขนาดเล็กที่ไม่ละเอียดอ่อน รายละเอียดจริงอยู่ใน `manifest.full.age`
+ทุกอย่างที่พกพาได้ (archive ข้อมูลและ `manifest.full.age`) ถอดรหัสได้ด้วยเพียง **passphrase** ของคุณ - ดูขั้นตอนที่ 1
+ไฟล์ `stub.dev.age` / `stub.pass.age` เป็นเพียงแคชการแสดงรายการบนอุปกรณ์ของโมดูล คุณสามารถเพิกเฉยต่อมันบน PC ได้
+
 ## เครื่องมือที่คุณอาจต้องใช้
 
 - **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
@@ -18,19 +24,18 @@ backup ของ VDBackup ใช้ **รูปแบบมาตรฐาน** 
 
 ## 1. ถอดรหัส (เฉพาะเมื่อไฟล์ลงท้ายด้วย `.age`)
 
-Keyfile (แนะนำ):
-
-```
-age -d -i age.key -o data.tar.zst  data.tar.zst.age
-```
-
-Passphrase:
+Passphrase (วิธีที่พกพาได้ - ใช้ได้บน PC ใดก็ได้ด้วยเพียง passphrase ของคุณ):
 
 ```
 age -d -o data.tar.zst  data.tar.zst.age      # age will prompt for the passphrase
 ```
 
-ทำแบบเดียวกันสำหรับแต่ละไฟล์ `*.age` (ทั้ง APK และ archive ข้อมูล)
+ทำแบบเดียวกันสำหรับแต่ละไฟล์ `*.age` (ทั้ง APK และ archive ข้อมูล) หาก backup ถูกเข้ารหัส
+ให้ถอดรหัส `manifest.full.age` ด้วยวิธีเดียวกันเพื่ออ่าน manifest ฉบับเต็ม:
+
+```
+age -d -o manifest.json  manifest.full.age    # the full, readable manifest
+```
 
 ## 2. แตกการบีบอัด + แตกไฟล์
 
@@ -65,8 +70,10 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 - ไฟล์ที่แตกออกมายังคง relative path ของมันไว้, SELinux context, uid/gid และ modes
   อยู่ภายใน tar (และจะถูกนำกลับมาใช้อย่างถูกต้องก็ต่อเมื่อคุณ restore บน Android)
 - `manifest.json` อธิบายอย่างแน่นอนว่าแต่ละไฟล์คืออะไร เวอร์ชันแอป และ
-  เจ้าของ/context เดิม มันเป็นแหล่งความจริง
-- ไม่มีอะไรในนี้ผูกกับอุปกรณ์เฉพาะ: passphrase/keyfile เดียวกันใช้ได้บนเครื่องใด
+  เจ้าของ/context เดิม มันเป็นแหล่งความจริง สำหรับ backup ที่เข้ารหัส manifest ฉบับเต็มคือ
+  `manifest.full.age` (ถอดรหัสมันตามขั้นตอนที่ 1) ส่วน `manifest.json` ที่เป็น plaintext เป็นเพียง
+  marker ขนาดเล็กและไม่มีข้อมูลที่ละเอียดอ่อน
+- ไม่มีอะไรในนี้ผูกกับอุปกรณ์เฉพาะ: passphrase เดียวกันใช้ได้บนเครื่องใด
   ก็ได้
 
 <!-- doc-footer -->

@@ -252,6 +252,15 @@ zodat een versleutelde backup op een ander apparaat herstelt en op een pc opent.
 compatibele AES-256-zip-modus is ook beschikbaar voor versleutelde archieven die je met een
 dubbelklik en een wachtwoord wilt openen.)
 
+Wanneer een backup is versleuteld, wordt ook zijn **metadata verzegeld** - de machtigingen,
+het app-label, de bestandsgroottes en de bestandslijst zijn allemaal versleuteld, zodat iemand
+die alleen de bestanden in handen krijgt (een cloudkopie, een verwijderde SD-kaart) er niets
+uit leert. De WebUI vermeldt je versleutelde backups nog steeds meteen, omdat een kleine
+listing-stub versleuteld wordt bewaard met een sleutel die alleen op dit apparaat bestaat, een
+backup die naar een ander apparaat is verplaatst blijft daar vermeldbaar zodra je de
+wachtwoordzin invoert. Alleen de pakketnaam van de app blijft zichtbaar in de mapnaam, zodat de
+backups draagbaar en makkelijk te beheren blijven.
+
 Om versleuteling te gebruiken, genereer je de versleutelingssleutel eenmaal (Instellingen),
 schakel je vervolgens versleuteling in voor je taak en stel je een wachtwoordzin in. De
 wachtwoordzin is wat de backup beschermt, kies er dus een sterke, er is geen hardwaresleutel

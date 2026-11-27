@@ -58,13 +58,13 @@ cloud (`rclone`/`restic`/ssh) yang berkomunikasi dengan jaringan.
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (reattach setelah tersambung kembali) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | daftar aplikasi / ikon base64 batch |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = metadata tersegel; `locked` = terenkripsi dan perangkat ini tidak bisa membaca bahkan stub daftarnya, mis. sebuah backup dari perangkat lain - ia tetap dipulihkan dengan frasa-sandi) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` menetapkan atau menghapus nama khusus cadangan (`note`) dan `tags` bebas, disimpan dalam berkas pendamping yang ikut bersama cadangan, dapat dicari dari `list-backups`. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` pengguna Android perangkat (multi-pengguna). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` subdirektori dari sebuah path (pemilih folder). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` cadangan folder/berkas mandiri. |
 | `provenance` | `{}` | manifes audit biner bawaan (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` detail lengkap satu backup (versi, sumber pemasangan, keadaan, tanggal, mode, ukuran, item, jumlah izin, perangkat) |
+| `backup-info` | `{ref}` | `{ok,...}` detail lengkap satu backup (versi, sumber pemasangan, keadaan, tanggal, mode, ukuran, item, jumlah izin, perangkat); untuk backup terenkripsi ia mengembalikan `encrypted:true` dengan field tingkat-stub saja (detail lengkap tersegel dan terlihat saat restore, dengan frasa-sandi) |
 | `backup-icon` | `{ref}` | `{ok,icon}` PNG base64 dari manifest (berfungsi saat aplikasi sudah dicopot) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref harus berada di bawah direktori backups) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` simpan N terbaru dari sebuah paket |

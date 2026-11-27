@@ -232,6 +232,14 @@ La cifratura non è **mai** legata alle chiavi hardware del tuo dispositivo, qui
 si ripristina su un altro dispositivo e si apre su un PC. (È disponibile anche una modalità zip AES-256 compatibile
 per gli archivi cifrati che vuoi aprire con un doppio clic e una password.)
 
+Quando un backup è cifrato, anche i suoi **metadati sono sigillati** - i permessi, l'etichetta
+dell'app, le dimensioni dei file e l'elenco dei file sono tutti cifrati, così chiunque metta le mani
+solo sui file (una copia nel cloud, una scheda SD rimossa) non ne apprende nulla. La WebUI continua a
+elencare istantaneamente i tuoi backup cifrati, perché un piccolo stub di listing è conservato
+cifrato con una chiave solo-dispositivo; un backup spostato su un altro dispositivo resta elencabile
+lì una volta inserita la sua passphrase. Solo il nome del pacchetto dell'app resta visibile nel nome
+della cartella, così i backup restano portatili e facili da gestire.
+
 Per usare la cifratura, genera una volta la chiave di cifratura (Settings), poi abilita
 la cifratura per il tuo lavoro e imposta una passphrase. La passphrase è ciò che protegge il
 backup, quindi scegline una forte, non c'è chiave hardware e nessuna backdoor di recupero.

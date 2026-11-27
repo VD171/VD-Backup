@@ -58,13 +58,13 @@ SSH-to-root 설정)을 통해 그 명령을 실행하세요. 모듈은 바이너
 | `cancel` | base64(opid) | `{ok,cancelled}` |
 | `list-ops` | `{}` | `{ok,ops:[...]}` (재연결 후 다시 붙기) |
 | `list-apps`/`icons` | `{user?}` / `{user?,items:[{package,vc}]}` | 앱 목록 / 일괄 base64 아이콘 |
-| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,items}]}` |
+| `list-backups` | `{package?}` | `{ok,backups:[{ref,package,label,versionName,versionCode,created_at,mode,note,tags,encrypted,locked,items}]}` (`encrypted` = 메타데이터가 봉인됨, `locked` = 암호화되어 있고 이 기기가 목록 스텁조차 읽을 수 없음, 예: 다른 기기에서 온 백업 - 그래도 암호문으로 복원됩니다) |
 | `note-set` | `{ref,note?,tags?}` | `{ok}` 백업의 사용자 지정 이름(`note`)과 자유 `tags`를 설정하거나 지웁니다. 백업과 함께 이동하는 사이드카에 저장되며 `list-backups`에서 검색할 수 있습니다. |
 | `list-users` | `{}` | `{ok,users:[{id,name}]}` 기기의 Android 사용자(멀티 유저). |
 | `list-dirs` | `{path}` | `{ok,path,parent,dirs:[...]}` 경로의 하위 디렉터리(폴더 선택기). |
 | `path-list` | `{user?}` | `{ok,backups:[...]}` 독립 폴더/파일 백업. |
 | `provenance` | `{}` | 번들 바이너리 감사 매니페스트 (`PROVENANCE.json`). |
-| `backup-info` | `{ref}` | `{ok,...}` 한 백업의 전체 세부 정보 (버전, 설치 출처, 상태, 날짜, 모드, 크기, 항목, 권한 개수, 기기) |
+| `backup-info` | `{ref}` | `{ok,...}` 한 백업의 전체 세부 정보 (버전, 설치 출처, 상태, 날짜, 모드, 크기, 항목, 권한 개수, 기기); 암호화된 백업의 경우 스텁 수준 필드만 포함하여 `encrypted:true`를 반환합니다 (전체 세부 정보는 봉인되어 있으며 암호문과 함께 복원 시 확인됩니다) |
 | `backup-icon` | `{ref}` | `{ok,icon}` 매니페스트에서 가져온 base64 PNG (앱이 제거된 경우에도 동작) |
 | `delete-backup` | `{ref}` | `{ok,deleted}` (ref는 backups 디렉터리 아래여야 함) |
 | `prune` | `{package,user?,keep}` | `{ok,pruned:[...]}` 패키지의 최신 N개 유지 |

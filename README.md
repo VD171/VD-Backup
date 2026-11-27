@@ -83,6 +83,8 @@ import existing Neo-Backup and Android-DataBackup backups so you can move over.
 - **Compression:** none / lz4 / zstd / gzip (gzip = "compatibility mode", opens anywhere).
 - **Encryption:** optional and portable (`age` + passphrase, or AES-256 zip), never
   tied to device hardware, so a backup restores on another device or opens on a PC.
+  An encrypted backup also seals its metadata (permissions, app label, the file list),
+  so the files alone give nothing away, while the WebUI still lists it instantly.
 - **Destinations:** local, SFTP, SCP, SMB, WebDAV, FTP, S3 and 70+ more (`rclone`),
   plus `rsync` and `restic` repos. Optional Google Drive via a tiny opt-in companion.
 - **Telegram:** back up to a private Telegram channel as unlimited cloud storage over MTProto, restore and delete from the WebUI too.

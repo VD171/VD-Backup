@@ -28,6 +28,6 @@ window.VDLU_I18N_FA = {
   ahead: 'جدیدتر از فید', aheadSub: 'نسخهٔ شما جدیدتر از به‌روزرسانی منتشرشده است', silentUpdate: 'به‌روزرسانی بی‌صدا', silentUpdateSub: 'به‌روزرسانی‌ها را در پس‌زمینه و بدون نمایش نوار راه‌اندازی مجدد اعمال می‌کند.',
   deferred: 'دانلود به تعویق افتاد', deferredSub: 'در انتظار شبکهٔ مجاز، در بررسی بعدی ازسر گرفته می‌شود',
   updateAvail: 'به‌روزرسانی موجود است', install: 'نصب', fileOne: 'فایل', fileMany: 'فایل',
-  requiresReboot: 'نیازمند راه‌اندازی مجدد', checkFail: 'بررسی ناموفق بود', ksuUnavailable: 'KSU API در دسترس نیست',
+  requiresReboot: 'نیازمند راه‌اندازی مجدد', checkFail: 'بررسی ناموفق بود', offline: 'آفلاین', busy: 'یک بررسی در حال اجراست', ksuUnavailable: 'KSU API در دسترس نیست',
   pendingUpdate: 'به‌روزرسانی در انتظار', notNow: 'الان نه', srcPlaceholder: 'https://…/&lt;ماژول&gt;'
 };

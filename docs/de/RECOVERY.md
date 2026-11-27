@@ -9,6 +9,15 @@ ohne dieses Modul. Ein Backup-Ordner enthält eine `manifest.json`, die APKs
 (`*.apk.zst`) und die Datenarchive (`<item>.tar.zst`, `.tar.gz` oder `.tar.lz4`),
 optional verschlüsselt mit einem nachgestellten `.age`.
 
+**Wenn die Daten verschlüsselt sind**, sind auch die Metadaten verschlüsselt, sodass
+nichts davon an jemanden gelangt, der nur die Dateien hat. Der Ordner enthält dann
+zusätzlich `manifest.full.age` (das vollständige Manifest) und zwei kleine
+`stub.*.age`-Dateien. `manifest.json` ist in diesem Fall nur ein winziger, nicht sensibler
+Marker; die eigentlichen Details stehen in `manifest.full.age`. Alles Portable (die
+Datenarchive und `manifest.full.age`) wird allein mit deiner **Passphrase** entschlüsselt -
+siehe Schritt 1. Die Dateien `stub.dev.age` / `stub.pass.age` sind nur der geräteinterne
+Auflistungs-Cache des Moduls; auf einem PC kannst du sie ignorieren.
+
 ## Werkzeuge, die du brauchen könntest
 
 - **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
@@ -18,19 +27,19 @@ optional verschlüsselt mit einem nachgestellten `.age`.
 
 ## 1. Entschlüsseln (nur wenn die Datei auf `.age` endet)
 
-Schlüsseldatei (empfohlen):
-
-```
-age -d -i age.key -o data.tar.zst  data.tar.zst.age
-```
-
-Passphrase:
+Passphrase (der portable Weg - funktioniert auf jedem PC allein mit deiner Passphrase):
 
 ```
 age -d -o data.tar.zst  data.tar.zst.age      # age will prompt for the passphrase
 ```
 
-Mach dasselbe für jede `*.age`-Datei (APKs und Datenarchive).
+Mach dasselbe für jede `*.age`-Datei (APKs und Datenarchive). Wenn das Backup verschlüsselt
+ist, entschlüssele `manifest.full.age` auf dieselbe Weise, um das vollständige Manifest zu
+lesen:
+
+```
+age -d -o manifest.json  manifest.full.age    # the full, readable manifest
+```
 
 ## 2. Dekomprimieren + extrahieren
 
@@ -65,9 +74,12 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 - Extrahierte Dateien behalten ihre relativen Pfade, der SELinux-Kontext, uid/gid und Modi
   sind im tar (und werden erst korrekt erneut angewendet, wenn du auf Android wiederherstellst).
 - `manifest.json` beschreibt genau, was jede Datei ist, die App-Version und den
-  ursprünglichen Eigentümer/Kontext. Es ist die Quelle der Wahrheit.
-- Nichts hier ist an ein bestimmtes Gerät gebunden: dieselbe Passphrase/Schlüsseldatei funktioniert auf jeder
-  Maschine.
+  ursprünglichen Eigentümer/Kontext. Es ist die Quelle der Wahrheit. Bei einem
+  verschlüsselten Backup ist das vollständige Manifest `manifest.full.age` (entschlüssele
+  es wie in Schritt 1); die Klartext-`manifest.json` ist nur ein kleiner Marker und enthält
+  keine sensiblen Daten.
+- Nichts hier ist an ein bestimmtes Gerät gebunden: dieselbe Passphrase funktioniert auf
+  jeder Maschine.
 
 <!-- doc-footer -->
 

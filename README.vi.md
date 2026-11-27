@@ -83,6 +83,7 @@ các bản sao lưu Neo-Backup và Android-DataBackup hiện có để bạn chu
 - **Nén:** none / lz4 / zstd / gzip (gzip = "chế độ tương thích", mở được ở mọi nơi).
 - **Mã hóa:** tùy chọn và khả chuyển (`age` + cụm mật khẩu, hoặc zip AES-256), không bao giờ
   gắn với phần cứng của thiết bị, nên một bản sao lưu có thể khôi phục trên thiết bị khác hoặc mở trên PC.
+  Một bản sao lưu đã mã hóa cũng niêm phong siêu dữ liệu của nó (quyền, nhãn ứng dụng, danh sách tập tin), nên chỉ riêng các tập tin chẳng để lộ gì, trong khi WebUI vẫn liệt kê nó tức thì.
 - **Đích đến:** cục bộ, SFTP, SCP, SMB, WebDAV, FTP, S3 và hơn 70 loại khác (`rclone`), cùng với
   kho `rsync` và `restic`. Tùy chọn Google Drive qua một ứng dụng đồng hành nhỏ bật theo lựa chọn.
 - **Telegram:** sao lưu vào một kênh Telegram riêng tư như kho lưu trữ đám mây không giới hạn qua MTProto, khôi phục và xóa cũng từ WebUI.

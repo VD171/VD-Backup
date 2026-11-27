@@ -73,6 +73,14 @@ derlemeleri kapsanmaz. İlk genel sürümden itibaren, aşağıdaki söz mutlakt
   her alanı savunmacı şekilde okur (eksik isteğe bağlı alanlar bir varsayılana geri döner) ve
   APK'ları dosya adlarına ve uzantılarına göre yükler, arşivleri aynı şekilde çıkarır, sabit bir manifest
   şekli varsaymaz.
+- **Şifrelendiğinde mühürlenen üst veri.** Veri şifrelendiğinde, tam manifesto
+  `manifest.full.age` içinde parolayla şifrelenir, dolayısıyla bir yedek yalnızca dosyalara
+  sahip olana hiçbir üst veri (izinler, uygulama etiketi, boyutlar, dosya listesi) sızdırmaz;
+  `manifest.json` küçük, hassas olmayan bir işaretçi olarak kalır, böylece her "burada bir yedek
+  var" yolu hâlâ çalışır. Küçücük bir listeleme saplaması iki kez tutulur - bir cihaz anahtarıyla
+  şifrelenir (WebUI parola olmadan hızlıca listeler) ve parolayla (başka bir cihaza taşınan bir
+  yedek orada listelenebilir kalır). Dizin, `<package>/<timestamp>` adını korur, dolayısıyla
+  paket, yolun hâlâ açığa çıkardığı tek şeydir; geri kalan her şey mühürlüdür.
 - **İleriye dönük uyumlu geri yükleme.** Geri yükleme bir yedeği eski olduğu için asla reddetmez ve
   daha eski bir VDBackup, bilmediği öğe türlerini başarısız olmak yerine sessizce atlar. Bu nedenle daha yeni bir
   VDBackup, herhangi bir daha eski yedeği geri yükler ve standart biçimli arşivler her durumda elle

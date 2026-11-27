@@ -9,6 +9,14 @@ sem este módulo. Uma pasta de backup contém um `manifest.json`, os APKs
 (`*.apk.zst`) e os archives de dados (`<item>.tar.zst`, `.tar.gz` ou `.tar.lz4`),
 opcionalmente cifrados com um `.age` final.
 
+**Se os dados estiverem cifrados**, os metadados também são cifrados, então nada deles vaza
+para quem tiver apenas os arquivos. A pasta então também contém `manifest.full.age` (o
+manifesto completo) e dois pequenos arquivos `stub.*.age`. Nesse caso o `manifest.json` é
+apenas um marcador fino e não sensível; os detalhes reais estão em `manifest.full.age`. Tudo
+que é portátil (os archives de dados e o `manifest.full.age`) se decifra apenas com a sua
+**senha** - veja o passo 1. Os arquivos `stub.dev.age` / `stub.pass.age` são apenas o cache de
+listagem do módulo no dispositivo; você pode ignorá-los num PC.
+
 ## Ferramentas que você pode precisar
 
 - **zstd**: https://github.com/facebook/zstd/releases  (macOS: `brew install zstd`, Linux: `apt install zstd`)
@@ -18,19 +26,18 @@ opcionalmente cifrados com um `.age` final.
 
 ## 1. Decifrar (só se o arquivo terminar com `.age`)
 
-Keyfile (recomendado):
-
-```
-age -d -i age.key -o data.tar.zst  data.tar.zst.age
-```
-
-Senha:
+Senha (a forma portátil - funciona em qualquer PC apenas com a sua senha):
 
 ```
 age -d -o data.tar.zst  data.tar.zst.age      # age will prompt for the passphrase
 ```
 
-Faça o mesmo para cada arquivo `*.age` (APKs e archives de dados).
+Faça o mesmo para cada arquivo `*.age` (APKs e archives de dados). Se o backup estiver
+cifrado, decifre o `manifest.full.age` da mesma forma para ler o manifesto completo:
+
+```
+age -d -o manifest.json  manifest.full.age    # the full, readable manifest
+```
 
 ## 2. Descomprimir + extrair
 
@@ -65,8 +72,10 @@ zstd -d base.apk.zst            # -> base.apk  (a normal installable APK)
 - Arquivos extraídos mantêm seus caminhos relativos, o contexto SELinux, uid/gid e modes
   estão dentro do tar (e são reaplicados adequadamente só quando você restaura no Android).
 - `manifest.json` descreve exatamente o que cada arquivo é, a versão do app e o
-  owner/contexto original. Ele é a fonte da verdade.
-- Nada aqui é atrelado a um dispositivo específico: a mesma senha/keyfile funciona em qualquer
+  owner/contexto original. Ele é a fonte da verdade. Para um backup cifrado o manifesto
+  completo é o `manifest.full.age` (decifre-o como no passo 1); o `manifest.json` em texto
+  claro é apenas um pequeno marcador e não carrega nenhum dado sensível.
+- Nada aqui é atrelado a um dispositivo específico: a mesma senha funciona em qualquer
   máquina.
 
 <!-- doc-footer -->
