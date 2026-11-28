@@ -30,6 +30,7 @@
   <link rel="icon" href="assets/logo-icon.svg">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="vdlu.css">
+  <script src="ui-switch.js"></script>
 </head>
 <body>
   <header class="topbar">
@@ -274,6 +275,14 @@
     <section id="settings" class="panel">
       <div class="card">
         <div class="field">
+          <label for="ui-mode-sel" data-i18n="settings_interface">Interface</label>
+          <select id="ui-mode-sel">
+            <option value="classic" data-i18n="opt_ui_classic">Classic</option>
+            <option value="next" data-i18n="opt_ui_next">New</option>
+          </select>
+          <div class="muted" data-i18n="settings_interface_hint">Switch between the classic interface and the new one. Both have every feature, and you can switch back at any time.</div>
+        </div>
+        <div class="field">
           <label data-i18n="settings_theme">Theme</label>
           <select id="set-theme">
             <option value="auto" data-i18n="opt_theme_auto">System</option>
@@ -375,6 +384,10 @@
           <input type="checkbox" class="switch" id="set-thermal"><span data-i18n="settings_thermal">Pause to cool down when the device gets hot</span>
         </div>
         <div class="muted" data-i18n="settings_thermal_hint">During a long backup, VDBackup waits a moment between apps if the device is running hot, so a big batch cannot overheat it. On by default.</div>
+        <div class="field check">
+          <input type="checkbox" class="switch" id="set-notify-progress"><span data-i18n="settings_notify_progress">Show progress in a notification</span>
+        </div>
+        <div class="muted" data-i18n="settings_notify_progress_hint">While a backup or restore runs, a notification shows its percent and current app, updated every few seconds. Off by default.</div>
         <div class="field check">
           <input type="checkbox" class="switch" id="set-space-preflight"><span data-i18n="settings_space_preflight">Check free space before a batch backup</span>
         </div>

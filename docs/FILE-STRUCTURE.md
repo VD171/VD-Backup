@@ -28,6 +28,8 @@ VD-Backup/
 │       ├── i18n.js                 # translation engine (I18N.t / apply / init / set)
 │       ├── styles.css              # dark theme
 │       ├── config.json             # WebUI manifest (title, icon, strict CSP, no network)
+│       ├── ui-switch.js            # Interface switch: Classic (index.html, default) or New (next/)
+│       ├── next/                   # opt-in New interface: index.html + css/ + js/, shares scripts.js, i18n and lang/
 │       ├── assets/                 # logo-icon.svg, logo-wordmark.svg
 │       └── lang/                   # en.js (fallback) + en.json + 20 more <code>.json
 ├── README.md + README.<code>.md    # English + the 21 standard languages

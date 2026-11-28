@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<!--
+  ======================================================================
+   VD BACKUP  ::  root backup & restore, no grant prompt
+   Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+
+   Copyright (C) 2026  VD171
+   SPDX-License-Identifier: AGPL-3.0-or-later
+
+   Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+   modified version, even as a service, and you MUST offer its source.
+
+   Site           : https://vd171.ru
+   Site           : https://vd.priv8.ru
+   Source         : https://github.com/VD171/VD-Backup
+   GitHub         : @VD171 https://github.com/VD171
+   XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+   XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+   Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+   Channel        : @Priv8_VD https://t.me/Priv8_VD
+   Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+   E-mail         : vd.priv8@pm.me
+  ======================================================================
+-->
+<html lang="en" data-theme="dark" data-ui="next">
+<head>
+  <meta charset="UTF-8">
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark light">
+  <title>VDBackup</title>
+  <link rel="icon" href="assets/logo-icon.svg">
+  <link rel="stylesheet" href="vdlu.css">
+  <link rel="stylesheet" href="next/css/tokens.css">
+  <link rel="stylesheet" href="next/css/base.css">
+  <link rel="stylesheet" href="next/css/components.css">
+  <link rel="stylesheet" href="next/css/screens.css">
+  <script src="ui-switch.js"></script>
+</head>
+<body class="nx">
+  <svg class="nx-sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h5v-6h4v6h5V9.5"/></symbol>
+    <symbol id="i-apps" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18.5" cy="12" r="1.4"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-5l-2 2"/><path d="M4 13a8 8 0 0 0 14 5l2-2"/><path d="M4 4v4h4"/><path d="M20 20v-4h-4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1 0-8 5.5 5.5 0 0 1 10.5-1.5A3.75 3.75 0 0 1 18 18z"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.5 7.5A1.5 1.5 0 0 1 5 6h4l2 2h8a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 19 19H5a1.5 1.5 0 0 1-1.5-1.5z"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18h2"/></symbol>
+    <symbol id="i-root" viewBox="0 0 24 24"><path d="M12 21s7.5-3.6 7.5-9.5V5.5L12 3 4.5 5.5v6C4.5 17.4 12 21 12 21z"/><path d="M9.5 12h5M12 9.5v5"/></symbol>
+    <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 19.5h14"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.75" cy="6.5" r="1"/><circle cx="4.75" cy="12" r="1"/><circle cx="4.75" cy="17.5" r="1"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><path d="M12 8h.01"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V8"/><path d="m7.5 12.5 4.5-4.5 4.5 4.5"/><path d="M5 4.5h14"/></symbol>
+    <symbol id="i-restore" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"/><path d="M4 4v4.5h4.5"/><path d="M12 8v4l2.5 1.5"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 4 3.5 7.5 7 11"/><path d="M3.5 7.5h13"/><path d="m17 13 3.5 3.5L17 20"/><path d="M20.5 16.5h-13"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 0 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.2-1-1.6-1-2.6 0-.9.7-1.6 1.7-1.6h2a4 4 0 0 0 4-4c0-3.9-3.8-7.1-8.5-7.1z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="15" cy="8" r="1"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5"/><path d="M12 17.2h.01"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a4 4 0 0 0 5.66 0l2.5-2.5a4 4 0 0 0-5.66-5.66l-1.2 1.2"/><path d="M14 11a4 4 0 0 0-5.66 0l-2.5 2.5a4 4 0 0 0 5.66 5.66l1.2-1.2"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="2.75"/><path d="M4.5 5.5v6c0 1.5 3.4 2.75 7.5 2.75s7.5-1.25 7.5-2.75v-6"/><path d="M4.5 11.5v6c0 1.5 3.4 2.75 7.5 2.75s7.5-1.25 7.5-2.75v-6"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M20.5 3.5 3.5 10.5l6.5 2.5 2.5 6.5z"/><path d="m10 13 4.5-4.5"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+  </svg>
+
+  <header class="nx-top">
+    <button class="nx-ib nx-backbtn" id="nx-back" type="button" aria-label="Back"><svg class="i"><use href="#i-back"/></svg></button>
+    <img class="nx-logo" src="assets/logo-icon.svg" alt="" width="28" height="28">
+    <div class="nx-titles">
+      <h1 id="nx-title">VDBackup</h1>
+      <span class="nx-ver" id="ver"></span>
+    </div>
+    <button class="nx-ib" id="theme-btn" type="button" data-i18n-title="settings_theme" aria-label="Theme"><svg class="i"><use href="#i-moon"/></svg></button>
+    <button class="nx-ib" id="nx-settings-btn" type="button" aria-label="Settings"><svg class="i"><use href="#i-gear"/></svg></button>
+  </header>
+
+  <main class="nx-main">
+    <!-- ============ Home ============ -->
+    <section id="home" class="panel active">
+      <div id="nx-boot-err" class="nx-note warn" hidden>
+        <span data-i18n="nx_boot_err">Something went wrong while loading this interface.</span>
+        <a href="#" class="nx-link" data-ui-switch="classic" data-i18n="nx_switch_classic">Switch to the classic interface</a>
+      </div>
+      <div id="overview" class="nx-hero" hidden>
+        <div class="nx-hero-k" data-i18n="nx_storage">Backup storage</div>
+        <div class="nx-hero-n" id="nx-used">-</div>
+        <div class="storage" id="ov-storage" hidden>
+          <div class="storage-bar"><i id="ov-bar-used"></i></div>
+          <div class="storage-line" id="ov-storage-line"></div>
+        </div>
+        <ul class="nx-where" id="nx-where" hidden></ul>
+        <div class="nx-stats">
+          <button class="nx-stat" type="button" data-go="backups:apps"><b class="tile-n" id="ov-apps">0</b><span data-i18n="nx_ov_apps">Apps backed up</span></button>
+          <button class="nx-stat" type="button" data-go="backups:apps"><b class="tile-n" id="ov-backups">0</b><span data-i18n="ui_overview_backups">Backups</span></button>
+          <button class="nx-stat" type="button" data-go="backups:files"><b class="tile-n" id="ov-folders">0</b><span data-i18n="ui_overview_folders">Folders</span></button>
+          <button class="nx-stat" type="button" data-go="schedule"><b class="tile-n" id="ov-scheduled">0</b><span data-i18n="ui_overview_scheduled">Scheduled</span></button>
+        </div>
+      </div>
+
+      <h2 class="nx-h" data-i18n="nx_quick">Quick actions</h2>
+      <div class="nx-qa">
+        <button class="nx-qa-b" type="button" data-go="apps:apps"><span class="nx-qa-ic go"><svg class="i"><use href="#i-up"/></svg></span><span data-i18n="nx_qa_backup">Back up apps</span></button>
+        <button class="nx-qa-b" type="button" data-go="backups:apps"><span class="nx-qa-ic rs"><svg class="i"><use href="#i-restore"/></svg></span><span data-i18n="nx_qa_restore">Restore</span></button>
+        <button class="nx-qa-b" type="button" data-go="apps:system"><span class="nx-qa-ic"><svg class="i"><use href="#i-phone"/></svg></span><span data-i18n="nx_seg_system">System data</span></button>
+        <button class="nx-qa-b" type="button" data-go="apps:files"><span class="nx-qa-ic"><svg class="i"><use href="#i-folder"/></svg></span><span data-i18n="nx_seg_files">Files</span></button>
+        <button class="nx-qa-b" type="button" data-go="schedule"><span class="nx-qa-ic"><svg class="i"><use href="#i-clock"/></svg></span><span data-i18n="tab_schedule">Schedule</span></button>
+        <button class="nx-qa-b" type="button" data-go="dests"><span class="nx-qa-ic"><svg class="i"><use href="#i-cloud"/></svg></span><span data-i18n="tab_dests">Destinations</span></button>
+      </div>
+
+      <div class="nx-h nx-h-row"><h2 data-i18n="nx_recent">Recent activity</h2><button class="nx-tbtn" type="button" data-go="log" data-i18n="nx_see_all">See all</button></div>
+      <ul id="nx-recent" class="list nx-list nx-recent"></ul>
+      <p id="nx-recent-empty" class="nx-empty" data-i18n="ui_log_empty" hidden>No activity yet.</p>
+    </section>
+
+    <!-- ============ Backup (apps, system data, files, /data/adb) ============ -->
+    <section id="apps" class="panel">
+      <div class="nx-seg" role="tablist" data-noswipe>
+        <button type="button" class="nx-seg-b on" data-seg="apps"><svg class="i"><use href="#i-apps"/></svg><span data-i18n="tab_apps">Apps</span></button>
+        <button type="button" class="nx-seg-b" data-seg="system"><svg class="i"><use href="#i-phone"/></svg><span data-i18n="nx_seg_system">System data</span></button>
+        <button type="button" class="nx-seg-b" data-seg="files"><svg class="i"><use href="#i-folder"/></svg><span data-i18n="nx_seg_files">Files</span></button>
+        <button type="button" class="nx-seg-b" data-seg="root"><svg class="i"><use href="#i-root"/></svg><span>/data/adb</span></button>
+      </div>
+      <div class="nx-pane" data-pane="apps">
+        <div class="field nx-user" id="user-field" hidden>
+          <label for="user-sel" data-i18n="ui_user_label">User</label>
+          <select id="user-sel"></select>
+        </div>
+        <div class="nx-sticky">
+          <div class="nx-search">
+            <svg class="i"><use href="#i-search"/></svg>
+            <input id="search" type="search" data-i18n-ph="search_apps" autocomplete="off" placeholder="Search apps">
+            <button id="refresh" class="nx-ib" type="button" data-i18n-title="refresh" aria-label="Refresh"><svg class="i"><use href="#i-refresh"/></svg></button>
+            <button id="app-select" class="nx-tbtn" type="button" data-i18n="ui_select">Select</button>
+          </div>
+          <div class="nx-filters" data-noswipe>
+            <select id="app-filter">
+              <option value="user" data-i18n="opt_apps_user">User apps</option>
+              <option value="system" data-i18n="opt_apps_system">System apps</option>
+              <option value="all" data-i18n="opt_apps_all">All apps</option>
+            </select>
+            <select id="app-sort">
+              <option value="name" data-i18n="opt_sort_name">Name</option>
+              <option value="package" data-i18n="opt_sort_pkg">Package</option>
+            </select>
+            <label class="nx-chipchk"><input type="checkbox" id="app-show-excluded"><span data-i18n="ui_show_excluded">Show excluded</span></label>
+          </div>
+          <div id="app-tag-chips" class="tag-filter" hidden data-noswipe></div>
+          <div id="app-batchbar" class="nx-batch batchbar" hidden>
+            <span id="app-selcount" class="grow"></span>
+            <button id="app-selall" class="nx-tbtn" type="button" data-i18n="ui_select_all">All</button>
+            <button id="app-selnone" class="nx-tbtn" type="button" data-i18n="ui_select_none">None</button>
+            <button id="app-backupsel" class="btn go" type="button" data-i18n="ui_backup_selected">Back up</button>
+          </div>
+        </div>
+        <button id="app-backuptag" class="btn go block" type="button" hidden data-i18n="ui_backup_tag">Back up tag</button>
+        <ul id="applist" class="list nx-list"></ul>
+        <p id="nx-apps-nomatch" class="nx-empty" data-i18n="ui_job_no_match" hidden>No apps match your search</p>
+      </div>
+      <div class="nx-pane" data-pane="system" hidden>
+        <p class="nx-hint" data-i18n="special_hint">Back up system-wide data: messages, contacts and call log, Wi-Fi and Bluetooth. Restore is same-device and needs a reboot.</p>
+        <div class="card nx-card nx-pad">
+          <div class="checks nx-checks" id="special-cats"></div>
+          <div class="notice warn" id="special-syssettings" hidden>
+            <label class="notice-toggle">
+              <input type="checkbox" class="switch" id="special-syssettings-cb">
+              <span data-i18n="ui_syssettings_label">Include system settings</span>
+              <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
+            </label>
+            <div class="notice-msg" data-i18n="msg_syssettings_warning">This backs up and, on restore, overwrites device-wide system settings such as display, sound and input options. It is optional and off by default, applies to the same device, and every value it changes is recorded in the activity log.</div>
+          </div>
+          <div class="checks">
+            <label class="nx-sw"><span class="nx-sw-t" data-i18n="special_portable">Also export a portable copy (SMS, call log, contacts as JSON)</span><input type="checkbox" class="switch" id="special-portable" checked></label>
+          </div>
+          <button id="special-backup" class="btn go block" type="button" data-i18n="backup">Back up</button>
+        </div>
+      </div>
+      <div class="nx-pane" data-pane="files" hidden>
+        <p class="nx-hint" data-i18n="ui_pathbk_hint">Back up any folder or file by its absolute path, with the same compression and encryption as an app backup. Restore writes it back to the same path.</p>
+        <div class="card nx-card nx-pad">
+          <div class="field nx-pathrow">
+            <input id="pb-path" type="text" data-i18n-ph="ui_pathbk_path_ph" spellcheck="false" autocomplete="off" placeholder="Absolute path (e.g. /storage/emulated/0/DCIM)">
+            <button id="pb-browse" class="btn" type="button" data-i18n="ui_browse">Browse</button>
+            <button id="nx-pb-add" class="btn" type="button" data-i18n="nx_pb_add">Add</button>
+          </div>
+          <p class="nx-hint" data-i18n="nx_pb_multi_hint">Add one or more folders: they are saved together in one backup.</p>
+          <ul id="nx-pb-list" class="list nx-list" hidden></ul>
+          <button id="pb-backup" class="btn go block" type="button" data-i18n="ui_pathbk_do">Back up</button>
+        </div>
+      </div>
+      <div class="nx-pane" data-pane="root" hidden>
+        <p class="nx-hint" data-i18n="ui_adb_hint">Back up the root environment under /data/adb - modules, their data and configs - all of it or a chosen subtree you pick from the file tree. Restore writes the selected files back with their original SELinux context, so root keeps working. Advanced; nothing is kept here but what you choose.</p>
+        <div class="card nx-card nx-pad">
+          <button id="adb-backup-open" class="btn go block" type="button" data-i18n="ui_adb_do">Back up /data/adb</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Restore (every backup, every source) ============ -->
+    <section id="backups" class="panel">
+      <div class="nx-seg" role="tablist" data-noswipe>
+        <button type="button" class="nx-seg-b on" data-seg="apps"><svg class="i"><use href="#i-apps"/></svg><span data-i18n="tab_apps">Apps</span></button>
+        <button type="button" class="nx-seg-b" data-seg="system"><svg class="i"><use href="#i-phone"/></svg><span data-i18n="nx_seg_system">System data</span></button>
+        <button type="button" class="nx-seg-b" data-seg="files"><svg class="i"><use href="#i-folder"/></svg><span data-i18n="nx_seg_files">Files</span></button>
+        <button type="button" class="nx-seg-b" data-seg="root"><svg class="i"><use href="#i-root"/></svg><span>/data/adb</span></button>
+        <button type="button" class="nx-seg-b" data-seg="import"><svg class="i"><use href="#i-import"/></svg><span data-i18n="nx_seg_import">Import</span></button>
+      </div>
+
+      <div class="nx-pane" data-pane="apps">
+        <div id="susfs-notice" class="notice nx-note" hidden>
+          <div class="notice-toggle">
+            <span data-i18n="susfs_notice_title">Hide the backup folder</span>
+            <span class="tag" data-i18n="susfs_notice_badge">Recommended</span>
+          </div>
+          <div class="notice-msg" data-i18n="susfs_notice_body">You have local backups in /sdcard/VDBackup. Hide this folder with SUSFS so its presence does not reveal root or an unlocked bootloader, just as the companion app would.</div>
+          <div class="notice-msg" data-i18n="susfs_notice_howto">Add the backup folder as a SUSFS hidden path (sus_path) in your root manager or SUSFS module. SUSFS does the hiding; this just reminds you.</div>
+          <div class="pkg" id="susfs-notice-path"></div>
+          <div class="modal-actions">
+            <button class="btn small" id="susfs-notice-dismiss" type="button" data-i18n="susfs_notice_dismiss">Got it</button>
+          </div>
+        </div>
+        <div class="nx-search">
+          <svg class="i"><use href="#i-search"/></svg>
+          <input id="bk-search" type="search" class="picker-search" data-i18n-ph="ui_bk_search" autocomplete="off" placeholder="Search backups by name, tag or app">
+          <button id="bk-select" class="nx-tbtn" type="button" data-i18n="ui_select">Select</button>
+        </div>
+        <div id="nx-rs-src" class="nx-filters" data-noswipe hidden></div>
+        <div id="nx-rs-flt" class="nx-filters" data-noswipe></div>
+        <div id="nx-rs-status"></div>
+        <div class="nx-cloudrow" data-noswipe hidden>
+          <button id="tg-backups-open" class="nx-chip" type="button"><svg class="i"><use href="#i-cloud"/></svg><span data-i18n="ui_tg_backups_btn">Restore from Telegram</span></button>
+          <button id="rc-backups-open" class="nx-chip" type="button"><svg class="i"><use href="#i-cloud"/></svg><span data-i18n="ui_rc_backups_btn">Restore from cloud remote</span></button>
+        </div>
+        <div id="bk-batchbar" class="nx-batch batchbar nx-batch-wrap" hidden>
+          <span id="bk-selcount" class="grow"></span>
+          <button id="bk-selall" class="nx-tbtn" type="button" data-i18n="ui_select_all">All</button>
+          <button id="bk-selnone" class="nx-tbtn" type="button" data-i18n="ui_select_none">None</button>
+          <button id="bk-seluninstalled" class="nx-tbtn" type="button" data-i18n="ui_select_uninstalled">Uninstalled</button>
+          <span class="nx-batch-acts">
+            <button id="bk-deletesel" class="btn danger" type="button" data-i18n="ui_delete_selected">Delete</button>
+            <button id="bk-restoresel" class="btn go" type="button" data-i18n="ui_restore_selected">Restore</button>
+          </span>
+        </div>
+        <ul id="backuplist" class="list nx-list"></ul>
+        <p id="backups-empty" class="nx-empty" data-i18n="backups_empty">No backups yet.</p>
+        <p id="nx-rs-nomatch" class="nx-empty" data-i18n="nx_bk_nomatch" hidden>No backups match these filters.</p>
+      </div>
+
+      <div class="nx-pane" data-pane="system" hidden>
+        <h2 class="nx-h" data-i18n="special_title">Special backups</h2>
+        <ul id="special-list" class="list nx-list"></ul>
+        <p id="special-empty" class="nx-empty" data-i18n="special_empty" hidden>No special backups yet.</p>
+      </div>
+
+      <div class="nx-pane" data-pane="files" hidden>
+        <h2 class="nx-h" data-i18n="ui_pathbk_title">Folder / file backup</h2>
+        <ul id="pathbk-list" class="list nx-list"></ul>
+        <p id="pathbk-empty" class="nx-empty" data-i18n="ui_pathbk_empty" hidden>No folder backups yet.</p>
+      </div>
+
+      <div class="nx-pane" data-pane="root" hidden>
+        <h2 class="nx-h" data-i18n="ui_adb_title">System files (/data/adb)</h2>
+        <ul id="adbbk-list" class="list nx-list"></ul>
+        <p id="adbbk-empty" class="nx-empty" data-i18n="ui_adb_empty" hidden>No /data/adb backups yet.</p>
+      </div>
+
+      <div class="nx-pane" data-pane="import" hidden>
+        <h2 class="nx-h" data-i18n="ui_import_title">Import from another app</h2>
+        <div class="card nx-card nx-pad">
+          <div class="field">
+            <select id="import-from">
+              <option value="neo">Neo Backup</option>
+              <option value="databackup">DataBackup</option>
+            </select>
+            <button id="import-scan" class="btn go block" type="button" data-i18n="ui_import_scan">Scan</button>
+          </div>
+        </div>
+        <ul id="importlist" class="list nx-list"></ul>
+        <p id="import-empty" class="nx-empty" data-i18n="msg_import_empty" hidden>No importable backups found.</p>
+      </div>
+    </section>
+
+    <!-- ============ Schedule ============ -->
+    <section id="schedule" class="panel">
+      <ul id="joblist" class="list nx-list"></ul>
+      <p id="jobs-empty" class="nx-empty" data-i18n="jobs_empty" hidden>No scheduled jobs yet.</p>
+      <details class="grp nx-exp">
+        <summary class="section-head"><span class="sh-ic"><svg class="i"><use href="#i-plus"/></svg></span><span class="sh-t" data-i18n="job_add">Add a scheduled job</span></summary>
+        <div class="card nx-card nx-pad">
+          <div class="field">
+            <label for="nx-job-kind" data-i18n="nx_job_what">What</label>
+            <select id="nx-job-kind">
+              <option value="apps" data-i18n="nx_job_kind_apps">Apps</option>
+              <option value="files" data-i18n="nx_seg_files">Files</option>
+            </select>
+          </div>
+          <div class="field" id="nx-job-paths" hidden>
+            <label for="nx-job-path" data-i18n="nx_job_folders">Folders</label>
+            <div class="nx-pathrow">
+              <input id="nx-job-path" type="text" data-i18n-ph="ui_pathbk_path_ph" spellcheck="false" autocomplete="off" placeholder="Absolute path (e.g. /storage/emulated/0/DCIM)">
+              <button id="nx-job-path-browse" class="btn" type="button" data-i18n="ui_browse">Browse</button>
+              <button id="nx-job-path-add" class="btn" type="button" data-i18n="nx_pb_add">Add</button>
+            </div>
+            <ul id="nx-job-path-list" class="list nx-list" hidden></ul>
+          </div>
+          <div class="field">
+            <label for="job-action" data-i18n="job_action">Action</label>
+            <select id="job-action">
+              <option value="backup" data-i18n="opt_action_backup">Back up</option>
+              <option value="restore" data-i18n="opt_action_restore">Restore latest</option>
+            </select>
+          </div>
+          <label class="nx-sw"><span class="nx-sw-t" data-i18n="job_all_apps">All apps</span><input type="checkbox" class="switch" id="job-all"></label>
+          <div class="field" id="job-app-field">
+            <label data-i18n="job_apps">Apps (pick one or more)</label>
+            <input id="job-app-search" type="search" class="picker-search" data-i18n-ph="ui_job_search" autocomplete="off" placeholder="Search apps by name or package">
+            <div id="job-app-count" class="muted picker-count"></div>
+            <ul id="job-applist" class="list picker-list"></ul>
+            <p id="job-app-nomatch" class="muted" data-i18n="ui_job_no_match" hidden>No apps match your search</p>
+          </div>
+          <div id="job-restore-warn" class="notice warn" data-i18n="job_restore_warn" hidden>Scheduled restore overwrites the app data with the latest backup on each run.</div>
+          <div class="nx-2col">
+            <div class="field">
+              <label for="job-cron" data-i18n="job_when">When</label>
+              <select id="job-cron">
+                <option value="daily" data-i18n="opt_cron_daily">Daily</option>
+                <option value="hourly" data-i18n="opt_cron_hourly">Hourly</option>
+                <option value="weekly" data-i18n="opt_cron_weekly">Weekly</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="job-at" data-i18n="job_at">At (HH:MM, optional)</label>
+              <input id="job-at" type="time">
+            </div>
+          </div>
+          <div id="job-backup-only">
+            <div class="field">
+              <label for="job-mode" data-i18n="settings_mode">Default backup mode</label>
+              <select id="job-mode">
+                <option value="full" data-i18n="opt_mode_full">Full (tar.zst)</option>
+                <option value="snapshot" data-i18n="opt_mode_snapshot">Snapshot (restic)</option>
+                <option value="mirror" data-i18n="opt_mode_mirror">Mirror (sync)</option>
+              </select>
+            </div>
+            <div class="nx-2col">
+              <div class="field">
+                <label for="job-dest" data-i18n="settings_dest">Default destination</label>
+                <select id="job-dest"></select>
+              </div>
+              <div class="field">
+                <label for="job-keep" data-i18n="job_keep">Keep last N</label>
+                <input id="job-keep" type="number" min="1" value="5" inputmode="numeric">
+              </div>
+            </div>
+          </div>
+          <label class="nx-sw"><span class="nx-sw-t" data-i18n="ui_sched_wifi_only">Only on Wi-Fi</span><input type="checkbox" class="switch" id="job-wifi"></label>
+          <label class="nx-sw"><span class="nx-sw-t" data-i18n="ui_sched_charging_only">Only while charging</span><input type="checkbox" class="switch" id="job-charging"></label>
+          <div class="field">
+            <label for="job-minbat" data-i18n="ui_sched_min_battery">Minimum battery</label>
+            <select id="job-minbat">
+              <option value="0" data-i18n="ui_sched_battery_off">Off</option>
+              <option value="20">20%</option>
+              <option value="50">50%</option>
+              <option value="80">80%</option>
+            </select>
+          </div>
+          <div class="field">
+            <label data-i18n="ui_sched_days">Days</label>
+            <div class="daytoggles" id="job-days"></div>
+          </div>
+          <button id="job-save" class="btn go block" type="button" data-i18n="save">Save</button>
+          <div id="job-status" class="muted"></div>
+        </div>
+      </details>
+      <button id="log-open" class="nx-row nx-card" type="button"><span class="nx-row-ic"><svg class="i"><use href="#i-list"/></svg></span><span class="nx-row-t" data-i18n="ui_log_open">View activity log</span><svg class="i nx-chev"><use href="#i-chev"/></svg></button>
+    </section>
+
+    <!-- ============ More ============ -->
+    <section id="more" class="panel">
+      <div class="nx-card nx-menu">
+        <button class="nx-row" type="button" data-go="dests"><span class="nx-row-ic"><svg class="i"><use href="#i-cloud"/></svg></span><span class="nx-row-t"><span data-i18n="tab_dests">Destinations</span><small data-i18n="nx_more_dests">Local, cloud remotes, restic, Drive, Telegram</small></span><svg class="i nx-chev"><use href="#i-chev"/></svg></button>
+        <button class="nx-row" type="button" data-go="settings"><span class="nx-row-ic"><svg class="i"><use href="#i-gear"/></svg></span><span class="nx-row-t"><span data-i18n="tab_settings">Settings</span><small data-i18n="nx_more_settings">Appearance, defaults, encryption, automation</small></span><svg class="i nx-chev"><use href="#i-chev"/></svg></button>
+        <button class="nx-row" type="button" data-go="log"><span class="nx-row-ic"><svg class="i"><use href="#i-list"/></svg></span><span class="nx-row-t"><span data-i18n="ui_log_title">Activity log</span><small data-i18n="nx_more_log">Every backup, restore and deletion</small></span><svg class="i nx-chev"><use href="#i-chev"/></svg></button>
+        <button class="nx-row" type="button" data-go="updates"><span class="nx-row-ic"><svg class="i"><use href="#i-refresh"/></svg></span><span class="nx-row-t"><span data-i18n="tab_updates">Updates</span><small data-i18n="nx_more_updates">Check for a new version</small></span><svg class="i nx-chev"><use href="#i-chev"/></svg></button>
+        <button class="nx-row" type="button" data-go="about"><span class="nx-row-ic"><svg class="i"><use href="#i-info"/></svg></span><span class="nx-row-t"><span data-i18n="tab_about">About</span><small data-i18n="nx_more_about">Version, links and credits</small></span><svg class="i nx-chev"><use href="#i-chev"/></svg></button>
+      </div>
+      <div class="nx-card nx-menu">
+        <button class="nx-row" type="button" data-ui-switch="classic"><span class="nx-row-ic"><svg class="i"><use href="#i-swap"/></svg></span><span class="nx-row-t"><span data-i18n="nx_switch_classic">Switch to the classic interface</span><small data-i18n="settings_interface_hint">Switch between the classic interface and the new one. Both have every feature, and you can switch back at any time.</small></span></button>
+      </div>
+    </section>
+
+    <!-- ============ Destinations ============ -->
+    <section id="dests" class="panel nx-sub">
+      <ul id="destlist" class="list nx-list"></ul>
+      <details class="grp nx-exp">
+        <summary class="section-head"><span class="sh-ic"><svg class="i"><use href="#i-plus"/></svg></span><span class="sh-t" data-i18n="dest_add">Add destination</span></summary>
+        <div class="card nx-card nx-pad">
+          <div class="field">
+            <input id="d-id" type="text" data-i18n-ph="ph_dest_id" autocomplete="off" spellcheck="false" placeholder="id (e.g. mynas)">
+            <select id="d-type">
+              <option value="local">local</option>
+              <option value="rclone">rclone (SFTP, SMB, WebDAV, Drive, S3...)</option>
+              <option value="restic">restic (snapshot repo)</option>
+              <option value="gdrive" data-i18n="ui_dest_gdrive">Google Drive (companion)</option>
+              <option value="telegram" data-i18n="ui_dest_telegram">Telegram (unlimited, via your account)</option>
+            </select>
+            <select id="d-remote"></select>
+            <div id="d-rclone-hint" class="notice" hidden>
+              <div class="notice-msg" data-i18n="ui_dest_rclone_hint">rclone needs a remote. Pick one below, or add a new one:</div>
+              <button id="d-add-remote" class="btn small" type="button" data-i18n="ui_dest_add_remote_btn">Add a remote</button>
+            </div>
+            <div id="d-gdrive-hint" class="notice" hidden>
+              <div class="notice-msg" data-i18n="ui_dest_gdrive_hint">The Google Drive companion needs its own Google Cloud OAuth client set at build time. For Drive with no setup, add a "Google Drive (rclone)" remote below instead.</div>
+            </div>
+            <div class="nx-pathrow">
+              <input id="d-path" type="text" data-i18n-ph="ph_dest_path" spellcheck="false" autocomplete="off" placeholder="path / sub-folder">
+              <button id="d-browse" class="btn" type="button" data-i18n="ui_browse">Browse</button>
+            </div>
+            <input id="d-repo" type="text" data-i18n-ph="ph_dest_repo" spellcheck="false" autocomplete="off" placeholder="restic repo">
+            <input id="d-pass" type="password" data-i18n-ph="ph_dest_pass" autocomplete="new-password" placeholder="restic password">
+            <button id="d-save" class="btn go block" type="button" data-i18n="save">Save</button>
+          </div>
+          <p class="nx-hint" data-i18n="dests_hint">Add a destination (local, SFTP, SMB, WebDAV, rclone, restic...).</p>
+        </div>
+        <h2 class="nx-h" id="remote-head"><svg class="i"><use href="#i-cloud"/></svg><span data-i18n="remote_add">Add cloud remote</span></h2>
+        <div class="card nx-card nx-pad">
+          <p class="nx-hint" data-i18n="ui_remote_section_hint">Create an rclone remote: the cloud account rclone connects to. Pick it above as a destination of type rclone.</p>
+          <div class="field" id="remote-box">
+            <ul id="remotelist" class="list nx-list"></ul>
+            <input id="r-name" type="text" data-i18n-ph="ph_remote_name" autocomplete="off" spellcheck="false" placeholder="remote name (e.g. mydrive)">
+            <select id="r-backend">
+              <option value="sftp">SFTP</option>
+              <option value="smb">SMB</option>
+              <option value="webdav">WebDAV</option>
+              <option value="ftp">FTP</option>
+              <option value="s3">S3</option>
+              <option value="drive" data-i18n="opt_remote_drive">Google Drive (rclone)</option>
+              <option value="dropbox" data-i18n="opt_remote_dropbox">Dropbox</option>
+              <option value="onedrive" data-i18n="opt_remote_onedrive">OneDrive</option>
+              <option value="box" data-i18n="opt_remote_box">Box</option>
+              <option value="pcloud" data-i18n="opt_remote_pcloud">pCloud</option>
+              <option value="mega" data-i18n="opt_remote_mega">Mega</option>
+              <option value="b2" data-i18n="opt_remote_b2">Backblaze B2</option>
+              <option value="custom" data-i18n="opt_remote_custom">Custom (advanced)</option>
+            </select>
+            <input id="r-host" type="text" data-i18n-ph="ph_remote_host" autocomplete="off" spellcheck="false" placeholder="host">
+            <input id="r-port" type="text" data-i18n-ph="ph_remote_port" inputmode="numeric" autocomplete="off" placeholder="port">
+            <input id="r-url" type="text" data-i18n-ph="ph_remote_url" autocomplete="off" spellcheck="false" placeholder="URL">
+            <input id="r-vendor" type="text" data-i18n-ph="ph_remote_vendor" autocomplete="off" placeholder="vendor (nextcloud/owncloud/other)">
+            <input id="r-user" type="text" data-i18n-ph="ph_remote_user" autocomplete="off" spellcheck="false" placeholder="user">
+            <input id="r-pass" type="password" data-i18n-ph="ph_remote_pass" autocomplete="new-password" placeholder="password">
+            <input id="r-akey" type="text" data-i18n-ph="ph_remote_akey" autocomplete="off" spellcheck="false" placeholder="access key id">
+            <input id="r-skey" type="password" data-i18n-ph="ph_remote_skey" autocomplete="new-password" placeholder="secret access key">
+            <input id="r-endpoint" type="text" data-i18n-ph="ph_remote_endpoint" autocomplete="off" spellcheck="false" placeholder="endpoint (S3)">
+            <input id="r-region" type="text" data-i18n-ph="ph_remote_region" autocomplete="off" spellcheck="false" placeholder="region (S3)">
+            <input id="r-account" type="text" data-i18n-ph="ui_r_account" autocomplete="off" spellcheck="false" placeholder="Key ID">
+            <input id="r-key" type="password" data-i18n-ph="ui_r_appkey" autocomplete="new-password" placeholder="Application key">
+            <div id="r-custom-box">
+              <input id="r-custom-backend" type="text" data-i18n-ph="ui_r_custom_backend" autocomplete="off" spellcheck="false" placeholder="Backend type">
+              <div id="r-params"></div>
+              <button id="r-add-param" class="btn small" type="button" data-i18n="ui_r_add_param">Add parameter</button>
+            </div>
+            <div id="r-authorize-box" class="remote-auth">
+              <button id="r-authorize" class="btn" type="button" data-i18n="ui_r_authorize">Authorize in browser</button>
+              <div id="r-auth-status" class="remote-auth-status" hidden>
+                <span class="spinner" aria-hidden="true"></span>
+                <span id="r-auth-msg"></span>
+              </div>
+              <a id="r-auth-link" class="remote-auth-link" href="#" hidden data-i18n="ui_r_auth_link">Open the sign-in page</a>
+              <div id="r-auth-err" class="modal-err"></div>
+              <button id="r-auth-cancel" class="btn small" type="button" hidden data-i18n="ui_r_cancel">Cancel</button>
+            </div>
+            <textarea id="r-token" data-i18n-ph="ph_remote_token" placeholder="rclone drive token"></textarea>
+            <p id="r-drive-hint" class="nx-hint" data-i18n="remote_drive_hint">No Google Cloud account needed. On any computer run: rclone authorize "drive", then paste the token it prints here.</p>
+            <button id="r-save" class="btn go block" type="button" data-i18n="remote_create">Create remote</button>
+          </div>
+        </div>
+      </details>
+      <div id="companion-hma" class="notice nx-note" hidden>
+        <div class="notice-toggle">
+          <span data-i18n="companion_hma_title">Hide the companion app</span>
+          <span class="tag" data-i18n="companion_hma_badge">Recommended</span>
+        </div>
+        <div class="notice-msg" data-i18n="companion_hma_body">The Google Drive companion app is installed. Always hide it with HMA-OSS so it does not reveal root or an unlocked bootloader.</div>
+        <div class="notice-msg" data-i18n="companion_hma_howto">Open HMA-OSS, edit your hide template and add this app to its list. HMA-OSS does the hiding; this just points you there.</div>
+        <div class="pkg" id="companion-hma-pkg"></div>
+        <div class="modal-actions">
+          <button class="btn small" id="companion-hma-dismiss" type="button" data-i18n="companion_hma_dismiss">Got it</button>
+          <button class="btn go small" id="companion-hma-add" type="button" data-i18n="companion_hma_add">Add to HMA-OSS list</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Settings ============ -->
+    <section id="settings" class="panel nx-sub">
+      <h2 class="nx-h"><svg class="i"><use href="#i-palette"/></svg><span data-i18n="nx_grp_appearance">Appearance</span></h2>
+      <div class="card nx-card nx-pad">
+        <div class="field">
+          <label for="ui-mode-sel" data-i18n="settings_interface">Interface</label>
+          <select id="ui-mode-sel">
+            <option value="classic" data-i18n="opt_ui_classic">Classic</option>
+            <option value="next" data-i18n="opt_ui_next">New</option>
+          </select>
+          <div class="nx-hint" data-i18n="settings_interface_hint">Switch between the classic interface and the new one. Both have every feature, and you can switch back at any time.</div>
+        </div>
+        <div class="field">
+          <label data-i18n="settings_theme">Theme</label>
+          <select id="set-theme">
+            <option value="auto" data-i18n="opt_theme_auto">System</option>
+            <option value="dark" data-i18n="opt_theme_dark">Dark</option>
+            <option value="light" data-i18n="opt_theme_light">Light</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="set-density" data-i18n="ui_density">Interface scale</label>
+          <div class="density-row" data-noswipe>
+            <input id="set-density" class="scale-slider" type="range" min="85" max="120" step="5" value="100" aria-describedby="set-density-val">
+            <span id="set-density-val" class="density-val">100%</span>
+          </div>
+          <div class="nx-hint" data-i18n="ui_density_hint">Drag to scale the whole interface. 100% is the default size.</div>
+        </div>
+        <div class="field">
+          <label for="set-lang" data-i18n="settings_language">Language</label>
+          <select id="set-lang"></select>
+        </div>
+        <div class="field">
+          <label data-i18n="settings_accent">Accent color</label>
+          <div class="swatches" id="accent-swatches"></div>
+        </div>
+      </div>
+
+      <h2 class="nx-h"><svg class="i"><use href="#i-sliders"/></svg><span data-i18n="nx_grp_defaults">Backup defaults</span></h2>
+      <div class="card nx-card nx-pad">
+        <div class="field">
+          <label data-i18n="settings_mode">Default backup mode</label>
+          <select id="set-mode">
+            <option value="full" data-i18n="opt_mode_full">Full (tar.zst)</option>
+            <option value="snapshot" data-i18n="opt_mode_snapshot">Snapshot (restic)</option>
+            <option value="mirror" data-i18n="opt_mode_mirror">Mirror (sync)</option>
+          </select>
+        </div>
+        <div class="nx-2col">
+          <div class="field">
+            <label for="set-dest" data-i18n="settings_dest">Default destination</label>
+            <select id="set-dest"></select>
+          </div>
+          <div class="field">
+            <label for="set-comp" data-i18n="settings_compression">Compression</label>
+            <select id="set-comp">
+              <option value="none" data-i18n="opt_comp_none">none</option>
+              <option value="lz4" data-i18n="opt_comp_lz4">lz4</option>
+              <option value="zstd:3" data-i18n="opt_comp_zstd_fast">zstd (fast)</option>
+              <option value="zstd:10" data-i18n="opt_comp_zstd_default">zstd (default)</option>
+              <option value="zstd:19" data-i18n="opt_comp_zstd_max">zstd (max)</option>
+              <option value="gzip" data-i18n="opt_comp_gzip">gzip (compatible)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label data-i18n="settings_network">Cloud transfers over</label>
+          <select id="set-netpolicy">
+            <option value="any" data-i18n="opt_net_any">Wi-Fi and mobile data</option>
+            <option value="wifi" data-i18n="opt_net_wifi">Wi-Fi only</option>
+            <option value="mobile" data-i18n="opt_net_mobile">Mobile data only</option>
+            <option value="off" data-i18n="opt_net_off">Off (no network)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="set-staging" data-i18n="settings_staging">Staging folder (stealth)</label>
+          <div class="nx-hint" data-i18n="settings_staging_msg">Where a backup is temporarily built when it goes to Telegram or to storage other than internal. A root-only folder keeps backup data off shared storage. Default: /data/local/tmp.</div>
+          <input id="set-staging" type="text" inputmode="url" spellcheck="false" autocomplete="off" data-i18n-ph="settings_staging_ph" placeholder="/data/local/tmp">
+        </div>
+        <div class="field">
+          <label for="set-tg-parallel" data-i18n="settings_tg_parallel">Telegram parallel transfers</label>
+          <div class="nx-hint" data-i18n="settings_tg_parallel_msg">A large backup moves to and from Telegram in parts. This many parts transfer at once: more is faster on a good connection, 1 sends one part at a time.</div>
+          <select id="set-tg-parallel">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+          </select>
+        </div>
+        <label class="nx-sw"><span class="nx-sw-t"><span data-i18n="settings_local_copy">Keep a local copy when a backup goes to a destination</span><small data-i18n="settings_local_copy_hint">Off by default: a backup sent to Telegram or to other storage keeps no copy on this device (nothing on shared storage, no duplication). Turn it on to also keep a local copy. Cloud destinations (rclone, Google Drive) always keep a local copy for now.</small></span><input type="checkbox" class="switch" id="set-local-copy"></label>
+      </div>
+
+      <h2 class="nx-h"><svg class="i"><use href="#i-lock"/></svg><span data-i18n="nx_grp_security">Encryption</span></h2>
+      <div class="card nx-card nx-pad">
+        <label class="nx-sw"><span class="nx-sw-t" data-i18n="settings_encrypt_data">Encrypt data</span><input type="checkbox" class="switch" id="set-enc-data"></label>
+        <label class="nx-sw"><span class="nx-sw-t" data-i18n="settings_encrypt_apk">Encrypt APKs</span><input type="checkbox" class="switch" id="set-enc-apk"></label>
+        <div class="nx-hint" data-i18n="settings_encrypt_hint">Encryption uses a passphrase you enter when you back up (age scrypt). Any age tool decrypts it on a PC with that passphrase. There is no recovery if you lose it.</div>
+        <div class="field">
+          <label for="set-gpass" data-i18n="settings_gpass">Default passphrase</label>
+          <div class="nx-hint" data-i18n="settings_gpass_msg">Optional. Set a master passphrase and encrypted backups use it automatically, without retyping it. Stored encrypted on this device (root-only); a specific app can override it with its own.</div>
+          <div class="nx-hint"><span data-i18n="settings_gpass_cur">Current:</span> <b id="set-gpass-state">-</b></div>
+          <input id="set-gpass" type="password" autocomplete="new-password" spellcheck="false" data-i18n-ph="settings_gpass_ph" placeholder="New passphrase (leave empty to keep)">
+          <input id="set-gpass-confirm" type="password" autocomplete="new-password" spellcheck="false" data-i18n-ph="settings_pass_confirm_ph" placeholder="Confirm passphrase">
+          <button class="btn small" id="set-gpass-clear" type="button" data-i18n="settings_gpass_clear">Clear</button>
+        </div>
+      </div>
+
+      <h2 class="nx-h"><svg class="i"><use href="#i-bolt"/></svg><span data-i18n="nx_grp_automation">Automation</span></h2>
+      <div class="card nx-card nx-pad">
+        <label class="nx-sw"><span class="nx-sw-t"><span data-i18n="settings_auto_backup">Back up apps automatically on install and update</span><small data-i18n="settings_auto_hint">When on, newly installed or updated apps are backed up in the background. The first run only records what is installed, so turning this on never backs up everything at once.</small></span><input type="checkbox" class="switch" id="set-auto"></label>
+        <div class="field nx-inline">
+          <label for="set-auto-keep" data-i18n="job_keep">Keep last N</label>
+          <input id="set-auto-keep" type="number" min="1" value="5" inputmode="numeric">
+        </div>
+        <label class="nx-sw"><span class="nx-sw-t"><span data-i18n="settings_thermal">Pause to cool down when the device gets hot</span><small data-i18n="settings_thermal_hint">During a long backup, VDBackup waits a moment between apps if the device is running hot, so a big batch cannot overheat it. On by default.</small></span><input type="checkbox" class="switch" id="set-thermal"></label>
+        <label class="nx-sw"><span class="nx-sw-t"><span data-i18n="settings_notify_progress">Show progress in a notification</span><small data-i18n="settings_notify_progress_hint">While a backup or restore runs, a notification shows its percent and current app, updated every few seconds. Off by default.</small></span><input type="checkbox" class="switch" id="set-notify-progress"></label>
+        <label class="nx-sw"><span class="nx-sw-t"><span data-i18n="settings_space_preflight">Check free space before a batch backup</span><small data-i18n="settings_space_preflight_hint">Before backing up many apps to local storage, VDBackup estimates whether they fit and stops up front with a clear message if not, instead of filling the disk partway through. On by default.</small></span><input type="checkbox" class="switch" id="set-space-preflight"></label>
+        <label class="nx-sw"><span class="nx-sw-t"><span data-i18n="settings_relaunch">Reopen apps after a backup</span><small data-i18n="settings_relaunch_hint">After a single backup, reopen the app that was running when it was paused for the snapshot. Off by default; batch and scheduled backups are not affected.</small></span><input type="checkbox" class="switch" id="set-relaunch"></label>
+      </div>
+
+      <h2 class="nx-h"><svg class="i"><use href="#i-apps"/></svg><span data-i18n="nx_grp_apps">Per-app rules</span></h2>
+      <div class="card nx-card nx-group">
+        <details class="grp">
+          <summary class="section-head"><span class="sh-t" data-i18n="settings_blocklist">Excluded apps</span><span id="block-app-count" class="muted picker-count"></span></summary>
+          <div class="nx-hint" data-i18n="settings_blocklist_hint">Apps on this list are skipped by automatic and scheduled backups.</div>
+          <input id="block-app-search" type="search" class="picker-search" data-i18n-ph="ui_job_search" autocomplete="off" placeholder="Search apps by name or package">
+          <ul id="block-applist" class="list picker-list"></ul>
+          <p id="block-app-nomatch" class="muted" data-i18n="ui_job_no_match" hidden>No apps match your search</p>
+        </details>
+        <details class="grp">
+          <summary class="section-head"><span class="sh-t" data-i18n="settings_app_items">Per-app items and tags</span><span id="ai-app-count" class="muted picker-count"></span></summary>
+          <div class="nx-hint" data-i18n="settings_app_items_hint">Choose exactly which items each app backs up in bulk, automatic and scheduled backups, for example APK only or APK + OBB. A single manual backup still lets you pick at the time. Apps you do not set here back up everything. Tap an app to also give it tags: free labels to group apps, filter the list, and back up a whole group at once.</div>
+          <input id="ai-app-search" type="search" class="picker-search" data-i18n-ph="ui_job_search" autocomplete="off" placeholder="Search apps by name or package">
+          <ul id="ai-applist" class="list picker-list"></ul>
+          <p id="ai-app-nomatch" class="muted" data-i18n="ui_job_no_match" hidden>No apps match your search</p>
+        </details>
+        <details class="grp">
+          <summary class="section-head"><span class="sh-t" data-i18n="settings_presets">Backup presets</span></summary>
+          <div class="nx-hint" data-i18n="settings_presets_hint">Named sets of items to include. Pick a preset in the backup dialog to fill the item choices at once.</div>
+          <ul id="presets-list" class="list"></ul>
+          <p id="presets-empty" class="muted" data-i18n="presets_empty">No presets yet.</p>
+          <div class="field">
+            <input id="preset-name" type="text" autocomplete="off" data-i18n-ph="ui_preset_name" placeholder="Preset name">
+          </div>
+          <div class="checks nx-checks">
+            <label><input type="checkbox" id="pi-apk" checked><span data-i18n="item_apk">APK (app)</span></label>
+            <label><input type="checkbox" id="pi-data" checked><span data-i18n="item_data">App data</span></label>
+            <label><input type="checkbox" id="pi-data_de" checked><span data-i18n="item_data_de">Protected data</span></label>
+            <label><input type="checkbox" id="pi-obb" checked><span data-i18n="item_obb">OBB</span></label>
+            <label><input type="checkbox" id="pi-external" checked><span data-i18n="item_external">External data</span></label>
+            <label><input type="checkbox" id="pi-media" checked><span data-i18n="item_media">Media</span></label>
+          </div>
+          <button id="preset-add" class="btn go block" type="button" data-i18n="ui_preset_add">Add preset</button>
+        </details>
+      </div>
+
+      <h2 class="nx-h"><svg class="i"><use href="#i-restore"/></svg><span data-i18n="nx_grp_restore">Restore options</span></h2>
+      <div class="card nx-card nx-pad">
+        <label class="nx-sw"><span class="nx-sw-t"><span data-i18n="settings_spoof">Set install source to Play Store on restore</span><small data-i18n="settings_spoof_hint">Restored apps report the Play Store as their install source instead of looking sideloaded. On by default; you can turn it off here or per restore, and when off the original install source is kept.</small></span><input type="checkbox" class="switch" id="set-spoof"></label>
+        <div class="notice warn">
+          <label class="notice-toggle">
+            <input type="checkbox" class="switch" id="set-ssaid">
+            <span data-i18n="ui_ssaid_label">Include the device ID (SSAID)</span>
+            <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
+          </label>
+          <div class="notice-msg" data-i18n="msg_ssaid_warning">This backs up and, on restore, rewrites the device ID (SSAID / ANDROID_ID). It is optional and off by default. A restored value only takes effect after a reboot, and the previous value is always saved first so it can be rolled back.</div>
+        </div>
+        <div class="notice warn">
+          <label class="notice-toggle">
+            <input type="checkbox" class="switch" id="set-app-netpolicy">
+            <span data-i18n="ui_app_netpolicy_label">Include per-app network policy</span>
+            <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
+          </label>
+          <div class="notice-msg" data-i18n="msg_app_netpolicy_warning">This backs up and, on restore, re-applies each app's per-app network policy (such as a ROM's deny-network toggle), stored in the system network-policy file. It is optional and off by default. A restored policy only takes effect after a reboot, and the previous file is always saved first so it can be rolled back.</div>
+        </div>
+      </div>
+
+      <div class="nx-saverow">
+        <div id="set-status" class="muted grow" role="status"></div>
+        <button id="set-save" class="btn go" type="button" data-i18n="save">Save</button>
+      </div>
+
+      <h2 class="nx-h"><svg class="i"><use href="#i-db"/></svg><span data-i18n="nx_grp_data">Settings data and reset</span></h2>
+      <div class="card nx-card nx-group">
+        <details class="grp">
+          <summary class="section-head"><span class="sh-t" data-i18n="settings_config_backup">Settings backup</span></summary>
+          <div class="nx-hint" data-i18n="settings_config_backup_hint">Save your destinations, schedules, presets and stored credentials to a single encrypted file you can import onto another device or after a clean install. The file holds remote passwords, so it is always protected with a passphrase.</div>
+          <button id="cfg-export" class="btn go block" type="button" data-i18n="settings_config_export">Export settings</button>
+          <button id="cfg-import" class="btn block" type="button" data-i18n="settings_config_import">Import settings</button>
+          <div id="cfg-config-status" class="muted"></div>
+        </details>
+        <details class="grp">
+          <summary class="section-head"><span class="sh-t" data-i18n="settings_wipe_credentials">Wipe stored credentials</span></summary>
+          <div class="nx-hint" data-i18n="settings_wipe_credentials_hint">Remove saved remote passwords and the device encryption key. Your destinations, schedules and backups stay, but you will need to re-enter passwords next time.</div>
+          <button id="cfg-wipe" class="btn danger block" type="button" data-i18n="settings_wipe_credentials">Wipe stored credentials</button>
+        </details>
+        <details class="grp">
+          <summary class="section-head nx-danger-t"><span class="sh-t" data-i18n="settings_reset">Reset / start fresh</span></summary>
+          <div class="nx-hint" data-i18n="settings_reset_hint">Choose what to wipe to start over. This is permanent and cannot be undone. Cloud remotes are never touched - only this module's own settings and local backups.</div>
+          <label class="nx-cb"><input type="checkbox" id="set-reset-config"><span data-i18n="settings_reset_config">Reset settings (destinations, schedules, presets, credentials)</span></label>
+          <label class="nx-cb"><input type="checkbox" id="set-reset-backups"><span data-i18n="settings_reset_backups">Delete all local backups</span></label>
+          <button id="cfg-reset" class="btn danger block" type="button" data-i18n="settings_reset_btn">Reset selected</button>
+          <div id="cfg-reset-status" class="muted"></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ Updates ============ -->
+    <section id="updates" class="panel nx-sub">
+      <div id="update-banner" class="banner" role="status">
+        <span class="banner-ic"><svg class="i"><use href="#i-refresh"/></svg></span>
+        <div class="banner-main">
+          <div class="banner-title" id="update-banner-title"></div>
+          <div class="banner-msg" id="update-banner-msg"></div>
+        </div>
+        <button class="banner-x" id="update-banner-x" type="button" aria-label="Dismiss">&times;</button>
+      </div>
+      <div id="vdlu-updates"></div>
+      <button id="update-check" class="btn go block" type="button" data-i18n="ui_check_updates">Check for updates</button>
+    </section>
+
+    <!-- ============ About ============ -->
+    <section id="about" class="panel about nx-sub">
+      <div class="about-hero nx-card nx-pad">
+        <img src="assets/logo-icon.svg" alt="VDBackup" width="56" height="56">
+        <div>
+          <div class="n">VDBackup</div>
+          <div class="v" id="about-ver"></div>
+        </div>
+      </div>
+      <p class="nx-hint nx-lead" data-i18n="about_what">Full app and data backup and restore as root, driven entirely from a WebUI. The open, root-native successor to Swift Backup, Neo-Backup and Android-DataBackup.</p>
+      <h2 class="nx-h"><svg class="i"><use href="#i-link"/></svg><span data-i18n="about_links">Project</span></h2>
+      <div class="links nx-card">
+        <a href="https://github.com/VD171/VD-Backup"><span class="k">GitHub</span><span class="val">github.com/VD171/VD-Backup</span></a>
+        <a href="https://github.com/VD171/VD-Backup/wiki"><span class="k" data-i18n="about_wiki">Wiki &amp; docs</span><span class="val">github.com/VD171/VD-Backup/wiki</span></a>
+        <a href="https://xdaforums.com/t/VD-Backup.4807267/"><span class="k">XDA</span><span class="val">xdaforums.com/t/VD-Backup.4807267</span></a>
+        <a href="https://github.com/VD171/VD-Backup/blob/main/docs/BINARIES.md"><span class="k" data-i18n="about_binaries">Bundled binaries (audit)</span><span class="val">docs/BINARIES.md</span></a>
+        <a href="https://t.me/VD_Priv8"><span class="k">Telegram</span><span class="val">@VD_Priv8</span></a>
+        <a href="https://t.me/Priv8_VD"><span class="k" data-i18n="about_channel">Channel</span><span class="val">@Priv8_VD</span></a>
+        <a href="https://discord.com/users/1296831918989639721"><span class="k">Discord</span><span class="val">@VD.Priv8</span></a>
+        <a href="mailto:vd.priv8@pm.me"><span class="k" data-i18n="about_email">E-mail</span><span class="val">vd.priv8@pm.me</span></a>
+      </div>
+      <h2 class="nx-h"><svg class="i"><use href="#i-apps"/></svg><span data-i18n="about_see_also">See also</span></h2>
+      <div class="links stack nx-card">
+        <a href="https://github.com/VD171/VD-Infos"><span class="k">VDInfos</span><span class="val" data-i18n="about_sib_vdinfos">a device method debugger: reads each item through every method that can read it and compares them side by side.</span></a>
+        <a href="https://github.com/VD171/VD-Google"><span class="k">VDGoogle</span><span class="val" data-i18n="about_sib_vdgoogle">your Google services (RCS, Wallet, Play Integrity attestations), read on your device with no internet.</span></a>
+        <a href="https://github.com/VD171/COPG-VD"><span class="k">COPG-VD</span><span class="val" data-i18n="about_sib_copg">a device spoofer that turns a fresh fingerprint into a coherent, consistent profile.</span></a>
+        <a href="https://github.com/VD171/VD-dropbear"><span class="k">VD-dropbear</span><span class="val" data-i18n="about_sib_vddropbear">a standalone rooted SSH daemon (Dropbear).</span></a>
+        <a href="https://github.com/VD171/VD-Installer"><span class="k">VDInstaller</span><span class="val" data-i18n="about_sib_vdinstaller">a frictionless root installer for sideloaded APKs: no grant-su prompt, no terminal, no Play Protect fight.</span></a>
+      </div>
+      <h2 class="nx-h"><svg class="i"><use href="#i-heart"/></svg><span data-i18n="about_credits">Credits</span></h2>
+      <div class="links stack nx-card">
+        <a href="https://github.com/VictorGabriel7Dev/mtproto-store"><span class="k">mtproto-store</span><span class="val" data-i18n="about_credit_mtproto">the Telegram backup backend, by VictorGabriel7Dev (from work by Ash). AGPL-3.0.</span></a>
+      </div>
+      <button id="prov-open" class="btn block" type="button" data-i18n="about_prov_btn">View bundled-binary manifest</button>
+      <h2 class="nx-h"><svg class="i"><use href="#i-root"/></svg><span data-i18n="about_disclaimer">Disclaimer</span></h2>
+      <p class="nx-hint" data-i18n="about_disclaimer_safety">VD Backup is free software provided as is, with no warranty of any kind. Restoring overwrites what is currently on your device and can cause data loss, so review each operation before you run it and keep your own copy of anything you cannot afford to lose. Your backups contain your personal data, so store them somewhere you trust.</p>
+      <p class="nx-hint" data-i18n="about_disclaimer_tm">VD Backup is an independent, unofficial project. It is not affiliated with, endorsed by, or sponsored by Google LLC or any other vendor. "Google Drive", "Android" and related names and logos are trademarks of their respective owners. VD Backup runs on your device and uploads only to the destinations you configure.</p>
+      <div class="foot" data-i18n="about_foot">GNU AGPL-3.0-or-later. Copyright (C) 2026 VD171</div>
+    </section>
+
+    <!-- ============ Activity log ============ -->
+    <section id="log" class="panel nx-sub">
+      <div class="nx-logbar">
+        <button id="log-export" class="btn small" type="button" data-i18n="ui_export_logs">Export logs</button>
+        <button id="log-clear" class="btn small danger" type="button" data-i18n="ui_clear_logs">Clear log</button>
+      </div>
+      <div id="log-export-result" hidden></div>
+      <ul id="log-list" class="list nx-list nx-log"></ul>
+      <p id="log-empty" class="nx-empty" data-i18n="ui_log_empty" hidden>No activity yet.</p>
+    </section>
+  </main>
+
+  <nav class="tabs nx-nav" role="tablist">
+    <button class="tab active" type="button" data-tab="home"><span class="nx-pill"><svg class="i"><use href="#i-home"/></svg></span><span data-i18n="nx_home">Home</span></button>
+    <button class="tab" type="button" data-tab="apps"><span class="nx-pill"><svg class="i"><use href="#i-up"/></svg></span><span data-i18n="nx_tab_backup">Backup</span></button>
+    <button class="tab" type="button" data-tab="backups"><span class="nx-pill"><svg class="i"><use href="#i-restore"/></svg></span><span data-i18n="restore">Restore</span></button>
+    <button class="tab" type="button" data-tab="schedule"><span class="nx-pill"><svg class="i"><use href="#i-clock"/></svg></span><span data-i18n="tab_schedule">Schedule</span></button>
+    <button class="tab" type="button" data-tab="more"><span class="nx-pill"><svg class="i"><use href="#i-more"/></svg></span><span data-i18n="nx_more">More</span></button>
+  </nav>
+
+  <div id="ops" class="ops" hidden></div>
+  <div id="nx-ops-scrim" class="nx-ops-scrim" hidden></div>
+
+  <div id="nx-rs-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="nx-rs-title"></div>
+      <div class="info-body" id="nx-rs-body"></div>
+      <div class="modal-actions">
+        <button class="btn" id="nx-rs-close" type="button" data-i18n="ui_close">Close</button>
+        <button class="btn danger" id="nx-rs-delete" type="button" data-i18n="delete">Delete</button>
+        <button class="btn" id="nx-rs-pull" type="button" data-i18n="nx_rs_download">Download to this device</button>
+        <button class="btn go" id="nx-rs-restore" type="button" data-i18n="restore">Restore</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pw-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="pw-title" data-i18n="ui_import_password">Backup password</div>
+      <div class="modal-msg" id="pw-msg"></div>
+      <div class="checks" id="pw-items" hidden></div>
+      <input id="pw-input" type="password" autocomplete="off" autocapitalize="off"
+             spellcheck="false" data-i18n-ph="ui_import_password" placeholder="Backup password">
+      <div class="modal-err" id="pw-err"></div>
+      <label class="notice-toggle" id="pw-batch-row" hidden>
+        <input type="checkbox" class="switch" id="pw-batch-apply">
+        <span data-i18n="ui_batch_pass_label">Try this password on apps whose saved password does not work</span>
+      </label>
+      <div class="notice warn" id="pw-ssaid-row">
+        <label class="notice-toggle">
+          <input type="checkbox" class="switch" id="pw-ssaid">
+          <span data-i18n="ui_ssaid_label">Include the device ID (SSAID)</span>
+          <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
+        </label>
+        <div class="notice-msg" data-i18n="msg_ssaid_warning">This backs up and, on restore, rewrites the device ID (SSAID / ANDROID_ID). It is optional and off by default. A restored value only takes effect after a reboot, and the previous value is always saved first so it can be rolled back.</div>
+      </div>
+      <div class="notice warn" id="pw-ssaid-apps-row" hidden>
+        <div class="notice-msg" data-i18n="ui_ssaid_apps_head">Apply device ID (SSAID) to:</div>
+        <div class="checks" id="pw-ssaid-apps"></div>
+        <div class="notice-msg" data-i18n="msg_ssaid_warning">This backs up and, on restore, rewrites the device ID (SSAID / ANDROID_ID). It is optional and off by default. A restored value only takes effect after a reboot, and the previous value is always saved first so it can be rolled back.</div>
+      </div>
+      <div class="notice warn" id="pw-app-netpolicy-row">
+        <label class="notice-toggle">
+          <input type="checkbox" class="switch" id="pw-app-netpolicy">
+          <span data-i18n="ui_app_netpolicy_label">Include per-app network policy</span>
+          <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
+        </label>
+        <div class="notice-msg" data-i18n="msg_app_netpolicy_warning">This backs up and, on restore, re-applies each app's per-app network policy (such as a ROM's deny-network toggle), stored in the system network-policy file. It is optional and off by default. A restored policy only takes effect after a reboot, and the previous file is always saved first so it can be rolled back.</div>
+      </div>
+      <div class="checks" id="pw-test-row" hidden>
+        <label><input type="checkbox" class="switch" id="pw-test"><span data-i18n="ui_restore_test">Test only (extract, do not touch the live app)</span></label>
+      </div>
+      <div class="checks" id="pw-spoof-row" hidden>
+        <label><input type="checkbox" class="switch" id="pw-spoof"><span data-i18n="ui_spoof_installer">Set install source to Play Store</span></label>
+      </div>
+      <div class="checks" id="pw-deep-row" hidden>
+        <label><input type="checkbox" class="switch" id="pw-deep"><span data-i18n="ui_deep_spoof">Also forge the initiating source (edits packages.xml, needs a reboot)</span></label>
+        <div class="muted" data-i18n="ui_deep_spoof_note">Advanced. Makes the app look fully Play-installed (initiating package and source), not just the installer. The system package database is backed up first; the change applies after a reboot.</div>
+      </div>
+      <div class="notice warn" id="pw-overwrite-row" hidden>
+        <label class="notice-toggle">
+          <input type="checkbox" class="switch" id="pw-overwrite">
+          <span data-i18n="ui_overwrite_label">I understand this overwrites the current app data</span>
+        </label>
+        <div class="notice-msg" data-i18n="msg_overwrite_warning">Restoring replaces this app's current data with the backup. The app is stopped first. This cannot be undone unless you have a separate backup of the current state.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="pw-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="pw-ok" data-i18n="ui_import_do">Import</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- generic confirm / alert dialog (replaces native confirm/alert) -->
+  <div id="msg-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="msg-title"></div>
+      <div class="modal-msg" id="msg-body"></div>
+      <div class="modal-actions">
+        <button class="btn" id="msg-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="msg-ok" data-i18n="ui_ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- backup details (tap a backup entry) -->
+  <div id="info-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="info-title"></div>
+      <div id="info-body" class="info-body"></div>
+      <div class="info-note">
+        <input id="info-note" type="text" data-i18n-ph="ui_bk_name_ph" placeholder="Name this backup (optional)" maxlength="200" autocomplete="off">
+        <input id="info-tags" type="text" data-i18n-ph="ui_bk_tags_ph" placeholder="Tags, comma-separated" autocomplete="off">
+        <button class="btn small block" id="info-note-save" data-i18n="save">Save</button>
+        <button class="btn small block" id="info-pin" data-i18n="ui_pin">Pin</button>
+        <div id="info-note-status" class="muted"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="info-close" data-i18n="ui_close">Close</button>
+        <button class="btn danger" id="info-delete" data-i18n="delete">Delete</button>
+        <button class="btn go" id="info-restore" data-i18n="restore">Restore</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- per-app backup history (tap an app to see its backups and restore) -->
+  <div id="cfg-import-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="settings_config_import">Import settings</div>
+      <div class="muted" data-i18n="settings_config_import_pick">Pick a settings file to import. Importing merges destinations, schedules, presets and credentials into this device without removing what is already here.</div>
+      <ul id="cfg-import-list" class="list"></ul>
+      <div id="cfg-import-empty" class="muted" data-i18n="settings_config_import_empty" hidden>No settings files found. Export settings first, or copy a file into VDBackup/.export on this device.</div>
+      <div class="modal-actions">
+        <button class="btn" id="cfg-import-close" data-i18n="ui_close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="appbk-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="appbk-title"></div>
+      <ul id="appbk-list" class="list"></ul>
+      <div id="appbk-empty" class="muted" data-i18n="appbk_empty" hidden>No backups yet.</div>
+      <div class="modal-actions">
+        <button class="btn" id="appbk-close" data-i18n="ui_close">Close</button>
+        <button class="btn" id="appbk-items" data-i18n="appbk_items">Items and tags</button>
+        <button class="btn" id="appbk-sysmount" data-i18n="ui_sysmount">Mount as system</button>
+        <button class="btn go" id="appbk-backup" data-i18n="backup">Back up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- choose what to include in this backup -->
+  <div id="backup-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="backup-title"></div>
+      <div class="field" id="backup-preset-row" hidden>
+        <label for="backup-preset" data-i18n="ui_preset">Preset</label>
+        <select id="backup-preset"></select>
+      </div>
+      <div class="modal-msg" data-i18n="backup_what">What to include in this backup</div>
+      <div class="checks">
+        <label><input type="checkbox" id="bi-apk" checked><span data-i18n="item_apk">APK (app)</span></label>
+        <label><input type="checkbox" id="bi-data" checked><span data-i18n="item_data">App data</span></label>
+        <label><input type="checkbox" id="bi-data_de" checked><span data-i18n="item_data_de">Protected data</span></label>
+        <label><input type="checkbox" id="bi-obb" checked><span data-i18n="item_obb">OBB</span></label>
+        <label><input type="checkbox" id="bi-external" checked><span data-i18n="item_external">External data</span></label>
+        <label><input type="checkbox" id="bi-media" checked><span data-i18n="item_media">Media</span></label>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" class="switch" id="bi-verify" checked><span data-i18n="ui_verify">Verify after backup</span></label>
+        <label><input type="checkbox" class="switch" id="bi-dryrun"><span data-i18n="ui_dryrun">Dry run (estimate only)</span></label>
+      </div>
+      <div class="field">
+        <label for="backup-dest" data-i18n="ui_backup_dest">Destination</label>
+        <select id="backup-dest"></select>
+      </div>
+      <input id="backup-pass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"
+             hidden data-i18n-ph="backup_passphrase" placeholder="Encryption passphrase">
+      <div id="backup-pass-info" class="modal-msg" hidden data-i18n="msg_backup_pass_stored">🔒 Encrypted with your saved passphrase (set in Settings).</div>
+      <div class="modal-actions">
+        <button class="btn" id="backup-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="backup-ok" data-i18n="backup">Back up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- per-app backup item set (Settings): what a given app backs up in bulk/auto/scheduled -->
+  <div id="appitems-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" id="appitems-title"></div>
+      <div class="modal-scroll">
+        <div class="modal-msg" data-i18n="appitems_msg">Items to back up for this app in bulk, automatic and scheduled backups</div>
+        <div class="checks">
+          <label><input type="checkbox" id="ai-apk"><span data-i18n="item_apk">APK (app)</span></label>
+          <label><input type="checkbox" id="ai-data"><span data-i18n="item_data">App data</span></label>
+          <label><input type="checkbox" id="ai-data_de"><span data-i18n="item_data_de">Protected data</span></label>
+          <label><input type="checkbox" id="ai-obb"><span data-i18n="item_obb">OBB</span></label>
+          <label><input type="checkbox" id="ai-external"><span data-i18n="item_external">External data</span></label>
+          <label><input type="checkbox" id="ai-media"><span data-i18n="item_media">Media</span></label>
+        </div>
+        <div class="field">
+          <label data-i18n="appitems_tags">Tags</label>
+          <div class="modal-msg" data-i18n="appitems_tags_msg">Free labels to group apps. Filter the app list by a tag and back up the whole group at once.</div>
+          <div id="ai-tags" class="tags-chips"></div>
+          <div class="tags-add">
+            <input id="ai-tag-input" type="text" data-i18n-ph="ui_tag_add_ph" placeholder="New tag" autocomplete="off">
+            <button class="btn small" id="ai-tag-add" data-i18n="ui_tag_add">Add</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="ai-note" data-i18n="appitems_note">Note</label>
+          <div class="modal-msg" data-i18n="appitems_note_msg">A free-text note for this app - a reminder, a description, whatever helps you.</div>
+          <textarea id="ai-note" rows="2" data-i18n-ph="appitems_note_ph" placeholder="Note for this app"></textarea>
+        </div>
+        <div class="field">
+          <label for="ai-pass" data-i18n="appitems_pass">Encryption passphrase (this app)</label>
+          <div class="modal-msg" data-i18n="appitems_pass_msg">Optional. Overrides the default passphrase for this app's encrypted backups.</div>
+          <div class="muted"><span data-i18n="settings_gpass_cur">Current:</span> <b id="ai-pass-state">-</b></div>
+          <input id="ai-pass" type="password" autocomplete="new-password" spellcheck="false" data-i18n-ph="appitems_pass_ph" placeholder="New passphrase (leave empty to keep)">
+          <input id="ai-pass-confirm" type="password" autocomplete="new-password" spellcheck="false" data-i18n-ph="settings_pass_confirm_ph" placeholder="Confirm passphrase">
+          <button class="btn small" id="ai-pass-clear" type="button" data-i18n="settings_gpass_clear">Clear</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="appitems-clear" data-i18n="appitems_clear">Use default (everything)</button>
+        <button class="btn" id="appitems-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="appitems-save" data-i18n="save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- mount an installed app as a system app (systemless, via a VDBackup sub-module) -->
+  <div id="sysmount-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="ui_sysmount_title">Mount as system app</div>
+      <div class="modal-msg" id="sysmount-sub"></div>
+      <div class="checks">
+        <label><input type="radio" name="sysmount-loc" id="sysmount-app" checked><span data-i18n="ui_sysmount_app">Regular system app (/system/app)</span></label>
+        <label><input type="radio" name="sysmount-loc" id="sysmount-priv"><span data-i18n="ui_sysmount_priv">Privileged system app (/system/priv-app)</span></label>
+      </div>
+      <div class="muted" data-i18n="ui_sysmount_note">This never changes the real /system partition. It adds the app through a VDBackup sub-module that the root manager mounts. Privileged apps may also need a privapp-permissions allowlist.</div>
+      <div id="sysmount-hint" class="muted"></div>
+      <div class="modal-actions">
+        <button class="btn" id="sysmount-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="sysmount-ok" data-i18n="ui_sysmount">Mount as system</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- folder browser (local destination path) -->
+  <div id="dir-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="ui_dir_title">Choose a folder</div>
+      <div id="dir-vols" class="vol-chips"></div>
+      <div class="modal-msg" id="dir-path"></div>
+      <ul id="dir-list" class="list"></ul>
+      <div class="modal-actions">
+        <button class="btn" id="dir-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="dir-use" data-i18n="ui_dir_use">Use this folder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- bundled-binary provenance manifest (supply-chain audit) -->
+  <div id="prov-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="about_prov_btn">View bundled-binary manifest</div>
+      <div class="modal-msg" data-i18n="about_prov_hint">Source and SHA-256 of every binary and library bundled for this device's ABI.</div>
+      <pre id="prov-body" class="codebox"></pre>
+      <div class="modal-actions">
+        <button class="btn go" id="prov-close" data-i18n="ui_close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- activity log moved to its own full-screen panel (section#log), reached from
+       the Schedule tab's "View activity log" button -->
+
+  <!-- special restore (system-wide): heavy friction, reboot required -->
+  <div id="special-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="special_restore_title">Restore special backup</div>
+      <div class="modal-msg" id="special-modal-sub"></div>
+      <div class="checks" id="special-modal-cats"></div>
+      <div class="notice warn" id="special-modal-syssettings" hidden>
+        <label class="notice-toggle">
+          <input type="checkbox" class="switch" id="special-modal-ss-cb">
+          <span data-i18n="ui_syssettings_label">Include system settings</span>
+          <span class="tag" data-i18n="ui_ssaid_optional">Optional</span>
+        </label>
+        <div class="notice-msg" data-i18n="msg_syssettings_warning">This backs up and, on restore, overwrites device-wide system settings such as display, sound and input options. It is optional and off by default, applies to the same device, and every value it changes is recorded in the activity log.</div>
+      </div>
+      <input id="special-pass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"
+             hidden data-i18n-ph="ui_import_password" placeholder="Backup password">
+      <div class="notice warn" id="special-ack-row">
+        <label class="notice-toggle">
+          <input type="checkbox" class="switch" id="special-ack">
+          <span data-i18n="special_ack_label">I understand this overwrites live system data and needs a reboot</span>
+        </label>
+        <div class="notice-msg" data-i18n="special_ack_warning">This replaces the current messages, contacts, Wi-Fi or Bluetooth state with the backup. It only applies after a reboot and can only be relied on when restoring to the same device and ROM.</div>
+      </div>
+      <div class="modal-err" id="special-err"></div>
+      <div class="modal-actions">
+        <button class="btn" id="special-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn danger" id="special-delete" data-i18n="delete">Delete</button>
+        <button class="btn go" id="special-ok" data-i18n="restore">Restore</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- folder / file backup options (compression + optional encryption) -->
+  <div id="pathbk-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="ui_pathbk_opts_title">Back up folder or file</div>
+      <div class="modal-msg" id="pathbk-sub"></div>
+      <div class="field">
+        <label data-i18n="settings_compression">Compression</label>
+        <select id="pb-comp">
+          <option value="none" data-i18n="opt_comp_none">none</option>
+          <option value="lz4" data-i18n="opt_comp_lz4">lz4</option>
+          <option value="zstd:3" data-i18n="opt_comp_zstd_fast">zstd (fast)</option>
+          <option value="zstd:10" data-i18n="opt_comp_zstd_default">zstd (default)</option>
+          <option value="zstd:19" data-i18n="opt_comp_zstd_max">zstd (max)</option>
+          <option value="gzip" data-i18n="opt_comp_gzip">gzip (compatible)</option>
+        </select>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" class="switch" id="pb-enc"><span data-i18n="settings_encrypt_data">Encrypt data</span></label>
+      </div>
+      <input id="pb-pass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"
+             hidden data-i18n-ph="backup_passphrase" placeholder="Encryption passphrase">
+      <div class="modal-actions">
+        <button class="btn" id="pb-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="pb-ok" data-i18n="ui_pathbk_do">Back up</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="adb-modal" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card adb-modal-card">
+      <div class="modal-title" id="adb-title" data-i18n="ui_adb_opts_title">Back up /data/adb</div>
+      <div class="modal-msg muted" id="adb-sub" data-i18n="ui_adb_pick">Check a folder to include all of it, or open it to choose inside. Only what you check is included.</div>
+      <div class="adb-toolbar">
+        <input id="adb-filter" type="search" class="picker-search" data-i18n-ph="ui_adb_filter_ph" placeholder="Filter visible names" autocomplete="off">
+        <label class="adb-total-lab"><input type="checkbox" id="adb-total"><span data-i18n="ui_adb_everything">Everything</span></label>
+      </div>
+      <div class="adb-tree modal-scroll" id="adb-tree"></div>
+      <div class="adb-selinfo muted" id="adb-selinfo"></div>
+      <div id="adb-bkopts">
+        <div class="field">
+          <label for="adb-dest" data-i18n="ui_backup_dest">Destination</label>
+          <select id="adb-dest"></select>
+        </div>
+        <div class="field">
+          <label data-i18n="settings_compression">Compression</label>
+          <select id="adb-comp">
+            <option value="none" data-i18n="opt_comp_none">none</option>
+            <option value="lz4" data-i18n="opt_comp_lz4">lz4</option>
+            <option value="zstd:3" data-i18n="opt_comp_zstd_fast">zstd (fast)</option>
+            <option value="zstd:10" data-i18n="opt_comp_zstd_default">zstd (default)</option>
+            <option value="zstd:19" data-i18n="opt_comp_zstd_max">zstd (max)</option>
+            <option value="gzip" data-i18n="opt_comp_gzip">gzip (compatible)</option>
+          </select>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" class="switch" id="adb-enc"><span data-i18n="settings_encrypt_data">Encrypt data</span></label>
+        </div>
+      </div>
+      <div id="adb-restwarn" class="notice warn" hidden><div class="notice-msg" data-i18n="ui_adb_restore_warn">This writes the checked files back under /data/adb, over whatever is there now, and can affect running root modules. Only what you check is written; everything else is left alone.</div></div>
+      <input id="adb-pass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" hidden data-i18n-ph="backup_passphrase" placeholder="Encryption passphrase">
+      <div class="modal-actions">
+        <button class="btn" id="adb-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="adb-ok" data-i18n="ui_adb_do">Back up</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tg-login" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="ui_tg_login_title">Connect Telegram</div>
+      <div class="modal-msg" data-i18n="ui_tg_login_msg">Log in to your Telegram account to use it as a backup destination. The login session is stored encrypted on this device.</div>
+      <div id="tg-step-phone">
+        <input id="tg-phone" type="tel" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-ph="ph_tg_phone" placeholder="+1 555 123 4567">
+      </div>
+      <div id="tg-step-code" hidden>
+        <input id="tg-code" type="text" inputmode="numeric" autocomplete="off" data-i18n-ph="ph_tg_code" placeholder="login code">
+        <input id="tg-2fa" type="password" autocomplete="off" hidden data-i18n-ph="ph_tg_2fa" placeholder="two-factor password">
+      </div>
+      <div class="modal-err" id="tg-err"></div>
+      <div class="modal-actions">
+        <button class="btn" id="tg-cancel" data-i18n="ui_import_cancel">Cancel</button>
+        <button class="btn go" id="tg-next" data-i18n="ui_tg_send_code">Send code</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tg-backups" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="ui_tg_backups_title">Backups in Telegram</div>
+      <div class="modal-msg" data-i18n="ui_tg_backups_msg">Pull a backup from your Telegram channel back to this device; then restore it like any local backup.</div>
+      <input id="tg-backups-search" type="search" hidden data-i18n-ph="search_apps" placeholder="Search apps">
+      <ul id="tg-backups-list" class="list tgb-list"></ul>
+      <div class="modal-actions">
+        <button class="btn" id="tg-backups-close" data-i18n="ui_import_cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="rc-backups" class="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-title" data-i18n="ui_rc_backups_title">Backups on a cloud remote</div>
+      <div class="modal-msg" data-i18n="ui_rc_backups_msg">Pull a backup from an rclone remote back to this device, then restore it like any local backup.</div>
+      <ul id="rc-backups-list" class="list"></ul>
+      <div class="modal-actions">
+        <button class="btn" id="rc-backups-close" data-i18n="ui_import_cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="lang/en.js"></script>
+  <script src="i18n.js"></script>
+  <script src="vdlu.js"></script>
+  <script src="scripts.js"></script>
+  <script src="next/js/boot.js"></script>
+  <script src="next/js/modals.js"></script>
+  <script src="next/js/shell.js"></script>
+  <script src="next/js/sources.js"></script>
+  <script src="next/js/restore.js"></script>
+  <script src="next/js/files.js"></script>
+  <script src="next/js/home.js"></script>
+</body>
+</html>

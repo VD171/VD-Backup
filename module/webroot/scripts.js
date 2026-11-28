@@ -471,7 +471,7 @@ function startBatchRestore() {
   // union of item types across the selected backups, in canonical order, so the batch modal
   // offers the same per-item toggles as single restore. Each app then restores the intersection of
   // its own items and the picked types (restore skips a type the backup does not have).
-  var BITEMS_ORDER = ["apk", "data", "data_de", "external", "obb", "media"];
+  var BITEMS_ORDER = ["apk", "data", "data_de", "external", "obb", "media", "profiles"];
   var bitemsSeen = {};
   refs.forEach(function (ref) { (bkSelected[ref].items || []).forEach(function (t) { bitemsSeen[t] = true; }); });
   var batchItems = BITEMS_ORDER.filter(function (t) { return bitemsSeen[t]; });
@@ -494,7 +494,9 @@ function startBatchRestore() {
 // batch delete: one confirm, then delete each selected backup and reload the list.
 function startBatchDelete() {
   var refs = Object.keys(bkSelected); if (!refs.length) return;
-  modalConfirmAction(I18N.t("confirm_delete_n", { n: refs.length }), I18N.t("delete"), function () {
+  var size = 0;
+  (BACKUPS || []).forEach(function (b) { if (bkSelected[b.ref]) size += b.size || 0; });
+  modalConfirmAction(I18N.t(size ? "confirm_delete_n_size" : "confirm_delete_n", { n: refs.length, size: fmtSize(size) }), I18N.t("delete"), function () {
     return Promise.all(refs.map(function (ref) {
       return helper("delete-backup", { ref: ref }).then(function (r) { if (r && r.ok) clearBackupIconCache(ref); return r; });
     }));
@@ -1772,6 +1774,7 @@ function trackOp(opid, ctx) {
   var missing = 0, stuck = 0;
   var timer = setInterval(function () {
     if (!box.parentNode) { clearInterval(timer); return; }   // card was closed/cancelled: stop polling
+    if (document.hidden) return;   // WebUI in the background: skip the poll, resume when visible
     helper("progress", opid, true).then(function (p) {
       if (!p || (!p.phase && !p.done)) {   // op vanished (finished + cleaned, or never started)
         if (++missing >= 3) { clearInterval(timer); closeCard(box); }
@@ -2207,6 +2210,7 @@ function loadSettings() {
   if ($("#set-auto"))     $("#set-auto").checked = !!CFG.auto_backup;
   if ($("#set-auto-keep")) $("#set-auto-keep").value = CFG.auto_backup_keep || 5;
   if ($("#set-thermal"))  $("#set-thermal").checked = (CFG.thermal_throttle !== false);
+  if ($("#set-notify-progress")) $("#set-notify-progress").checked = (CFG.notify_progress === true);
   if ($("#set-space-preflight")) $("#set-space-preflight").checked = (CFG.space_preflight !== false);
   if ($("#set-local-copy")) $("#set-local-copy").checked = (CFG.local_copy === true);
   if ($("#set-spoof"))    $("#set-spoof").checked = (CFG.spoof_installer !== false);
@@ -2243,6 +2247,7 @@ function saveSettings() {
   if ($("#set-auto")) CFG.auto_backup = $("#set-auto").checked;
   if ($("#set-auto-keep")) CFG.auto_backup_keep = parseInt($("#set-auto-keep").value, 10) || 5;
   if ($("#set-thermal")) CFG.thermal_throttle = $("#set-thermal").checked;
+  if ($("#set-notify-progress")) CFG.notify_progress = $("#set-notify-progress").checked;
   if ($("#set-space-preflight")) CFG.space_preflight = $("#set-space-preflight").checked;
   if ($("#set-local-copy")) CFG.local_copy = $("#set-local-copy").checked;
   if ($("#set-spoof")) CFG.spoof_installer = $("#set-spoof").checked;
@@ -2694,6 +2699,7 @@ function openSpecialRestore(bk) {
   $("#special-delete").onclick = function () {
     modalConfirmAction(I18N.t("confirm_delete_backup"), I18N.t("delete"), function () { return helper("delete-backup", { ref: bk.ref }); }).then(function (r) {
       if (r === null) return;
+      if (!r || !r.ok) { modalAlert(errMsg(r)); return; }
       m.hidden = true; loadSpecial();
     });
   };
@@ -3245,12 +3251,15 @@ function boot() {
   if ($("#bk-seluninstalled")) $("#bk-seluninstalled").onclick = function () {
     // select the backups whose app is no longer installed, so they can be bulk-deleted to free
     // space. Selects only (does not delete) - the user reviews and uses the existing Delete button.
-    helper("list-apps", { user: activeUser }).then(function (r) {
-      var inst = {}; ((r && r.apps) || []).forEach(function (a) { inst[a.package] = true; });
+    // a failed app list must not read as "nothing installed": that would select every backup
+    return helper("list-apps", { user: activeUser }).then(function (r) {
+      if (!r || !r.apps) { modalAlert(errMsg(r)); return false; }
+      var inst = {}; r.apps.forEach(function (a) { inst[a.package] = true; });
       (BACKUPS || []).forEach(function (b) {
-        if (b.package && b.package.indexOf(".") >= 0 && !inst[b.package]) bkSelected[b.ref] = { ref: b.ref, package: b.package, items: b.items };
+        if (b.mode !== "mirror" && b.package && b.package.indexOf(".") >= 0 && !inst[b.package]) bkSelected[b.ref] = { ref: b.ref, package: b.package, items: b.items };
       });
       updateBkSelCount(); renderBackups(BACKUPS);
+      return true;
     }).catch(function () { modalAlert(errMsg()); });
   };
   $("#bk-restoresel").onclick = startBatchRestore;
@@ -3356,6 +3365,7 @@ function boot() {
   helper("config-get").then(function (c) { CFG = c || {}; activeUser = (CFG.user != null) ? (CFG.user | 0) : 0; return I18N.init(CFG.language || "auto"); })
     .then(function () {
       I18N.apply();
+      if (window.VDB_UI) VDB_UI.sync(CFG);   // Classic / New interface choice (ui-switch.js)
       // The bridge runs one exec at a time, so call order is load order. The app list is the
       // first screen: ask for it first, and queue what the other tabs need only behind it.
       var rest = function () {

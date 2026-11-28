@@ -1,0 +1,207 @@
+/*
+ * ======================================================================
+ *  VD BACKUP  ::  root backup & restore, no grant prompt
+ *  Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+ *
+ *  Copyright (C) 2026  VD171
+ *  SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ *  Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+ *  modified version, even as a service, and you MUST offer its source.
+ *
+ *  Site           : https://vd171.ru
+ *  Site           : https://vd.priv8.ru
+ *  Source         : https://github.com/VD171/VD-Backup
+ *  GitHub         : @VD171 https://github.com/VD171
+ *  XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+ *  XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+ *  Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+ *  Channel        : @Priv8_VD https://t.me/Priv8_VD
+ *  Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+ *  E-mail         : vd.priv8@pm.me
+ * ======================================================================
+ *
+ *  New interface: per-screen layout (Home, Apps, Backups, More, Settings,
+ *  Activity log, About) and the Updates widget palette.
+ */
+
+/* ---- Home ---- */
+.nx-hero { margin-top: 8px; padding: 20px 18px 16px; border-radius: var(--r-lg); background: var(--surface);
+  border: 1px solid var(--line); background-image: linear-gradient(160deg, var(--accent-soft), transparent 60%); }
+.nx-hero-k { font-size: 13px; font-weight: 650; color: var(--muted); }
+.nx-hero-n { direction: ltr; unicode-bidi: isolate; font-size: 34px; font-weight: 800; letter-spacing: -.02em; margin: 2px 0 10px; font-variant-numeric: tabular-nums; }
+[dir="rtl"] .nx-hero-n { text-align: right; }
+.storage-bar { height: 10px; border-radius: 5px; background: var(--surface-3); overflow: hidden; }
+.storage-bar > i { display: block; height: 100%; width: 0; min-width: 6px; border-radius: 5px; background: var(--accent); transition: width .5s var(--ease); }
+.storage-line { margin-top: 8px; font-size: 13px; color: var(--muted); }
+.nx-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 16px; }
+.nx-stat { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; padding: 10px 10px 9px;
+  border-radius: 14px; border: 0; background: var(--surface-2); color: var(--muted); font-size: 12px; font-weight: 600; text-align: start; }
+.nx-stat b { color: var(--text); font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.nx-stat span { max-width: 100%; font-size: 11.5px; line-height: 1.25; overflow-wrap: break-word; }
+.nx-stat:active, .nx-qa-b:active { background: var(--surface-3); }
+.nx-stat.nx-loading b { animation: nx-pulse 1.2s ease-in-out infinite; }
+@keyframes nx-pulse { 50% { opacity: .45; } }
+.nx-where { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.nx-where[hidden] { display: none; }
+.nx-where-r { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px;
+  padding: 4px 2px; border-top: 1px solid var(--line); font-size: 13px; cursor: pointer; }
+.nx-where-n { font-weight: 650; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nx-where-v { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+.nx-qa { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.nx-qa-b { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; min-width: 0;
+  padding: 14px 6px 12px; border-radius: var(--r); border: 1px solid var(--line); background: var(--surface);
+  font-size: 13px; font-weight: 650; line-height: 1.25; text-align: center; color: var(--text); }
+.nx-qa-ic { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--surface-3); color: var(--text); }
+.nx-qa-ic.go { background: var(--accent-soft); color: var(--accent-ink); }
+.nx-qa-ic.rs { background: var(--info-soft); color: var(--info); }
+.nx-recent:empty { display: none; }
+.nx-recent .row { min-height: 58px; }
+.nx-recent .nx-dot { width: 36px; height: 36px; border-radius: 12px; flex: none; display: grid; place-items: center;
+  background: var(--surface-3); color: var(--muted); }
+.nx-recent .nx-dot .i { width: 18px; height: 18px; }
+.nx-recent .nx-dot.ok { background: var(--accent-soft); color: var(--accent-ink); }
+.nx-recent .nx-dot.rs { background: var(--info-soft); color: var(--info); }
+.nx-recent .nx-dot.del { background: var(--danger-soft); color: var(--danger-ink); }
+.nx-recent .when { flex: none; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ---- Apps ---- */
+.nx-user { margin: 8px 0 4px; }
+.nx-sticky { position: sticky; top: calc(var(--top-h) + env(safe-area-inset-top)); z-index: 20; background: var(--bg);
+  margin: 0 -16px; padding: 6px 16px 4px; }
+.nx-search { display: flex; align-items: center; gap: 4px; min-height: 52px; padding-inline: 14px 6px; border-radius: var(--r-pill);
+  background: var(--surface-2); border: 1px solid var(--line); margin: 6px 0 10px; }
+.nx-search:focus-within { border-color: var(--accent); }
+.nx-search > .i { color: var(--muted); }
+.nx-search input { flex: 1 1 auto; min-width: 0; border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 8px; min-height: 48px; margin: 0; }
+.nx-search .nx-ib { width: 40px; height: 40px; }
+.nx-filters { display: flex; gap: 8px; align-items: center; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+.nx-filters::-webkit-scrollbar { display: none; }
+.nx-filters .segmented { flex: none; flex-wrap: nowrap; gap: 6px; }
+.nx-filters .segmented .segment { flex: none; min-height: 34px; padding: 0 12px; border: 1px solid var(--line-2) !important;
+  border-radius: 10px; font-size: 13px; }
+.nx-filters .segmented .segment.on { border-color: transparent !important; }
+.nx-filters .segmented + .segmented { padding-inline-start: 8px; border-inline-start: 1px solid var(--line); border-radius: 0; }
+.nx-chipchk { flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 12px;
+  border-radius: 10px; border: 1px solid var(--line-2); font-size: 13px; font-weight: 650; white-space: nowrap; cursor: pointer; }
+.nx-chipchk input { width: 16px !important; height: 16px !important; }
+.nx-chipchk:has(input:checked) { background: var(--accent-soft); border-color: transparent; color: var(--accent-ink); }
+.nx-batch { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; padding: 8px 8px 8px 14px; margin: 0 0 8px;
+  border-radius: var(--r); background: var(--accent-soft); }
+[dir="rtl"] .nx-batch { padding: 8px 14px 8px 8px; }
+.nx-batch .grow { font-weight: 700; color: var(--accent-ink); white-space: nowrap; }
+.nx-batch .btn { min-height: 40px; }
+.nx-batch-acts { display: flex; gap: 8px; width: 100%; margin-top: 4px; }
+.nx-batch-acts .btn { flex: 1 1 0; }
+/* Restore select mode: the actions stay in reach while picking rows further down */
+#bk-batchbar { position: sticky; top: calc(var(--top-h) + env(safe-area-inset-top) + 6px); z-index: 20;
+  background: linear-gradient(var(--accent-soft), var(--accent-soft)) var(--bg); box-shadow: 0 0 0 6px var(--bg); }
+#app-backuptag { margin: 0 0 12px; }
+
+/* ---- Backups ---- */
+.nx-seg { display: flex; gap: 8px; overflow-x: auto; margin: 8px -16px 6px; padding: 2px 16px 8px; scrollbar-width: none; }
+.nx-seg::-webkit-scrollbar { display: none; }
+.nx-seg-b { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 14px;
+  border-radius: var(--r-pill); border: 1px solid var(--line-2); background: transparent; color: var(--text);
+  font-size: 13.5px; font-weight: 650; white-space: nowrap; }
+.nx-seg-b .i { width: 18px; height: 18px; color: var(--muted); }
+.nx-seg-b.on { background: var(--accent); border-color: transparent; color: var(--on-accent); }
+.nx-seg-b.on .i { color: var(--on-accent); }
+.nx-cloudrow { display: flex; flex-wrap: wrap; gap: 8px; margin: -2px 0 12px; }
+.nx-cloudrow .nx-chip { flex: 1 1 auto; justify-content: center; }
+.nx-cloudrow[hidden] { display: none; }
+/* Restore: source and filter chips (one scrolling row each), per-source errors, row badges */
+#nx-rs-src, #nx-rs-flt { margin: 0 -16px; padding: 0 16px 8px; }
+#nx-rs-src[hidden], #nx-rs-flt:empty { display: none; }
+.nx-fchip { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px;
+  border-radius: 10px; border: 1px solid var(--line-2); background: transparent; color: var(--text);
+  font-size: 13px; font-weight: 650; white-space: nowrap; }
+.nx-fchip.on { background: var(--accent-soft); border-color: transparent; color: var(--accent-ink); }
+.nx-cnt { min-width: 20px; padding: 0 6px; border-radius: 10px; background: var(--surface-3); color: var(--muted);
+  font-size: 11.5px; line-height: 20px; text-align: center; font-variant-numeric: tabular-nums; }
+.nx-fchip.on .nx-cnt { background: var(--surface); color: var(--accent-ink); }
+.nx-chip-spin { width: 14px; height: 14px; border-width: 2px; }
+.nx-chip-warn { display: inline-grid; color: var(--warn); }
+.nx-chip-warn .i { width: 16px; height: 16px; }
+.nx-fsel { flex: none; width: auto; min-height: 34px; padding-inline: 12px 34px; border-radius: 10px;
+  border-color: var(--line-2); background-color: transparent; font-size: 13px; font-weight: 650; }
+[dir="rtl"] .nx-fsel { background-position: 15px 50%, 20px 50%; }
+.nx-srcerr { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+.nx-srcerr .grow { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.nx-srcerr .btn { flex: none; }
+.nx-srcs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.nx-srcs .badge { font-size: 11px; padding: 1px 8px; }
+#backuplist > li[hidden] { display: none; }
+.nx-pane > .nx-card { margin-bottom: 6px; }
+.nx-pane .nx-card .btn.block:first-child { margin-top: 0; }
+
+/* ---- Schedule / More / Settings rows ---- */
+.nx-row { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 10px 16px; border: 0;
+  background: transparent; color: var(--text); text-align: start; font-size: 15px; font-weight: 650; }
+.nx-row.nx-card { border: 1px solid var(--line); margin-top: 12px; }
+.nx-row:active { background: var(--surface-2); }
+.nx-row-ic { width: 40px; height: 40px; border-radius: 12px; flex: none; display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent-ink); }
+.nx-row-t { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.nx-row-t small { font-size: 12.5px; font-weight: 400; color: var(--muted); line-height: 1.4; }
+.nx-chev { color: var(--muted); width: 20px; height: 20px; }
+.nx-menu { overflow: hidden; margin-top: 8px; }
+.nx-menu .nx-row + .nx-row { border-top: 1px solid var(--line); }
+.nx-menu + .nx-menu { margin-top: 14px; }
+.nx-exp { margin-top: 4px; }
+.nx-saverow { display: flex; align-items: center; gap: 12px; margin: 18px 4px 0; }
+.nx-saverow .btn { min-width: 120px; }
+
+/* ---- Activity log ---- */
+.nx-logbar { display: flex; gap: 8px; justify-content: flex-end; margin: 8px 0 12px; }
+.nx-log .row { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; min-height: 0; padding: 12px 16px; }
+.nx-log .op { font-weight: 650; }
+.nx-log .when { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.nx-log .ref { grid-column: 1 / -1; color: var(--muted); font-size: 12.5px; overflow-wrap: anywhere; }
+#log-export-result { margin: 0 0 12px; }
+
+/* ---- About ---- */
+.about-hero { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+.about-hero img { width: 56px; height: 56px; border-radius: 16px; }
+.about-hero .n { font-size: 22px; font-weight: 800; }
+.about-hero .v { color: var(--muted); font-size: 13.5px; }
+.links { display: flex; flex-direction: column; overflow: hidden; }
+.links a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 10px 16px;
+  color: var(--text); text-decoration: none; }
+.links a + a { border-top: 1px solid var(--line); }
+.links a:active { background: var(--surface-2); }
+.links a .k { font-weight: 650; flex: none; }
+.links a .val { color: var(--muted); font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: ltr; }
+.links.stack a { flex-direction: column; align-items: flex-start; gap: 3px; }
+.links.stack a .val { white-space: normal; direction: inherit; line-height: 1.45; }
+.foot { text-align: center; color: var(--muted); font-size: 12.5px; margin: 24px 0 8px; }
+#prov-open { margin-top: 14px; }
+
+/* ---- Updates (VDLU widget) ---- */
+#updates { --vdlu-accent: var(--accent); --vdlu-radius: var(--r); --vdlu-radius-sm: var(--r-sm); }
+#vdlu-updates:empty { display: none; }
+
+@media (min-width: 560px) {
+  .nx-qa { grid-template-columns: repeat(6, 1fr); }
+}
+/* four across only where a tile fits a whole word: on a phone most languages broke mid-word */
+@media (max-width: 480px) {
+  .nx-stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 360px) {
+  .nx-2col, .nx-checks { grid-template-columns: 1fr; }
+}
+
+/* ---- first open ever: placeholders sized like the Home content until the data lands ---- */
+.nx-skel #overview[hidden] { display: block; }
+.nx-skel #overview .tile-n, .nx-skel #nx-used { color: transparent; border-radius: 8px; background: var(--surface-3);
+  animation: nx-pulse 1.2s ease-in-out infinite; }
+.nx-skel #nx-used { display: inline-block; min-width: 140px; }
+.nx-skel #overview .tile-n { min-width: 36px; }
+.nx-skel #nx-recent:empty { display: block; height: 232px; border-radius: var(--r);
+  background: repeating-linear-gradient(var(--surface) 0 50px, var(--line) 50px 58px); animation: nx-pulse 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .nx-skel #overview .tile-n, .nx-skel #nx-used, .nx-skel #nx-recent:empty, .nx-stat.nx-loading b { animation: none; } }
+/* long lists: let the WebView skip layout and paint of rows far off screen */
+/* (the size is the content box, padding comes on top: name + package, and in Restore date + source badges) */
+#applist > .row, #backuplist > .row { content-visibility: auto; contain-intrinsic-size: auto 44px; }
+#backuplist > .row { contain-intrinsic-size: auto 84px; }
