@@ -471,7 +471,7 @@ function startBatchRestore() {
   // union of item types across the selected backups, in canonical order, so the batch modal
   // offers the same per-item toggles as single restore. Each app then restores the intersection of
   // its own items and the picked types (restore skips a type the backup does not have).
-  var BITEMS_ORDER = ["apk", "data", "data_de", "external", "obb", "media"];
+  var BITEMS_ORDER = ["apk", "data", "data_de", "external", "obb", "media", "profiles"];
   var bitemsSeen = {};
   refs.forEach(function (ref) { (bkSelected[ref].items || []).forEach(function (t) { bitemsSeen[t] = true; }); });
   var batchItems = BITEMS_ORDER.filter(function (t) { return bitemsSeen[t]; });
@@ -494,7 +494,9 @@ function startBatchRestore() {
 // batch delete: one confirm, then delete each selected backup and reload the list.
 function startBatchDelete() {
   var refs = Object.keys(bkSelected); if (!refs.length) return;
-  modalConfirmAction(I18N.t("confirm_delete_n", { n: refs.length }), I18N.t("delete"), function () {
+  var size = 0;
+  (BACKUPS || []).forEach(function (b) { if (bkSelected[b.ref]) size += b.size || 0; });
+  modalConfirmAction(I18N.t(size ? "confirm_delete_n_size" : "confirm_delete_n", { n: refs.length, size: fmtSize(size) }), I18N.t("delete"), function () {
     return Promise.all(refs.map(function (ref) {
       return helper("delete-backup", { ref: ref }).then(function (r) { if (r && r.ok) clearBackupIconCache(ref); return r; });
     }));
@@ -3245,12 +3247,15 @@ function boot() {
   if ($("#bk-seluninstalled")) $("#bk-seluninstalled").onclick = function () {
     // select the backups whose app is no longer installed, so they can be bulk-deleted to free
     // space. Selects only (does not delete) - the user reviews and uses the existing Delete button.
-    helper("list-apps", { user: activeUser }).then(function (r) {
-      var inst = {}; ((r && r.apps) || []).forEach(function (a) { inst[a.package] = true; });
+    // a failed app list must not read as "nothing installed": that would select every backup
+    return helper("list-apps", { user: activeUser }).then(function (r) {
+      if (!r || !r.apps) { modalAlert(errMsg(r)); return false; }
+      var inst = {}; r.apps.forEach(function (a) { inst[a.package] = true; });
       (BACKUPS || []).forEach(function (b) {
-        if (b.package && b.package.indexOf(".") >= 0 && !inst[b.package]) bkSelected[b.ref] = { ref: b.ref, package: b.package, items: b.items };
+        if (b.mode !== "mirror" && b.package && b.package.indexOf(".") >= 0 && !inst[b.package]) bkSelected[b.ref] = { ref: b.ref, package: b.package, items: b.items };
       });
       updateBkSelCount(); renderBackups(BACKUPS);
+      return true;
     }).catch(function () { modalAlert(errMsg()); });
   };
   $("#bk-restoresel").onclick = startBatchRestore;
