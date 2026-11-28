@@ -333,6 +333,17 @@ var NX_RS = (function () {
       });
       updateBkSelCount(); renderBackups(BACKUPS);
     };
+    // Uninstalled is the cleanup action: pick exactly those backups, then offer to delete them.
+    // Cancel keeps the picks, so they can still be reviewed or restored instead.
+    var un = $id("bk-seluninstalled"), pick = un && un.onclick;
+    if (pick) un.onclick = function () {
+      bkSelected = {};
+      pick().then(function (ok) {
+        if (!ok) return;
+        draw();   // prunes the picks a chip or the search hides, so the count is what is on screen
+        if (Object.keys(bkSelected).length) startBatchDelete(); else modalAlert(I18N.t("nx_bk_no_uninstalled"));
+      });
+    };
   });
   return { draw: draw, show: show };
 })();
