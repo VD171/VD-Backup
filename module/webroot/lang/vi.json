@@ -587,6 +587,7 @@
   "settings_relaunch": "Mở lại ứng dụng sau khi sao lưu",
   "settings_relaunch_hint": "Sau một lần sao lưu đơn lẻ, mở lại ứng dụng đang chạy đã bị tạm dừng để chụp ảnh. Mặc định tắt; không ảnh hưởng đến sao lưu theo nhóm và theo lịch.",
   "ui_dest_gdrive_hint": "Ứng dụng đồng hành Google Drive cần ứng dụng khách OAuth Google Cloud riêng được đặt khi build. Để dùng Drive mà không cần thiết lập, hãy thêm đích \"Google Drive (rclone)\" bên dưới để thay thế.",
+  "ui_dest_restic_hint": "Kho lưu trữ: một đường dẫn cục bộ, hoặc máy chủ REST dạng http://host:8000/repo (thêm user:password@ trước tên máy chủ nếu máy chủ yêu cầu đăng nhập; tiền tố rest: là tùy chọn). Ô mật khẩu là mật khẩu của kho restic.",
   "settings_reset": "Đặt lại / bắt đầu lại",
   "settings_reset_hint": "Chọn những gì cần xóa để bắt đầu lại. Thao tác này là vĩnh viễn và không thể hoàn tác. Các remote đám mây không bao giờ bị động đến - chỉ cài đặt riêng của mô-đun này và các bản sao lưu cục bộ.",
   "settings_reset_config": "Đặt lại cài đặt (đích, lịch, cấu hình, thông tin đăng nhập)",

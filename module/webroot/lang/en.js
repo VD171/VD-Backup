@@ -305,6 +305,7 @@ window.__I18N_EN = {
   "remote_create": "Create remote",
   "ui_dest_rclone_hint": "rclone needs a remote. Pick one below, or add a new one:",
   "ui_dest_gdrive_hint": "The Google Drive companion needs its own Google Cloud OAuth client set at build time. For Drive with no setup, add a \"Google Drive (rclone)\" remote below instead.",
+  "ui_dest_restic_hint": "Repository: a local path, or a REST server as http://host:8000/repo (add user:password@ before the host if the server needs a login; the rest: prefix is optional). The password field is the restic repository password.",
   "ui_dest_add_remote_btn": "Add a remote",
   "remote_drive_hint": "No Google Cloud account needed. On any computer run: rclone authorize \"drive\", then paste the token it prints here.",
   "remote_none": "No remotes yet. Add one below.",

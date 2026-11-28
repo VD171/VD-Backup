@@ -200,6 +200,9 @@
         <button id="d-browse" class="btn" data-i18n="ui_browse">Browse</button>
         <input id="d-repo" type="text" data-i18n-ph="ph_dest_repo" placeholder="restic repo">
         <input id="d-pass" type="password" data-i18n-ph="ph_dest_pass" placeholder="restic password">
+        <div id="d-restic-hint" class="notice" hidden>
+          <div class="notice-msg" data-i18n="ui_dest_restic_hint">Repository: a local path, or a REST server as http://host:8000/repo (add user:password@ before the host if the server needs a login; the rest: prefix is optional). The password field is the restic repository password.</div>
+        </div>
         <button id="d-save" class="btn go block" data-i18n="save">Save</button>
       </div>
       <p class="muted" data-i18n="dests_hint">rclone covers SFTP, SMB, WebDAV, FTP, Google Drive, S3 and more.</p>

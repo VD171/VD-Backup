@@ -915,6 +915,31 @@ tg_ok() { printf '%s' "$1" | "$JQ" -e '.ok==true' >/dev/null 2>&1; }
 # v1.0.0 binary on arm64; its CONTRACT.md's user/null shape does not match the shipped build.)
 tg_authed() { tg_cmd check-auth | "$JQ" -e '.ok==true and .is_auth==true' >/dev/null 2>&1; }
 
+# restic REST repo: http(s)://[user:pass@]host/path, rest: prefix optional. The login moves to
+# RESTIC_REST_USERNAME/PASSWORD (restic >= 0.17): special chars work as typed, never in argv.
+restic_repo() {   # <repo> ; sets RREPO, exports/unsets the REST credentials
+  RREPO="$(printf '%s' "$1" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+  unset RESTIC_REST_USERNAME RESTIC_REST_PASSWORD
+  case "$RREPO" in http://*|https://*) RREPO="rest:$RREPO" ;; esac
+  case "$RREPO" in rest:http://*@*|rest:https://*@*) : ;; *) return 0 ;; esac
+  _rr="${RREPO#rest:}"; _rs="${_rr%%://*}"; _rr="${_rr#*://}"
+  _ru="${_rr%@*}"; _rr="${_rr##*@}"   # last @: the password may contain @ or /
+  RREPO="rest:$_rs://$_rr"
+  case "$_ru" in *:*) _rp="${_ru#*:}"; _ru="${_ru%%:*}" ;; *) _rp="" ;; esac
+  RESTIC_REST_USERNAME="$(pct_dec "$_ru")"; RESTIC_REST_PASSWORD="$(pct_dec "$_rp")"
+  export RESTIC_REST_USERNAME RESTIC_REST_PASSWORD
+}
+pct_dec() {   # <s> ; decodes %HH escapes, the rest is kept as typed
+  _pi="$1"; _po=""
+  while :; do
+    case "$_pi" in *%[0-9A-Fa-f][0-9A-Fa-f]*) : ;; *) break ;; esac
+    _pp="${_pi%%%[0-9A-Fa-f][0-9A-Fa-f]*}"; _pi="${_pi#"$_pp"%}"
+    _ph="${_pi%"${_pi#??}"}"; _pi="${_pi#??}"
+    _po="$_po$_pp$(printf '%b' "\\0$(printf '%03o' "$((0x$_ph))")")"
+  done
+  printf '%s' "$_po$_pi"
+}
+
 # resolve the destination (from dests/<id>.json) into DTYPE/DREMOTE/DPATH/DREPO
 resolve_dest() {
   DESTID="$(jget "$ARGS" '.dest')"; { [ -z "$DESTID" ] || [ "$DESTID" = null ]; } && DESTID=local
@@ -926,6 +951,7 @@ resolve_dest() {
     DPATH="$("$JQ" -r '.path // empty'   "$DJSON")"
     DREPO="$("$JQ" -r '.repo // empty'   "$DJSON")"
   fi
+  if [ -n "$DREPO" ]; then restic_repo "$DREPO"; DREPO="$RREPO"; fi
 }
 
 # A local backup destination MUST live in user storage. Backups must never be written to

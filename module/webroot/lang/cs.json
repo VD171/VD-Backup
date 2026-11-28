@@ -587,6 +587,7 @@
   "settings_relaunch": "Po záloze znovu otevřít aplikace",
   "settings_relaunch_hint": "Po jedné záloze se znovu otevře aplikace, která běžela, když byla pozastavena kvůli snímku. Ve výchozím nastavení vypnuto; dávkových a naplánovaných záloh se to netýká.",
   "ui_dest_gdrive_hint": "Doprovodná aplikace Google Drive potřebuje vlastního klienta OAuth z Google Cloud nastaveného při sestavování. Pro Drive bez jakéhokoli nastavování přidejte místo toho níže cíl \"Google Drive (rclone)\".",
+  "ui_dest_restic_hint": "Repozitář: místní cesta, nebo server REST ve tvaru http://host:8000/repo (pokud server vyžaduje přihlášení, přidejte před hostitele user:password@; předpona rest: je volitelná). Pole hesla je heslo repozitáře restic.",
   "settings_reset": "Resetovat / začít znovu",
   "settings_reset_hint": "Vyberte, co chcete vymazat a začít znovu. Toto je trvalé a nelze to vrátit zpět. Vzdálených cloudových úložišť se to nikdy nedotkne - pouze vlastního nastavení tohoto modulu a místních záloh.",
   "settings_reset_config": "Resetovat nastavení (cíle, plány, předvolby, přihlašovací údaje)",

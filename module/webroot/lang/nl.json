@@ -587,6 +587,7 @@
   "settings_relaunch": "Apps opnieuw openen na een back-up",
   "settings_relaunch_hint": "Na een enkele back-up de app opnieuw openen die actief was toen deze voor de snapshot werd gepauzeerd. Standaard uit; back-ups in bulk en geplande back-ups worden niet beïnvloed.",
   "ui_dest_gdrive_hint": "De Google Drive begeleidende app heeft een eigen Google Cloud OAuth-client nodig die tijdens het bouwen wordt ingesteld. Voor Drive zonder installatie voeg je hieronder in plaats daarvan een \"Google Drive (rclone)\"-bestemming toe.",
+  "ui_dest_restic_hint": "Repository: een lokaal pad, of een REST-server als http://host:8000/repo (zet user:password@ voor de host als de server een login vraagt; het voorvoegsel rest: is optioneel). Het wachtwoordveld is het wachtwoord van de restic-repository.",
   "settings_reset": "Resetten / opnieuw beginnen",
   "settings_reset_hint": "Kies wat je wilt wissen om opnieuw te beginnen. Dit is permanent en kan niet ongedaan worden gemaakt. Cloud-remotes worden nooit aangeraakt - alleen de eigen instellingen van deze module en lokale back-ups.",
   "settings_reset_config": "Instellingen resetten (bestemmingen, planningen, voorinstellingen, inloggegevens)",

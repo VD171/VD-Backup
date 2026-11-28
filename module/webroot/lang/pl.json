@@ -587,6 +587,7 @@
   "settings_relaunch": "Ponownie otwieraj aplikacje po kopii zapasowej",
   "settings_relaunch_hint": "Po pojedynczej kopii zapasowej otwórz ponownie aplikację, która działała, gdy została wstrzymana na czas migawki. Domyślnie wyłączone; kopie zbiorcze i zaplanowane nie są objęte.",
   "ui_dest_gdrive_hint": "Aplikacja towarzysząca Google Drive wymaga własnego klienta OAuth Google Cloud ustawianego podczas kompilacji. Aby korzystać z Drive bez konfiguracji, dodaj zamiast tego poniżej cel \"Google Drive (rclone)\".",
+  "ui_dest_restic_hint": "Repozytorium: ścieżka lokalna lub serwer REST w postaci http://host:8000/repo (dodaj user:password@ przed hostem, jeśli serwer wymaga logowania; przedrostek rest: jest opcjonalny). Pole hasła to hasło repozytorium restic.",
   "settings_reset": "Resetowanie / zacznij od nowa",
   "settings_reset_hint": "Wybierz, co wyczyścić, aby zacząć od nowa. To działanie jest trwałe i nie można go cofnąć. Zdalne zasoby w chmurze nigdy nie są ruszane - usuwane są tylko własne ustawienia tego modułu i lokalne kopie zapasowe.",
   "settings_reset_config": "Zresetuj ustawienia (cele, harmonogramy, ustawienia predefiniowane, dane logowania)",

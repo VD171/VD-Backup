@@ -587,6 +587,7 @@
   "settings_relaunch": "Öppna appar igen efter en säkerhetskopiering",
   "settings_relaunch_hint": "Öppna appen som kördes igen efter en enskild säkerhetskopiering, den som pausades för ögonblicksbilden. Av som standard; batch- och schemalagda säkerhetskopieringar påverkas inte.",
   "ui_dest_gdrive_hint": "Följeslagarappen för Google Drive behöver en egen Google Cloud OAuth-klient som anges vid byggtillfället. För Drive utan konfiguration lägger du istället till ett \"Google Drive (rclone)\"-mål nedan.",
+  "ui_dest_restic_hint": "Arkiv: en lokal sökväg, eller en REST-server som http://host:8000/repo (lägg till user:password@ före värden om servern kräver inloggning; prefixet rest: är valfritt). Lösenordsfältet är lösenordet till restic-arkivet.",
   "settings_reset": "Återställ / börja om",
   "settings_reset_hint": "Välj vad som ska rensas för att börja om. Detta är permanent och kan inte ångras. Molnfjärrar rörs aldrig - endast den här modulens egna inställningar och lokala säkerhetskopior.",
   "settings_reset_config": "Återställ inställningar (mål, scheman, förval, autentiseringsuppgifter)",
