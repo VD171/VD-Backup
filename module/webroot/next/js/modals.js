@@ -78,6 +78,11 @@ var NX_MODALS = (function () {
       m.addEventListener("click", function (e) { if (e.target === m && m === top()) closeTop(); });
       if (!m.hidden) sync(m);
     });
+    // the keyboard shrinks the viewport after a field takes focus: bring that field back into view
+    window.addEventListener("resize", function () {
+      var a = document.activeElement, m = top();
+      if (m && a && m.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) a.scrollIntoView({ block: "center" });
+    });
     document.addEventListener("keydown", function (e) {
       var m = top(); if (!m) return;
       if (e.key === "Escape") { e.preventDefault(); closeTop(); return; }
@@ -89,14 +94,6 @@ var NX_MODALS = (function () {
       else if (!e.shiftKey && a === last) { e.preventDefault(); first.focus(); }
     });
   }
-
-  // Android back: close only the top dialog (registered before the engine's own handler)
-  window.addEventListener("popstate", function (e) {
-    if (!top()) return;
-    e.stopImmediatePropagation();
-    closeTop();
-    history.pushState({ vdb: 1 }, "");
-  }, true);
 
   document.addEventListener("DOMContentLoaded", init);
   return { top: top, closeTop: closeTop, depth: function () { return stack.length; } };

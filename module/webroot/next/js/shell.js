@@ -86,18 +86,53 @@ var NX = (function () {
     });
   }
 
-  // running operations: one-line bar above the nav; a tap opens every op as a sheet
+  // running operations: one-line bar above the nav. A tap opens the sheet only when the bar
+  // cannot show everything: several ops at once, or a finished batch with its skipped/failed list.
+  var ops = null;
+  function opsOpen() { return !!ops && ops.classList.contains("nx-open"); }
+  function showOps(on) {
+    var scrim = document.getElementById("nx-ops-scrim");
+    ops.classList.toggle("nx-open", on); if (scrim) scrim.hidden = !on;
+  }
   function opsBar() {
-    var ops = document.getElementById("ops"), scrim = document.getElementById("nx-ops-scrim");
-    if (!ops || !scrim) return;
-    function open(on) { ops.classList.toggle("nx-open", on); scrim.hidden = !on; }
-    ops.addEventListener("click", function (e) { if (!e.target.closest("button")) open(!ops.classList.contains("nx-open")); });
-    scrim.onclick = function () { open(false); };
-    new MutationObserver(function () { if (ops.hidden) open(false); }).observe(ops, { attributes: true, attributeFilter: ["hidden"] });
+    ops = document.getElementById("ops");
+    var scrim = document.getElementById("nx-ops-scrim");
+    if (!ops || !scrim) { ops = null; return; }
+    ops.addEventListener("click", function (e) {
+      if (e.target.closest("button")) return;
+      if (opsOpen()) { showOps(false); return; }
+      if (ops.querySelectorAll(".op-card").length > 1 || ops.querySelector(".op-failed, .op-skipped")) showOps(true);
+    });
+    scrim.onclick = function () { showOps(false); };
+    new MutationObserver(function () { if (ops.hidden) showOps(false); }).observe(ops, { attributes: true, attributeFilter: ["hidden"] });
+  }
+
+  // Android back. Every level the user opened (a tab after the first, a dialog, the ops sheet)
+  // gets one history entry, pushed from the tap that opened it: WebView skips entries a page
+  // adds without a user gesture, so a sentinel re-armed after each Back let Back close the
+  // whole WebUI. Back pops one entry and closes one level; a level closed by its own button
+  // drops its entry again, so the count never drifts.
+  var depth = 0, skip = 0;
+  function levels() {
+    return (typeof _tabStack !== "undefined" ? _tabStack.length - 1 : 0) + NX_MODALS.depth() + (opsOpen() ? 1 : 0);
+  }
+  function syncHistory(gesture) {
+    var want = levels();
+    if (want < depth) { skip++; history.go(want - depth); depth = want; return; }
+    while (gesture && depth < want) { history.pushState({ vdb: 1 }, ""); depth++; }
+  }
+  function backNav() {
     window.addEventListener("popstate", function (e) {
-      if (!ops.classList.contains("nx-open")) return;
-      e.stopImmediatePropagation(); open(false); history.pushState({ vdb: 1 }, "");
+      e.stopImmediatePropagation();   // the engine's handler re-arms a sentinel; this one replaces it
+      if (skip) { skip--; return; }
+      if (depth) depth--;
+      if (NX_MODALS.closeTop()) return;
+      if (opsOpen()) showOps(false);
+      else if (_tabStack.length > 1) { _tabStack.pop(); switchTab(_tabStack[_tabStack.length - 1]); }
     }, true);
+    ["click", "keydown", "touchend"].forEach(function (t) {
+      document.addEventListener(t, function () { setTimeout(function () { syncHistory(true); }, 0); }, true);
+    });
   }
 
   function wrapEngine() {
@@ -156,6 +191,7 @@ var NX = (function () {
   }
 
   wrapEngine();
+  backNav();   // before the engine's own popstate handler, which it must pre-empt
   document.addEventListener("DOMContentLoaded", function () { bind(); watchBoot(); });
   return { go: go, setSeg: setSeg };
 })();
