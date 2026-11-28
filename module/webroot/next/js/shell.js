@@ -179,6 +179,10 @@ var NX = (function () {
       apply(root);
       kindCards();
       if (window.NX_HOME && NX_HOME.relabel) NX_HOME.relabel();
+      // a language change: the Restore lists are built with the old words and are not
+      // reloaded on the next visit, so draw them again (the engine only redraws Apps)
+      if (window.NX_SRC && NX_SRC.get("local")) renderBackups(BACKUPS);
+      if (typeof PATH_BACKUPS !== "undefined" && PATH_BACKUPS.length) renderPathBackups(PATH_BACKUPS);
       var cur = document.querySelector(".panel.active");
       updateBar(cur ? cur.id : "home");
     };

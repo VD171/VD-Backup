@@ -103,16 +103,22 @@ var NX_SRC = (function () {
     if (!src[id]) { src[id] = { id: id, kind: kind, name: name, state: "idle", items: [], err: "", at: 0 }; order.push(id); restore(src[id]); }
     src[id].keep = true;
   }
+  function setDests(ds) {
+    order.forEach(function (id) { src[id].keep = id === "local"; });
+    add("local", "local", "");
+    if (ds.some(function (d) { return d.type === "telegram"; })) add("telegram", "telegram", "Telegram");
+    ds.forEach(function (d) { if (/^(rclone|gdrive|restic)$/.test(d.type)) add(d.id, d.type, d.id); });
+    order = order.filter(function (id) { if (src[id].keep) return true; delete src[id]; return false; });
+    destsAt = Date.now(); emit();
+  }
   function loadDests() {
-    return helper("dests-list").then(function (r) {
-      var ds = (r && r.dests) ? r.dests : [];
-      order.forEach(function (id) { src[id].keep = id === "local"; });
-      add("local", "local", "");
-      if (ds.some(function (d) { return d.type === "telegram"; })) add("telegram", "telegram", "Telegram");
-      ds.forEach(function (d) { if (/^(rclone|gdrive|restic)$/.test(d.type)) add(d.id, d.type, d.id); });
-      order = order.filter(function (id) { if (src[id].keep) return true; delete src[id]; return false; });
-      destsAt = Date.now(); emit();
-    });
+    return helper("dests-list").then(function (r) { setDests((r && r.dests) ? r.dests : []); });
+  }
+  // the engine reloads the destinations after an add or a delete: follow it at once, so Restore
+  // neither keeps a deleted one (its rows and errors) nor misses a new one for minutes
+  if (typeof renderDests === "function") {
+    var drawDests = renderDests;
+    window.renderDests = function (list) { drawDests(list); if (destsAt) setDests(list || []); };
   }
 
   function fetchOne(s) {
