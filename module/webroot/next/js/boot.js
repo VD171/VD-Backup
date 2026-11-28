@@ -100,3 +100,48 @@ var NX_BOOT = (function () {
     last: function (verb) { try { return cache[verb] ? JSON.parse(cache[verb]) : null; } catch (e) { return null; } }
   };
 })();
+
+// config-set deep-merges onto the stored config, so a key the engine drops from a per-app map
+// (the last tag of an app, a cleared note, items back to everything) came back on the next
+// load. Such a key is sent as null, which the merge does store and every reader treats as unset.
+(function () {
+  var MAPS = ["app_items", "app_tags", "app_note"], stored = {}, real = window.helper;
+  function keep(c) {
+    MAPS.forEach(function (m) {
+      if (!c || !c[m] || typeof c[m] !== "object") return;
+      stored[m] = {};
+      Object.keys(c[m]).forEach(function (k) { if (c[m][k] != null) stored[m][k] = 1; });
+    });
+  }
+  window.helper = function (verb, args, raw) {
+    if (verb === "config-get") return real(verb, args, raw).then(function (r) { keep(r); return r; });
+    if (verb !== "config-set" || raw || !args || typeof args !== "object") return real(verb, args, raw);
+    var out = {};
+    Object.keys(args).forEach(function (k) { out[k] = args[k]; });
+    MAPS.forEach(function (m) {
+      var cur = args[m]; if (!cur || typeof cur !== "object" || !stored[m]) return;
+      var o = {};
+      Object.keys(cur).forEach(function (k) { o[k] = cur[k]; });
+      Object.keys(stored[m]).forEach(function (k) { if (o[k] == null) o[k] = null; });
+      out[m] = o;
+    });
+    return real(verb, out, raw).then(function (r) { if (r && r.ok !== false) keep(args); return r; });
+  };
+})();
+
+// A tap on a button that starts an op at once (a remote row's Restore, System data's Back up)
+// sent a second op when tapped twice before the first answer: the same op request while one
+// is in flight now shares its answer, so both taps track the one op.
+(function () {
+  var OPS = /^(backup|backup-batch|restore|restore-batch|import|special-backup|special-restore|cloud-fetch|path-backup|path-restore|adb-backup|adb-restore|config-export|config-import|telegram-pull|rclone-pull|gdrive-pull)$/;
+  var flying = {}, real = window.helper;
+  window.helper = function (verb, args, raw) {
+    if (!OPS.test(verb)) return real(verb, args, raw);
+    var k = verb + " " + (raw ? String(args) : JSON.stringify(args));
+    if (flying[k]) return flying[k];
+    var p = flying[k] = real(verb, args, raw);
+    var done = function () { delete flying[k]; };
+    p.then(done, done);
+    return p;
+  };
+})();
