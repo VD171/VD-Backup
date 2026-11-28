@@ -139,13 +139,13 @@ var NX_FILES = (function () {
     Array.prototype.slice.call(ul.querySelectorAll(".nx-remote")).forEach(function (r) { ul.removeChild(r); });
     var local = {};
     (typeof PATH_BACKUPS !== "undefined" ? PATH_BACKUPS : []).forEach(function (b) { local[String(b.ref).split("/").pop()] = 1; });
-    var n = 0;
     tgFiles().slice().sort(function (a, b) { return (b.when || 0) - (a.when || 0); }).forEach(function (f) {
       if (local[f.dir]) return;   // a local copy is restored from its own row
-      ul.appendChild(remoteRow(f)); n++;
+      ul.appendChild(remoteRow(f));
     });
+    // a Telegram reload can empty the list too, not only the local render
     var empty = $id("pathbk-empty");
-    if (empty && n) empty.hidden = true;
+    if (empty) empty.hidden = ul.children.length > 0;
   }
   if (typeof renderPathBackups === "function") {
     var renderPB = renderPathBackups;

@@ -69,6 +69,11 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 .nx-pathrow { display: flex; gap: 8px; align-items: stretch; }
 .nx-pathrow > input { flex: 1 1 auto; min-width: 0; }
 .nx-pathrow > .btn { flex: none; min-height: var(--tap); border-radius: var(--r-sm); }
+/* a row (not a .field column): the input gets its own line, the buttons share the next,
+   so long translated labels never squeeze the path */
+.nx-pathrow:not(.field) { flex-wrap: wrap; }
+.nx-pathrow:not(.field) > input { flex-basis: 100%; }
+.nx-pathrow:not(.field) > .btn { flex: 1 1 0; }
 .nx-fpath { min-width: 0; overflow-wrap: anywhere; font-size: 14px; }
 #pathbk-sub { white-space: pre-line; overflow-wrap: anywhere; }
 

@@ -89,7 +89,7 @@ body.nx-in-sub .nx-ver { display: none; }
   font-size: 12px; font-weight: 600; padding: 0 2px; }
 .nx-nav .tab:active .nx-pill { background: var(--surface-3); }
 .nx-nav .tab > span:last-child { max-width: 100%; line-height: 1.15; text-align: center; overflow: hidden;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; hyphens: auto; }
 .nx-pill { width: 60px; height: 32px; border-radius: var(--r-pill); display: grid; place-items: center;
   transition: background var(--dur) var(--ease); }
 .nx-nav .tab.active, .nx-nav .tab.nx-parent { color: var(--text); }

@@ -167,6 +167,21 @@ var NX_RS = (function () {
     Array.prototype.forEach.call(ul.children, function (li) { if (!li.classList.contains("nx-remote") && !li._nxb) li._nxb = shown[i++]; });
   }
 
+  // a batch acts on what the user can see: drop picks a chip or the search now hides
+  function prune(rows) {
+    var seen = {};
+    rows.forEach(function (r) {
+      var b = r.li._nxb; if (!b) return;
+      if (!r.li.hidden) { seen[b.ref] = 1; return; }
+      if (!bkSelected[b.ref]) return;
+      r.li.classList.remove("sel");
+      var cb = r.li.querySelector(".selbox"); if (cb) cb.checked = false;
+    });
+    var n = 0;
+    Object.keys(bkSelected).forEach(function (ref) { if (!seen[ref]) { delete bkSelected[ref]; n++; } });
+    if (n) updateBkSelCount();
+  }
+
   function draw() {
     var ul = $id("backuplist"); if (!ul) return;
     var q = (bkQuery || "").toLowerCase().trim();
@@ -192,6 +207,7 @@ var NX_RS = (function () {
     rows.sort(function (a, b) { return cmp(a.x, b.x); });
     var vis = 0;
     rows.forEach(function (r) { var on = match(r.x); r.li.hidden = !on; if (on) vis++; ul.appendChild(r.li); });
+    if (bkSelectMode) prune(rows);
     var loading = NX_SRC.list().some(function (s) { return s.state === "loading"; });
     var empty = $id("backups-empty"), none = $id("nx-rs-nomatch");
     if (empty) empty.style.display = (rows.length || loading || q) ? "none" : "";
