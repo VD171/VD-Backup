@@ -640,5 +640,15 @@
   "nx_rs_download": "Download to this device",
   "nx_rs_where": "Stored in",
   "settings_notify_progress": "Show progress in a notification",
-  "settings_notify_progress_hint": "While a backup or restore runs, a notification shows its percent and current app, updated every few seconds. Off by default."
+  "settings_notify_progress_hint": "While a backup or restore runs, a notification shows its percent and current app, updated every few seconds. Off by default.",
+  "nx_pb_add": "Add",
+  "nx_pb_remove": "Remove",
+  "nx_pb_multi_hint": "Add one or more folders: they are saved together in one backup.",
+  "nx_n_folders": "${n} folders",
+  "nx_job_what": "What",
+  "nx_job_kind_apps": "Apps",
+  "nx_job_folders": "Folders",
+  "nx_job_need_folder": "Add at least one folder.",
+  "settings_tg_parallel": "Telegram parallel transfers",
+  "settings_tg_parallel_msg": "A large backup moves to and from Telegram in parts. This many parts transfer at once: more is faster on a good connection, 1 sends one part at a time."
 }

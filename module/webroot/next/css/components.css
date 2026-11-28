@@ -69,6 +69,8 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 .nx-pathrow { display: flex; gap: 8px; align-items: stretch; }
 .nx-pathrow > input { flex: 1 1 auto; min-width: 0; }
 .nx-pathrow > .btn { flex: none; min-height: var(--tap); border-radius: var(--r-sm); }
+.nx-fpath { min-width: 0; overflow-wrap: anywhere; font-size: 14px; }
+#pathbk-sub { white-space: pre-line; overflow-wrap: anywhere; }
 
 /* switch (track + knob) */
 input[type="checkbox"].switch { -webkit-appearance: none; appearance: none; flex: none; position: relative;

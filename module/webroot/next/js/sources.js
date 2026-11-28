@@ -64,6 +64,11 @@ var NX_SRC = (function () {
   function norm(s, r) {
     var list = (r && r.backups) ? r.backups : [];
     if (s.kind === "telegram") {
+      // folder backups (<dir>.vdbf.tar, dir ending in its _<ts>) are listed by the Files restore pane
+      s.files = list.filter(function (b) { return /\.vdbf\.tar$/.test(b.name || ""); }).map(function (b) {
+        var dir = b.name.replace(/\.vdbf\.tar$/, ""), m = /_(\d{8}T\d{6}Z)$/.exec(dir);
+        return { dir: dir, label: (b.meta && b.meta.label) || "", when: (m && when(m[1])) || when(b.date), size: Number(b.size) || 0, raw: b };
+      });
       return list.filter(function (b) { return /\.vdb\.tar$/.test(b.name || ""); }).map(function (b) {
         var m = /^(.+)__(.+)\.vdb\.tar$/.exec(b.name), t = tsvc(m ? m[2] : "");
         return entry(s, { mode: "full", package: m ? m[1] : b.name, label: (b.meta && b.meta.label) || "", tsvc: m ? m[2] : "",
@@ -84,7 +89,7 @@ var NX_SRC = (function () {
 
   function save() {
     var out = {};
-    order.forEach(function (id) { var s = src[id]; if (s.kind !== "local" && s.state === "ok") out[id] = { at: s.at, items: s.items.map(function (e) { return e.raw; }) }; });
+    order.forEach(function (id) { var s = src[id]; if (s.kind !== "local" && s.state === "ok") out[id] = { at: s.at, items: s.items.concat(s.files || []).map(function (e) { return e.raw; }) }; });
     try { localStorage.setItem(CACHE, JSON.stringify(out)); } catch (e) {}
   }
   function restore(s) {

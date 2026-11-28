@@ -191,7 +191,10 @@
           <div class="field nx-pathrow">
             <input id="pb-path" type="text" data-i18n-ph="ui_pathbk_path_ph" spellcheck="false" autocomplete="off" placeholder="Absolute path (e.g. /storage/emulated/0/DCIM)">
             <button id="pb-browse" class="btn" type="button" data-i18n="ui_browse">Browse</button>
+            <button id="nx-pb-add" class="btn" type="button" data-i18n="nx_pb_add">Add</button>
           </div>
+          <p class="nx-hint" data-i18n="nx_pb_multi_hint">Add one or more folders: they are saved together in one backup.</p>
+          <ul id="nx-pb-list" class="list nx-list" hidden></ul>
           <button id="pb-backup" class="btn go block" type="button" data-i18n="ui_pathbk_do">Back up</button>
         </div>
       </div>
@@ -294,6 +297,22 @@
       <details class="grp nx-exp">
         <summary class="section-head"><span class="sh-ic"><svg class="i"><use href="#i-plus"/></svg></span><span class="sh-t" data-i18n="job_add">Add a scheduled job</span></summary>
         <div class="card nx-card nx-pad">
+          <div class="field">
+            <label for="nx-job-kind" data-i18n="nx_job_what">What</label>
+            <select id="nx-job-kind">
+              <option value="apps" data-i18n="nx_job_kind_apps">Apps</option>
+              <option value="files" data-i18n="nx_seg_files">Files</option>
+            </select>
+          </div>
+          <div class="field" id="nx-job-paths" hidden>
+            <label for="nx-job-path" data-i18n="nx_job_folders">Folders</label>
+            <div class="nx-pathrow">
+              <input id="nx-job-path" type="text" data-i18n-ph="ui_pathbk_path_ph" spellcheck="false" autocomplete="off" placeholder="Absolute path (e.g. /storage/emulated/0/DCIM)">
+              <button id="nx-job-path-browse" class="btn" type="button" data-i18n="ui_browse">Browse</button>
+              <button id="nx-job-path-add" class="btn" type="button" data-i18n="nx_pb_add">Add</button>
+            </div>
+            <ul id="nx-job-path-list" class="list nx-list" hidden></ul>
+          </div>
           <div class="field">
             <label for="job-action" data-i18n="job_action">Action</label>
             <select id="job-action">
@@ -560,6 +579,18 @@
           <label for="set-staging" data-i18n="settings_staging">Staging folder (stealth)</label>
           <div class="nx-hint" data-i18n="settings_staging_msg">Where a backup is temporarily built when it goes to Telegram or to storage other than internal. A root-only folder keeps backup data off shared storage. Default: /data/local/tmp.</div>
           <input id="set-staging" type="text" inputmode="url" spellcheck="false" autocomplete="off" data-i18n-ph="settings_staging_ph" placeholder="/data/local/tmp">
+        </div>
+        <div class="field">
+          <label for="set-tg-parallel" data-i18n="settings_tg_parallel">Telegram parallel transfers</label>
+          <div class="nx-hint" data-i18n="settings_tg_parallel_msg">A large backup moves to and from Telegram in parts. This many parts transfer at once: more is faster on a good connection, 1 sends one part at a time.</div>
+          <select id="set-tg-parallel">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+          </select>
         </div>
         <label class="nx-sw"><span class="nx-sw-t"><span data-i18n="settings_local_copy">Keep a local copy when a backup goes to a destination</span><small data-i18n="settings_local_copy_hint">Off by default: a backup sent to Telegram or to other storage keeps no copy on this device (nothing on shared storage, no duplication). Turn it on to also keep a local copy. Cloud destinations (rclone, Google Drive) always keep a local copy for now.</small></span><input type="checkbox" class="switch" id="set-local-copy"></label>
       </div>
@@ -1162,6 +1193,7 @@
   <script src="next/js/shell.js"></script>
   <script src="next/js/sources.js"></script>
   <script src="next/js/restore.js"></script>
+  <script src="next/js/files.js"></script>
   <script src="next/js/home.js"></script>
 </body>
 </html>
