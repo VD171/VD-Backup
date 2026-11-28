@@ -578,7 +578,7 @@
   "ui_removable_title": "Removable storage",
   "msg_removable_unencrypted": "This destination is on removable storage (SD card or USB), which is not encrypted. A backup saved here can be read by anyone who has the card unless you turn on Encrypt data in Settings, which protects it with a passphrase.",
   "msg_err_locked": "Unlock the device first. Saved credentials are kept on encrypted storage that stays locked until the first unlock after a reboot.",
-  "msg_err_tg_kind": "Telegram destinations hold app backups only. Pick another destination for folder and /data/adb backups.",
+  "msg_err_tg_kind": "Telegram destinations hold app and folder backups. Pick another destination for /data/adb backups.",
   "ui_show_excluded": "Show excluded",
   "ui_clear_logs": "Clear log",
   "confirm_clear_logs": "Clear the entire activity log? This cannot be undone.",
@@ -592,5 +592,6 @@
   "settings_reset_config": "Reset settings (destinations, schedules, presets, credentials)",
   "settings_reset_backups": "Delete all local backups",
   "settings_reset_btn": "Reset selected",
-  "confirm_reset_data": "This permanently wipes the selected data and cannot be undone. Continue?"
+  "confirm_reset_data": "This permanently wipes the selected data and cannot be undone. Continue?",
+  "msg_err_job_path": "A Files job needs at least one absolute folder path."
 }

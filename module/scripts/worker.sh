@@ -306,7 +306,7 @@ relaunch_thawed() {
 }
 cleanup() {
   _release_wakelock; verifier_restore; relaunch_thawed
-  rm -f "$LOGS/$OPID.pid"; [ -n "$OPID" ] && rm -rf "$STATE/staging/"*"$OPID"* 2>/dev/null
+  rm -f "$LOGS/$OPID.pid"; [ -n "$OPID" ] && rm -rf "$STATE/staging/"*"$OPID"* "$SECRETS/telegram/par.$OPID".* 2>/dev/null
   # VDLU apply-busy: our pid file is gone now; drop the marker only if no OTHER op is still live, so a
   # concurrent/auto backup keeps the updater deferred until the last one ends (a dead op's pid self-heals).
   _ab=0
@@ -915,6 +915,77 @@ tg_ok() { printf '%s' "$1" | "$JQ" -e '.ok==true' >/dev/null 2>&1; }
 # v1.0.0 binary on arm64; its CONTRACT.md's user/null shape does not match the shipped build.)
 tg_authed() { tg_cmd check-auth | "$JQ" -e '.ok==true and .is_auth==true' >/dev/null 2>&1; }
 
+# Parallel transfers. An archive over .tg_part_mb (default 256 MiB, max 1900: one Telegram file holds
+# 2000 MiB) is stored as parts named <name>.partNNNofMMM, and .tg_parallel parts (default 3, max 8)
+# move at once, each through its own mtproto-store process and so its own connection (one process
+# already uploads a file on 4 threads, but downloads it on one). Each process gets a private copy of
+# the session: concurrent processes would otherwise rewrite the one session file at the same time.
+# helper.sh telegram-list folds the parts back into one entry whose message_id is "id1,id2,...".
+TG_PAR="$(cfg .tg_parallel)"; case "$TG_PAR" in ''|*[!0-9]*) TG_PAR=3 ;; esac
+[ "$TG_PAR" -ge 1 ] || TG_PAR=1; [ "$TG_PAR" -le 8 ] || TG_PAR=8
+TG_PART_MB="$(cfg .tg_part_mb)"; case "$TG_PART_MB" in ''|*[!0-9]*) TG_PART_MB=256 ;; esac
+[ "$TG_PART_MB" -ge 64 ] || TG_PART_MB=64; [ "$TG_PART_MB" -le 1900 ] || TG_PART_MB=1900
+tg_job() (   # <up|down> <dir> <i>: upload <dir>/p<i>/, or download line <i> of <dir>/refs to <dir>/p<i>
+  _js="$TG_STATE/par.$OPID.$3"; rm -rf "$_js"
+  mkdir -p "$_js/creds" "$_js/dests" && chmod 700 "$_js" && cp "$TG_STATE/creds/telegram.session" "$_js/creds/" || exit 1
+  cp "$TG_STATE/dests/telegram.json" "$_js/dests/" 2>/dev/null
+  TG_STATE="$_js"
+  if [ "$1" = up ]; then tg_cmd upload --dir "$2/p$3" > "$2/p$3.json"
+  else tg_cmd download --ref "$(sed -n "${3}p" "$2/refs")" --out "$2/p$3" > "$2/p$3.json"; fi
+  rm -rf "$_js"
+)
+tg_part_ok() {   # <up|down> <dir> <i>
+  if [ "$1" = up ]; then "$JQ" -e '.ok==true and (.uploaded[0].message_id // 0) > 0' "$2/p$3.json" >/dev/null 2>&1
+  else "$JQ" -e '.ok==true' "$2/p$3.json" >/dev/null 2>&1 && [ -s "$2/p$3" ]; fi
+}
+# <up|down> <dir> <n>: moves the n parts TG_PAR at a time, retries a failed part once; 0 = all moved.
+# The parts are the same size, so waiting for each round costs little against a rolling pool.
+tg_par_run() {
+  _ri=1
+  while [ "$_ri" -le "$3" ]; do
+    _rp=""; _rk=0
+    while [ "$_rk" -lt "$TG_PAR" ] && [ "$_ri" -le "$3" ]; do
+      tg_job "$1" "$2" "$_ri" & _rp="$_rp $!"
+      _ri=$((_ri + 1)); _rk=$((_rk + 1))
+      [ "$_rk" -lt "$TG_PAR" ] && [ "$_ri" -le "$3" ] && sleep 1   # stagger the connects
+    done
+    for _rw in $_rp; do wait "$_rw"; done
+  done
+  _ri=1
+  while [ "$_ri" -le "$3" ]; do
+    tg_part_ok "$1" "$2" "$_ri" || { tg_job "$1" "$2" "$_ri"; tg_part_ok "$1" "$2" "$_ri"; } || return 1
+    _ri=$((_ri + 1))
+  done
+}
+# <dir> <name>: uploads <dir>/<name>, split into parts when it is over TG_PART_MB. A failed split
+# upload deletes the parts that did land, so the channel never keeps half an archive.
+tg_upload() {
+  _ub="$(stat -c %s "$1/$2" 2>/dev/null)"; case "$_ub" in ''|*[!0-9]*) return 1 ;; esac
+  _un="$("$JQ" -n --argjson b "$_ub" --argjson m "$TG_PART_MB" '($b / ($m * 1048576)) | ceil' 2>/dev/null)"
+  case "$_un" in ''|*[!0-9]*) return 1 ;; esac
+  [ "$_un" -le 1 ] && { tg_ok "$(tg_cmd upload --dir "$1" --opid "$OPID")"; return; }
+  [ "$_un" -le 999 ] || return 1
+  # cut from the tail, so staging never holds the archive twice
+  _ui="$_un"
+  while [ "$_ui" -ge 1 ]; do
+    _uf="$1/p$_ui/$2.part$(printf %03d "$_ui")of$(printf %03d "$_un")"; mkdir -p "$1/p$_ui" || return 1
+    if [ "$_ui" = 1 ]; then mv "$1/$2" "$_uf" || return 1
+    else
+      dd if="$1/$2" of="$_uf" bs=1048576 skip=$(( (_ui - 1) * TG_PART_MB )) 2>/dev/null \
+        && truncate -s "$("$JQ" -n --argjson i "$_ui" --argjson m "$TG_PART_MB" '($i - 1) * $m * 1048576')" "$1/$2" || return 1
+    fi
+    _ui=$((_ui - 1))
+  done
+  tg_par_run up "$1" "$_un" && return 0
+  _ids=""
+  for _uj in "$1"/p*.json; do
+    _id="$("$JQ" -r '.uploaded[0].message_id // empty' "$_uj" 2>/dev/null)"
+    case "$_id" in ''|*[!0-9]*) : ;; *) _ids="$_ids${_ids:+,}$_id" ;; esac
+  done
+  [ -n "$_ids" ] && tg_cmd delete --ref "$_ids" >/dev/null
+  return 1
+}
+
 # resolve the destination (from dests/<id>.json) into DTYPE/DREMOTE/DPATH/DREPO
 resolve_dest() {
   DESTID="$(jget "$ARGS" '.dest')"; { [ -z "$DESTID" ] || [ "$DESTID" = null ]; } && DESTID=local
@@ -1097,11 +1168,13 @@ transfer_full() {
             # Telegram stores by message-id, not path: pack the whole backup dir into ONE
             # self-describing archive (name encodes pkg/timestamp/versioncode) so list-remote
             # alone identifies it; the channel is the authoritative index (restorable offsite).
+            # A folder backup sets TGNAME (<dir>.vdbf.tar), as its PKG holds a slash.
             _tstg="$STATE/staging/tgup.$OPID"; rm -rf "$_tstg"; mkdir -p "$_tstg"
-            exec_ns "$TAR" -C "$DEST" -c -f "$_tstg/${PKG}__${TS}_${VC}.vdb.tar" . \
+            _tname="${TGNAME:-${PKG}__${TS}_${VC}.vdb.tar}"
+            exec_ns "$TAR" -C "$DEST" -c -f "$_tstg/$_tname" . \
               || { rm -rf "$_tstg"; audit "telegram pack failed $PKG"; finish false ERR_TRANSFER; return 1; }
             TG_LABEL=""; [ -n "${LABEL:-}" ] && [ "$LABEL" != "$PKG" ] && TG_LABEL="$LABEL"
-            tg_ok "$(tg_cmd upload --dir "$_tstg" --opid "$OPID")" \
+            tg_upload "$_tstg" "$_tname" \
               || { rm -rf "$_tstg"; audit "telegram upload failed $PKG"; finish false ERR_TRANSFER; return 1; }
             rm -rf "$_tstg" ;;
     local)  if [ -n "$DPATH" ] && [ "$DPATH" != "$BACKUPS" ]; then
@@ -2538,77 +2611,106 @@ do_cloud_fetch() {
 }
 
 # ----------------------------------------------------------------------
-# Standalone folder/file backup (not per-app): tar.zst any absolute path under
+# Standalone folder/file backup (not per-app): tar.zst one or more absolute paths under
 # shared storage or /data into .paths/<sanitized>_<ts>/ with its own manifest, and
 # ship it to the resolved destination via the same transfer path as a full backup.
+# One source keeps the original manifest (source/archive/...); several get one archive
+# each (data<i>.<ext>) listed in .items, with .sources for the listing.
+path_ok() {   # <abs path>; 0 = may be backed up
+  case "$1" in ''|null|*..*) return 1 ;; esac   # never allow traversal in the source
+  # shared storage, or any /data path (root can read all); reject anything else.
+  case "$1" in /storage/emulated/*|/data/media/*|/sdcard/*|/data/*) : ;; *) return 1 ;; esac
+  exec_ns test -e "$1" || return 2
+}
+path_pack() {   # <src> <archive name>: 1 = archive failed, 2 = it does not read back whole
+  exec_ns "$TAR" $TARC -C "$(dirname "$1")" -c "$(basename "$1")" 2>/dev/null | comp "$COMP" | \
+    if use_data_age; then enc_age "$DEST/$2"; else cat > "$DEST/$2"; fi || return 1
+  # completeness check: the written archive reads back as a full tar (catches truncation)
+  if use_data_age; then
+    dec_age "$DEST/$2" | { case "$COMP" in gzip) "$GZIP" -dc ;; lz4) "$ZSTD" -dq --format=lz4 -c ;; none) cat ;; *) "$ZSTD" -dqc ;; esac; } | exec_ns "$TAR" -t >/dev/null 2>&1 || return 2
+  else
+    decomp "$DEST/$2" | exec_ns "$TAR" -t >/dev/null 2>&1 || return 2
+  fi
+}
 do_path_backup() {
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
-  SRCP="$(jget "$ARGS" '.path')"
-  case "$SRCP" in ''|null) finish false ERR_BAD_PATH; return ;; /*) : ;; *) finish false ERR_BAD_PATH; return ;; esac
-  case "$SRCP" in *..*) finish false ERR_BAD_PATH; return ;; esac   # never allow traversal in the source
-  # shared storage, or any /data path (root can read all); reject anything else.
-  case "$SRCP" in /storage/emulated/*|/data/media/*|/sdcard/*|/data/*) : ;; *) finish false ERR_BAD_PATH; return ;; esac
-  exec_ns test -e "$SRCP" || { finish false ERR_NO_PATH; return; }
+  # .paths[] (several folders) and/or the single .path, one per line; trailing slashes dropped, duplicates once
+  mkdir -p "$STATE/staging"; _srcs="$STATE/staging/psrc.$OPID"
+  printf '%s' "$ARGS" | "$JQ" -r '[(.path // empty)] + (.paths // []) | map(select(type == "string" and (contains("\n") | not)) | sub("/+$"; "")) | unique | .[]' > "$_srcs" 2>/dev/null
+  _n=0; SRCP=""
+  while IFS= read -r _s; do
+    path_ok "$_s"; case $? in 1) finish false ERR_BAD_PATH; return ;; 2) finish false ERR_NO_PATH; return ;; esac
+    _n=$((_n + 1)); [ -n "$SRCP" ] || SRCP="$_s"
+  done < "$_srcs"
+  { [ "$_n" -gt 0 ] && [ "$_n" -le 64 ]; } || { finish false ERR_BAD_PATH; return; }
   COMP="$(jget "$ARGS" '.compression')"; { [ -z "$COMP" ] || [ "$COMP" = null ]; } && COMP="$(cfg .compression)"; [ -n "$COMP" ] || COMP="zstd:10"
   PW="$(jget "$ARGS" '.password')"; [ "$PW" = null ] && PW=""
   ENCDATA="$(jget "$ARGS" '.encrypt_data')"; [ "$ENCDATA" = null ] && ENCDATA="$(cfg .encrypt_data)"
+  if [ "$ENCDATA" = true ] && [ -z "$PW" ]; then PW="$(default_pass "")"; fi   # a scheduled run has only the stored one
   if [ "$ENCDATA" = true ] && [ -z "$PW" ]; then finish false ERR_CRYPTO_PASS; return; fi
   if [ "$ENCDATA" = true ] && ! crypto_available; then finish false ERR_CRYPTO_UNAVAIL; return; fi
   use_data_age() { [ "$ENCDATA" = true ] && [ -n "$PW" ]; }
   resolve_dest
-  # Telegram stores one archive per app backup and telegram-pull restores only those, so a
-  # folder backup there could never come back: refuse it up front, before any work.
-  [ "$DTYPE" = telegram ] && { finish false ERR_TG_KIND; return; }
   transport_guard full || return
-  prog 2 preparing "path"; audit "path-backup start $SRCP"; notify backup_start "path"
+  prog 2 preparing "path"; audit "path-backup start $(tr '\n' ' ' < "$_srcs")"; notify backup_start "path"
   SAFE="$(printf '%s' "$SRCP" | sed -e 's#^/##' -e 's#[^A-Za-z0-9._-]#_#g')"; [ -n "$SAFE" ] || SAFE=path
+  # several folders: the count and a checksum of the list keep each set in its own series (retention)
+  [ "$_n" -gt 1 ] && SAFE="${SAFE}_n${_n}_$(cksum < "$_srcs" | cut -d' ' -f1)"
   BACKUPS="$(backups_dir "$U")"; BK="$BACKUPS/.paths"; TS="$(date -u +%Y%m%dT%H%M%SZ)"; DEST="$BK/${SAFE}_${TS}"
   media_own "$BACKUPS"; media_own "$BK"; mkdir -p "$DEST"
-  parent="$(dirname "$SRCP")"; base="$(basename "$SRCP")"
-  ctx="$(ls -Zd "$SRCP" 2>/dev/null | cut -d' ' -f1)"
-  uid="$(stat -c %u "$SRCP" 2>/dev/null || echo 0)"; gid="$(stat -c %g "$SRCP" 2>/dev/null || echo 0)"
-  ext="$(comp_ext "$COMP")"; enc=none; arc="data.$ext"
+  ext="$(comp_ext "$COMP")"; enc=none; use_data_age && enc=age
+  _items="$STATE/staging/pitems.$OPID"; : > "$_items"
   prog 20 archiving "path"
-  if use_data_age; then enc=age; arc="$arc.age"
-    exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" | enc_age "$DEST/$arc" \
-      || { audit "path-backup archive failed $SRCP"; finish false ERR_BACKUP_TAR; return; }
-  else
-    exec_ns "$TAR" $TARC -C "$parent" -c "$base" 2>/dev/null | comp "$COMP" > "$DEST/$arc" \
-      || { audit "path-backup archive failed $SRCP"; finish false ERR_BACKUP_TAR; return; }
-  fi
-  # completeness check: the written archive reads back as a full tar (catches truncation)
-  if [ "$enc" = age ]; then
-    dec_age "$DEST/$arc" | { case "$COMP" in gzip) "$GZIP" -dc ;; lz4) "$ZSTD" -dq --format=lz4 -c ;; none) cat ;; *) "$ZSTD" -dqc ;; esac; } | exec_ns "$TAR" -t >/dev/null 2>&1 \
-      || { audit "path-backup incomplete $SRCP"; finish false ERR_BACKUP_INCOMPLETE; return; }
-  else
-    decomp "$DEST/$arc" | exec_ns "$TAR" -t >/dev/null 2>&1 \
-      || { audit "path-backup incomplete $SRCP"; finish false ERR_BACKUP_INCOMPLETE; return; }
-  fi
-  sha="$(sha256sum "$DEST/$arc" 2>/dev/null | cut -d' ' -f1)"
+  _i=0
+  while IFS= read -r _s <&3; do
+    _i=$((_i + 1)); arc="data.$ext"; [ "$_n" -gt 1 ] && arc="data$_i.$ext"; [ "$enc" = age ] && arc="$arc.age"
+    [ "$_n" -gt 1 ] && prog $((20 + 60 * _i / _n)) archiving "$_s"
+    path_pack "$_s" "$arc"; _pr=$?
+    [ "$_pr" = 1 ] && { audit "path-backup archive failed $_s"; finish false ERR_BACKUP_TAR; return; }
+    [ "$_pr" = 2 ] && { audit "path-backup incomplete $_s"; finish false ERR_BACKUP_INCOMPLETE; return; }
+    ctx="$(ls -Zd "$_s" 2>/dev/null | cut -d' ' -f1)"
+    uid="$(stat -c %u "$_s" 2>/dev/null || echo 0)"; gid="$(stat -c %g "$_s" 2>/dev/null || echo 0)"
+    "$JQ" -nc --arg src "$_s" --arg archive "$arc" --arg ctx "${ctx:-}" --argjson uid "${uid:-0}" --argjson gid "${gid:-0}" \
+      --arg sha "$(sha256sum "$DEST/$arc" 2>/dev/null | cut -d' ' -f1)" \
+      '{source:$src, archive:$archive, root_context:$ctx, owner_uid:$uid, owner_gid:$gid, sha256:$sha}' >> "$_items"
+  done 3< "$_srcs"
   prog 90 manifest "path"
   FP="$(getprop ro.build.fingerprint)"; SDK="$(getprop ro.build.version.sdk)"; SEL="$(getenforce 2>/dev/null | tr 'A-Z' 'a-z')"
-  "$JQ" -n --arg producer "VDBackup $(sed -n 's/^version=//p' "$MODDIR/module.prop")" \
+  "$JQ" -s --arg producer "VDBackup $(sed -n 's/^version=//p' "$MODDIR/module.prop")" \
     --arg created "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --argjson epoch "$(date +%s)" \
     --arg fp "$FP" --argjson sdk "${SDK:-0}" --arg abi "$abi" --arg sel "${SEL:-unknown}" \
-    --arg src "$SRCP" --arg archive "$arc" --arg comp "$COMP" --arg enc "$enc" \
-    --arg ctx "${ctx:-}" --argjson uid "${uid:-0}" --argjson gid "${gid:-0}" --argjson user "$U" --arg sha "$sha" \
+    --arg comp "$COMP" --arg enc "$enc" --argjson user "$U" \
     '{format_version:1, kind:"path", producer:$producer, created_at:$created, created_epoch:$epoch,
-      device:{fingerprint:$fp, sdk:$sdk, abi:$abi, selinux:$sel}, user_id:$user,
-      source:$src, archive:$archive, compression:$comp, encryption:$enc,
-      root_context:$ctx, owner_uid:$uid, owner_gid:$gid, sha256:$sha}' > "$DEST/manifest.json"
+      device:{fingerprint:$fp, sdk:$sdk, abi:$abi, selinux:$sel}, user_id:$user}
+     + (if length == 1 then {source:.[0].source, archive:.[0].archive} else {sources:map(.source), items:.} end)
+     + {compression:$comp, encryption:$enc}
+     + (if length == 1 then .[0] | {root_context, owner_uid, owner_gid, sha256} else {} end)' "$_items" > "$DEST/manifest.json"
+  rm -f "$_items"
   sha256sum "$DEST/manifest.json" | cut -d' ' -f1 > "$DEST/manifest.json.sha256"
   use_data_age && cp "$MODDIR/etc/RECOVERY.md" "$DEST/RECOVERY.md" 2>/dev/null
   media_own -R "$DEST"
   [ -s "$DEST/manifest.json" ] || { finish false ERR_BACKUP_INCOMPLETE; return; }
   # seal the metadata when encrypted. The listing shows the source from the device-key stub.
   if use_data_age; then
-    seal_meta "$DEST" '{format_version, created_at, encrypted:true, kind, source:(.source // "")}' || { finish false ERR_META_ENC; return; }
+    seal_meta "$DEST" '{format_version, created_at, encrypted:true, kind, source:(.source // ((.sources // []) | join(", "))), sources}' || { finish false ERR_META_ENC; return; }
     media_own -R "$DEST"
   fi
-  # reuse the full-backup transfer path (namespaced under .paths/<sanitized>)
-  PKG=".paths/$SAFE"; VC="$TS"
+  # reuse the full-backup transfer path (namespaced under .paths/<sanitized>); on Telegram the
+  # archive is named after the backup dir, and the caption label names the folder unless encrypted
+  PKG=".paths/$SAFE"; VC="$TS"; TGNAME="${SAFE}_${TS}.vdbf.tar"; LABEL=""
+  [ "$enc" = none ] && { LABEL="$SRCP"; [ "$_n" -gt 1 ] && LABEL="$SRCP +$((_n - 1))"; }
   prog 95 transfer "path"; transfer_full || return
-  audit "path-backup done $SRCP -> $DEST"; notify backup_done "path"
+  # a scheduled run carries .keep: prune this series to its newest <keep> (pinned ones stay)
+  _keep="$(jget "$ARGS" '.keep // empty')"
+  case "$_keep" in ''|*[!0-9]*) : ;; *)
+    _k=0
+    for _o in $(ls -1 "$BK" 2>/dev/null | sort -r); do
+      case "$_o" in "${SAFE}"_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]T[0-9][0-9][0-9][0-9][0-9][0-9]Z) : ;; *) continue ;; esac
+      { [ -f "$BK/$_o/manifest.json" ] && [ ! -f "$BK/$_o/.pinned" ]; } || continue
+      _k=$((_k + 1)); [ "$_k" -gt "$_keep" ] && rm -rf "${BK:?}/$_o" && audit "prune $BK/$_o"
+    done ;;
+  esac
+  audit "path-backup done $SRCP -> $DEST ($_n)"; notify backup_done "path"
   finish true ERR_NONE
 }
 
@@ -2646,43 +2748,57 @@ do_path_restore() {
     [ "$_rr" = 2 ] && { finish false ERR_MANIFEST_SHA; return; }
     M="$_pm"
   fi
-  SRCP="$("$JQ" -r '.source // empty' "$M")"
-  arc="$("$JQ" -r '.archive // empty' "$M")"
   enc="$("$JQ" -r '.encryption // "none"' "$M")"
-  ctx="$("$JQ" -r '.root_context // empty' "$M")"
-  uid="$("$JQ" -r '.owner_uid // 0' "$M")"; gid="$("$JQ" -r '.owner_gid // 0' "$M")"
-  case "$SRCP" in /storage/emulated/*|/data/media/*|/sdcard/*|/data/*) : ;; *) finish false ERR_BAD_PATH; return ;; esac
-  case "$SRCP" in *..*) finish false ERR_BAD_PATH; return ;; esac
-  path_restore_ok "$SRCP" || { audit "path-restore refused $SRCP"; finish false ERR_BAD_PATH; return; }
-  { [ -n "$arc" ] && [ "$arc" != null ]; } || { finish false ERR_NO_BACKUP; return; }
   if [ "$enc" = age ] && [ -z "$PW" ]; then finish false ERR_CRYPTO_PASS; return; fi
   if [ "$enc" = age ] && ! crypto_available; then finish false ERR_CRYPTO_UNAVAIL; return; fi
-  prog 5 preparing "path"; audit "path-restore start $REF -> $SRCP"; notify restore_start "path"
-  # anti-traversal: reject a tampered archive BEFORE the destructive wipe
+  # one line per restored folder: the .items of a multi-folder backup, else the top-level fields
+  _items="$STATE/staging/pitems.$OPID"
+  "$JQ" -c 'if .items then .items[] else {source, archive, root_context, owner_uid, owner_gid, sha256} end' "$M" > "$_items" 2>/dev/null
+  [ -s "$_items" ] || { finish false ERR_NO_BACKUP; return; }
   _renc=none; [ "$enc" = age ] && _renc=age
-  archive_safe "$REF/$arc" "$_renc" || { audit "path-restore unsafe archive $arc"; finish false ERR_UNSAFE_ARCHIVE; return; }
-  # integrity before the destructive restore
-  want="$("$JQ" -r '.sha256 // empty' "$M")"
-  if [ -n "$want" ] && [ "$want" != null ]; then
-    got="$(sha256sum "$REF/$arc" 2>/dev/null | cut -d' ' -f1)"
-    [ "$want" = "$got" ] || { audit "path-restore sha mismatch $arc"; finish false ERR_VERIFY; return; }
-  fi
-  parent="$(dirname "$SRCP")"; mkdir -p "$parent"
-  prog 40 extracting "path"
-  exec_ns rm -rf "$SRCP" 2>/dev/null
-  if [ "$enc" = age ]; then
-    dec_age "$REF/$arc" | { case "$arc" in
-        *.tar.gz*) "$GZIP" -dc ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c ;;
-        *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; } | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
-  else
-    decomp "$REF/$arc" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
-  fi
-  [ $? -eq 0 ] || { audit "path-restore extract failed $arc"; finish false ERR_RESTORE; return; }
-  case "$uid" in ''|*[!0-9]*) uid=0 ;; esac; case "$gid" in ''|*[!0-9]*) gid=0 ;; esac
-  [ "$uid" != 0 ] && exec_ns chown -hR "$uid:$gid" "$SRCP" 2>/dev/null
-  if [ -n "$ctx" ] && [ "$ctx" != null ]; then exec_ns chcon -hR "$ctx" "$SRCP" 2>/dev/null || exec_ns restorecon -R "$SRCP" 2>/dev/null
-  else exec_ns restorecon -R "$SRCP" 2>/dev/null; fi
-  prog 97 finalizing "path"; audit "path-restore done $SRCP"; notify restore_done "path"
+  # every folder passes every check before the first destructive wipe
+  while IFS= read -r _it <&3; do
+    SRCP="$(jget "$_it" '.source // empty')"; arc="$(jget "$_it" '.archive // empty')"
+    case "$SRCP" in /storage/emulated/*|/data/media/*|/sdcard/*|/data/*) : ;; *) finish false ERR_BAD_PATH; return ;; esac
+    case "$SRCP" in *..*) finish false ERR_BAD_PATH; return ;; esac
+    path_restore_ok "$SRCP" || { audit "path-restore refused $SRCP"; finish false ERR_BAD_PATH; return; }
+    case "$arc" in ''|null|*/*|*..*) finish false ERR_NO_BACKUP; return ;; esac
+    [ -f "$REF/$arc" ] || { finish false ERR_NO_BACKUP; return; }
+  done 3< "$_items"
+  prog 5 preparing "path"; audit "path-restore start $REF"; notify restore_start "path"
+  while IFS= read -r _it <&3; do
+    SRCP="$(jget "$_it" '.source // empty')"; arc="$(jget "$_it" '.archive // empty')"
+    # anti-traversal: reject a tampered archive BEFORE the destructive wipe
+    archive_safe "$REF/$arc" "$_renc" || { audit "path-restore unsafe archive $arc"; finish false ERR_UNSAFE_ARCHIVE; return; }
+    # integrity before the destructive restore
+    want="$(jget "$_it" '.sha256 // empty')"
+    if [ -n "$want" ] && [ "$want" != null ]; then
+      got="$(sha256sum "$REF/$arc" 2>/dev/null | cut -d' ' -f1)"
+      [ "$want" = "$got" ] || { audit "path-restore sha mismatch $arc"; finish false ERR_VERIFY; return; }
+    fi
+  done 3< "$_items"
+  while IFS= read -r _it <&3; do
+    SRCP="$(jget "$_it" '.source // empty')"; arc="$(jget "$_it" '.archive // empty')"
+    ctx="$(jget "$_it" '.root_context // empty')"
+    uid="$(jget "$_it" '.owner_uid // 0')"; gid="$(jget "$_it" '.owner_gid // 0')"
+    parent="$(dirname "$SRCP")"; mkdir -p "$parent"
+    prog 40 extracting "$SRCP"
+    exec_ns rm -rf "$SRCP" 2>/dev/null
+    if [ "$enc" = age ]; then
+      dec_age "$REF/$arc" | { case "$arc" in
+          *.tar.gz*) "$GZIP" -dc ;; *.tar.lz4*) "$ZSTD" -dq --format=lz4 -c ;;
+          *.tar.zst*) "$ZSTD" -dqc ;; *) cat ;; esac; } | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
+    else
+      decomp "$REF/$arc" | exec_ns "$TAR" $TARX -x -C "$parent" 2>/dev/null
+    fi
+    [ $? -eq 0 ] || { audit "path-restore extract failed $arc"; finish false ERR_RESTORE; return; }
+    case "$uid" in ''|*[!0-9]*) uid=0 ;; esac; case "$gid" in ''|*[!0-9]*) gid=0 ;; esac
+    [ "$uid" != 0 ] && exec_ns chown -hR "$uid:$gid" "$SRCP" 2>/dev/null
+    if [ -n "$ctx" ] && [ "$ctx" != null ]; then exec_ns chcon -hR "$ctx" "$SRCP" 2>/dev/null || exec_ns restorecon -R "$SRCP" 2>/dev/null
+    else exec_ns restorecon -R "$SRCP" 2>/dev/null; fi
+  done 3< "$_items"
+  rm -f "$_items"
+  prog 97 finalizing "path"; audit "path-restore done $REF"; notify restore_done "path"
   finish true ERR_NONE
 }
 
@@ -2702,7 +2818,7 @@ do_adb_backup() {
   use_data_age() { [ "$ENCDATA" = true ] && [ -n "$PW" ]; }
   U=0   # /data/adb is system-wide, not per-user
   resolve_dest
-  [ "$DTYPE" = telegram ] && { finish false ERR_TG_KIND; return; }   # app backups only (see do_path_backup)
+  [ "$DTYPE" = telegram ] && { finish false ERR_TG_KIND; return; }   # telegram-pull restores app and folder backups only
   transport_guard full || return
   prog 2 preparing "adb"; audit "adb-backup start"; notify backup_start "adb"
   BACKUPS="$(backups_dir "$U")"; BK="$BACKUPS/.adb"; TS="$(date -u +%Y%m%dT%H%M%SZ)"; DEST="$BK/$TS"
@@ -3111,26 +3227,39 @@ echo $$ > /sys/fs/cgroup/cgroup.procs 2>/dev/null || true
 # mark the operation live immediately, before any (possibly slow) validation, so the
 # UI never sits on a stale "starting" while the first guard/dumpsys runs.
 do_telegram_pull() {   # download a backup from Telegram into local storage; it then restores via the normal flow
-  MID="$(jget "$ARGS" '.message_id')"; case "$MID" in ''|*[!0-9-]*) finish false ERR_INVALID_REF; return ;; esac
+  # message_id is one id, or "id1,id2,..." for an archive stored in parts (in part order)
+  MID="$(jget "$ARGS" '.message_id')"; case "$MID" in ''|,*|*,|*,,*|*[!0-9,]*) finish false ERR_INVALID_REF; return ;; esac
   NAME="$(jget "$ARGS" '.name')"
   U="$(jget "$ARGS" '.user // 0')"; case "$U" in ""|*[!0-9]*) U=0 ;; esac
-  case "$NAME" in *__*.vdb.tar) : ;; *) finish false ERR_INVALID_REF; return ;; esac
-  _rest="${NAME%.vdb.tar}"; PKG="${_rest%%__*}"; _tsvc="${_rest#*__}"
-  valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
-  case "$_tsvc" in ''|*/*|*..*|*' '*) finish false ERR_INVALID_REF; return ;; esac   # feeds a backups path
+  BACKUPS="$(backups_dir "$U")"
+  case "$NAME" in
+    *__*.vdb.tar)   # app backup: <pkg>__<ts>_<vc>.vdb.tar -> <pkg>/<ts>_<vc>
+      _rest="${NAME%.vdb.tar}"; PKG="${_rest%%__*}"; _tsvc="${_rest#*__}"
+      valid_pkg "$PKG" || { finish false ERR_NO_PACKAGE; return; }
+      case "$_tsvc" in ''|*/*|*..*|*' '*) finish false ERR_INVALID_REF; return ;; esac   # feeds a backups path
+      _ddir="$BACKUPS/$PKG/$_tsvc" ;;
+    *.vdbf.tar)     # folder backup: <dir>.vdbf.tar -> .paths/<dir>
+      _tsvc="${NAME%.vdbf.tar}"; PKG=path
+      case "$_tsvc" in ''|.*|*..*|*[!A-Za-z0-9._-]*) finish false ERR_INVALID_REF; return ;; esac
+      _ddir="$BACKUPS/.paths/$_tsvc" ;;
+    *) finish false ERR_INVALID_REF; return ;;
+  esac
   net_guard || return
   [ -x "$TGBIN" ] || { finish false ERR_TG_BIN; return; }
   tg_authed || { finish false ERR_TG_AUTH; return; }
-  BACKUPS="$(backups_dir "$U")"; _ddir="$BACKUPS/$PKG/$_tsvc"
   _dl="$STATE/staging/tgpull.$OPID"; rm -rf "$_dl"; mkdir -p "$_dl"
+  printf '%s\n' "$MID" | tr ',' '\n' > "$_dl/refs"; _np="$(grep -c . "$_dl/refs")"
   prog 10 fetching "$PKG"; audit "telegram-pull start $PKG msg $MID"
-  tg_ok "$(tg_cmd download --ref "$MID" --out "$_dl/$NAME" --opid "$OPID")" \
+  if [ "$_np" = 1 ]; then tg_ok "$(tg_cmd download --ref "$MID" --out "$_dl/p1" --opid "$OPID")"
+  else tg_par_run down "$_dl" "$_np"; fi \
     || { rm -rf "$_dl"; audit "telegram-pull download failed $PKG"; finish false ERR_DOWNLOAD; return; }
   prog 75 extracting "$PKG"
-  media_own "$BACKUPS"; media_own "$BACKUPS/$PKG"; rm -rf "$_ddir"; mkdir -p "$_ddir"
-  exec_ns "$TAR" -C "$_ddir" -x -f "$_dl/$NAME" \
+  media_own "$BACKUPS"; media_own "$(dirname "$_ddir")"; rm -rf "$_ddir"; mkdir -p "$_ddir"
+  _i=1; while [ "$_i" -le "$_np" ]; do cat "$_dl/p$_i" || break; _i=$((_i + 1)); done | exec_ns "$TAR" -C "$_ddir" -x -f - \
     || { rm -rf "$_dl" "$_ddir"; audit "telegram-pull extract failed $PKG"; finish false ERR_RESTORE; return; }
-  rm -rf "$_dl"; media_own -R "$_ddir"
+  rm -rf "$_dl"
+  [ -f "$_ddir/manifest.json" ] || { rm -rf "$_ddir"; audit "telegram-pull no manifest $PKG"; finish false ERR_NO_BACKUP; return; }
+  media_own -R "$_ddir"
   prog 97 done "$PKG"; audit "telegram-pull done $PKG -> $_ddir"
   finish true ERR_NONE
 }
