@@ -607,7 +607,7 @@ remap_restored() {   # <type> <target>
 # the shape in sync with the manifest block and with fwstate_apply.
 fwstate_capture() {   # echoes JSON on stdout; uses $PKG $U
   _df="$STATE/staging/fwdump.$OPID"; fw dumpsys package "$PKG" > "$_df" 2>/dev/null
-  _fperms="$(sed -n "/User $U:/,/^ *User [0-9]/p" "$_df" | sed -n '/runtime permissions:/,/^$/p' | grep 'granted=' | while IFS= read -r ln; do
+  _fperms="$(sed -n '/^Packages:/,/^[^ ]/p' "$_df" | sed -n "/^ *User $U:/,/^ *User [0-9]/p" | sed -n '/runtime permissions:/,/^$/p' | grep 'granted=' | while IFS= read -r ln; do
       nm="${ln%%:*}"; nm="$(printf '%s' "$nm" | tr -d ' \t')"
       case "$ln" in *granted=true*) g=true ;; *) g=false ;; esac
       [ -n "$nm" ] && printf '%s\t%s\n' "$nm" "$g"
@@ -1450,8 +1450,9 @@ backup() {
   prog 86 framework "$PKG"
   # runtime permissions (no awk: toybox lacks it). Slice the runtime section with
   # sed, keep granted= lines, emit "<perm>\t<true|false>", then build JSON via jq.
-  # scope to this user's block first (dumpsys lists runtime permissions per "User N:")
-  PERMS_TSV="$(sed -n "/User $U:/,/^ *User [0-9]/p" "$DUMPF" | sed -n '/runtime permissions:/,/^$/p' | grep 'granted=' | while IFS= read -r ln; do
+  # scope to this user's block under "Packages:" first (dumpsys lists runtime permissions
+  # per "User N:"; the earlier "Domain verification status:" section has "User N:" lines too)
+  PERMS_TSV="$(sed -n '/^Packages:/,/^[^ ]/p' "$DUMPF" | sed -n "/^ *User $U:/,/^ *User [0-9]/p" | sed -n '/runtime permissions:/,/^$/p' | grep 'granted=' | while IFS= read -r ln; do
       nm="${ln%%:*}"; nm="$(printf '%s' "$nm" | tr -d ' \t')"
       case "$ln" in *granted=true*) g=true ;; *) g=false ;; esac
       [ -n "$nm" ] && printf '%s\t%s\n' "$nm" "$g"
