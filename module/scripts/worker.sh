@@ -336,6 +336,13 @@ progx() {
   printf '{"opid":"%s","percent":%s,"phase":"%s","item":"%s","done":false,"rate":"%s","eta":"%s","n":%s,"of":%s,"cur":"%s"}\n' \
     "$OPID" "$1" "$(jstr "$2")" "$(jstr "$3")" "$(jstr "$4")" "$(jstr "$5")" "$_pxn" "$_pxo" "$(jstr "$8")" > "$PROG"
   prog_notify "$1" "${8:-$3}"; }
+# Post (or replace) the notification <tag> as the shell user, which every ROM shows; a post
+# from uid 0 goes out as package "root" and some ROMs drop it without an error. Root is the
+# fallback when su cannot switch users. npost <tag> <text>
+npost() {
+  fw NP_TAG="$1" NP_TXT="$2" su -p 2000 -c 'cmd notification post -t VDBackup "$NP_TAG" "$NP_TXT"' >/dev/null 2>&1 \
+    || fw cmd notification post -t "VDBackup" "$1" "$2" >/dev/null 2>&1
+}
 # Optional progress notification (config notify_progress, default off): text-only "42% - item",
 # posted in the background on the op's own tag (the start/done notices reuse it), at most every
 # 5 s and never while the previous post is still running. State file: "<time> <pid>".
@@ -347,7 +354,7 @@ prog_notify() {
   [ $(( _npt - ${_npl:-0} )) -ge 5 ] || return 0
   [ -n "${_npp:-}" ] && kill -0 "$_npp" 2>/dev/null && return 0
   printf '%s\n' "$_npt" > "$_npf" 2>/dev/null || return 0
-  fw cmd notification post -t "VDBackup" "vdbackup_$OPID" "$1%${2:+ - $2}" >/dev/null 2>&1 &
+  npost "vdbackup_$OPID" "$1%${2:+ - $2}" &
   printf '%s %s\n' "$_npt" "$!" > "$_npf"
 }
 prog_notify_wait() {   # let a pending progress post land before a final text replaces it
@@ -364,7 +371,7 @@ finish() { # finish <ok> <code>; inside a batch it records the per-app result in
   if [ -f "$STATE/staging/np.$OPID" ]; then
     prog_notify_wait; rm -f "$STATE/staging/np.$OPID"
     if [ "$1" = true ]; then _npm="100%"; else _npm="$2"; fi
-    fw cmd notification post -t "VDBackup" "vdbackup_$OPID" "$_npm" >/dev/null 2>&1
+    npost "vdbackup_$OPID" "$_npm"
   fi
   printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":%s,"code":"%s"}\n' \
     "$OPID" "$1" "$2" > "$PROG"; }
@@ -395,7 +402,7 @@ notify() {
   _nn="$2"; case "$_nn" in *.*) _lbl="$(notify_label "$_nn")"; [ -n "$_lbl" ] && _nn="$_lbl" ;; esac
   if command -v vdb_notify_msg >/dev/null 2>&1; then _nm="$(vdb_notify_msg "$_nl" "$1" "$_nn")"; else _nm="$_nn"; fi
   prog_notify_wait; case "$1" in *_done) rm -f "$STATE/staging/np.$OPID" ;; esac
-  fw cmd notification post -t "VDBackup" "vdbackup_$OPID" "$_nm" >/dev/null 2>&1 && return 0
+  npost "vdbackup_$OPID" "$_nm" && return 0
   [ -f "$MODDIR/etc/vdbackup_helper.dex" ] && LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" \
       /system/bin ru.vd171.vdbackup.Helper notify "VDBackup" "$_nm" >/dev/null 2>&1; }
 
