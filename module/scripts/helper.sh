@@ -654,9 +654,22 @@ case "$verb" in
 
   telegram-list)
     # list backups stored in the Telegram channel (the authoritative offsite index). Pass the
-    # engine's list-remote JSON through; the WebUI parses the self-describing <pkg>__<ts>_<vc>.vdb.tar names.
+    # engine's list-remote JSON through; the WebUI parses the self-describing <pkg>__<ts>_<vc>.vdb.tar
+    # (app) and <dir>.vdbf.tar (folder) names. An archive stored in parts (<name>.partNNNofMMM) is
+    # folded into one entry under <name>, its message_id the part ids in order ("id1,id2,..."), which
+    # telegram-pull and telegram-delete take as is. A set missing a part stays as its raw parts.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
     _tgb="$(command -v "$BIN/mtproto-store" 2>/dev/null || command -v "$STATE/bin/mtproto-store" 2>/dev/null || echo mtproto-store)"
     _o="$(MTPROTO_STORE_TAG=VDB MTPROTO_STORE_STATE="$SECRETS/telegram" "$_tgb" list-remote 2>/dev/null)"
+    _g="$(printf '%s' "$_o" | "$JQ" -c 'def part: (.name // "") | capture("^(?<base>.+)\\.part(?<i>[0-9]{3})of(?<n>[0-9]{3})$"); def isp: [part] | length > 0;
+      if (.backups | type) == "array" then .backups |= (map(select(isp | not))
+        + (map(select(isp)) | group_by(part | .base + "/" + .n) | map(
+            sort_by(part.i) | unique_by(part.i) as $p | ($p[0] | part) as $h
+            | if ($p | length) == ($h.n | tonumber) and ($p | map(part.i | tonumber)) == [range(1; ($h.n | tonumber) + 1)]
+              then [$p[0] + {name:$h.base, message_id:($p | map(.message_id | tostring) | join(",")), size:($p | map(.size // 0) | add), parts:($p | length)}]
+              else $p end) | add // []))
+      else . end' 2>/dev/null)"
+    [ -n "$_g" ] && _o="$_g"
     [ -n "$_o" ] && printf '%s\n' "$_o" || err ERR_TG_LIST "could not list the Telegram channel" ;;
 
   rclone-list)
@@ -1125,7 +1138,7 @@ EOF
       [ "$first" = 1 ] || printf ','; first=0
       _r="$(dirname "$m")"
       printf '%s' "$(read_meta "$_r")" | "$JQ" -c --arg ref "$_r" \
-        '{ref:$ref, source:(.source // ""), created_at:(.created_at // ""),
+        '{ref:$ref, source:(.source // ((.sources // []) | join(", "))), sources:(.sources // [.source // empty]), created_at:(.created_at // ""),
           encryption:(.encryption // (if .encrypted then "age" else "none" end)), compression:(.compression // ""),
           encrypted:.encrypted, locked:.locked}' 2>/dev/null
     done
@@ -1438,8 +1451,14 @@ EOF
     j="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null)"
     id="$(printf '%s' "$j" | "$JQ" -r '.id // empty' 2>/dev/null)"
     case "$id" in ""|*/*|*' '*) err ERR_JOB_ID "invalid or missing job id"; exit 0 ;; esac
-    # target: a single .package, an explicit .packages[], or .all (every user app)
-    has_t="$(printf '%s' "$j" | "$JQ" -r '((.package // "") != "") or (((.packages // []) | length) > 0) or (.all == true)' 2>/dev/null)"
+    # target: a single .package, an explicit .packages[], or .all (every user app); a files job
+    # (.kind "files") backs up its .paths[] (absolute folders) as one folder backup instead
+    if [ "$(printf '%s' "$j" | "$JQ" -r '.kind // "apps"' 2>/dev/null)" = files ]; then
+      _okp="$(printf '%s' "$j" | "$JQ" -r '((.paths // []) | length) > 0 and ((.action // "backup") == "backup")
+        and all(.paths[]; type == "string" and startswith("/") and (contains("..") | not) and (contains("\n") | not))' 2>/dev/null)"
+      [ "$_okp" = true ] || { err ERR_JOB_PATH "a files job needs paths[] of absolute folders and action backup"; exit 0; }
+    fi
+    has_t="$(printf '%s' "$j" | "$JQ" -r '((.package // "") != "") or (((.packages // []) | length) > 0) or (.all == true) or (.kind == "files")' 2>/dev/null)"
     [ "$has_t" = true ] || { err ERR_JOB_PKG "job needs a package, packages[] or all:true"; exit 0; }
     bad="$(printf '%s' "$j" | "$JQ" -r '([(.package // empty)] + (.packages // [])) | .[] | select((test("[/ ]")) or (test("\\.\\.")))' 2>/dev/null)"
     [ -z "$bad" ] || { err ERR_JOB_PKG "invalid package name in job"; exit 0; }
@@ -1527,6 +1546,19 @@ EOF
       jdest="$("$JQ" -r '.dest // "local"' "$f" 2>/dev/null)"
       jref="$("$JQ" -r '.ref // empty' "$f" 2>/dev/null)"
       fired=0; items=""
+      # a files job: one folder backup of its .paths, pruned to <keep> by the worker
+      if [ "$("$JQ" -r '.kind // "apps"' "$f" 2>/dev/null)" = files ]; then
+        launchn=$(( launchn + 1 )); opid="$(new_opid)-$launchn"
+        argj="$("$JQ" -c --argjson u "$juser" --arg d "$jdest" --argjson k "$keep" '{paths:(.paths // []),user:$u,dest:$d,sched:true,keep:$k}' "$f" 2>/dev/null)"
+        [ -n "$argj" ] || continue
+        detach "$opid" path-backup "$(printf '%s' "$argj" | base64 | tr -d '\n')"
+        RAN="$RAN$("$JQ" -cn --arg id "$id" --arg opid "$opid" '{id:$id,opid:$opid,package:"files",action:"backup"}'),"
+        printf '{"ts":"%s","op":"scheduler-run","id":"%s","opid":"%s","package":"files","action":"backup"}\n' \
+          "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(jstr "$id")" "$(jstr "$opid")" >> "$LOGS/audit.jsonl"
+        tmp="$STATE/jobs/.$id.tmp"
+        "$JQ" --argjson now "$now" '.last_run=$now' "$f" > "$tmp" 2>/dev/null && mv "$tmp" "$f" && chmod 600 "$f"
+        continue
+      fi
       # resolve this job's target packages (single / list / all, minus blocklist) and launch ONE
       # detached batch op for the job: backup-batch of the packages, or restore-batch of each
       # one's latest backup. The worker runs them in sequence and prunes each app to <keep>

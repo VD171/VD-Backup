@@ -248,7 +248,7 @@ window.__I18N_EN = {
   "msg_err_dest_id": "The destination name is missing or invalid.",
   "msg_err_dest_none": "That destination no longer exists.",
   "msg_err_dest_type": "That destination type is not supported.",
-  "msg_err_tg_kind": "Telegram destinations hold app backups only. Pick another destination for folder and /data/adb backups.",
+  "msg_err_tg_kind": "Telegram destinations hold app and folder backups. Pick another destination for /data/adb backups.",
   "msg_err_dest_unreach": "The destination could not be reached.",
   "msg_err_drive": "Google Drive could not be reached. Please authorize access and try again.",
   "msg_err_drive_consent": "Google Drive is not authorized yet. Please authorize access and try again.",
@@ -609,5 +609,6 @@ window.__I18N_EN = {
   "ui_vol_sd": "SD card / USB",
   "ui_removable_title": "Removable storage",
   "msg_removable_unencrypted": "This destination is on removable storage (SD card or USB), which is not encrypted. A backup saved here can be read by anyone who has the card unless you turn on Encrypt data in Settings, which protects it with a passphrase.",
-  "msg_err_locked": "Unlock the device first. Saved credentials are kept on encrypted storage that stays locked until the first unlock after a reboot."
+  "msg_err_locked": "Unlock the device first. Saved credentials are kept on encrypted storage that stays locked until the first unlock after a reboot.",
+  "msg_err_job_path": "A Files job needs at least one absolute folder path."
 };
