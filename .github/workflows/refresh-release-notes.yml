@@ -20,15 +20,15 @@
 #  E-mail         : vd.priv8@pm.me
 # ======================================================================
 #
-#  Regenerate the canonical body + SHA256SUMS.txt for an ALREADY published
-#  release and apply them as github-actions[bot], WITHOUT rebuilding. A local
-#  `gh release edit` uses a human PAT and re-attributes the release, breaking
-#  auditability (github_release_sempre_bot_author); from CI the bot stays the
-#  author. Rebuilding instead would churn the non-reproducible dex/APK bytes
-#  and desync the live VDLU feed, so this reuses the published assets.
+#  Regenerate the lean body for an ALREADY published release and apply it as
+#  github-actions[bot], WITHOUT rebuilding. A local `gh release edit` uses a
+#  human PAT and re-attributes the release, breaking auditability
+#  (github_release_sempre_bot_author); from CI the bot stays the author.
+#  Rebuilding instead would churn the non-reproducible dex/APK bytes and
+#  desync the live VDLU feed, so this only rewrites the notes.
 #
-#  Use it to bring an older release up to the current release-notes contract
-#  (STANDARDS 22) or after editing release-notes-body.sh.
+#  Use it to bring an older release up to the current body (changelog +
+#  @Priv8_VD banner) or after editing release-notes-body.sh.
 name: Refresh release notes
 
 on:
@@ -54,32 +54,11 @@ jobs:
         run: |
           set -e
           gh release view "$VER" >/dev/null 2>&1 || { echo "::error::release $VER not found"; exit 1; }
-
-          # Asset sha256 straight from the published digests - no download for the .zip / .tar.zst.
-          : > SHA256SUMS.txt
-          gh release view "$VER" --json assets \
-            -q '.assets[] | select(.name | test("\\.(zip|tar\\.zst)$")) | "\(.digest | sub("sha256:";""))  \(.name)"' \
-            | sort -k2 >> SHA256SUMS.txt
-
-          # Per-binary sha256: the universal-full zip holds every ABI's bin/<abi>/*. Pull only
-          # that one asset, extract just bin/, and hash the shipped binaries (same filter as the
-          # build step) - never a per-file listing of the zip (release_sha_zip_binarios_only).
-          gh release download "$VER" -p "VD-Backup-${VER}-universal-full.zip" -D _dl
-          mkdir -p _x
-          ( cd _x && unzip -q -o "$GITHUB_WORKSPACE/_dl/VD-Backup-${VER}-universal-full.zip" 'bin/*' )
-          ( cd _x && for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-              for f in bin/$abi/*; do
-                [ -f "$f" ] || continue
-                case "$f" in *.sha256|*.gitkeep|*PROVENANCE*) continue ;; esac
-                sha256sum "$f"
-              done
-            done ) >> SHA256SUMS.txt
-          rm -rf _dl _x
-
-          sh .github/scripts/release-notes-body.sh "$VER" SHA256SUMS.txt > release-notes.md
-
+          sh .github/scripts/release-notes-body.sh "$VER" > release-notes.md
           gh release edit "$VER" --notes-file release-notes.md
-          gh release upload "$VER" SHA256SUMS.txt --clobber
+          # Drop the checksums asset if an older refresh attached one (releases carry only
+          # the .zip / .tar.zst now; the per-file .sha256 inside each zip is the integrity gate).
+          gh release delete-asset "$VER" SHA256SUMS.txt -y || true
 
       - name: Assert the release is still authored by github-actions[bot]
         env:

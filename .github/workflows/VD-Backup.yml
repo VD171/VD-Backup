@@ -315,28 +315,11 @@ jobs:
           VER: ${{ steps.v.outputs.name }}
         run: |
           set -e
-          # SHA256SUMS: every published asset (the .zip variants + the on-demand .tar.zst
-          # addons) plus every shipped per-ABI binary (bin/<abi>/*), never a per-file listing
-          # of the zip contents (release_sha_zip_binarios_only). Published as an asset so the
-          # bytes are verifiable; the body quotes the asset lines and points here for the rest.
-          : > SHA256SUMS.txt
-          for z in "VD-Backup-${VER}-universal-full.zip" "VD-Backup-${VER}-universal-lite.zip" \
-                   "VD-Backup-${VER}-arm64-v8a-full.zip" "VD-Backup-${VER}-armeabi-v7a-full.zip" \
-                   "VD-Backup-${VER}-x86-full.zip" "VD-Backup-${VER}-x86_64-full.zip" \
-                   assets-${VER}-*.tar.zst; do
-            [ -f "$z" ] && sha256sum "$z" >> SHA256SUMS.txt
-          done
-          ( cd module && for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-              for f in bin/$abi/*; do
-                [ -f "$f" ] || continue
-                case "$f" in *.sha256|*.gitkeep|*PROVENANCE*) continue ;; esac
-                sha256sum "$f"
-              done
-            done ) >> SHA256SUMS.txt
-          # Canonical body (CHANGELOG section + install + checksums + See also + the @Priv8_VD
-          # footer): the same generator the notes-refresh workflow calls, so a build and a
-          # later refresh of the same version emit byte-identical notes (STANDARDS 22).
-          sh .github/scripts/release-notes-body.sh "$VER" SHA256SUMS.txt > release-notes.md
+          # Lean release body: the version's CHANGELOG section plus the @Priv8_VD banner
+          # (owner 28/11: no checksums block, no contacts, no see also, no downloads legend;
+          # the per-file .sha256 companions inside each zip stay the integrity gate). The same
+          # generator the notes-refresh workflow calls, so a build and a refresh match.
+          sh .github/scripts/release-notes-body.sh "$VER" > release-notes.md
           # Idempotent: drop any existing release/tag for this version first.
           gh release delete "$VER" -y --cleanup-tag || true
           gh release create "$VER" \
@@ -347,7 +330,6 @@ jobs:
             "VD-Backup-${VER}-x86-full.zip" \
             "VD-Backup-${VER}-x86_64-full.zip" \
             assets-${VER}-*.tar.zst \
-            SHA256SUMS.txt \
             --title "VDBackup ${VER}" \
             --notes-file release-notes.md
 
