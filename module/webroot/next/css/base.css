@@ -1,0 +1,107 @@
+/*
+ * ======================================================================
+ *  VD BACKUP  ::  root backup & restore, no grant prompt
+ *  Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+ *
+ *  Copyright (C) 2026  VD171
+ *  SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ *  Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+ *  modified version, even as a service, and you MUST offer its source.
+ *
+ *  Site           : https://vd171.ru
+ *  Site           : https://vd.priv8.ru
+ *  Source         : https://github.com/VD171/VD-Backup
+ *  GitHub         : @VD171 https://github.com/VD171
+ *  XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+ *  XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+ *  Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+ *  Channel        : @Priv8_VD https://t.me/Priv8_VD
+ *  Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+ *  E-mail         : vd.priv8@pm.me
+ * ======================================================================
+ *
+ *  New interface: base layout, app bar, bottom navigation and panels.
+ */
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; background: var(--bg); }
+body {
+  margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Arabic", sans-serif;
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  zoom: var(--ui-scale);
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button, .tab, .nx-row, summary, label, .btn, .segment, .nx-chip, .nx-stat, .nx-qa-b {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: manipulation;
+}
+a { color: var(--accent-ink); }
+img { max-width: 100%; }
+.nx-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.i { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round; }
+.muted { color: var(--muted); }
+.grow { flex: 1 1 auto; min-width: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---- top app bar ---- */
+.nx-top {
+  position: sticky; top: 0; z-index: 30; height: calc(var(--top-h) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 8px 0; display: flex; align-items: center; gap: 4px;
+  background: var(--bg); border-bottom: 1px solid transparent; transition: border-color var(--dur);
+}
+.nx-top.scrolled { border-bottom-color: var(--line); }
+.nx-logo { width: 28px; height: 28px; margin-inline: 8px 6px; }
+.nx-titles { flex: 1 1 auto; min-width: 0; display: flex; align-items: baseline; gap: 8px; }
+.nx-titles h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nx-ver { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.nx-ib { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border: 0;
+  border-radius: 50%; background: transparent; color: var(--muted); }
+.nx-ib:active { background: var(--surface-3); }
+.nx-backbtn { display: none; color: var(--text); }
+body.nx-in-sub .nx-backbtn { display: grid; }
+body.nx-in-sub .nx-logo { display: none; }
+body.nx-in-sub .nx-ver { display: none; }
+[dir="rtl"] .nx-backbtn .i, [dir="rtl"] .nx-chev { transform: scaleX(-1); }
+
+/* ---- panels ---- */
+.nx-main { max-width: 760px; margin: 0 auto;
+  padding: 4px 16px calc(var(--nav-h) + 96px + env(safe-area-inset-bottom)); }
+.panel { display: none; }
+.panel.active { display: block; animation: nx-in .22s var(--ease); }
+@keyframes nx-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .panel.active { animation: none; } }
+
+/* ---- bottom navigation (Material 3 navigation bar) ---- */
+.nx-nav {
+  position: fixed; inset-inline: 0; bottom: 0; z-index: 40;
+  height: calc(var(--nav-h) + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
+  display: flex; background: var(--surface); border-top: 1px solid var(--line);
+}
+.nx-nav .tab { flex: 1 1 0; min-width: 0; border: 0; background: none; color: var(--muted);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  font-size: 12px; font-weight: 600; padding: 0 2px; }
+.nx-nav .tab:active .nx-pill { background: var(--surface-3); }
+.nx-nav .tab > span:last-child { max-width: 100%; line-height: 1.15; text-align: center; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.nx-pill { width: 60px; height: 32px; border-radius: var(--r-pill); display: grid; place-items: center;
+  transition: background var(--dur) var(--ease); }
+.nx-nav .tab.active, .nx-nav .tab.nx-parent { color: var(--text); }
+.nx-nav .tab.active .nx-pill, .nx-nav .tab.nx-parent .nx-pill { background: var(--accent-soft); color: var(--accent-ink); }
+.nx-nav .tab.active > span:last-child, .nx-nav .tab.nx-parent > span:last-child { font-weight: 700; }
+
+/* ---- section headings, hints, empty states ---- */
+.nx-h { display: flex; align-items: center; gap: 8px; margin: 22px 4px 10px; font-size: 13px; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.nx-h .i { width: 18px; height: 18px; color: var(--accent-ink); }
+.nx-h-row { justify-content: space-between; }
+.nx-h-row h2 { margin: 0; font: inherit; letter-spacing: inherit; }
+[lang="ar"] .nx-h, [lang="fa"] .nx-h { letter-spacing: 0; text-transform: none; font-size: 14px; }
+.nx-hint { color: var(--muted); font-size: 13.5px; line-height: 1.5; margin: 6px 4px 10px; }
+.nx-lead { font-size: 15px; color: var(--text); }
+.nx-empty { color: var(--muted); text-align: center; margin: 28px 12px; font-size: 14px; }
+.nx-link { color: var(--accent-ink); font-weight: 700; text-decoration: none; }

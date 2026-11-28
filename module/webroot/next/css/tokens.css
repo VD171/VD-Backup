@@ -1,0 +1,87 @@
+/*
+ * ======================================================================
+ *  VD BACKUP  ::  root backup & restore, no grant prompt
+ *  Full app/data backup & restore as root: KernelSU/APatch/Magisk WebUI.
+ *
+ *  Copyright (C) 2026  VD171
+ *  SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ *  Free software under the GNU AGPL v3 or later. NETWORK COPYLEFT: run a
+ *  modified version, even as a service, and you MUST offer its source.
+ *
+ *  Site           : https://vd171.ru
+ *  Site           : https://vd.priv8.ru
+ *  Source         : https://github.com/VD171/VD-Backup
+ *  GitHub         : @VD171 https://github.com/VD171
+ *  XDA-Developers : @VD171 https://xdaforums.com/m/vd171.4699873/
+ *  XDA thread     : https://xdaforums.com/t/VD-Backup.4807267/
+ *  Telegram       : @VD_Priv8 https://t.me/VD_Priv8
+ *  Channel        : @Priv8_VD https://t.me/Priv8_VD
+ *  Discord        : @VD.Priv8 https://discord.com/users/1296831918989639721
+ *  E-mail         : vd.priv8@pm.me
+ * ======================================================================
+ *
+ *  New interface: design tokens (dark default, light, auto). The accent is
+ *  the same user-chosen --accent the classic interface sets on <html>.
+ */
+
+:root {
+  --bg: #0e1116; --surface: #161a21; --surface-2: #1c2129; --surface-3: #242a34;
+  --line: #2a303b; --line-2: #39414f;
+  --text: #e8ecf2; --muted: #a3acba; --faint: #7f8898;
+  --accent: #34d399; --on-accent: #03140d;
+  --accent-ink: var(--accent);
+  --accent-soft: rgba(52, 211, 153, .15);
+  --danger: #f87171; --danger-ink: #fca5a5; --danger-soft: rgba(248, 113, 113, .14);
+  --warn: #fbbf24; --warn-soft: rgba(251, 191, 36, .12);
+  --info: #60a5fa; --info-soft: rgba(96, 165, 250, .14);
+  --scrim: rgba(3, 6, 10, .62);
+  --shadow: 0 12px 32px -12px rgba(0, 0, 0, .7);
+  --r: 18px; --r-sm: 12px; --r-lg: 26px; --r-pill: 999px;
+  --tap: 48px;
+  --top-h: 58px; --nav-h: 72px;
+  --ease: cubic-bezier(.2, .8, .2, 1); --dur: .18s;
+  --ui-scale: 1;
+  color-scheme: dark;
+}
+
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  :root {
+    --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+    --accent-line: color-mix(in srgb, var(--accent) 45%, var(--line));
+  }
+}
+
+html[data-theme="light"] {
+  --bg: #f3f5f8; --surface: #ffffff; --surface-2: #f0f2f6; --surface-3: #e6e9ef;
+  --line: #dde1e8; --line-2: #c9ced8;
+  --text: #121620; --muted: #535d6c; --faint: #6c7584;
+  --accent-ink: #0b7a56;
+  --danger: #dc2626; --danger-ink: #b91c1c; --danger-soft: rgba(220, 38, 38, .09);
+  --warn: #b45309; --warn-soft: rgba(245, 158, 11, .13);
+  --info: #2563eb; --info-soft: rgba(37, 99, 235, .09);
+  --scrim: rgba(15, 20, 30, .42);
+  --shadow: 0 12px 30px -14px rgba(20, 30, 50, .35);
+  color-scheme: light;
+}
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  html[data-theme="light"] { --accent-ink: color-mix(in srgb, var(--accent) 58%, #000); }
+}
+
+@media (prefers-color-scheme: light) {
+  html[data-theme="auto"] {
+    --bg: #f3f5f8; --surface: #ffffff; --surface-2: #f0f2f6; --surface-3: #e6e9ef;
+    --line: #dde1e8; --line-2: #c9ced8;
+    --text: #121620; --muted: #535d6c; --faint: #6c7584;
+    --accent-ink: #0b7a56;
+    --danger: #dc2626; --danger-ink: #b91c1c; --danger-soft: rgba(220, 38, 38, .09);
+    --warn: #b45309; --warn-soft: rgba(245, 158, 11, .13);
+    --info: #2563eb; --info-soft: rgba(37, 99, 235, .09);
+    --scrim: rgba(15, 20, 30, .42);
+    --shadow: 0 12px 30px -14px rgba(20, 30, 50, .35);
+    color-scheme: light;
+  }
+  @supports (color: color-mix(in srgb, red 50%, blue)) {
+    html[data-theme="auto"] { --accent-ink: color-mix(in srgb, var(--accent) 58%, #000); }
+  }
+}

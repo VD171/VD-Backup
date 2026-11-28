@@ -334,12 +334,38 @@ progx() {
   _pxn="$6"; case "$_pxn" in ''|*[!0-9]*) _pxn=0 ;; esac
   _pxo="$7"; case "$_pxo" in ''|*[!0-9]*) _pxo=0 ;; esac
   printf '{"opid":"%s","percent":%s,"phase":"%s","item":"%s","done":false,"rate":"%s","eta":"%s","n":%s,"of":%s,"cur":"%s"}\n' \
-    "$OPID" "$1" "$(jstr "$2")" "$(jstr "$3")" "$(jstr "$4")" "$(jstr "$5")" "$_pxn" "$_pxo" "$(jstr "$8")" > "$PROG"; }
+    "$OPID" "$1" "$(jstr "$2")" "$(jstr "$3")" "$(jstr "$4")" "$(jstr "$5")" "$_pxn" "$_pxo" "$(jstr "$8")" > "$PROG"
+  prog_notify "$1" "${8:-$3}"; }
+# Optional progress notification (config notify_progress, default off): text-only "42% - item",
+# posted in the background on the op's own tag (the start/done notices reuse it), at most every
+# 5 s and never while the previous post is still running. State file: "<time> <pid>".
+prog_notify() {
+  [ -n "${_NPROG+x}" ] || _NPROG="$(cfg .notify_progress)"
+  [ "$_NPROG" = true ] || return 0
+  _npf="$STATE/staging/np.$OPID"; _npt="$(date +%s)"
+  read -r _npl _npp 2>/dev/null < "$_npf"
+  [ $(( _npt - ${_npl:-0} )) -ge 5 ] || return 0
+  [ -n "${_npp:-}" ] && kill -0 "$_npp" 2>/dev/null && return 0
+  printf '%s\n' "$_npt" > "$_npf" 2>/dev/null || return 0
+  fw cmd notification post -t "VDBackup" "vdbackup_$OPID" "$1%${2:+ - $2}" >/dev/null 2>&1 &
+  printf '%s %s\n' "$_npt" "$!" > "$_npf"
+}
+prog_notify_wait() {   # let a pending progress post land before a final text replaces it
+  read -r _npl _npp 2>/dev/null < "$STATE/staging/np.$OPID" || return 0
+  _npw=0
+  while [ -n "${_npp:-}" ] && kill -0 "$_npp" 2>/dev/null && [ "$_npw" -lt 3 ]; do sleep 1; _npw=$(( _npw + 1 )); done
+}
 prog() {  # prog <percent> <phase> <item> (back-compat: no rich extras)
   progx "$1" "$2" "$3" "" "" 0 0 ""; }
 finish() { # finish <ok> <code>; inside a batch it records the per-app result instead of
   # writing the terminal state, so one app's end does not end the whole batch op.
   if [ "${IN_BATCH:-0}" = 1 ]; then LAST_OK="$1"; LAST_CODE="$2"; return 0; fi
+  # a progress notification with no done notice after it would stay at its last percent
+  if [ -f "$STATE/staging/np.$OPID" ]; then
+    prog_notify_wait; rm -f "$STATE/staging/np.$OPID"
+    if [ "$1" = true ]; then _npm="100%"; else _npm="$2"; fi
+    fw cmd notification post -t "VDBackup" "vdbackup_$OPID" "$_npm" >/dev/null 2>&1
+  fi
   printf '{"opid":"%s","percent":100,"phase":"finished","done":true,"ok":%s,"code":"%s"}\n' \
     "$OPID" "$1" "$2" > "$PROG"; }
 audit() { printf '{"ts":"%s","op":"%s","opid":"%s","detail":"%s"}\n' \
@@ -368,6 +394,7 @@ notify() {
   _nl="$(cfg .language)"; case "$_nl" in ""|null|auto) _nl=en ;; esac
   _nn="$2"; case "$_nn" in *.*) _lbl="$(notify_label "$_nn")"; [ -n "$_lbl" ] && _nn="$_lbl" ;; esac
   if command -v vdb_notify_msg >/dev/null 2>&1; then _nm="$(vdb_notify_msg "$_nl" "$1" "$_nn")"; else _nm="$_nn"; fi
+  prog_notify_wait; case "$1" in *_done) rm -f "$STATE/staging/np.$OPID" ;; esac
   fw cmd notification post -t "VDBackup" "vdbackup_$OPID" "$_nm" >/dev/null 2>&1 && return 0
   [ -f "$MODDIR/etc/vdbackup_helper.dex" ] && LD_LIBRARY_PATH= app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" \
       /system/bin ru.vd171.vdbackup.Helper notify "VDBackup" "$_nm" >/dev/null 2>&1; }

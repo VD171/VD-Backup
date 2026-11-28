@@ -1772,6 +1772,7 @@ function trackOp(opid, ctx) {
   var missing = 0, stuck = 0;
   var timer = setInterval(function () {
     if (!box.parentNode) { clearInterval(timer); return; }   // card was closed/cancelled: stop polling
+    if (document.hidden) return;   // WebUI in the background: skip the poll, resume when visible
     helper("progress", opid, true).then(function (p) {
       if (!p || (!p.phase && !p.done)) {   // op vanished (finished + cleaned, or never started)
         if (++missing >= 3) { clearInterval(timer); closeCard(box); }
@@ -2207,6 +2208,7 @@ function loadSettings() {
   if ($("#set-auto"))     $("#set-auto").checked = !!CFG.auto_backup;
   if ($("#set-auto-keep")) $("#set-auto-keep").value = CFG.auto_backup_keep || 5;
   if ($("#set-thermal"))  $("#set-thermal").checked = (CFG.thermal_throttle !== false);
+  if ($("#set-notify-progress")) $("#set-notify-progress").checked = (CFG.notify_progress === true);
   if ($("#set-space-preflight")) $("#set-space-preflight").checked = (CFG.space_preflight !== false);
   if ($("#set-local-copy")) $("#set-local-copy").checked = (CFG.local_copy === true);
   if ($("#set-spoof"))    $("#set-spoof").checked = (CFG.spoof_installer !== false);
@@ -2243,6 +2245,7 @@ function saveSettings() {
   if ($("#set-auto")) CFG.auto_backup = $("#set-auto").checked;
   if ($("#set-auto-keep")) CFG.auto_backup_keep = parseInt($("#set-auto-keep").value, 10) || 5;
   if ($("#set-thermal")) CFG.thermal_throttle = $("#set-thermal").checked;
+  if ($("#set-notify-progress")) CFG.notify_progress = $("#set-notify-progress").checked;
   if ($("#set-space-preflight")) CFG.space_preflight = $("#set-space-preflight").checked;
   if ($("#set-local-copy")) CFG.local_copy = $("#set-local-copy").checked;
   if ($("#set-spoof")) CFG.spoof_installer = $("#set-spoof").checked;
@@ -2694,6 +2697,7 @@ function openSpecialRestore(bk) {
   $("#special-delete").onclick = function () {
     modalConfirmAction(I18N.t("confirm_delete_backup"), I18N.t("delete"), function () { return helper("delete-backup", { ref: bk.ref }); }).then(function (r) {
       if (r === null) return;
+      if (!r || !r.ok) { modalAlert(errMsg(r)); return; }
       m.hidden = true; loadSpecial();
     });
   };
@@ -3356,6 +3360,7 @@ function boot() {
   helper("config-get").then(function (c) { CFG = c || {}; activeUser = (CFG.user != null) ? (CFG.user | 0) : 0; return I18N.init(CFG.language || "auto"); })
     .then(function () {
       I18N.apply();
+      if (window.VDB_UI) VDB_UI.sync(CFG);   // Classic / New interface choice (ui-switch.js)
       // The bridge runs one exec at a time, so call order is load order. The app list is the
       // first screen: ask for it first, and queue what the other tabs need only behind it.
       var rest = function () {

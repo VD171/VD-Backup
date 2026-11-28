@@ -141,7 +141,7 @@ backup_listing() {
   else
     "$JQ" -c '{package:.package.name, label:(.package.label // .package.name),
       icon:(.package.icon // ""), versionName:.package.versionName, versionCode:.package.versionCode,
-      created_at:.created_at, mode:.mode, types:[.items[].type], encrypted:false, locked:false}' "$_bl_m" 2>/dev/null
+      created_at:.created_at, mode:.mode, types:[.items[].type], size:([.items[].size // 0] | add // 0), encrypted:false, locked:false}' "$_bl_m" 2>/dev/null
   fi
 }
 
@@ -676,8 +676,33 @@ case "$verb" in
       case "$_tsvc" in */*) continue ;; esac
       [ "$_first" = 1 ] || printf ','; _first=0
       printf '{"dest":"%s","rref":"%s","package":"%s","tsvc":"%s"}' "$(jstr "$id")" "$(jstr "$_rref")" "$(jstr "$_pkg")" "$(jstr "$_tsvc")"
-    done; }
+    done
+    # mirrors:true also lists Mirror copies (<pfx>/<pkg>/meta.json, one live copy per app, no <ts_vc>)
+    if [ "$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.mirrors // false' 2>/dev/null)" = true ]; then
+      "$_rc" --config "$SECRETS/rclone.conf" lsf -R --max-depth 2 --files-only --format tp --include meta.json "$rem:$pfx/" 2>/dev/null \
+        | while IFS= read -r _l; do
+          _p="${_l#*;}"; _pkg="${_p%/meta.json}"
+          case "$_pkg" in ''|*/*) continue ;; esac
+          [ "$_first" = 1 ] || printf ','; _first=0
+          printf '{"dest":"%s","rref":"%s","package":"%s","tsvc":"","mode":"mirror","mtime":"%s"}' "$(jstr "$id")" "$(jstr "$_pkg")" "$(jstr "$_pkg")" "$(jstr "${_l%%;*}")"
+        done
+    fi; }
     printf ']}\n' ;;
+
+  restic-list)
+    # list the Snapshot-mode snapshots of a restic destination (tagged vdbackup,<pkg>), newest first.
+    # Restore takes one by id through restore {mode:"snapshot",dest,package,snapshot}.
+    JQ="$(command -v "$BIN/jq" 2>/dev/null || echo jq)"
+    id="$(printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.dest // empty' 2>/dev/null)"
+    f="$STATE/dests/$id.json"
+    { [ -n "$id" ] && [ -f "$f" ] && [ "$("$JQ" -r '.type // empty' "$f")" = restic ]; } || { err ERR_DEST_NONE "no such restic destination"; exit 0; }
+    repo="$("$JQ" -r '.repo // empty' "$f")"
+    _rs="$(command -v "$BIN/restic" 2>/dev/null || command -v "$STATE/bin/restic" 2>/dev/null || echo restic)"
+    _o="$(RCLONE_CONFIG="$SECRETS/rclone.conf" RESTIC_PASSWORD_FILE="$SECRETS/creds/$id.pass" "$_rs" -r "$repo" snapshots --json --tag vdbackup 2>/dev/null)"
+    [ -n "$_o" ] || { err ERR_RESTIC "could not list the restic snapshots"; exit 0; }
+    printf '%s' "$_o" | "$JQ" -c --arg d "$id" '{ok:true, dest:$d, backups:([.[]? | {dest:$d, id:.id, short_id:.short_id, time:.time,
+        package:(((.tags // []) | map(select(. != "vdbackup")))[0] // ""), size:(.summary.total_bytes_processed // 0)}] | sort_by(.time) | reverse)}' 2>/dev/null \
+      || err ERR_RESTIC "could not list the restic snapshots" ;;
 
   gdrive-list)
     # list Full backups stored on a Google Drive destination (via the companion, which walks the
@@ -1029,7 +1054,7 @@ case "$verb" in
       printf '%s' "$(backup_listing "$ref")" | "$JQ" -c --arg ref "$ref" --argjson hasapk "$_hasapk" --argjson nt "$_nt" --argjson pin "$_pin" \
         '{ref:$ref, package:.package, label:.label, versionName:.versionName,
           versionCode:.versionCode, created_at:.created_at, mode:.mode,
-          note:$nt.note, tags:$nt.tags, pinned:$pin, encrypted:.encrypted, locked:.locked,
+          note:$nt.note, tags:$nt.tags, pinned:$pin, encrypted:.encrypted, locked:.locked, size:(.size // 0),
           items:((if $hasapk then ["apk"] else [] end) + .types)}' 2>/dev/null
     done
     done <<EOF
@@ -1793,6 +1818,17 @@ EOF
       printf '{"ts":"%s","op":"prune","ref":"%s"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(jstr "$r")" >> "$LOGS/audit.jsonl"
     done
     printf ']}\n' ;;
+
+  bootstrap)
+    # first-paint data in one exec (the WebUI bridge runs one exec at a time): the same JSON the
+    # separate verbs print, keyed by verb. Every verb stays callable on its own.
+    printf '{"ok":true'
+    for _v in config-get ping list-users list-ops dests-list; do
+      _o="$(sh "$0" "$_v" '')"; printf ',"%s":%s' "$_v" "${_o:-null}"
+    done
+    _o="$(sh "$0" overview "$(printf '{"user":0}' | base64)")"; printf ',"overview":%s' "${_o:-null}"
+    _o="$(sh "$0" log-read "$(printf '{"limit":4}' | base64)")"; printf ',"log-read":%s' "${_o:-null}"
+    printf '}\n' ;;
 
   *)
     err ERR_UNKNOWN_VERB "unknown verb: $verb" ;;
