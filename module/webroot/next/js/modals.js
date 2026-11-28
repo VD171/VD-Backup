@@ -95,6 +95,38 @@ var NX_MODALS = (function () {
     });
   }
 
+  // one dialog element serves many flows. A request made while it is open (an op's passphrase
+  // retry, a late alert) took the open dialog over, so the answer went to the wrong flow; it now
+  // waits its turn. The same request again while it is pending (a double tap) answers `dropped`.
+  function serialize(names, keyOf, dropped) {
+    var q = Promise.resolve(), live = {};
+    names.forEach(function (name, i) {
+      var orig = window[name]; if (typeof orig !== "function") return;
+      window[name] = function () {
+        var args = arguments, k = i + "|" + keyOf.apply(null, args);
+        if (live[k]) return Promise.resolve(dropped[i]);
+        live[k] = 1;
+        var p = q.then(function () { return orig.apply(null, args); });
+        q = p.then(function () { delete live[k]; }, function () { delete live[k]; });
+        return p;
+      };
+    });
+  }
+  serialize(["openMsg", "modalConfirmAction"], function (a, b) {
+    return typeof a === "object" ? [a.title, a.body, !!a.confirm].join("|") : [b, a].join("|");
+  }, [false, null]);
+  serialize(["openOpModal"], function (o) { return [o.titleKey, o.msg, !!o.needPassword].join("|"); }, [null]);
+
+  // the backup dialog keeps its ticks between opens: a dry run left on made the next real
+  // backup only an estimate, so it starts off each time
+  if (typeof openBackupModal === "function") {
+    var openBk = openBackupModal;
+    window.openBackupModal = function (pkg, label) {
+      var dry = document.getElementById("bi-dryrun"); if (dry) dry.checked = false;
+      return openBk(pkg, label);
+    };
+  }
+
   document.addEventListener("DOMContentLoaded", init);
   return { top: top, closeTop: closeTop, depth: function () { return stack.length; } };
 })();

@@ -232,18 +232,30 @@ var NX_RS = (function () {
       } });
     }).catch(function () { modalAlert(errMsg()); });
   }
-  function restore(e) {
-    if (e.mode === "mirror") { startRestore("", e.package, null, "mirror", e.src); return; }
-    if (e.kind !== "restic") { pull(e, true); return; }
-    openOpModal({ overwriteAck: true, allowTest: true, allowSpoof: true, titleKey: "restore", confirmKey: "restore",
-                  msg: I18N.t("confirm_restore", { name: e.label || e.package }) }).then(function (res) {
+  // Snapshot and Mirror restores install the APKs and overwrite the live data dirs whole: the
+  // worker takes no test run, item pick, SSAID or network policy for them, so none is offered
+  // (a ticked "test" ran a real restore). The active user goes along, as with a backup.
+  function liveRestore(args, name) {
+    openOpModal({ overwriteAck: true, allowSsaid: false, allowSpoof: true, titleKey: "restore", confirmKey: "restore",
+                  msg: I18N.t("confirm_restore", { name: name }) }).then(function (res) {
       if (res == null) return;
-      var args = { mode: "snapshot", dest: e.src, package: e.package, snapshot: e.id, ssaid: res.ssaid, netpolicy: res.netpolicy,
-                   test: res.test, spoof_installer: res.spoof_installer, deep_spoof: res.deep_spoof };
-      var ctx = { restorePkg: e.package };
+      args.user = activeUser | 0; args.spoof_installer = res.spoof_installer;
+      var ctx = { restorePkg: args.package };
       ctx.retry = function () { helper("restore", args).then(function (r) { if (r && r.opid) trackOp(r.opid, ctx); else modalAlert(errMsg(r)); }).catch(function () { modalAlert(errMsg()); }); };
       ctx.retry();
     });
+  }
+  if (typeof startRestore === "function") {
+    var startRs = startRestore;
+    window.startRestore = function (ref, pkg, items, mode, dest) {
+      if (mode !== "mirror") { startRs(ref, pkg, items, mode, dest); return; }
+      liveRestore({ mode: "mirror", package: pkg, dest: dest || "local" }, pkg);
+    };
+  }
+  function restore(e) {
+    if (e.mode === "mirror") { startRestore("", e.package, null, "mirror", e.src); return; }
+    if (e.kind !== "restic") { pull(e, true); return; }
+    liveRestore({ mode: "snapshot", dest: e.src, package: e.package, snapshot: e.id }, e.label || e.package);
   }
   function del(e, done) {
     var tg = e.kind === "telegram";
@@ -305,6 +317,14 @@ var NX_RS = (function () {
   // Select > All takes the rows on screen: the engine's version also picked backups the
   // filter chips hide, which a batch delete would then remove unseen
   document.addEventListener("DOMContentLoaded", function () {
+    // a restore with every item unticked sent items [], which the worker reads as "everything":
+    // OK stays off until an item is ticked, and Enter in the passphrase field waits for it too
+    var items = $id("pw-items"), ok = $id("pw-ok"), pwm = $id("pw-modal");
+    if (items && ok && pwm) {
+      var none = function () { return !items.hidden && !!items.children.length && !items.querySelector("input:checked"); };
+      items.addEventListener("change", function () { ok.disabled = none(); });
+      pwm.addEventListener("keydown", function (e) { if (e.key === "Enter" && none()) { e.preventDefault(); e.stopPropagation(); } }, true);
+    }
     var all = $id("bk-selall"); if (!all) return;
     all.onclick = function () {
       Array.prototype.forEach.call($id("backuplist").children, function (li) {
