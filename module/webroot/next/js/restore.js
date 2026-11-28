@@ -122,7 +122,9 @@ var NX_RS = (function () {
     var app = APPS.filter(function (a) { return a.package === e.package; })[0];
     if (app) { ic.dataset.pkg = e.package; ic.dataset.vc = app.versionCode != null ? String(app.versionCode) : "0"; loadIcon(ic); }
     var g = el("div", "grow");
-    var nm = el("div", "name", name); nm.dir = "auto"; g.appendChild(nm);
+    var nm = el("div", e.label ? "name" : "name nx-pkgname", e.label ? name : ""); nm.dir = "auto"; g.appendChild(nm);
+    // no label known: the package is all there is, so it wraps after its dots instead of being cut off
+    if (!e.label) name.split(/(?<=\.)/).forEach(function (p) { nm.appendChild(document.createTextNode(p)); nm.appendChild(document.createElement("wbr")); });
     if (e.label) g.appendChild(el("div", "pkg", e.package));
     var bits = [dateOf(e.when)], sub = el("div", "sub");
     if (x.size) bits.push(fmtSize(x.size));
@@ -193,7 +195,7 @@ var NX_RS = (function () {
     var loading = NX_SRC.list().some(function (s) { return s.state === "loading"; });
     var empty = $id("backups-empty"), none = $id("nx-rs-nomatch");
     if (empty) empty.style.display = (rows.length || loading || q) ? "none" : "";
-    if (none) none.hidden = !(rows.length && !vis);
+    if (none) none.hidden = rows.length ? vis > 0 : !q || loading;   // a search can leave no rows at all
   }
 
   // ---- remote actions ----

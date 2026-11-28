@@ -54,6 +54,7 @@ var NX = (function () {
       if (on && b.scrollIntoView) b.scrollIntoView({ block: "nearest", inline: "nearest" });
     });
     root.querySelectorAll(".nx-pane").forEach(function (p) { p.hidden = p.dataset.pane !== name; });
+    if (name !== "apps") endSelect(root.id);
     // the System data / Files / adb backup forms need the engine's special-categories list
     if (root.id === "apps" && name !== "apps" && !specials && typeof loadSpecial === "function") { specials = true; loadSpecial(); }
   }
@@ -113,8 +114,18 @@ var NX = (function () {
   // whole WebUI. Back pops one entry and closes one level; a level closed by its own button
   // drops its entry again, so the count never drifts.
   var depth = 0, skip = 0;
+  // select mode of the tab on screen is a level too: Back ends it before it leaves the tab
+  function selecting() {
+    var tab = curTabId();
+    return (tab === "apps" && selectMode) || (tab === "backups" && bkSelectMode);
+  }
+  function endSelect(tab) {
+    tab = tab || curTabId();
+    if (tab === "apps" && selectMode) setSelectMode(false);
+    if (tab === "backups" && bkSelectMode) setBkSelectMode(false);
+  }
   function levels() {
-    return (typeof _tabStack !== "undefined" ? _tabStack.length - 1 : 0) + NX_MODALS.depth() + (opsOpen() ? 1 : 0);
+    return (typeof _tabStack !== "undefined" ? _tabStack.length - 1 : 0) + NX_MODALS.depth() + (opsOpen() ? 1 : 0) + (selecting() ? 1 : 0);
   }
   function syncHistory(gesture) {
     var want = levels();
@@ -128,6 +139,7 @@ var NX = (function () {
       if (depth) depth--;
       if (NX_MODALS.closeTop()) return;
       if (opsOpen()) showOps(false);
+      else if (selecting()) endSelect();
       else if (_tabStack.length > 1) { _tabStack.pop(); switchTab(_tabStack[_tabStack.length - 1]); }
     }, true);
     ["click", "keydown", "touchend"].forEach(function (t) {
@@ -139,11 +151,28 @@ var NX = (function () {
     if (typeof _tabStack !== "undefined" && _tabStack.length === 1) _tabStack[0] = "home";
     var orig = window.switchTab;
     window.switchTab = function (name) {
+      var from = curTabId();
+      if (from !== name) endSelect(from);   // a selection is not left behind on a tab out of sight
       orig(name);
       updateBar(name);
       window.scrollTo(0, 0);
       if (name === "home" && window.NX_HOME) NX_HOME.show();
       if (name === "backups" && window.NX_SRC) NX_SRC.load(false);
+    };
+    // a main tab sits right above Home, a sub page above the screen it was opened from: Back from
+    // any main tab goes Home instead of through every tab visited before it
+    var nav = window.navTab;
+    window.navTab = function (name) {
+      if (!name || name === curTabId()) return;
+      if (!SUB[name]) _tabStack.length = 1;
+      if (name === "home") switchTab(name); else nav(name);
+    };
+    // Backup > Apps: say so when the search or a filter leaves no app, instead of a blank screen
+    var apps = window.renderApps;
+    window.renderApps = function (q) {
+      apps(q);
+      var none = document.getElementById("nx-apps-nomatch");
+      if (none) none.hidden = !APPS.length || !!document.querySelector("#applist > li");
     };
     var apply = I18N.apply;
     I18N.apply = function (root) {
@@ -176,7 +205,20 @@ var NX = (function () {
     }, { passive: true });
     kindCards();
     opsBar();
+    kbWatch();
     updateBar("home");
+  }
+
+  // the keyboard shrinks the viewport (same width, a text field focused): hide the bars under it
+  function kbWatch() {
+    var w = window.innerWidth, full = window.innerHeight;
+    window.addEventListener("resize", function () {
+      if (window.innerWidth !== w) { w = window.innerWidth; full = window.innerHeight; }
+      else if (window.innerHeight > full) full = window.innerHeight;
+      var a = document.activeElement;
+      var typing = !!a && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && !/^(checkbox|radio|range|color|button)$/.test(a.type)));
+      document.documentElement.classList.toggle("nx-kb", typing && window.innerHeight < full * 0.8);
+    });
   }
 
   // escape hatch: if the engine fails to come up, offer the classic interface
