@@ -1050,9 +1050,10 @@ EOF
       [ -n "$_mit" ] || continue   # a dir with no restorable component is not a backup
       _mts="$(stat -c %Y "$_mp" 2>/dev/null || echo 0)"; case "$_mts" in ''|*[!0-9]*) _mts=0 ;; esac
       _mnt="$("$JQ" -c '{note:(.note//""),tags:((.tags//[])|map(select(type=="string")))}' "$_mp/note.json" 2>/dev/null)"; case "$_mnt" in '') _mnt='{"note":"","tags":[]}' ;; esac
+      _mlb="$("$JQ" -r '.package.label // empty' "$_mp/meta.json" 2>/dev/null)"; [ -n "$_mlb" ] || _mlb="$_mpkg"
       [ "$first" = 1 ] || printf ','; first=0
       printf '{"ref":"%s","package":"%s","label":"%s","mode":"mirror","dest":"local","versionName":"","versionCode":0,"created_at":%s000,"note":%s,"tags":%s,"items":[%s]}' \
-        "$(jstr "$_mp")" "$(jstr "$_mpkg")" "$(jstr "$_mpkg")" "$_mts" \
+        "$(jstr "$_mp")" "$(jstr "$_mpkg")" "$(jstr "$_mlb")" "$_mts" \
         "$(printf '%s' "$_mnt" | "$JQ" -c '.note')" "$(printf '%s' "$_mnt" | "$JQ" -c '.tags')" "${_mit%,}"
     done
     printf ']}\n' ;;
@@ -1155,6 +1156,13 @@ EOF
         insts=$(( insts + _c )); _b="${d%/}"; printf '%s\n' "${_b##*/}" >> "$_ovapps"
       done
       for d in "$_r"/.paths/*/; do [ -d "$d" ] && paths=$(( paths + 1 )); done
+      # Mirror backups: one live copy per app under .mirror/vdbackup/<pkg>, listed like list-backups
+      for d in "$_r"/.mirror/vdbackup/*/; do
+        [ -d "$d" ] || continue
+        _c=0; for s in data data_de external obb media apk; do [ -d "$d$s" ] && _c=1; done
+        [ "$_c" = 1 ] || continue
+        insts=$(( insts + 1 )); _b="${d%/}"; printf '%s\n' "${_b##*/}" >> "$_ovapps"
+      done
       _sk="$(du -sk "$_r" 2>/dev/null | cut -f1)"; case "$_sk" in ''|*[!0-9]*) _sk=0 ;; esac
       size="$("$JQ" -n "${size:-0} + ${_sk:-0} * 1024")"   # toybox du: -k (KiB), never -B
     done
@@ -1227,7 +1235,10 @@ EOF
     printf '%s' "$ARGS_B64" | base64 -d 2>/dev/null | "$JQ" -r '.refs[]? | strings' 2>/dev/null \
       | while IFS= read -r ref; do
           [ -n "$(ref_root "$ref")" ] || continue
-          [ -f "$ref/manifest.json" ] || continue
+          if [ ! -f "$ref/manifest.json" ]; then   # a Mirror: the icon is in its meta.json
+            [ -f "$ref/meta.json" ] && "$JQ" -c --arg r "$ref" '{($r): (.package.icon // "")}' "$ref/meta.json" 2>/dev/null
+            continue
+          fi
           if [ -f "$ref/manifest.full.age" ]; then
             "$JQ" -c -n --arg r "$ref" --arg ic "$(backup_listing "$ref" | "$JQ" -r '.icon // ""' 2>/dev/null)" '{($r): $ic}'
           else

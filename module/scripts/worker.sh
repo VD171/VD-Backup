@@ -1189,7 +1189,20 @@ do_mirror() {
   prog 88 mirror media;    echo " $ITEMS " | grep -q ' media '    && sync_one media    "/data/media/$U/Android/media/$PKG" 88
   # framework state (perms/appops/grants/enabled) so Mirror restore matches Full's
   # permission fidelity; a small meta.json beside the mirrored trees.
-  _mmeta="$STATE/staging/mmeta.$OPID.json"; fwstate_capture > "$_mmeta" 2>/dev/null
+  # plus the app name and icon, so the Backups list can show them (a mirror has no manifest)
+  _mlb=""; _mic=""
+  if [ -f "$MODDIR/etc/vdbackup_helper.dex" ]; then
+    _mlb="$(LD_LIBRARY_PATH='' app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" \
+        /system/bin ru.vd171.vdbackup.Helper label "$PKG" "$U" 2>/dev/null | "$JQ" -r '.label // empty' 2>/dev/null)"
+    _mip="$STATE/staging/mic.$OPID.png"
+    LD_LIBRARY_PATH='' app_process -Djava.class.path="$MODDIR/etc/vdbackup_helper.dex" /system/bin \
+      ru.vd171.vdbackup.Helper icon "$PKG" "$_mip" "$U" >/dev/null 2>&1
+    [ -s "$_mip" ] && _mic="$(base64 < "$_mip" | tr -d '\n')"
+    rm -f "$_mip"
+  fi
+  _mmeta="$STATE/staging/mmeta.$OPID.json"
+  fwstate_capture 2>/dev/null | "$JQ" --arg n "$PKG" --arg l "${_mlb:-$PKG}" --arg i "$_mic" \
+    '.package += {name:$n, label:$l, icon:$i}' > "$_mmeta" 2>/dev/null
   case "$DTYPE" in
     local)  mkdir -p "$(remote_pfx)/$PKG" && cp "$_mmeta" "$(remote_pfx)/$PKG/meta.json" 2>/dev/null ;;
     rclone) exec_ns "$RCLONE" --config "$SECRETS/rclone.conf" copyto "$_mmeta" "$DREMOTE:$(remote_pfx)/$PKG/meta.json" >/dev/null 2>&1 ;;
