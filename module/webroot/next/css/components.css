@@ -45,7 +45,7 @@
 .nx-tbtn:active { background: var(--accent-soft); }
 
 /* ---- form controls ---- */
-input[type="text"], input[type="search"], input[type="password"], input[type="number"], input[type="time"],
+input[type="text"], input[type="search"], input[type="password"], input[type="number"], input[type="time"], input[type="tel"],
 select, textarea {
   width: 100%; min-height: var(--tap); padding: 0 14px; border-radius: var(--r-sm);
   border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font-size: 15px;
@@ -141,6 +141,7 @@ input[type="checkbox"]:not(.switch):not(.selbox), input[type="radio"] { width: 2
 [dir="rtl"] .row .pkg { text-align: end; }
 .row .sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
 .row:has(> .btn + .btn) .name { white-space: normal; overflow-wrap: anywhere; }
+.row .name.nx-pkgname { white-space: normal; overflow-wrap: anywhere; }
 .row > span.grow { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .app-ic { width: 42px; height: 42px; flex: none; border-radius: 12px; background: var(--surface-3); color: var(--muted);
   display: grid; place-items: center; font-weight: 800; font-size: 17px; background-size: cover; background-position: center; }
@@ -328,9 +329,8 @@ details.grp[open] > summary.section-head { border-color: var(--accent-line, var(
 .banner-title { font-weight: 700; }
 .banner-msg { color: var(--muted); font-size: 13px; line-height: 1.5; white-space: pre-line; }
 .banner-x { border: 0; background: none; color: var(--muted); font-size: 22px; line-height: 1; padding: 0 4px; }
-.swatches { display: flex; gap: 10px; align-items: center; overflow-x: auto; padding: 4px 2px 6px; scrollbar-width: none; }
-.swatches::-webkit-scrollbar { display: none; }
-.swatch { width: 34px; height: 34px; flex: none; padding: 0; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--line-2); }
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 4px 2px 6px; }
+.swatch { width: 40px; height: 40px; flex: none; padding: 0; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--line-2); }
 .swatch-reset { background: var(--surface-2); color: var(--muted); font-size: 18px; line-height: 1; }
 .swatch-custom { -webkit-appearance: none; appearance: none; background: none; overflow: hidden; }
 .swatch-custom::-webkit-color-swatch-wrapper { padding: 0; }

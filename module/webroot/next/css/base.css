@@ -82,6 +82,8 @@ body.nx-in-sub .nx-ver { display: none; }
   height: calc(var(--nav-h) + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
   display: flex; background: var(--surface); border-top: 1px solid var(--line);
 }
+/* the keyboard is up: its room goes to the field being typed in */
+.nx-kb .nx-nav, .nx-kb .ops:not(.nx-open) { display: none; }
 .nx-nav .tab { flex: 1 1 0; min-width: 0; border: 0; background: none; color: var(--muted);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   font-size: 12px; font-weight: 600; padding: 0 2px; }
