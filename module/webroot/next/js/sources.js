@@ -138,6 +138,7 @@ var NX_SRC = (function () {
       return chain;
     }).catch(function () {});
   }
+  function stale() { order.forEach(function (id) { src[id].at = 0; }); }   // reload each on its next load()
   function reload(id) { var s = src[id]; return s ? fetchOne(s) : Promise.resolve(); }
 
   // the engine's list-backups result (called from its renderBackups)
@@ -181,7 +182,7 @@ var NX_SRC = (function () {
   }
 
   return {
-    on: function (f) { subs.push(f); }, load: load, reload: reload, setLocal: setLocal, setLocalSize: setLocalSize,
+    on: function (f) { subs.push(f); }, load: load, reload: reload, stale: stale, setLocal: setLocal, setLocalSize: setLocalSize,
     all: all, stats: stats, when: when,
     list: function () { return order.map(function (id) { return src[id]; }); },
     get: function (id) { return src[id]; },

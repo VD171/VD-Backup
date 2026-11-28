@@ -181,7 +181,7 @@ var NX_RS = (function () {
       rows.push({ li: li, x: x });
     });
     all.forEach(function (x) {
-      if (x.in[0] === "local") return;
+      if (x.in[0] === "local" || bkSelectMode) return;   // batch restore / delete take local backups only
       if (q && !bkMatch({ package: x.e.package, label: x.e.label }, q)) return;
       rows.push({ li: remoteRow(x), x: x });
     });
@@ -267,6 +267,34 @@ var NX_RS = (function () {
       NX_SRC.setLocal(BACKUPS);
     };
   }
-  NX_SRC.on(draw);
+  // each source reports loading, then its list: redraw once per frame, not once per report
+  var queued = false;
+  NX_SRC.on(function () {
+    if (queued) return; queued = true;
+    requestAnimationFrame(function () { queued = false; draw(); });
+  });
+
+  // an op card leaves the bar when its op ends: backups may have changed on any source, so
+  // reload now when Restore is on screen (any other visit reloads through switchTab)
+  var opsBox = $id("ops");
+  if (opsBox) new MutationObserver(function (recs) {
+    if (!recs.some(function (r) { return r.removedNodes.length; })) return;
+    NX_SRC.stale();
+    var p = $id("backups");
+    if (p && p.classList.contains("active")) { loadBackups(); NX_SRC.load(false); }
+  }).observe(opsBox, { childList: true });
+
+  // Select > All takes the rows on screen: the engine's version also picked backups the
+  // filter chips hide, which a batch delete would then remove unseen
+  document.addEventListener("DOMContentLoaded", function () {
+    var all = $id("bk-selall"); if (!all) return;
+    all.onclick = function () {
+      Array.prototype.forEach.call($id("backuplist").children, function (li) {
+        var b = li._nxb;
+        if (b && !li.hidden && b.mode !== "mirror") bkSelected[b.ref] = { ref: b.ref, package: b.package, items: b.items };
+      });
+      updateBkSelCount(); renderBackups(BACKUPS);
+    };
+  });
   return { draw: draw, show: show };
 })();
