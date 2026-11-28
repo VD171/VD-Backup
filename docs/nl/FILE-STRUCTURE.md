@@ -41,8 +41,10 @@ VD-Backup/
 └── .github/
     ├── workflows/ci.yml            # build/sanity on every push & PR
     ├── workflows/VD-Backup.yml     # manual release (workflow_dispatch)
+    ├── workflows/refresh-release-notes.yml  # re-publish a release's notes (bot, no rebuild)
     ├── scripts/version.sh          # version bump (v1.0 -> v1.01 ...) + update.json
     ├── scripts/build_bin.sh        # build the per-ABI static binaries
+    ├── scripts/release-notes-body.sh  # release body: changelog + @Priv8_VD banner
     ├── ISSUE_TEMPLATE/             # bug / feature templates
     └── PULL_REQUEST_TEMPLATE.md
 ```
