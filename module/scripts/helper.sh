@@ -174,6 +174,30 @@ mkdir -p "$LOGS"
 
 # --- tiny JSON helpers (no jq dependency) -------------------------------
 jstr() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/\t/\\t/g'; }
+# restic REST repo: http(s)://[user:pass@]host/path, rest: prefix optional. The login moves to
+# RESTIC_REST_USERNAME/PASSWORD (restic >= 0.17): special chars work as typed, never in argv.
+restic_repo() {   # <repo> ; sets RREPO, exports/unsets the REST credentials
+  RREPO="$(printf '%s' "$1" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+  unset RESTIC_REST_USERNAME RESTIC_REST_PASSWORD
+  case "$RREPO" in http://*|https://*) RREPO="rest:$RREPO" ;; esac
+  case "$RREPO" in rest:http://*@*|rest:https://*@*) : ;; *) return 0 ;; esac
+  _rr="${RREPO#rest:}"; _rs="${_rr%%://*}"; _rr="${_rr#*://}"
+  _ru="${_rr%@*}"; _rr="${_rr##*@}"   # last @: the password may contain @ or /
+  RREPO="rest:$_rs://$_rr"
+  case "$_ru" in *:*) _rp="${_ru#*:}"; _ru="${_ru%%:*}" ;; *) _rp="" ;; esac
+  RESTIC_REST_USERNAME="$(pct_dec "$_ru")"; RESTIC_REST_PASSWORD="$(pct_dec "$_rp")"
+  export RESTIC_REST_USERNAME RESTIC_REST_PASSWORD
+}
+pct_dec() {   # <s> ; decodes %HH escapes, the rest is kept as typed
+  _pi="$1"; _po=""
+  while :; do
+    case "$_pi" in *%[0-9A-Fa-f][0-9A-Fa-f]*) : ;; *) break ;; esac
+    _pp="${_pi%%%[0-9A-Fa-f][0-9A-Fa-f]*}"; _pi="${_pi#"$_pp"%}"
+    _ph="${_pi%"${_pi#??}"}"; _pi="${_pi#??}"
+    _po="$_po$_pp$(printf '%b' "\\0$(printf '%03o' "$((0x$_ph))")")"
+  done
+  printf '%s' "$_po$_pi"
+}
 ok()   { printf '{"ok":true,%s}\n'  "$1"; }
 err()  { printf '{"ok":false,"code":"%s","message":"%s"}\n' "$1" "$(jstr "$2")"; }
 
@@ -1417,7 +1441,8 @@ EOF
     case "$t" in
       local)  p="$("$JQ" -r '.path // empty' "$f")"; [ -d "${p:-$(bdir 0)}" ] && ok '"reachable":true' || err ERR_DEST_UNREACH "path not found" ;;
       rclone) rem="$("$JQ" -r '.remote // empty' "$f")"; "$BIN/rclone" --config "$SECRETS/rclone.conf" lsd "$rem:" >/dev/null 2>&1 && ok '"reachable":true' || err ERR_DEST_AUTH "rclone remote unreachable" ;;
-      restic) repo="$("$JQ" -r '.repo // empty' "$f")"; RESTIC_PASSWORD_FILE="$SECRETS/creds/$id.pass" "$BIN/restic" -r "$repo" snapshots >/dev/null 2>&1 && ok '"reachable":true' || err ERR_DEST_AUTH "restic repo unreachable" ;;
+      restic) restic_repo "$("$JQ" -r '.repo // empty' "$f")"; _rb="$BIN/restic"; [ -x "$_rb" ] || _rb="$STATE/bin/restic"   # lite: fetched copy
+        RESTIC_PASSWORD_FILE="$SECRETS/creds/$id.pass" "$_rb" -r "$RREPO" snapshots >/dev/null 2>&1 && ok '"reachable":true' || err ERR_DEST_AUTH "restic repo unreachable" ;;
       gdrive) cp="ru.vd171.vdbackup"; pm path "$cp" >/dev/null 2>&1 || { err ERR_COMPANION "Google Drive companion not installed"; exit 0; }
         drv="/data/data/$cp/files"; au="$(stat -c %u "/data/data/$cp" 2>/dev/null)"; mkdir -p "$drv" 2>/dev/null
         case "$au" in ''|*[!0-9]*) : ;; *) chown "$au:$au" "$drv" 2>/dev/null ;; esac; restorecon "$drv" 2>/dev/null

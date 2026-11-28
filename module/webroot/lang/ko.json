@@ -587,6 +587,7 @@
   "settings_relaunch": "백업 후 앱 다시 열기",
   "settings_relaunch_hint": "단일 백업 후, 스냅샷을 위해 일시 중지될 때 실행 중이던 앱을 다시 엽니다. 기본적으로 꺼짐. 일괄 및 예약 백업에는 영향을 주지 않습니다.",
   "ui_dest_gdrive_hint": "Google 드라이브 컴패니언 앱에는 빌드 시점에 설정되는 전용 Google Cloud OAuth 클라이언트가 필요합니다. 설정 없이 드라이브를 사용하려면 대신 아래에 \"Google Drive (rclone)\" 대상을 추가하세요.",
+  "ui_dest_restic_hint": "저장소: 로컬 경로 또는 http://host:8000/repo 형식의 REST 서버(서버에 로그인이 필요하면 호스트 앞에 user:password@를 추가하세요. rest: 접두사는 선택 사항입니다). 비밀번호 칸에는 restic 저장소 비밀번호를 입력합니다.",
   "settings_reset": "초기화 / 처음부터 다시 시작",
   "settings_reset_hint": "처음부터 다시 시작하기 위해 지울 항목을 선택하세요. 이 작업은 영구적이며 되돌릴 수 없습니다. 클라우드 리모트는 건드리지 않으며, 이 모듈 자체의 설정과 로컬 백업만 삭제됩니다.",
   "settings_reset_config": "설정 초기화 (대상, 예약, 프리셋, 자격 증명)",

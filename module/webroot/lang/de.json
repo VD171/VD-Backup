@@ -587,6 +587,7 @@
   "settings_relaunch": "Apps nach einem Backup erneut öffnen",
   "settings_relaunch_hint": "Nach einem einzelnen Backup wird die App erneut geöffnet, die lief, als sie für den Snapshot pausiert wurde. Standardmäßig deaktiviert; Sammel- und geplante Backups sind nicht betroffen.",
   "ui_dest_gdrive_hint": "Die Google Drive Begleit-App benötigt einen eigenen Google Cloud OAuth-Client, der zur Build-Zeit festgelegt wird. Für Drive ohne Einrichtung stattdessen unten ein \"Google Drive (rclone)\"-Ziel hinzufügen.",
+  "ui_dest_restic_hint": "Repository: ein lokaler Pfad oder ein REST-Server als http://host:8000/repo (user:password@ vor dem Host einfügen, wenn der Server eine Anmeldung verlangt; das Präfix rest: ist optional). Das Passwortfeld ist das Passwort des restic-Repositorys.",
   "settings_reset": "Zurücksetzen / neu beginnen",
   "settings_reset_hint": "Wählen Sie aus, was gelöscht werden soll, um neu zu beginnen. Dies ist dauerhaft und kann nicht rückgängig gemacht werden. Cloud-Remotes werden nie angetastet - nur die eigenen Einstellungen dieses Moduls und die lokalen Backups.",
   "settings_reset_config": "Einstellungen zurücksetzen (Ziele, Zeitpläne, Voreinstellungen, Zugangsdaten)",

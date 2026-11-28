@@ -587,6 +587,7 @@
   "settings_relaunch": "备份后重新打开应用",
   "settings_relaunch_hint": "单次备份后，重新打开为制作快照而被暂停、当时正在运行的应用。默认关闭；不影响批量备份和计划备份。",
   "ui_dest_gdrive_hint": "Google 云端硬盘配套应用需要在构建时设置自己的 Google Cloud OAuth 客户端。若要无需任何设置即可使用云端硬盘，请改为在下方添加一个 \"Google Drive (rclone)\" 目标。",
+  "ui_dest_restic_hint": "仓库：本地路径，或 REST 服务器，格式为 http://host:8000/repo（如果服务器需要登录，请在主机前加上 user:password@；rest: 前缀可省略）。密码栏填写 restic 仓库密码。",
   "settings_reset": "重置 / 重新开始",
   "settings_reset_hint": "选择要清除的内容以重新开始。此操作是永久性的，无法撤销。云端远程永远不会被触及 - 只会清除此模块自己的设置和本地备份。",
   "settings_reset_config": "重置设置（目标、计划、预设、凭据）",

@@ -587,6 +587,7 @@
   "settings_relaunch": "Reabrir las apps tras una copia",
   "settings_relaunch_hint": "Tras una copia individual, se reabre la app que estaba en ejecución cuando se pausó para la instantánea. Desactivado de forma predeterminada; las copias por lotes y programadas no se ven afectadas.",
   "ui_dest_gdrive_hint": "El complemento de Google Drive necesita su propio cliente OAuth de Google Cloud configurado en tiempo de compilación. Para usar Drive sin configuración, añade abajo un destino \"Google Drive (rclone)\" en su lugar.",
+  "ui_dest_restic_hint": "Repositorio: una ruta local o un servidor REST como http://host:8000/repo (añade user:password@ antes del host si el servidor pide inicio de sesión; el prefijo rest: es opcional). El campo de contraseña es la contraseña del repositorio restic.",
   "settings_reset": "Restablecer / empezar de cero",
   "settings_reset_hint": "Elige qué borrar para empezar de nuevo. Esto es permanente y no se puede deshacer. Los remotos en la nube nunca se tocan - solo los propios ajustes de este módulo y las copias de seguridad locales.",
   "settings_reset_config": "Restablecer ajustes (destinos, programaciones, ajustes predefinidos, credenciales)",

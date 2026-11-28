@@ -587,6 +587,7 @@
   "settings_relaunch": "Reopen apps after a backup",
   "settings_relaunch_hint": "After a single backup, reopen the app that was running when it was paused for the snapshot. Off by default; batch and scheduled backups are not affected.",
   "ui_dest_gdrive_hint": "The Google Drive companion needs its own Google Cloud OAuth client set at build time. For Drive with no setup, add a \"Google Drive (rclone)\" remote below instead.",
+  "ui_dest_restic_hint": "Repository: a local path, or a REST server as http://host:8000/repo (add user:password@ before the host if the server needs a login; the rest: prefix is optional). The password field is the restic repository password.",
   "settings_reset": "Reset / start fresh",
   "settings_reset_hint": "Choose what to wipe to start over. This is permanent and cannot be undone. Cloud remotes are never touched - only this module's own settings and local backups.",
   "settings_reset_config": "Reset settings (destinations, schedules, presets, credentials)",

@@ -587,6 +587,7 @@
   "settings_relaunch": "Reabrir apps após um backup",
   "settings_relaunch_hint": "Após um backup único, reabre o app que estava em execução quando foi pausado para o snapshot. Desativado por padrão; backups em lote e agendados não são afetados.",
   "ui_dest_gdrive_hint": "O complemento do Google Drive precisa do próprio cliente OAuth do Google Cloud definido no momento da compilação. Para usar o Drive sem configuração, adicione abaixo um destino \"Google Drive (rclone)\" em vez disso.",
+  "ui_dest_restic_hint": "Repositório: um caminho local, ou um servidor REST como http://host:8000/repo (adicione user:password@ antes do host se o servidor exigir login; o prefixo rest: é opcional). O campo de senha é a senha do repositório restic.",
   "settings_reset": "Redefinir / começar do zero",
   "settings_reset_hint": "Escolha o que apagar para recomeçar. Isso é permanente e não pode ser desfeito. Os remotos na nuvem nunca são tocados - apenas as próprias configurações deste módulo e os backups locais.",
   "settings_reset_config": "Redefinir configurações (destinos, agendamentos, presets, credenciais)",

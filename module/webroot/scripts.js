@@ -984,7 +984,9 @@ function renderDests(list) {
   (list || []).forEach(function (d) {
     var li = el("li", "row"), grow = el("div", "grow");
     grow.appendChild(el("div", "name", d.id + "  (" + d.type + ")"));
-    grow.appendChild(el("div", "pkg", d.remote || d.repo || d.path || ""));
+    // hide the password of a restic REST repo URL
+    var repo = (d.repo || "").replace(/^((?:rest:)?https?:\/\/[^:@\/]*):.*@/, "$1:***@");
+    grow.appendChild(el("div", "pkg", d.remote || repo || d.path || ""));
     var t = el("button", "btn", I18N.t("test")); t.onclick = function () { testDest(d.id); };
     var x = el("button", "btn", I18N.t("delete")); x.onclick = function () { delDest(d.id); };
     li.appendChild(grow); li.appendChild(t); li.appendChild(x); ul.appendChild(li);
@@ -1246,6 +1248,7 @@ function syncDestFields() {
   set("#remote-box", type === "rclone");
   var hint = $("#d-rclone-hint"); if (hint) hint.hidden = (type !== "rclone");
   var ghint = $("#d-gdrive-hint"); if (ghint) ghint.hidden = (type !== "gdrive");
+  var rhint = $("#d-restic-hint"); if (rhint) rhint.hidden = (type !== "restic");
 }
 // jump to the Add-cloud-remote section and briefly highlight it, so choosing the
 // rclone destination type makes clear that a remote is required and where to add it.

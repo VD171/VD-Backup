@@ -587,6 +587,7 @@
   "settings_relaunch": "Yedeklemeden sonra uygulamaları yeniden aç",
   "settings_relaunch_hint": "Tek bir yedeklemeden sonra, anlık görüntü için duraklatıldığında çalışmakta olan uygulamayı yeniden aç. Varsayılan olarak kapalı; toplu ve zamanlanmış yedeklemeleri etkilemez.",
   "ui_dest_gdrive_hint": "Google Drive yardımcı uygulaması, derleme sırasında ayarlanan kendi Google Cloud OAuth istemcisine ihtiyaç duyar. Kurulum gerektirmeyen Drive için bunun yerine aşağıya bir \"Google Drive (rclone)\" hedefi ekleyin.",
+  "ui_dest_restic_hint": "Depo: yerel bir yol veya http://host:8000/repo biçiminde bir REST sunucusu (sunucu oturum açma istiyorsa ana bilgisayardan önce user:password@ ekleyin; rest: öneki isteğe bağlıdır). Parola alanı restic deposunun parolasıdır.",
   "settings_reset": "Sıfırla / baştan başla",
   "settings_reset_hint": "Baştan başlamak için neyin silineceğini seçin. Bu kalıcıdır ve geri alınamaz. Bulut uzak birimlerine asla dokunulmaz - yalnızca bu modülün kendi ayarları ve yerel yedekleri.",
   "settings_reset_config": "Ayarları sıfırla (hedefler, zamanlamalar, ön ayarlar, kimlik bilgileri)",

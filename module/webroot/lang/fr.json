@@ -587,6 +587,7 @@
   "settings_relaunch": "Rouvrir les applis après une sauvegarde",
   "settings_relaunch_hint": "Après une sauvegarde individuelle, l'appli qui était en cours d'exécution lorsqu'elle a été mise en pause pour l'instantané est rouverte. Désactivé par défaut ; les sauvegardes par lots et planifiées ne sont pas concernées.",
   "ui_dest_gdrive_hint": "L'application compagnon Google Drive nécessite son propre client OAuth Google Cloud défini au moment de la compilation. Pour utiliser Drive sans configuration, ajoutez plutôt ci-dessous une destination \"Google Drive (rclone)\".",
+  "ui_dest_restic_hint": "Dépôt : un chemin local, ou un serveur REST sous la forme http://host:8000/repo (ajoutez user:password@ avant l'hôte si le serveur demande une connexion ; le préfixe rest: est facultatif). Le champ mot de passe est le mot de passe du dépôt restic.",
   "settings_reset": "Réinitialiser / repartir de zéro",
   "settings_reset_hint": "Choisissez ce qu'il faut effacer pour repartir de zéro. Cette action est permanente et irréversible. Les distants cloud ne sont jamais touchés - seuls les réglages propres à ce module et les sauvegardes locales sont concernés.",
   "settings_reset_config": "Réinitialiser les réglages (destinations, planifications, préréglages, identifiants)",

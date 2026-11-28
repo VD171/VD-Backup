@@ -587,6 +587,7 @@
   "settings_relaunch": "Buka kembali aplikasi setelah pencadangan",
   "settings_relaunch_hint": "Setelah satu pencadangan, buka kembali aplikasi yang sedang berjalan saat dijeda untuk snapshot. Mati secara bawaan; pencadangan massal dan terjadwal tidak terpengaruh.",
   "ui_dest_gdrive_hint": "Aplikasi pendamping Google Drive memerlukan klien OAuth Google Cloud tersendiri yang disetel saat build. Untuk Drive tanpa penyiapan, tambahkan tujuan \"Google Drive (rclone)\" di bawah ini sebagai gantinya.",
+  "ui_dest_restic_hint": "Repositori: path lokal, atau server REST seperti http://host:8000/repo (tambahkan user:password@ sebelum host jika server memerlukan login; prefiks rest: opsional). Kolom kata sandi adalah kata sandi repositori restic.",
   "settings_reset": "Setel ulang / mulai dari awal",
   "settings_reset_hint": "Pilih apa yang ingin dihapus untuk mulai dari awal. Ini permanen dan tidak dapat dibatalkan. Remote cloud tidak pernah disentuh - hanya pengaturan modul ini sendiri dan cadangan lokal.",
   "settings_reset_config": "Setel ulang pengaturan (tujuan, jadwal, praset, kredensial)",
